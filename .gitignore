@@ -1,8 +1,21 @@
-node_modules/
-.env
-dist/
-coverage/
+# Visual Studio
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build folders
+Debug/
+Release/
+
+# Logs
 *.log
-.vscode/
-.idea/
-.DS_Store
+
+
+
+
+
+
