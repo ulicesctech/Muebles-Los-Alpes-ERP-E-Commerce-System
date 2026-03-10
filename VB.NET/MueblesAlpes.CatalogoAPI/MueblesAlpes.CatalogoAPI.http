@@ -1,6 +1,0 @@
-@MueblesAlpes.CatalogoAPI_HostAddress = http://localhost:5078
-
-GET {{MueblesAlpes.CatalogoAPI_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
