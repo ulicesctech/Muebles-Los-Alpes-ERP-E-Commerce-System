@@ -1,243 +1,53 @@
-<<<<<<< HEAD
-# ============================================================
-# .gitignore - ASP.NET Web Forms (VB.NET) + Visual Studio 2022
-# Oracle scripts / PL-SQL included, secrets excluded
-# ============================================================
-
-# ----------------------------
-# Visual Studio (VS 2022)
-# ----------------------------
+# =========================
+# Visual Studio / VS2022
+# =========================
 .vs/
-=======
-##################################################
-# Visual Studio
-##################################################
-
-.vs/
-*.user
->>>>>>> f6d9fa3fa44a22dae82a7861a6c96c98727599d3
+**/.vs/
 *.suo
 *.user
 *.userosscache
 *.sln.docstates
-*.VC.db
-*.VC.opendb
-*.cache
-*.pdb
-*.ilk
-*.tlog
 
-<<<<<<< HEAD
-# ReSharper / Rider / JetBrains
-_ReSharper*/
-*.DotSettings.user
-.idea/
-
-# Visual Studio Code (optional)
-.vscode/
-
-# ----------------------------
 # Build outputs
-# ----------------------------
-[Bb]in/
-[Oo]bj/
-[Dd]ebug*/
-[Rr]elease*/
-x64/
-x86/
-[Aa]ny [Cc]PU/
-build/
-artifacts/
+**/bin/
+**/obj/
+**/Debug/
+**/Release/
+**/x64/
+**/x86/
+**/AnyCPU/
 
-# ASP.NET compilation / publish
-*.Publish.xml
-*.publish.xml
-PublishProfiles/
-publish/
-AppPackages/
+# ASP.NET / Publish
+**/App_Data/*.mdf
+**/App_Data/*.ldf
+**/PublishProfiles/
 
-# ----------------------------
-# ASP.NET Web Forms / IIS Express
-# ----------------------------
-# Local IIS Express config
-.vs/config/
-iisexpress/
-applicationhost.config
-
-# ASP.NET local data (if used)
-# NOTE: App_Data is often for local dev db/files; normally don't commit
-**/App_Data/
-
-# ----------------------------
 # NuGet
-# ----------------------------
-# Old style packages folder
-packages/
-
-# Newer lock / restore artifacts
+**/packages/
 *.nupkg
 *.snupkg
-*.nuspec
-project.lock.json
-packages.lock.json
 .nuget/
 
-# ----------------------------
-# Test results
-# ----------------------------
-TestResults/
-*.trx
-*.coverage
-*.coveragexml
-
-# ----------------------------
 # Logs
-# ----------------------------
-=======
-##################################################
-# Build results
-##################################################
-
-[Bb]in/
-[Oo]bj/
-Debug/
-Release/
-x64/
-x86/
-
-##################################################
-# ASP.NET
-##################################################
-
-App_Data/*.mdf
-App_Data/*.ldf
-
-##################################################
-# NuGet
-##################################################
-
-packages/
-*.nupkg
-*.snupkg
-
-# Excepto packages.config
-!**/packages.config
-
-##################################################
-# Logs
-##################################################
-
->>>>>>> f6d9fa3fa44a22dae82a7861a6c96c98727599d3
 *.log
-logs/
-**/logs/
 
-<<<<<<< HEAD
-# ----------------------------
-# Secrets / configs (DO NOT COMMIT)
-# ----------------------------
-# Web.config contains connectionStrings in Web Forms -> NEVER commit real one
-**/Web.config
-**/Web.Debug.config
-**/Web.Release.config
-**/connectionStrings.config
-
-# .NET Core style (if you have any API later)
-**/appsettings.json
-**/appsettings.*.json
-**/secrets.json
-=======
-##################################################
-# Web.config transforms
-##################################################
-
-Web.Debug.config
-Web.Release.config
-
-##################################################
-# OS
-##################################################
-
-.DS_Store
-Thumbs.db
-
-##################################################
-# Node (por si luego agregamos frontend moderno)
-##################################################
-
-node_modules/
-dist/
-build/
-
-##################################################
-# Secrets
-##################################################
-
-*.env
-*.env.local
->>>>>>> f6d9fa3fa44a22dae82a7861a6c96c98727599d3
-
-# Env files
-**/.env
-**/.env.*
-**/*.env
-
-# Keys / certs
-*.pfx
-*.p12
-*.pem
-*.key
-*.crt
-*.cer
-
-# ----------------------------
-# Oracle / SQL Developer / DB exports (do not commit)
-# ----------------------------
-# SQL Developer settings/cache
-*.jdb
-*.jde
-*.jfm
-
-# Oracle dumps / traces / audit files
-*.dmp
-*.trc
-*.aud
-
-# Wallet / network files (keep examples only)
-**/wallet*/
-**/tnsnames.ora
-**/sqlnet.ora
-**/listener.ora
-
-# ----------------------------
-# OS junk (Windows)
-# ----------------------------
+# OS files
 Thumbs.db
 ehthumbs.db
 Desktop.ini
-$RECYCLE.BIN/
+.DS_Store
+
+# Temporary files
 *.tmp
 *.temp
 *.bak
-*.old
 *.swp
-*.swo
 
-# ----------------------------
-# Virtual Machines / snapshots (too big for git)
-# ----------------------------
-*.ova
-*.ovf
-*.vdi
-*.vmdk
-*.vhd
-*.vhdx
-*.qcow2
-
-# ----------------------------
-# OPTIONAL: Front-end libraries
-# ----------------------------
-# If you use LibMan/npm/bower etc, adjust as needed
-node_modules/
-bower_components/
-dist/
+# Security (no quemar config/credenciales)
+**/Web.config.user
+**/appsettings.*.json
+**/*.secrets.json
+**/*.pfx
+**/*.cer
+**/*.key
+.env
