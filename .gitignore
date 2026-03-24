@@ -43,7 +43,11 @@ Desktop.ini
 *.bak
 *.swp
 
-# Security (no quemar config/credenciales)
+# =========================
+# SEGURIDAD — Credenciales
+# NO subir al repositorio
+# =========================
+**/Web.config
 **/Web.config.user
 **/appsettings.*.json
 **/*.secrets.json
@@ -51,3 +55,6 @@ Desktop.ini
 **/*.cer
 **/*.key
 .env
+
+# EXCEPCIÓN: el ejemplo SÍ va al repo
+!**/Web.config.example
