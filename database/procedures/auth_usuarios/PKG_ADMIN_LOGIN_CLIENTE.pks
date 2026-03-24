@@ -1,0 +1,18 @@
+CREATE OR REPLACE PACKAGE PKG_ADMIN_LOGIN_CLIENTE AS
+  PROCEDURE LOGC_CREAR(
+    p_id_cliente IN NUMBER, 
+    p_usuario IN VARCHAR2, 
+    p_password IN VARCHAR2
+    );
+
+  PROCEDURE LOGC_ACTUALIZAR_PWD(
+    p_id_cliente IN NUMBER, 
+    p_password IN VARCHAR2
+    );
+
+  PROCEDURE LOGC_ELIMINAR(
+    p_id_cliente IN NUMBER
+    );
+  PROCEDURE LOGC_AUTENTICAR(p_usuario IN VARCHAR2, p_password IN VARCHAR2, p_id_cliente OUT NUMBER);
+END PKG_ADMIN_LOGIN_CLIENTE;
+/

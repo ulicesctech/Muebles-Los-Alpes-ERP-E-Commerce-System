@@ -1,0 +1,22 @@
+CREATE OR REPLACE PACKAGE PKG_RH_PUESTO AS
+  PROCEDURE PUE_CREAR(
+    p_nombre IN VARCHAR2, 
+    p_salario IN NUMBER, 
+    p_descripcion IN VARCHAR2, 
+    p_id OUT NUMBER
+    );
+
+  PROCEDURE PUE_ACTUALIZAR(
+    p_id IN NUMBER, 
+    p_nombre IN VARCHAR2, 
+    p_salario IN NUMBER, 
+    p_descripcion IN VARCHAR2
+    );
+
+  PROCEDURE PUE_ELIMINAR(
+    p_id IN NUMBER
+  );
+  
+  PROCEDURE PUE_LISTAR(p_data OUT SYS_REFCURSOR);
+END PKG_RH_PUESTO;
+/
