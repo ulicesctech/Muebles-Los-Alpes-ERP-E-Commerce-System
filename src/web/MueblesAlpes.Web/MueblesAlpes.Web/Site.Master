@@ -12,12 +12,156 @@
     <webopt:bundlereference runat="server" path="~/Content/css" />
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <style>
-        body { background-color: #f5f5f5; }
-        .navbar-brand { font-weight: bold; letter-spacing: 1px; }
-        .dropdown-menu { min-width: 200px; }
-        .footer { margin-top: 40px; padding: 20px 0; border-top: 1px solid #e5e5e5; color: #888; }
-        .page-header { border-bottom: 2px solid #d4a843; margin-bottom: 20px; }
-        .page-header h2 { color: #333; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f0ebe0; color: #333; }
+
+        /* NAV */
+        .nav-main { background: #1a0e05; padding: 0 30px; border-bottom: 2px solid #C9973A; }
+        .nav-main > ul { list-style: none; display: flex; margin: 0; padding: 0; }
+        .nav-main > ul > li { position: relative; }
+        .nav-main > ul > li > a {
+            color: rgba(240,217,160,0.85);
+            text-decoration: none;
+            padding: 14px 18px;
+            font-size: 13px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            font-family: Arial, sans-serif;
+            letter-spacing: 0.3px;
+        }
+        .nav-main > ul > li > a:hover {
+            color: #C9973A;
+            border-bottom-color: #C9973A;
+            background: rgba(201,151,58,0.06);
+        }
+
+        /* DROPDOWN */
+        .nav-main > ul > li:hover .dropdown-nav { display: block; }
+        .dropdown-nav {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #1a0e05;
+            min-width: 230px;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+            z-index: 9999;
+            border-top: 3px solid #C9973A;
+            overflow: hidden;
+        }
+        .dropdown-nav a {
+            color: rgba(240,217,160,0.75) !important;
+            padding: 11px 20px !important;
+            font-size: 13px !important;
+            font-weight: normal !important;
+            display: block !important;
+            border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+            background: #1a0e05 !important;
+            transition: all 0.15s;
+            text-decoration: none;
+            font-family: Arial, sans-serif;
+        }
+        .dropdown-nav a:hover {
+            background: #2a1a0a !important;
+            color: #C9973A !important;
+            padding-left: 26px !important;
+        }
+        .dropdown-header-nav {
+            padding: 8px 20px;
+            font-size: 10px;
+            font-weight: bold;
+            color: #C9973A;
+            background: #0d0703;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: block;
+            border-bottom: 1px solid rgba(201,151,58,0.15);
+        }
+
+        /* CONTENT */
+        .content-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 28px 15px;
+            min-height: calc(100vh - 380px);
+        }
+
+        /* BOOTSTRAP OVERRIDES */
+        .panel { border-radius: 12px; border-color: #e0d0b8; box-shadow: 0 2px 8px rgba(92,58,30,0.08); }
+        .panel-default > .panel-heading {
+            background: linear-gradient(135deg, #5C3A1E, #7a4f2a);
+            color: #f0d9a0;
+            border-color: #5C3A1E;
+            border-radius: 12px 12px 0 0;
+        }
+        .page-header { border-bottom: 3px solid #C9973A; margin-bottom: 24px; padding-bottom: 12px; }
+        .page-header h2 { color: #3a1f0a; font-family: Georgia, serif; font-size: 24px; }
+        .table > thead > tr > th {
+            background: linear-gradient(135deg, #5C3A1E, #7a4f2a);
+            color: #f0d9a0;
+            border-color: #5C3A1E;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .table-striped > tbody > tr:nth-of-type(odd) { background-color: #fdf6ec; }
+        .table > tbody > tr > td { vertical-align: middle; }
+
+        /* FOOTER */
+        .footer-main {
+            background: #0d0703;
+            color: #f0d9a0;
+            padding: 40px 30px;
+            margin-top: 40px;
+            border-top: 3px solid #C9973A;
+        }
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+        .footer-main h5 {
+            color: #C9973A;
+            margin-bottom: 14px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(201,151,58,0.2);
+        }
+        .footer-main p {
+            font-size: 13px;
+            color: rgba(240,217,160,0.45);
+            line-height: 1.9;
+            max-width: 200px;
+            margin-top: 12px;
+        }
+        .footer-main a {
+            color: rgba(240,217,160,0.55);
+            text-decoration: none;
+            font-size: 13px;
+            display: block;
+            margin-bottom: 9px;
+            transition: color 0.2s;
+        }
+        .footer-main a:hover { color: #C9973A; }
+        .footer-bottom {
+            background: #050300;
+            color: rgba(240,217,160,0.25);
+            text-align: center;
+            padding: 14px;
+            font-size: 12px;
+            letter-spacing: 0.3px;
+        }
     </style>
 </head>
 <body>
@@ -38,47 +182,136 @@
             </Scripts>
         </asp:ScriptManager>
 
-        <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-            <div class="container">
-                <a class="navbar-brand" runat="server" href="~/">
-                    🪑 Muebles Los Alpes
-                </a>
-                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
-                    <span class="navbar-toggler-icon"></span>
+        <%-- TOP BAR --%>
+        <div style="background:#3a1f0a; color:rgba(240,217,160,0.7); text-align:center; padding:7px 30px; font-size:12px; font-family:Arial,sans-serif; letter-spacing:0.5px; border-bottom:1px solid rgba(201,151,58,0.2);">
+            Envios a todo Guatemala &nbsp;&nbsp;|&nbsp;&nbsp; Tel: +502 5568 8472 &nbsp;&nbsp;|&nbsp;&nbsp; Santos &amp; Familia — Desde 1978
+        </div>
+
+        <%-- HEADER --%>
+        <div style="background:#111; padding:14px 30px; display:flex; align-items:center; gap:24px; border-bottom:3px solid #C9973A; min-height:85px;">
+
+            <%-- LOGO --%>
+            <a runat="server" href="~/" style="flex-shrink:0; text-decoration:none;">
+                <img src='<%: ResolveUrl("~/Content/MueblesLosAlpes.png") %>'
+                     alt="Muebles Los Alpes"
+                     style="height:65px; width:auto; display:block;" />
+            </a>
+
+            <%-- BUSCADOR --%>
+            <div style="flex:1; max-width:620px; margin:0 auto; height:52px; display:flex;">
+                <input type="text"
+                       placeholder="Buscar en toda la tienda..."
+                       style="flex:1; min-width:0; height:52px; padding:0 22px; background:#1e1e1e; border:2px solid #C9973A; border-right:none; border-radius:6px 0 0 6px; color:#f0d9a0; font-size:14px; font-family:Arial,sans-serif; outline:none;" />
+                <button type="button"
+                        style="height:52px; width:62px; background:#C9973A; border:2px solid #C9973A; border-left:none; border-radius:0 6px 6px 0; color:white; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;"
+                        onmouseover="this.style.background='#a87a2e';"
+                        onmouseout="this.style.background='#C9973A';">
+                    &#128269;
                 </button>
-                <div class="collapse navbar-collapse">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link" runat="server" href="~/">Inicio</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button"
-                               data-bs-toggle="dropdown" aria-expanded="false">
-                                Catálogo & Inventario
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-dark">
-                                <li><h6 class="dropdown-header">Catálogo</h6></li>
-                                <li><a class="dropdown-item" runat="server" href="~/Modules/CatalogoInventario/Categorias.aspx">🏷️ Categorías</a></li>
-                                <li><a class="dropdown-item" runat="server" href="~/Modules/CatalogoInventario/Materiales.aspx">🧱 Materiales</a></li>
-                                <li><a class="dropdown-item" runat="server" href="~/Modules/CatalogoInventario/Tipos.aspx">📋 Tipos</a></li>
-                                <li><a class="dropdown-item" runat="server" href="~/Modules/CatalogoInventario/Productos.aspx">🛋️ Productos</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><h6 class="dropdown-header">Bodega</h6></li>
-                                <li><a class="dropdown-item" runat="server" href="~/Modules/CatalogoInventario/Almacenes.aspx">🏭 Almacenes</a></li>
-                                <li><a class="dropdown-item" runat="server" href="~/Modules/CatalogoInventario/Nichos.aspx">📍 Nichos</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
             </div>
+
+            <%-- ACCIONES --%>
+            <div style="display:flex; gap:4px; align-items:center; margin-left:auto; flex-shrink:0;">
+                <a runat="server" href="~/Modules/AuthUsuarios/"
+                   style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 16px; border-radius:8px; text-decoration:none; color:rgba(240,217,160,0.75); font-size:11px; font-family:Arial,sans-serif;"
+                   onmouseover="this.style.background='rgba(201,151,58,0.12)'; this.style.color='#C9973A';"
+                   onmouseout="this.style.background='transparent'; this.style.color='rgba(240,217,160,0.75)';">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+                    </svg>
+                    <span>Mi cuenta</span>
+                </a>
+                <a runat="server" href="~/"
+                   style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 16px; border-radius:8px; text-decoration:none; color:rgba(240,217,160,0.75); font-size:11px; font-family:Arial,sans-serif;"
+                   onmouseover="this.style.background='rgba(201,151,58,0.12)'; this.style.color='#C9973A';"
+                   onmouseout="this.style.background='transparent'; this.style.color='rgba(240,217,160,0.75)';">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6V11c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                    </svg>
+                    <span>Alertas</span>
+                </a>
+                <a runat="server" href="~/Modules/AuthUsuarios/"
+                   style="display:flex; align-items:center; gap:8px; padding:12px 24px; background:#C9973A; color:#1a0e05; border-radius:8px; text-decoration:none; font-size:13px; font-weight:bold; font-family:Arial,sans-serif; margin-left:8px; letter-spacing:0.3px;"
+                   onmouseover="this.style.background='#a87a2e'; this.style.color='white';"
+                   onmouseout="this.style.background='#C9973A'; this.style.color='#1a0e05';">
+                    Ingresar
+                </a>
+            </div>
+        </div>
+
+        <%-- NAV --%>
+        <nav class="nav-main">
+            <ul>
+                <li><a runat="server" href="~/">Inicio</a></li>
+                <li>
+                    <a href="#">Catalogo &amp; Inventario &#9660;</a>
+                    <div class="dropdown-nav">
+                        <span class="dropdown-header-nav">Catalogo</span>
+                        <a runat="server" href="~/Modules/CatalogoInventario/Index.aspx">Dashboard</a>
+                        <a runat="server" href="~/Modules/CatalogoInventario/Categorias.aspx">Categorias</a>
+                        <a runat="server" href="~/Modules/CatalogoInventario/Materiales.aspx">Materiales</a>
+                        <a runat="server" href="~/Modules/CatalogoInventario/Tipos.aspx">Tipos</a>
+                        <a runat="server" href="~/Modules/CatalogoInventario/Productos.aspx">Productos</a>
+                        <span class="dropdown-header-nav">Bodega</span>
+                        <a runat="server" href="~/Modules/CatalogoInventario/Almacenes.aspx">Almacenes</a>
+                        <a runat="server" href="~/Modules/CatalogoInventario/Nichos.aspx">Nichos</a>
+                    </div>
+                </li>
+                <li>
+                    <a href="#">Auth &amp; Usuarios &#9660;</a>
+                    <div class="dropdown-nav">
+                        <a runat="server" href="~/Modules/AuthUsuarios/">Dashboard</a>
+                    </div>
+                </li>
+                <li>
+                    <a href="#">Compras &amp; Proveedor &#9660;</a>
+                    <div class="dropdown-nav">
+                        <a runat="server" href="~/Modules/ComprasProveedor/">Dashboard</a>
+                    </div>
+                </li>
+                <li>
+                    <a href="#">Ventas &amp; Facturacion &#9660;</a>
+                    <div class="dropdown-nav">
+                        <a runat="server" href="~/Modules/VentasFacturacion/">Dashboard</a>
+                    </div>
+                </li>
+            </ul>
         </nav>
 
-        <div class="container body-content" style="padding-top: 20px;">
+        <%-- CONTENIDO --%>
+        <div class="content-wrapper">
             <asp:ContentPlaceHolder ID="MainContent" runat="server">
             </asp:ContentPlaceHolder>
-            <div class="footer text-center">
-                <p>&copy; <%: DateTime.Now.Year %> — Muebles Los Alpes ERP</p>
+        </div>
+
+        <%-- FOOTER --%>
+        <div class="footer-main">
+            <div class="footer-inner">
+                <div>
+                    <img src='<%: ResolveUrl("~/Content/MueblesLosAlpes.png") %>'
+                         alt="Muebles Los Alpes"
+                         style="height:65px; width:auto; display:block; opacity:0.9;" />
+                    <p>Santos &amp; Familia — Desde 1978.<br />Diseno &amp; Confort Hogareno.<br />Guatemala</p>
+                </div>
+                <div>
+                    <h5>Modulos</h5>
+                    <a runat="server" href="~/Modules/CatalogoInventario/Index.aspx">Catalogo &amp; Inventario</a>
+                    <a runat="server" href="~/Modules/AuthUsuarios/">Auth &amp; Usuarios</a>
+                    <a runat="server" href="~/Modules/ComprasProveedor/">Compras &amp; Proveedor</a>
+                    <a runat="server" href="~/Modules/VentasFacturacion/">Ventas &amp; Facturacion</a>
+                </div>
+                
+                <div>
+                    <h5>Tecnologia</h5>
+                    <a href="#">ASP.NET Web Forms VB.NET</a>
+                    <a href="#">Oracle 21c</a>
+                    <a href="#">Oracle Data Guard</a>
+                    <a href="#">ODP.NET Managed Driver</a>
+                </div>
             </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; <%: DateTime.Now.Year %> — Muebles Los Alpes ERP &nbsp;|&nbsp; Santos &amp; Familia &nbsp;|&nbsp; Guatemala
         </div>
 
     </form>
