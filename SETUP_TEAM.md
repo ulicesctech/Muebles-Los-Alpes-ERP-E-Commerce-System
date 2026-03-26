@@ -10,17 +10,7 @@
 ---
 
 ## Estrategia de ramas
-
-main          - versión final / entrega
-  └── develop - integración de todo el equipo
-        ├── feature/wilmer-auth-usuarios
-        ├── feature/ulices-catalogo-inventario
-        ├── feature/anderson-compras-proveedor
-        └── feature/jose-ventas-facturacion
-
 **Regla de oro:** Nunca hacer push directo a develop ni a main.
-
----
 
 ## Configuración inicial 
 
