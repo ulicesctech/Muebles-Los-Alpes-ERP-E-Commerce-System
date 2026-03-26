@@ -1,6 +1,6 @@
-# 🛠️ SETUP DEL EQUIPO — Muebles Los Alpes ERP
+# SETUP DEL EQUIPO — Muebles Los Alpes ERP
 
-## 📋 Stack tecnológico
+## Stack tecnológico
 - **Frontend/Backend:** ASP.NET Web Forms — Visual Basic .NET (VS 2022)
 - **Base de datos:** Oracle 21c (ODP.NET Managed Driver)
 - **Arquitectura BD:** Primary (productiva) + Standby (read-only) con Oracle Data Guard
@@ -9,7 +9,7 @@
 
 ---
 
-## 🌿 Estrategia de ramas
+##  Estrategia de ramas
 
 main          ← versión final / entrega
   └── develop ← integración de todo el equipo
@@ -22,7 +22,7 @@ main          ← versión final / entrega
 
 ---
 
-## 🚀 Configuración inicial (primera vez)
+##  Configuración inicial (primera vez)
 
 ### 1. Clonar el repositorio
 git clone https://github.com/ulicesctech/Muebles-Los-Alpes-ERP-E-Commerce-System.git
@@ -53,7 +53,7 @@ Abrir SQL Developer y ejecutar el instalador de tu módulo:
 
 ---
 
-## 📁 Estructura del proyecto
+## Estructura del proyecto
 
 Muebles-Los-Alpes-ERP-E-Commerce-System/
 ├── database/
@@ -87,7 +87,7 @@ Muebles-Los-Alpes-ERP-E-Commerce-System/
 
 ---
 
-## 📐 Zona de trabajo por desarrollador
+## Zona de trabajo por desarrollador
 
 | Dev      | Módulo               | Services                    | Modules                    |
 |----------|----------------------|-----------------------------|----------------------------|
@@ -98,7 +98,7 @@ Muebles-Los-Alpes-ERP-E-Commerce-System/
 
 ---
 
-## 🔄 Flujo de trabajo diario
+## Flujo de trabajo diario
 
 # 1. Antes de empezar — sincronizar con develop
 git checkout feature/tu-rama
@@ -118,7 +118,7 @@ git push origin feature/tu-rama
 
 ---
 
-## ✅ Convención de commits
+## Convención de commits
 
 Formato: tipo(modulo): descripción
 
@@ -135,7 +135,7 @@ db(catalogo): agregar package PKG_BOD_STOCK
 
 ---
 
-## ⚠️ Reglas obligatorias
+## Reglas obligatorias
 
 1. NUNCA hacer commit del Web.config con credenciales
 2. NUNCA escribir SQL directo en VB.NET — todo por packages PL/SQL
@@ -148,7 +148,7 @@ db(catalogo): agregar package PKG_BOD_STOCK
 
 ---
 
-## 🆘 Problemas comunes
+##  Problemas comunes
 
 | Problema                     | Solución                                      |
 |------------------------------|-----------------------------------------------|
