@@ -1,9 +1,9 @@
 # SETUP DEL EQUIPO — Muebles Los Alpes ERP
 
 ## Stack tecnológico
-- **Frontend/Backend:** ASP.NET Web Forms — Visual Basic .NET (VS 2022)
-- **Base de datos:** Oracle 21c (ODP.NET Managed Driver)
-- **Arquitectura BD:** Primary (productiva) + Standby (read-only) con Oracle Data Guard
+- **Frontend/Backend:** ASP.NET Web Forms — Visual Basic .NET VS 2022
+- **Base de datos:** Oracle 21c ODP.NET Managed Driver
+- **Arquitectura BD:** Primary productiva con Standby read-only con Oracle Data Guard
 - **ORM/Acceso a datos:** Sin ORM — todo por Packages PL/SQL
 - **Control de versiones:** Git + GitHub
 
@@ -11,8 +11,8 @@
 
 ## Estrategia de ramas
 
-main          ← versión final / entrega
-  └── develop ← integración de todo el equipo
+main          - versión final / entrega
+  └── develop - integración de todo el equipo
         ├── feature/wilmer-auth-usuarios
         ├── feature/ulices-catalogo-inventario
         ├── feature/anderson-compras-proveedor
@@ -22,7 +22,7 @@ main          ← versión final / entrega
 
 ---
 
-## Configuración inicial (primera vez)
+## Configuración inicial 
 
 ### 1. Clonar el repositorio
 git clone https://github.com/ulicesctech/Muebles-Los-Alpes-ERP-E-Commerce-System.git
@@ -34,7 +34,7 @@ git checkout feature/wilmer-auth-usuarios           # Wilmer
 git checkout feature/anderson-compras-proveedor     # Anderson
 git checkout feature/jose-ventas-facturacion        # Jose
 
-### 3. Configurar Web.config (NUNCA subir al repo)
+### 3. Configurar Web.config NUNCA subir al repo
 Copia la plantilla y edítala con tus credenciales locales de Oracle:
 - Copia: Web.config.example → Web.config
 - Edita User Id, Password y Data Source
@@ -50,40 +50,6 @@ Abrir SQL Developer y ejecutar el instalador de tu módulo:
 - Wilmer:   @database/procedures/auth_usuarios/00_install_auth_usuarios.sql
 - Anderson: @database/procedures/compras_proveedor/00_install_compras_proveedor.sql
 - Jose:     @database/procedures/ventas_facturacion/00_install_ventas_facturacion.sql
-
----
-
-## Estructura del proyecto
-
-Muebles-Los-Alpes-ERP-E-Commerce-System/
-├── database/
-│   ├── ddl/
-│   ├── full/databasefull/
-│   └── procedures/
-│       ├── auth_usuarios/           ← Wilmer
-│       ├── catalogo_inventario/     ← Ulices
-│       ├── compras_proveedor/       ← Anderson
-│       └── ventas_facturacion/      ← Jose
-└── src/
-    └── web/
-        └── MueblesAlpes.Web/
-            └── MueblesAlpes.Web/
-                ├── App_Code/
-                │   ├── Data/
-                │   │   └── OracleDb.vb          ← Helper DAL (NO tocar sin coordinar)
-                │   ├── Services/
-                │   │   ├── AuthUsuarios/         ← Wilmer
-                │   │   ├── CatalogoInventario/   ← Ulices
-                │   │   ├── ComprasProveedor/     ← Anderson
-                │   │   └── VentasFacturacion/    ← Jose
-                ├── Modules/
-                │   ├── AuthUsuarios/             ← Wilmer
-                │   ├── CatalogoInventario/       ← Ulices
-                │   ├── ComprasProveedor/         ← Anderson
-                │   └── VentasFacturacion/        ← Jose
-                ├── Site.Master                   ← Compartida (coordinar cambios)
-                ├── Web.config.example            ← Plantilla (SÍ va al repo)
-                └── Web.config                    ← Local (NO va al repo)
 
 ---
 
@@ -120,7 +86,7 @@ git push origin feature/tu-rama
 
 ## Convención de commits
 
-Formato: tipo(modulo): descripción
+Formato: tipo modulo: descripción
 
 feat     → Nueva funcionalidad
 fix      → Corrección de bug
@@ -148,12 +114,3 @@ db(catalogo): agregar package PKG_BOD_STOCK
 
 ---
 
-## Problemas comunes
-
-| Problema                     | Solución                                      |
-|------------------------------|-----------------------------------------------|
-| OracleConn not found         | Crear Web.config desde Web.config.example     |
-| Errores NuGet al abrir       | Update-Package -reinstall en Package Manager  |
-| designer.vb vacío            | Abrir .aspx, agregar espacio y guardar        |
-| Conflicto en Site.Master     | Coordinarse con el equipo                     |
-| Error al compilar OracleDb   | Verificar Build Action = Compile              |
