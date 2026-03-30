@@ -1,0 +1,30 @@
+# CODEOWNERS — Muebles Los Alpes ERP
+
+# Archivos compartidos — Ulices
+/src/web/MueblesAlpes.Web/MueblesAlpes.Web/Site.Master @ulicesctech
+/src/web/MueblesAlpes.Web/MueblesAlpes.Web/Default.aspx @ulicesctech
+/src/web/MueblesAlpes.Web/MueblesAlpes.Web/App_Code/Data/OracleDb.vb @ulicesctech
+/Web.config.example @ulicesctech
+/.gitignore @ulicesctech
+/SETUP_TEAM.md @ulicesctech
+/CONTRIBUTING.md @ulicesctech
+
+# Catalogo & Inventario — Ulices
+/src/web/MueblesAlpes.Web/MueblesAlpes.Web/Modules/CatalogoInventario/ @ulicesctech
+/src/web/MueblesAlpes.Web/MueblesAlpes.Web/App_Code/Services/CatalogoInventario/ @ulicesctech
+/database/procedures/catalogo_inventario/ @ulicesctech
+
+# Auth & Usuarios — Wilmer
+/src/web/MueblesAlpes.Web/MueblesAlpes.Web/Modules/AuthUsuarios/ @wcojonc7
+/src/web/MueblesAlpes.Web/MueblesAlpes.Web/App_Code/Services/AuthUsuarios/ @wcojonc7
+/database/procedures/auth_usuarios/ @wcojonc7
+
+# Compras & Proveedor — Anderson
+/src/web/MueblesAlpes.Web/MueblesAlpes.Web/Modules/ComprasProveedor/ @anderg24
+/src/web/MueblesAlpes.Web/MueblesAlpes.Web/App_Code/Services/ComprasProveedor/ @anderg24
+/database/procedures/compras_proveedor/ @anderg24
+
+# Ventas & Facturacion — Jose
+/src/web/MueblesAlpes.Web/MueblesAlpes.Web/Modules/VentasFacturacion/ @Josepdib
+/src/web/MueblesAlpes.Web/MueblesAlpes.Web/App_Code/Services/VentasFacturacion/ @Josepdib
+/database/procedures/ventas_facturacion/ @Josepdib
