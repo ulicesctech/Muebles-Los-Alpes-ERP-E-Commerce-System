@@ -1,24 +1,59 @@
 CREATE OR REPLACE PACKAGE BODY PKG_CP_BOD_PEDIDO AS
-    PROCEDURE PED_CREAR(p_codigo IN VARCHAR2, p_forma_pago IN VARCHAR2, p_id OUT NUMBER) IS
+
+    PROCEDURE PED_CREAR(
+        p_codigo     IN VARCHAR2, 
+        p_forma_pago IN VARCHAR2, 
+        p_total      IN NUMBER, 
+        p_id         OUT NUMBER
+    ) AS
     BEGIN
-        INSERT INTO BOD_PEDIDO(ped_codigo, ped_forma_pago, ped_fecha, ped_total)
-        VALUES (TRIM(p_codigo), NVL(p_forma_pago, 'SIMULADO'), SYSDATE, 0)
-        RETURNING ped_pedido INTO p_id;
+        INSERT INTO BOD_PEDIDO (PED_CODIGO, PED_FORMA_PAGO, PED_TOTAL, PED_FECHA)
+        VALUES (p_codigo, p_forma_pago, p_total, SYSDATE)
+        RETURNING PED_PEDIDO INTO p_id;
+        COMMIT;
+    EXCEPTION WHEN OTHERS THEN ROLLBACK; RAISE;
     END;
 
-    PROCEDURE PED_AGREGAR_DETALLE(p_ped_id IN NUMBER, p_hip_id IN NUMBER, p_cant_sol IN NUMBER) IS
+    PROCEDURE PED_ACTUALIZAR(
+        p_id         IN NUMBER, 
+        p_codigo     IN VARCHAR2, 
+        p_forma_pago IN VARCHAR2, 
+        p_total      IN NUMBER
+    ) AS
     BEGIN
-        INSERT INTO BOD_DETALLE_PEDIDO(ped_pedido, hip_historial_precio, detpe_cantidad_solicitada)
-        VALUES (p_ped_id, p_hip_id, p_cant_sol);
+        UPDATE BOD_PEDIDO 
+        SET PED_CODIGO = p_codigo, 
+            PED_FORMA_PAGO = p_forma_pago, 
+            PED_TOTAL = p_total
+        WHERE PED_PEDIDO = p_id;
+        COMMIT;
+    EXCEPTION WHEN OTHERS THEN ROLLBACK; RAISE;
     END;
 
-    PROCEDURE PED_ELIMINAR(p_id IN NUMBER) IS
+    PROCEDURE PED_ELIMINAR(p_id IN NUMBER) AS
     BEGIN
         DELETE FROM BOD_DETALLE_PEDIDO WHERE ped_pedido = p_id;
-        DELETE FROM BOD_PEDIDO WHERE ped_pedido = p_id;
+        DELETE FROM BOD_PEDIDO WHERE PED_PEDIDO = p_id;
+        COMMIT;
     END;
 
-    PROCEDURE PED_LISTAR(p_data OUT SYS_REFCURSOR) IS
-    BEGIN OPEN p_data FOR SELECT * FROM BOD_PEDIDO ORDER BY ped_fecha DESC; END;
+    PROCEDURE PED_LISTAR(p_data OUT SYS_REFCURSOR) AS
+    BEGIN
+        OPEN p_data FOR 
+        SELECT PED_PEDIDO, PED_CODIGO, PED_FECHA, PED_FORMA_PAGO, PED_TOTAL 
+        FROM BOD_PEDIDO 
+        ORDER BY PED_PEDIDO DESC;
+    END;
+
+    -- Búsqueda Case Insensitive arreglada
+    PROCEDURE PED_BUSCAR(p_codigo IN VARCHAR2, p_data OUT SYS_REFCURSOR) AS
+    BEGIN
+        OPEN p_data FOR 
+        SELECT PED_PEDIDO, PED_CODIGO, PED_FECHA, PED_FORMA_PAGO, PED_TOTAL 
+        FROM BOD_PEDIDO 
+        WHERE UPPER(PED_CODIGO) LIKE '%' || UPPER(p_codigo) || '%'
+        ORDER BY PED_PEDIDO DESC;
+    END;
+
 END PKG_CP_BOD_PEDIDO;
 /
