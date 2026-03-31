@@ -1,6 +1,5 @@
 CREATE OR REPLACE PACKAGE PKG_CLI_CARRITO AS
   PROCEDURE CARRITO_CREAR(
-    p_correlativo   IN VARCHAR2,
     p_cliente       IN NUMBER,
     p_id            OUT NUMBER
   );

@@ -12,14 +12,11 @@ CREATE OR REPLACE PACKAGE BODY PKG_FAC_FACTURA_CLIENTE AS
         p_empleado          IN NUMBER,
         p_codigo_factura    OUT VARCHAR2) IS
     BEGIN
-        assert_id(p_presupuesto, 'Factura: Presupuesto obligatorio.');
         assert_id(p_empleado, 'Factura: Empleado obligatorio.');
         INSERT INTO FAC_FACTURA_CLIENTE (
-            pre_presupuesto,
             em_empleado,
             facli_fecha)
         VALUES (
-            p_presupuesto,
             p_empleado,
             SYSDATE)
         RETURNING facli_codigo_factura INTO p_codigo_factura;

@@ -8,18 +8,15 @@ CREATE OR REPLACE PACKAGE BODY PKG_CLI_CARRITO AS
     END;
 
     PROCEDURE CARRITO_CREAR(
-        p_correlativo   IN VARCHAR2,
         p_cliente       IN NUMBER,
         p_id            OUT NUMBER) IS
     BEGIN
         assert_id(p_cliente, 'Carrito: Cliente obligatorio.');
         INSERT INTO CLI_CARRITO (
-            pre_correlativo,
             cli_cliente,
             pre_fecha_inicio,
             pre_total)
         VALUES (
-            TRIM(p_correlativo),
             p_cliente,
             SYSDATE,
             0)
@@ -56,8 +53,18 @@ CREATE OR REPLACE PACKAGE BODY PKG_CLI_CARRITO AS
     PROCEDURE CARRITO_LISTAR(
         p_data OUT SYS_REFCURSOR) IS
     BEGIN
-        OPEN p_data FOR SELECT * FROM CLI_CARRITO
-        ORDER BY pre_fecha_inicio DESC;
+        OPEN p_data FOR 
+            SELECT c.PRE_CARRITO, c.PRE_CORRELATIVO, 
+                   cli.CLI_PRIMER_NOMBRE || ' ' || cli.CLI_PRIMER_APELLIDO AS NOMBRE_CLIENTE,
+                   c.PRE_FECHA_INICIO, c.PRE_TOTAL,
+                   NVL(LISTAGG(bh.PRO_REFERENCIA || ' x' || cd.DETPRE_CANTIDAD, ', ') 
+                   WITHIN GROUP (ORDER BY bh.PRO_REFERENCIA), 'Sin productos') AS PRODUCTOS
+            FROM CLI_CARRITO c
+            JOIN CLI_CLIENTE cli ON c.CLI_CLIENTE = cli.CLI_CLIENTE
+            LEFT JOIN CLI_DETALLE_CARRITO cd ON c.PRE_CARRITO = cd.PRE_CARRITO
+            LEFT JOIN BOD_HISTORIAL_PRECIO bh ON cd.HIP_HISTORIAL_PRECIO = bh.HIP_HISTORIAL_PRECIO
+            GROUP BY c.PRE_CARRITO, c.PRE_CORRELATIVO, cli.CLI_PRIMER_NOMBRE, cli.CLI_PRIMER_APELLIDO, c.PRE_FECHA_INICIO, c.PRE_TOTAL
+            ORDER BY c.PRE_CARRITO DESC;
     END;
 
     PROCEDURE CARRITO_VACIAR(
