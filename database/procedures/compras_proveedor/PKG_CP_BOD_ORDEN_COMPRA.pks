@@ -1,6 +1,6 @@
 CREATE OR REPLACE PACKAGE PKG_CP_BOD_ORDEN_COMPRA AS
 
-    -- Para crear: p_orc_key se envía vacío desde VB
+    -- p_orc_key recibe el valor manual desde la aplicación
     PROCEDURE ORC_CREAR(
         p_orc_key  IN VARCHAR2, 
         p_codigo   IN VARCHAR2, 
@@ -8,7 +8,7 @@ CREATE OR REPLACE PACKAGE PKG_CP_BOD_ORDEN_COMPRA AS
         p_total    IN NUMBER
     );
 
-    -- ACTUALIZADO: Se agregó p_prov_id para permitir cambiar el proveedor al editar
+    -- Permite actualizar datos, incluyendo el cambio de proveedor
     PROCEDURE ORC_ACTUALIZAR(
         p_orc_key IN VARCHAR2, 
         p_codigo  IN VARCHAR2, 
@@ -25,7 +25,7 @@ CREATE OR REPLACE PACKAGE PKG_CP_BOD_ORDEN_COMPRA AS
         p_data    OUT SYS_REFCURSOR
     );
 
-    -- Para búsqueda Case Insensitive (el UPPER se maneja en el PKB)
+    -- Búsqueda por código (Case Insensitive)
     PROCEDURE ORC_BUSCAR(
         p_codigo IN VARCHAR2, 
         p_data   OUT SYS_REFCURSOR

@@ -33,7 +33,7 @@
     .badge-key { background:#fdf6ec; color:#C9973A; padding:3px 8px; border-radius:20px; font-size:11px; font-weight:bold; border:1px solid #e8d8c0; }
 </style>
 
-<div class="breadcrumb-mod">🏠 Inicio / Cuentas por Pagar / <strong>Facturas de Proveedor</strong></div>
+<div class="breadcrumb-mod">🏠 Inicio / Compras proveedor / <strong>Facturas de Proveedor</strong></div>
 <div class="page-title">🧾 Gestión de Facturas de Proveedor</div>
 
 <asp:Panel ID="pnlMsg" runat="server" Visible="false">

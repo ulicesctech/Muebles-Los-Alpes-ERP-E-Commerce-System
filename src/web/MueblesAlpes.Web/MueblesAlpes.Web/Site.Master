@@ -302,7 +302,7 @@
                     <h5>Modulos</h5>
                     <a runat="server" href="~/Modules/CatalogoInventario/Index.aspx">Catalogo &amp; Inventario</a>
                     <a runat="server" href="~/Modules/AuthUsuarios/">Auth &amp; Usuarios</a>
-                    <a runat="server" href="~/Modules/ComprasProveedor/">Compras &amp; Proveedor</a>
+                    <a runat="server" href="~/Modules/ComprasProveedor/Index.aspx">Compras &amp; Proveedor</a>
                     <a runat="server" href="~/Modules/VentasFacturacion/">Ventas &amp; Facturacion</a>
                 </div>
                 
