@@ -10,15 +10,8 @@
 Option Strict On
 Option Explicit On
 
+Namespace Modules.ComprasProveedor
 
-Partial Public Class SiteMaster
-
-    '''<summary>
-    '''Control MainContent.
-    '''</summary>
-    '''<remarks>
-    '''Campo generado automáticamente.
-    '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-    '''</remarks>
-    Protected WithEvents MainContent As Global.System.Web.UI.WebControls.ContentPlaceHolder
-End Class
+    Partial Public Class Index
+    End Class
+End Namespace

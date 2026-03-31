@@ -266,7 +266,12 @@
                 <li>
                     <a href="#">Compras &amp; Proveedor &#9660;</a>
                     <div class="dropdown-nav">
-                        <a runat="server" href="~/Modules/ComprasProveedor/">Dashboard</a>
+                        <a runat="server" href="~/Modules/ComprasProveedor/Index.aspx">Dashboard</a>
+                        <a runat="server" href="~/Modules/ComprasProveedor/FacturasProveedor.aspx">Facturas</a>
+                        <a runat="server" href="~/Modules/ComprasProveedor/OrdenesCompra.aspx">Ordenes Compra</a>
+                        <a runat="server" href="~/Modules/ComprasProveedor/Pedidos.aspx">Pedidos</a>
+                        <a runat="server" href="~/Modules/ComprasProveedor/Proveedores.aspx">Proveedores</a>
+                        <a runat="server" href="~/Modules/ComprasProveedor/ReclamosProveedor.aspx">Reclamos</a>
                     </div>
                 </li>
                 <li>
