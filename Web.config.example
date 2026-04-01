@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   ================================================================
-  Web.config.example — PLANTILLA DE CONFIGURACIÓN
+  Web.config.example ï¿½ PLANTILLA DE CONFIGURACIï¿½N
   ================================================================
   INSTRUCCIONES:
-  1. Copia este archivo y renómbralo a Web.config
+  1. Copia este archivo y renï¿½mbralo a Web.config
   2. Reemplaza TU_USUARIO, TU_PASSWORD y el Data Source
      con tus credenciales locales de Oracle
   3. NUNCA hagas commit del Web.config real
