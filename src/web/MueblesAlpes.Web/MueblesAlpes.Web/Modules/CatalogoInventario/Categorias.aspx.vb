@@ -115,6 +115,7 @@ Namespace Modules.CatalogoInventario
             pnlMsg.Visible = True
         End Sub
 
+
     End Class
 
 End Namespace

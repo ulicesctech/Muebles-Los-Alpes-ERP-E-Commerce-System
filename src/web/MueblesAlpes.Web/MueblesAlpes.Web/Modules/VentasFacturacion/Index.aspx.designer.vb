@@ -10,7 +10,7 @@
 Option Strict On
 Option Explicit On
 
-Namespace Modules.ComprasProveedor
+Namespace Modules.VentasFacturacion
 
     Partial Public Class Index
     End Class
