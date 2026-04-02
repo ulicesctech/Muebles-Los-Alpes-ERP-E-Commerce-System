@@ -1,6 +1,6 @@
 ﻿Imports System
 
-Namespace Modules.ComprasProveedor
+Namespace Modules.VentasFacturacion
     Partial Public Class Index
         Inherits System.Web.UI.Page
 
