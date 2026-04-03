@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Grupos de Usuario" Language="VB" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeFile="GrupoUsuario.aspx.vb" Inherits="MueblesAlpes.Web.Modules.AuthUsuarios.Admin.GrupoUsuarioPage" %>
+﻿<%@ Page Title="Ascensos" Language="VB" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeFile="Ascensos.aspx.vb" Inherits="MueblesAlpes.Web.Modules.AuthUsuarios.AscensosPage" %>
 
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
 <style>
@@ -12,6 +12,7 @@
     .form-card-head span { color:#f0d9a0; font-size:14px; font-weight:bold; }
     .form-card-body { padding:20px; }
     .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .form-row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
     .form-group { margin-bottom:16px; }
     .form-group label { display:block; font-size:13px; font-weight:bold; color:#5C3A1E; margin-bottom:6px; font-family:Arial,sans-serif; }
     .form-control { width:100%; padding:10px 12px; border:1px solid #e8d8c0; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; color:#333; box-sizing:border-box; }
@@ -28,40 +29,53 @@
     .table-card tbody tr:hover { background:#fdf8f3; }
     .table-card tbody td { padding:14px 18px; font-size:13px; white-space:nowrap; }
     .badge-id { background:#fdf6ec; color:#C9973A; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:bold; border:1px solid #e8d8c0; }
-    .badge-ok  { background:#f0fff4; color:#276749; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:bold; }
-    .badge-no  { background:#fff5f5; color:#c53030; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:bold; }
     .actions-cell { display:flex; gap:8px; justify-content:flex-end; }
     .btn-edit-t { background:#fdf6ec; color:#C9973A; border:1px solid #e8d8c0; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer; }
     .btn-edit-t:hover { background:#C9973A; color:white; }
-    .btn-del-t  { background:#fff5f5; color:#e53e3e; border:1px solid #fed7d7; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer; }
+    .btn-del-t { background:#fff5f5; color:#e53e3e; border:1px solid #fed7d7; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer; }
     .btn-del-t:hover { background:#e53e3e; color:white; }
     .empty-state { text-align:center; padding:40px; color:#aaa; }
 </style>
 
 <div class="breadcrumb-mod">
     <a href='<%: ResolveUrl("~/Modules/AuthUsuarios/Index.aspx") %>'>🏠 Auth & Usuarios</a> /
-    <strong style="color:#5C3A1E;">Grupos de Usuario</strong>
+    <strong style="color:#5C3A1E;">Ascensos</strong>
 </div>
 
-<div class="page-title">👥 Gestión de Grupos</div>
+<div class="page-title">📈 Gestión de Ascensos</div>
 
 <asp:Label ID="lblMensaje" runat="server" CssClass="alert-ok"  Visible="false" />
 <asp:Label ID="lblError"   runat="server" CssClass="alert-err" Visible="false" />
 
 <div class="form-card">
-    <div class="form-card-head"><span>🔧 Nuevo / Editar Grupo</span></div>
+    <div class="form-card-head"><span>🔧 Nuevo / Editar Ascenso</span></div>
     <div class="form-card-body">
-        <asp:HiddenField ID="hfId" runat="server" />
+        <asp:HiddenField ID="hfId"   runat="server" />
+        <asp:HiddenField ID="hfMode" runat="server" Value="crear" />
+
         <div class="form-row">
             <div class="form-group">
-                <label>Descripción *</label>
-                <asp:TextBox ID="txtDescripcion" runat="server" CssClass="form-control" placeholder="Nombre del grupo..." />
+                <label>Empleado *</label>
+                <asp:DropDownList ID="ddlEmpleado" runat="server" CssClass="form-control" />
             </div>
             <div class="form-group">
-                <label>Permiso *</label>
-                <asp:DropDownList ID="ddlPermisos" runat="server" CssClass="form-control" />
+                <label>Puesto *</label>
+                <asp:DropDownList ID="ddlPuesto" runat="server" CssClass="form-control" />
             </div>
         </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Fecha Inicio *</label>
+                <asp:TextBox ID="txtFechaInicio" runat="server" CssClass="form-control"
+                    TextMode="Date" />
+            </div>
+            <div class="form-group">
+                <label>Fecha Final <small style="color:#aaa;">(opcional)</small></label>
+                <asp:TextBox ID="txtFechaFinal" runat="server" CssClass="form-control"
+                    TextMode="Date" />
+            </div>
+        </div>
+
         <div style="display:flex; gap:10px;">
             <asp:Button ID="btnGuardar" runat="server" Text="💾 Guardar"
                 CssClass="btn-gold" OnClick="btnGuardar_Click" />
@@ -72,48 +86,35 @@
 </div>
 
 <div class="table-card">
-    <asp:GridView ID="gvGrupos" runat="server" AutoGenerateColumns="false"
-        OnRowCommand="gvGrupos_RowCommand" GridLines="None">
+    <asp:GridView ID="gvAscensos" runat="server" AutoGenerateColumns="false"
+        OnRowCommand="gvAscensos_RowCommand" GridLines="None">
         <Columns>
             <asp:TemplateField HeaderText="ID" ItemStyle-Width="70px">
                 <ItemTemplate>
-                    <span class="badge-id"><%# Eval("grupus_grupo_usuario") %></span>
+                    <span class="badge-id"><%# Eval("asc_ascenso") %></span>
                 </ItemTemplate>
             </asp:TemplateField>
-            <asp:BoundField DataField="grupus_descripcion" HeaderText="Grupo" />
-            <asp:BoundField DataField="per_permisos"       HeaderText="Permiso ID" />
-            <asp:TemplateField HeaderText="Admin">
-                <ItemTemplate><%# If(Eval("per_admin").ToString()="1","<span class='badge-ok'>✓</span>","<span class='badge-no'>✗</span>") %></ItemTemplate>
-            </asp:TemplateField>
-            <asp:TemplateField HeaderText="RH">
-                <ItemTemplate><%# If(Eval("per_rh").ToString()="1","<span class='badge-ok'>✓</span>","<span class='badge-no'>✗</span>") %></ItemTemplate>
-            </asp:TemplateField>
-            <asp:TemplateField HeaderText="Fac">
-                <ItemTemplate><%# If(Eval("per_fac").ToString()="1","<span class='badge-ok'>✓</span>","<span class='badge-no'>✗</span>") %></ItemTemplate>
-            </asp:TemplateField>
-            <asp:TemplateField HeaderText="Cli">
-                <ItemTemplate><%# If(Eval("per_cli").ToString()="1","<span class='badge-ok'>✓</span>","<span class='badge-no'>✗</span>") %></ItemTemplate>
-            </asp:TemplateField>
-            <asp:TemplateField HeaderText="Bod">
-                <ItemTemplate><%# If(Eval("per_bod").ToString()="1","<span class='badge-ok'>✓</span>","<span class='badge-no'>✗</span>") %></ItemTemplate>
-            </asp:TemplateField>
-            <asp:TemplateField HeaderText="Promo">
-                <ItemTemplate><%# If(Eval("per_promo").ToString()="1","<span class='badge-ok'>✓</span>","<span class='badge-no'>✗</span>") %></ItemTemplate>
-            </asp:TemplateField>
+            <asp:BoundField DataField="em_nombre_completo" HeaderText="Empleado" />
+            <asp:BoundField DataField="pue_nombre"         HeaderText="Puesto" />
+            <asp:BoundField DataField="asc_fecha_inicio"   HeaderText="Fecha Inicio" DataFormatString="{0:dd/MM/yyyy}" />
+            <asp:BoundField DataField="asc_fecha_final"    HeaderText="Fecha Final"  DataFormatString="{0:dd/MM/yyyy}" NullDisplayText="—" />
             <asp:TemplateField HeaderText="Acciones">
                 <ItemTemplate>
                     <div class="actions-cell">
                         <asp:LinkButton runat="server" Text="✏️" CommandName="Editar"
-                            CommandArgument='<%# Eval("grupus_grupo_usuario") %>' CssClass="btn-edit-t" />
+                            CommandArgument='<%# Eval("asc_ascenso") %>' CssClass="btn-edit-t" />
                         <asp:LinkButton runat="server" Text="🗑" CommandName="Eliminar"
-                            CommandArgument='<%# Eval("grupus_grupo_usuario") %>' CssClass="btn-del-t"
-                            OnClientClick="return confirm('¿Eliminar este grupo?');" />
+                            CommandArgument='<%# Eval("asc_ascenso") %>' CssClass="btn-del-t"
+                            OnClientClick="return confirm('¿Eliminar este ascenso?');" />
                     </div>
                 </ItemTemplate>
             </asp:TemplateField>
         </Columns>
         <EmptyDataTemplate>
-            <div class="empty-state"><div style="font-size:40px;">👥</div><p>No hay grupos registrados.</p></div>
+            <div class="empty-state">
+                <div style="font-size:40px;">📈</div>
+                <p>No hay ascensos registrados.</p>
+            </div>
         </EmptyDataTemplate>
     </asp:GridView>
 </div>

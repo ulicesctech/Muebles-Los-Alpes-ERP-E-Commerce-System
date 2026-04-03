@@ -2,108 +2,141 @@
 
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
 <style>
-    .breadcrumb-mod { background:white; border:1px solid #e8d8c0; border-radius:8px; padding:10px 16px; margin-bottom:20px; font-size:13px; font-family:Arial,sans-serif; color:#888; box-shadow:0 1px 4px rgba(92,58,30,0.06); }
-    .breadcrumb-mod a { color:#C9973A; text-decoration:none; }
-
-    .mod-header { background:linear-gradient(135deg,#1a1a1a,#2a1a0a); border-radius:12px; padding:28px 32px; margin-bottom:28px; border-left:5px solid #C9973A; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 16px rgba(0,0,0,0.15); }
-    .mod-header h2 { color:#C9973A; font-family:Georgia,serif; margin:0 0 6px; font-size:24px; }
-    .mod-header p { color:rgba(240,217,160,0.7); margin:0; font-size:13px; font-family:Arial,sans-serif; }
-    .mod-header .mod-icon { font-size:55px; opacity:0.15; }
-
-    .section-label { font-size:12px; font-weight:bold; color:#5C3A1E; margin:24px 0 14px; padding:8px 14px; background:linear-gradient(135deg,#fdf6ec,#f5e8d0); border-radius:8px; border-left:4px solid #C9973A; font-family:Arial,sans-serif; text-transform:uppercase; letter-spacing:0.5px; }
-
-    .crud-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:10px; }
-    .crud-grid.two-col { grid-template-columns:repeat(2,1fr); max-width:600px; }
-    .crud-grid.three-col { grid-template-columns:repeat(3,1fr); }
-
-    .crud-card { background:white; border-radius:12px; border:1px solid #e8d8c0; overflow:hidden; transition:all 0.2s; box-shadow:0 2px 8px rgba(92,58,30,0.06); }
-    .crud-card:hover { box-shadow:0 8px 24px rgba(201,151,58,0.18); transform:translateY(-4px); border-color:#C9973A; }
-    .crud-card-body { padding:22px 18px 14px; text-align:center; }
-    .crud-card .crud-icon { font-size:40px; margin-bottom:10px; }
-    .crud-card h4 { color:#1a1a1a; font-size:14px; margin:0 0 6px; font-family:Georgia,serif; }
-    .crud-card p { color:#999; font-size:12px; margin:0; font-family:Arial,sans-serif; line-height:1.5; }
-    .crud-card-footer { padding:12px 18px; border-top:1px solid #f5ece0; display:flex; align-items:center; justify-content:space-between; }
-    .crud-card-footer a { font-size:13px; font-weight:bold; font-family:Arial,sans-serif; text-decoration:none; display:flex; align-items:center; gap:6px; transition:gap 0.2s; }
-    .crud-card-footer a:hover { gap:10px; text-decoration:none; }
-
-    .back-link { display:inline-flex; align-items:center; gap:6px; color:#C9973A; font-size:13px; font-family:Arial,sans-serif; text-decoration:none; margin-top:20px; padding:8px 14px; border-radius:6px; border:1px solid #e8d8c0; background:white; transition:all 0.2s; }
-    .back-link:hover { border-color:#C9973A; background:#fdf6ec; text-decoration:none; color:#C9973A; }
+    .au-hero { background:linear-gradient(135deg,#5C3A1E,#8B5E3C); border-radius:14px; padding:32px 28px; margin-bottom:28px; color:#f0d9a0; }
+    .au-hero h1 { font-family:Georgia,serif; font-size:26px; margin:0 0 8px; }
+    .au-hero p  { font-size:14px; color:#c9a96e; margin:0; font-family:Arial,sans-serif; }
+    .au-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:18px; }
+    .au-card { background:white; border-radius:12px; border:1px solid #e8d8c0; box-shadow:0 2px 8px rgba(92,58,30,0.06); overflow:hidden; transition:transform 0.2s,box-shadow 0.2s; }
+    .au-card:hover { transform:translateY(-3px); box-shadow:0 6px 16px rgba(92,58,30,0.12); }
+    .au-card-head { background:linear-gradient(135deg,#5C3A1E,#8B5E3C); padding:16px 18px; }
+    .au-card-head h3 { color:#f0d9a0; font-size:15px; font-family:Georgia,serif; margin:0; }
+    .au-card-head span { font-size:22px; }
+    .au-card-body { padding:16px 18px; font-family:Arial,sans-serif; }
+    .au-card-desc { font-size:13px; color:#666; margin-bottom:14px; }
+    .au-btn { display:block; background:linear-gradient(135deg,#C9973A,#a87a2e); color:#1a1a1a; text-decoration:none; padding:10px 14px; border-radius:8px; font-size:13px; font-weight:bold; text-align:center; margin-bottom:8px; transition:all 0.2s; }
+    .au-btn:hover { background:linear-gradient(135deg,#a87a2e,#7a5818); color:white; text-decoration:none; }
+    .au-section-title { font-size:13px; font-weight:bold; color:#8B5E3C; text-transform:uppercase; letter-spacing:0.5px; margin:0 0 16px; font-family:Arial,sans-serif; padding-bottom:8px; border-bottom:2px solid #e8d8c0; }
+    .au-section { margin-bottom:28px; }
+    .welcome-bar { background:white; border:1px solid #e8d8c0; border-radius:10px; padding:14px 20px; margin-bottom:24px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 8px rgba(92,58,30,0.06); font-family:Arial,sans-serif; }
+    .welcome-bar span { font-size:14px; color:#5C3A1E; font-weight:bold; }
+    .welcome-bar small { font-size:12px; color:#aaa; }
+    .btn-cerrar { background:white; color:#e53e3e; border:2px solid #fed7d7; padding:8px 16px; border-radius:8px; font-size:13px; font-weight:bold; cursor:pointer; font-family:Arial,sans-serif; }
+    .btn-cerrar:hover { background:#e53e3e; color:white; }
 </style>
 
-<div class="breadcrumb-mod">
-    <a href='<%: ResolveUrl("~/") %>'>Inicio</a> /
-    <strong style="color:#5C3A1E;">Auth &amp; Usuarios</strong>
+<div class="au-hero">
+    <h1>🔐 Auth &amp; Usuarios</h1>
+    <p>Gestión de permisos, grupos, empleados y clientes del sistema.</p>
 </div>
 
-<div class="mod-header">
-    <div>
-        <h2>Auth &amp; Usuarios</h2>
-        <p>Gestion de autenticacion, roles, permisos y recursos humanos.</p>
+<%-- Bienvenida si hay sesión --%>
+<asp:Panel ID="pnlBienvenida" runat="server" Visible="false">
+    <div class="welcome-bar">
+        <div>
+            <span>👋 <asp:Label ID="lblNombre" runat="server" /></span><br/>
+            <small><asp:Label ID="lblGrupo" runat="server" /></small>
+        </div>
+        <asp:Button ID="btnCerrarSesion" runat="server" Text="🚪 Cerrar Sesión"
+            CssClass="btn-cerrar" OnClick="btnCerrarSesion_Click" />
     </div>
-    <div class="mod-icon">&#128100;</div>
-</div>
+</asp:Panel>
 
-<div class="section-label">Acceso al Sistema</div>
-<div class="crud-grid two-col">
-    <div class="crud-card">
-        <div class="crud-card-body">
-            <div class="crud-icon">&#128100;</div>
-            <h4>Login Empleado</h4>
-            <p>Acceso para empleados y administradores del sistema.</p>
-        </div>
-        <div class="crud-card-footer" style="background:#fdf6ec;">
-            <a href='<%: ResolveUrl("~/Modules/AuthUsuarios/Cliente/LoginEmpleado.aspx") %>' style="color:#C9973A;">Ingresar <span>&#8594;</span></a>
+<%-- ACCESO — si NO hay sesión --%>
+<asp:Panel ID="pnlAcceso" runat="server" Visible="false">
+    <div class="au-section">
+        <div class="au-section-title">🔑 Acceso al Sistema</div>
+        <div class="au-grid">
+            <div class="au-card">
+                <div class="au-card-head">
+                    <span>🛒</span>
+                    <h3>Soy Cliente</h3>
+                </div>
+                <div class="au-card-body">
+                    <div class="au-card-desc">Ingresa o regístrate para realizar tus compras.</div>
+                    <a href='<%: ResolveUrl("~/Modules/AuthUsuarios/LoginCliente.aspx") %>' class="au-btn">Ingresar como Cliente</a>
+                </div>
+            </div>
+            <div class="au-card">
+                <div class="au-card-head">
+                    <span>👨‍💼</span>
+                    <h3>Soy Empleado</h3>
+                </div>
+                <div class="au-card-body">
+                    <div class="au-card-desc">Ingresa con tus credenciales de empleado.</div>
+                    <a href='<%: ResolveUrl("~/Modules/AuthUsuarios/LoginEmpleado.aspx") %>' class="au-btn">Ingresar como Empleado</a>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="crud-card">
-        <div class="crud-card-body">
-            <div class="crud-icon">&#128722;</div>
-            <h4>Login Cliente</h4>
-            <p>Acceso para clientes de la tienda en linea.</p>
-        </div>
-        <div class="crud-card-footer" style="background:#f5f0eb;">
-            <a href='<%: ResolveUrl("~/Modules/AuthUsuarios/Cliente/LoginCliente.aspx") %>' style="color:#5C3A1E;">Ingresar <span>&#8594;</span></a>
-        </div>
-    </div>
-</div>
+</asp:Panel>
 
-<div class="section-label">Administracion</div>
-<div class="crud-grid two-col">
-    <div class="crud-card">
-        <div class="crud-card-body">
-            <div class="crud-icon">&#128101;</div>
-            <h4>Grupos de Usuario</h4>
-            <p>Gestion de grupos y roles del sistema.</p>
-        </div>
-        <div class="crud-card-footer" style="background:#fdf6ec;">
-            <a href='<%: ResolveUrl("~/Modules/AuthUsuarios/Admin/GrupoUsuario.aspx") %>' style="color:#C9973A;">Gestionar <span>&#8594;</span></a>
+<%-- ADMIN — solo empleados con permiso Admin --%>
+<asp:Panel ID="pnlAdmin" runat="server" Visible="false">
+    <div class="au-section">
+        <div class="au-section-title">⚙️ Administración</div>
+        <div class="au-grid">
+            <div class="au-card">
+                <div class="au-card-head"><span>👥</span><h3>Grupos de Usuario</h3></div>
+                <div class="au-card-body">
+                    <div class="au-card-desc">Administra los grupos y sus permisos de acceso.</div>
+                    <a href='<%: ResolveUrl("~/Modules/AuthUsuarios/GrupoUsuario.aspx") %>' class="au-btn">Gestionar Grupos</a>
+                </div>
+            </div>
+            <div class="au-card">
+                <div class="au-card-head"><span>⚙️</span><h3>Permisos</h3></div>
+                <div class="au-card-body">
+                    <div class="au-card-desc">Consulta los permisos asignados a cada grupo.</div>
+                    <a href='<%: ResolveUrl("~/Modules/AuthUsuarios/Permisos.aspx") %>' class="au-btn">Ver Permisos</a>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="crud-card">
-        <div class="crud-card-body">
-            <div class="crud-icon">&#128274;</div>
-            <h4>Permisos</h4>
-            <p>Control de acceso y permisos por rol.</p>
-        </div>
-        <div class="crud-card-footer" style="background:#f5f0eb;">
-            <a href='<%: ResolveUrl("~/Modules/AuthUsuarios/Admin/Permisos.aspx") %>' style="color:#5C3A1E;">Gestionar <span>&#8594;</span></a>
-        </div>
-    </div>
-</div>
+</asp:Panel>
 
-<div class="section-label">Recursos Humanos</div>
-<div class="crud-grid two-col">
-    <div class="crud-card">
-        <div class="crud-card-body">
-            <div class="crud-icon">&#128203;</div>
-            <h4>Puestos</h4>
-            <p>Gestion de puestos de trabajo de la empresa.</p>
-        </div>
-        <div class="crud-card-footer" style="background:#fdf6ec;">
-            <a href='<%: ResolveUrl("~/Modules/AuthUsuarios/Cliente/Puestos.aspx") %>' style="color:#C9973A;">Gestionar <span>&#8594;</span></a>
+<%-- RH — solo empleados con permiso RH --%>
+<asp:Panel ID="pnlRH" runat="server" Visible="false">
+    <div class="au-section">
+        <div class="au-section-title">👨‍💼 Recursos Humanos</div>
+        <div class="au-grid">
+            <div class="au-card">
+                <div class="au-card-head"><span>💼</span><h3>Puestos</h3></div>
+                <div class="au-card-body">
+                    <div class="au-card-desc">Gestiona los puestos de trabajo y salarios.</div>
+                    <a href='<%: ResolveUrl("~/Modules/AuthUsuarios/Puestos.aspx") %>' class="au-btn">Gestionar Puestos</a>
+                </div>
+            </div>
+            <div class="au-card">
+                <div class="au-card-head"><span>👨‍💼</span><h3>Empleados</h3></div>
+                <div class="au-card-body">
+                    <div class="au-card-desc">Administra el personal de la empresa.</div>
+                    <a href='<%: ResolveUrl("~/Modules/AuthUsuarios/Empleados.aspx") %>' class="au-btn">Gestionar Empleados</a>
+                </div>
+            </div>
+            <div class="au-card">
+                <div class="au-card-head"><span>📈</span><h3>Ascensos</h3></div>
+                <div class="au-card-body">
+                    <div class="au-card-desc">Registra y gestiona los ascensos del personal.</div>
+                    <a href='<%: ResolveUrl("~/Modules/AuthUsuarios/Ascensos.aspx") %>' class="au-btn">Gestionar Ascensos</a>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+</asp:Panel>
 
-<a class="back-link" href='<%: ResolveUrl("~/") %>'>&#8592; Volver al Panel Principal</a>
+<%-- CLIENTES — solo empleados con permiso CLI --%>
+<asp:Panel ID="pnlClientes" runat="server" Visible="false">
+    <div class="au-section">
+        <div class="au-section-title">🛒 Clientes</div>
+        <div class="au-grid">
+            <div class="au-card">
+                <div class="au-card-head"><span>🛒</span><h3>Gestión de Clientes</h3></div>
+                <div class="au-card-body">
+                    <div class="au-card-desc">Administra el registro y datos de los clientes.</div>
+                    <a href='<%: ResolveUrl("~/Modules/AuthUsuarios/Clientes.aspx") %>' class="au-btn">Gestionar Clientes</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</asp:Panel>
+
 </asp:Content>
