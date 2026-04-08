@@ -12,7 +12,7 @@ Option Explicit On
 
 Namespace Modules.CatalogoInventario
 
-    Partial Public Class Almacenes
+    Partial Public Class Precios
 
         '''<summary>
         '''pnlMsg control.
@@ -33,58 +33,112 @@ Namespace Modules.CatalogoInventario
         Protected WithEvents lblMsg As Global.System.Web.UI.WebControls.Label
 
         '''<summary>
-        '''lblTituloForm control.
+        '''ddlProducto control.
         '''</summary>
         '''<remarks>
         '''Auto-generated field.
         '''To modify move field declaration from designer file to code-behind file.
         '''</remarks>
-        Protected WithEvents lblTituloForm As Global.System.Web.UI.WebControls.Label
+        Protected WithEvents ddlProducto As Global.System.Web.UI.WebControls.DropDownList
 
         '''<summary>
-        '''hfId control.
+        '''pnlInfoProducto control.
         '''</summary>
         '''<remarks>
         '''Auto-generated field.
         '''To modify move field declaration from designer file to code-behind file.
         '''</remarks>
-        Protected WithEvents hfId As Global.System.Web.UI.WebControls.HiddenField
+        Protected WithEvents pnlInfoProducto As Global.System.Web.UI.WebControls.Panel
 
         '''<summary>
-        '''txtNombre control.
+        '''lblNombreProducto control.
         '''</summary>
         '''<remarks>
         '''Auto-generated field.
         '''To modify move field declaration from designer file to code-behind file.
         '''</remarks>
-        Protected WithEvents txtNombre As Global.System.Web.UI.WebControls.TextBox
+        Protected WithEvents lblNombreProducto As Global.System.Web.UI.WebControls.Label
 
         '''<summary>
-        '''txtPais control.
+        '''lblTipo control.
         '''</summary>
         '''<remarks>
         '''Auto-generated field.
         '''To modify move field declaration from designer file to code-behind file.
         '''</remarks>
-        Protected WithEvents txtPais As Global.System.Web.UI.WebControls.TextBox
+        Protected WithEvents lblTipo As Global.System.Web.UI.WebControls.Label
 
         '''<summary>
-        '''txtUbicacion control.
+        '''lblMaterial control.
         '''</summary>
         '''<remarks>
         '''Auto-generated field.
         '''To modify move field declaration from designer file to code-behind file.
         '''</remarks>
-        Protected WithEvents txtUbicacion As Global.System.Web.UI.WebControls.TextBox
+        Protected WithEvents lblMaterial As Global.System.Web.UI.WebControls.Label
 
         '''<summary>
-        '''btnGuardar control.
+        '''ddlAlmacen control.
         '''</summary>
         '''<remarks>
         '''Auto-generated field.
         '''To modify move field declaration from designer file to code-behind file.
         '''</remarks>
-        Protected WithEvents btnGuardar As Global.System.Web.UI.WebControls.Button
+        Protected WithEvents ddlAlmacen As Global.System.Web.UI.WebControls.DropDownList
+
+        '''<summary>
+        '''ddlNicho control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents ddlNicho As Global.System.Web.UI.WebControls.DropDownList
+
+        '''<summary>
+        '''pnlPrecioNicho control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents pnlPrecioNicho As Global.System.Web.UI.WebControls.Panel
+
+        '''<summary>
+        '''lblPrecioNicho control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents lblPrecioNicho As Global.System.Web.UI.WebControls.Label
+
+        '''<summary>
+        '''txtPrecio control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents txtPrecio As Global.System.Web.UI.WebControls.TextBox
+
+        '''<summary>
+        '''txtFechaInicio control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents txtFechaInicio As Global.System.Web.UI.WebControls.TextBox
+
+        '''<summary>
+        '''btnRegistrar control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents btnRegistrar As Global.System.Web.UI.WebControls.Button
 
         '''<summary>
         '''btnCancelar control.
@@ -96,84 +150,39 @@ Namespace Modules.CatalogoInventario
         Protected WithEvents btnCancelar As Global.System.Web.UI.WebControls.Button
 
         '''<summary>
-        '''pnlNichos control.
+        '''ddlMes control.
         '''</summary>
         '''<remarks>
         '''Auto-generated field.
         '''To modify move field declaration from designer file to code-behind file.
         '''</remarks>
-        Protected WithEvents pnlNichos As Global.System.Web.UI.WebControls.Panel
+        Protected WithEvents ddlMes As Global.System.Web.UI.WebControls.DropDownList
 
         '''<summary>
-        '''lblAlmacenNombre control.
+        '''ddlAnio control.
         '''</summary>
         '''<remarks>
         '''Auto-generated field.
         '''To modify move field declaration from designer file to code-behind file.
         '''</remarks>
-        Protected WithEvents lblAlmacenNombre As Global.System.Web.UI.WebControls.Label
+        Protected WithEvents ddlAnio As Global.System.Web.UI.WebControls.DropDownList
 
         '''<summary>
-        '''hfAlmacenId control.
+        '''btnFiltrar control.
         '''</summary>
         '''<remarks>
         '''Auto-generated field.
         '''To modify move field declaration from designer file to code-behind file.
         '''</remarks>
-        Protected WithEvents hfAlmacenId As Global.System.Web.UI.WebControls.HiddenField
+        Protected WithEvents btnFiltrar As Global.System.Web.UI.WebControls.Button
 
         '''<summary>
-        '''txtNicNumero control.
+        '''gvHistorial control.
         '''</summary>
         '''<remarks>
         '''Auto-generated field.
         '''To modify move field declaration from designer file to code-behind file.
         '''</remarks>
-        Protected WithEvents txtNicNumero As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
-        '''txtNicZona control.
-        '''</summary>
-        '''<remarks>
-        '''Auto-generated field.
-        '''To modify move field declaration from designer file to code-behind file.
-        '''</remarks>
-        Protected WithEvents txtNicZona As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
-        '''txtNicCaracteristica control.
-        '''</summary>
-        '''<remarks>
-        '''Auto-generated field.
-        '''To modify move field declaration from designer file to code-behind file.
-        '''</remarks>
-        Protected WithEvents txtNicCaracteristica As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
-        '''btnCrearNicho control.
-        '''</summary>
-        '''<remarks>
-        '''Auto-generated field.
-        '''To modify move field declaration from designer file to code-behind file.
-        '''</remarks>
-        Protected WithEvents btnCrearNicho As Global.System.Web.UI.WebControls.Button
-
-        '''<summary>
-        '''gvNichos control.
-        '''</summary>
-        '''<remarks>
-        '''Auto-generated field.
-        '''To modify move field declaration from designer file to code-behind file.
-        '''</remarks>
-        Protected WithEvents gvNichos As Global.System.Web.UI.WebControls.GridView
-
-        '''<summary>
-        '''gvAlmacenes control.
-        '''</summary>
-        '''<remarks>
-        '''Auto-generated field.
-        '''To modify move field declaration from designer file to code-behind file.
-        '''</remarks>
-        Protected WithEvents gvAlmacenes As Global.System.Web.UI.WebControls.GridView
+        Protected WithEvents gvHistorial As Global.System.Web.UI.WebControls.GridView
     End Class
 End Namespace

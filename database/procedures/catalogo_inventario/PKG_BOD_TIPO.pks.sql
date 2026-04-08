@@ -1,7 +1,10 @@
+-- ============================================================
+-- 3. PKG_BOD_TIPO
+-- ============================================================
 CREATE OR REPLACE PACKAGE PKG_BOD_TIPO AS
   PROCEDURE CREAR(p_descripcion IN VARCHAR2, p_cat_categoria IN NUMBER, p_id OUT NUMBER);
   PROCEDURE ACTUALIZAR(p_id IN NUMBER, p_descripcion IN VARCHAR2, p_cat_categoria IN NUMBER);
-  PROCEDURE ELIMINAR(p_id IN NUMBER); -- solo si no está referenciado por BOD_PRODUCTO
+  PROCEDURE ELIMINAR(p_id IN NUMBER);
   PROCEDURE LISTAR(p_data OUT SYS_REFCURSOR);
   PROCEDURE LISTAR_POR_CATEGORIA(p_cat_categoria IN NUMBER, p_data OUT SYS_REFCURSOR);
 END PKG_BOD_TIPO;

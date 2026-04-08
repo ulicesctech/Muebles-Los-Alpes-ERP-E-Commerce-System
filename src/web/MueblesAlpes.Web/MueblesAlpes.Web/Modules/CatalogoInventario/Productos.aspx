@@ -135,8 +135,8 @@
                 <ItemTemplate><span class="badge-id"><%# Eval("PRO_REFERENCIA") %></span></ItemTemplate>
             </asp:TemplateField>
             <asp:BoundField DataField="PRO_NOMBRE"      HeaderText="Nombre"   />
-            <asp:BoundField DataField="TIP_TIPO"        HeaderText="Tipo"     ItemStyle-Width="120px" />
-            <asp:BoundField DataField="MAT_MATERIAL"    HeaderText="Material" ItemStyle-Width="120px" />
+            <asp:BoundField DataField="TIP_DESCRIPCION" HeaderText="Tipo"     ItemStyle-Width="120px" />
+            <asp:BoundField DataField="MAT_DESCRIPCION" HeaderText="Material" ItemStyle-Width="120px" />
             <asp:BoundField DataField="PRO_COLOR"       HeaderText="Color"    ItemStyle-Width="90px" />
             <asp:BoundField DataField="PRO_PESO"        HeaderText="Peso kg"  ItemStyle-Width="80px" />
             <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="200px">

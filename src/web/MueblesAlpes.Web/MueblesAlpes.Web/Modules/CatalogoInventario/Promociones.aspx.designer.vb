@@ -12,7 +12,7 @@ Option Explicit On
 
 Namespace Modules.CatalogoInventario
 
-    Partial Public Class Nichos
+    Partial Public Class Promociones
 
         '''<summary>
         '''pnlMsg control.
@@ -33,67 +33,49 @@ Namespace Modules.CatalogoInventario
         Protected WithEvents lblMsg As Global.System.Web.UI.WebControls.Label
 
         '''<summary>
-        '''pnlFormEditar control.
+        '''ddlProducto control.
         '''</summary>
         '''<remarks>
         '''Auto-generated field.
         '''To modify move field declaration from designer file to code-behind file.
         '''</remarks>
-        Protected WithEvents pnlFormEditar As Global.System.Web.UI.WebControls.Panel
+        Protected WithEvents ddlProducto As Global.System.Web.UI.WebControls.DropDownList
 
         '''<summary>
-        '''lblTituloForm control.
+        '''txtPorcentaje control.
         '''</summary>
         '''<remarks>
         '''Auto-generated field.
         '''To modify move field declaration from designer file to code-behind file.
         '''</remarks>
-        Protected WithEvents lblTituloForm As Global.System.Web.UI.WebControls.Label
+        Protected WithEvents txtPorcentaje As Global.System.Web.UI.WebControls.TextBox
 
         '''<summary>
-        '''hfId control.
+        '''txtFechaInicio control.
         '''</summary>
         '''<remarks>
         '''Auto-generated field.
         '''To modify move field declaration from designer file to code-behind file.
         '''</remarks>
-        Protected WithEvents hfId As Global.System.Web.UI.WebControls.HiddenField
+        Protected WithEvents txtFechaInicio As Global.System.Web.UI.WebControls.TextBox
 
         '''<summary>
-        '''txtNumero control.
+        '''txtFechaFinal control.
         '''</summary>
         '''<remarks>
         '''Auto-generated field.
         '''To modify move field declaration from designer file to code-behind file.
         '''</remarks>
-        Protected WithEvents txtNumero As Global.System.Web.UI.WebControls.TextBox
+        Protected WithEvents txtFechaFinal As Global.System.Web.UI.WebControls.TextBox
 
         '''<summary>
-        '''txtZona control.
+        '''btnCrear control.
         '''</summary>
         '''<remarks>
         '''Auto-generated field.
         '''To modify move field declaration from designer file to code-behind file.
         '''</remarks>
-        Protected WithEvents txtZona As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
-        '''txtCaracteristica control.
-        '''</summary>
-        '''<remarks>
-        '''Auto-generated field.
-        '''To modify move field declaration from designer file to code-behind file.
-        '''</remarks>
-        Protected WithEvents txtCaracteristica As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
-        '''btnGuardar control.
-        '''</summary>
-        '''<remarks>
-        '''Auto-generated field.
-        '''To modify move field declaration from designer file to code-behind file.
-        '''</remarks>
-        Protected WithEvents btnGuardar As Global.System.Web.UI.WebControls.Button
+        Protected WithEvents btnCrear As Global.System.Web.UI.WebControls.Button
 
         '''<summary>
         '''btnCancelar control.
@@ -105,12 +87,48 @@ Namespace Modules.CatalogoInventario
         Protected WithEvents btnCancelar As Global.System.Web.UI.WebControls.Button
 
         '''<summary>
-        '''gvNichos control.
+        '''pnlVigente control.
         '''</summary>
         '''<remarks>
         '''Auto-generated field.
         '''To modify move field declaration from designer file to code-behind file.
         '''</remarks>
-        Protected WithEvents gvNichos As Global.System.Web.UI.WebControls.GridView
+        Protected WithEvents pnlVigente As Global.System.Web.UI.WebControls.Panel
+
+        '''<summary>
+        '''lblPorcentaje control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents lblPorcentaje As Global.System.Web.UI.WebControls.Label
+
+        '''<summary>
+        '''lblFechaInicio control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents lblFechaInicio As Global.System.Web.UI.WebControls.Label
+
+        '''<summary>
+        '''lblFechaFinal control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents lblFechaFinal As Global.System.Web.UI.WebControls.Label
+
+        '''<summary>
+        '''gvPromociones control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents gvPromociones As Global.System.Web.UI.WebControls.GridView
     End Class
 End Namespace

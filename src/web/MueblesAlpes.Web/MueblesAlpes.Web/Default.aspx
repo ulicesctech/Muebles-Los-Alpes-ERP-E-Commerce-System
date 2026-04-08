@@ -168,7 +168,7 @@
     <div>
         <h2>Panel Administrativo</h2>
         <p>Muebles Los Alpes — Santos &amp; Familia, Desde 1978</p>
-        <span class="date-tag"><%: DateTime.Now.ToString("dddd, dd 'de' MMMM 'de' yyyy", New System.Globalization.CultureInfo("es-GT")) %></span>
+        
     </div>
     <div class="big-num">ERP</div>
 </div>
@@ -201,7 +201,7 @@
         <div class="mc-head" style="background:#C9973A;"></div>
         <div class="mc-body">
             <div class="mc-ico" style="background:#fdf6ec;">&#128230;</div>
-            <h4>Catalogo &amp; Inventario</h4>
+            <h4>Catalogo & Inventario</h4>
             <p>Productos, categorias, materiales, almacenes y nichos.</p>
         </div>
         <div class="mc-foot" style="color:#C9973A;">
