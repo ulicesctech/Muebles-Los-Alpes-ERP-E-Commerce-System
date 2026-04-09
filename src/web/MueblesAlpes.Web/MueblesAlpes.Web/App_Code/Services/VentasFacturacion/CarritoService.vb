@@ -51,7 +51,15 @@ Public Class CarritoService
         Dim ps As New List(Of OracleParameter) From {
             New OracleParameter("p_carrito", OracleDbType.Decimal, carrito, ParameterDirection.Input)
         }
-        Return OracleDb.ExecRefCursor("SELECT cd.DETCAR_DETALLE_CARRITO, bh.PRO_REFERENCIA, cd.DETPRE_CANTIDAD FROM CLI_DETALLE_CARRITO cd JOIN BOD_HISTORIAL_PRECIO bh ON cd.HIP_HISTORIAL_PRECIO = bh.HIP_HISTORIAL_PRECIO WHERE cd.PRE_CARRITO = :p_carrito", ps, "p_data")
+        Return OracleDb.ExecRefCursor(PKG & ".CARRITO_LISTAR_DETALLE", ps, "p_data")
+    End Function
+
+    Public Shared Function ListarProductosConPrecio() As DataTable
+        Return OracleDb.ExecRefCursor(PKG & ".CARRITO_PRODUCTOS_DISPONIBLES", Nothing, "p_data")
+    End Function
+
+    Public Shared Function Resumen() As DataTable
+        Return OracleDb.ExecRefCursor(PKG & ".CARRITO_RESUMEN", Nothing, "p_data")
     End Function
 
 End Class

@@ -174,13 +174,11 @@
   <ItemGroup>
     <!-- PAGINAS RAIZ -->
     <Content Include="About.aspx" />
+    <Content Include="App_Start\RouteConfig.cs" />
     <Content Include="Contact.aspx" />
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />
     <Content Include="favicon.ico" />
-    <Content Include="Modules\CatalogoInventario\Precios.aspx" />
-    <Content Include="Modules\CatalogoInventario\Promociones.aspx" />
-    <Content Include="Modules\CatalogoInventario\Stock.aspx" />
     <Content Include="Web.config" />
     <Content Include="Bundle.config" />
     <Content Include="Site.Master" />
@@ -393,8 +391,8 @@
     <!-- SERVICES -->
     <Compile Include="App_Code\Data\OracleDb.vb" />
     <Content Include="App_Code\Services\AuthUsuarios\AscensoService.vb" />
-    <Content Include="App_Code\Services\AuthUsuarios\ClienteService.vb" />
-    <Content Include="App_Code\Services\AuthUsuarios\EmpleadoService.vb" />
+    <Compile Include="App_Code\Services\AuthUsuarios\ClienteService.vb" />
+    <Compile Include="App_Code\Services\AuthUsuarios\EmpleadoService.vb" />
     <Content Include="App_Code\Services\AuthUsuarios\GrupoUsuarioService.vb" />
     <Content Include="App_Code\Services\AuthUsuarios\LoginClienteService.vb" />
     <Content Include="App_Code\Services\AuthUsuarios\LoginEmpleadoService.vb" />
@@ -415,6 +413,8 @@
     <Compile Include="App_Code\Services\ComprasProveedor\PedidoService.vb" />
     <Compile Include="App_Code\Services\ComprasProveedor\ProveedorService.vb" />
     <Compile Include="App_Code\Services\ComprasProveedor\ReclamoProveedorService.vb" />
+    <Compile Include="App_Code\Services\VentasFacturacion\CarritoService.vb" />
+    <Compile Include="App_Code\Services\VentasFacturacion\FacturaService.vb" />
     <!-- APP START -->
     <Compile Include="App_Start\BundleConfig.vb" />
     <Compile Include="App_Start\RouteConfig.vb" />
@@ -442,27 +442,6 @@
     </Compile>
     <Compile Include="Global.asax.vb">
       <DependentUpon>Global.asax</DependentUpon>
-    </Compile>
-    <Compile Include="Modules\CatalogoInventario\Precios.aspx.designer.vb">
-      <DependentUpon>Precios.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Modules\CatalogoInventario\Precios.aspx.vb">
-      <DependentUpon>Precios.aspx</DependentUpon>
-      <SubType>ASPXCodebehind</SubType>
-    </Compile>
-    <Compile Include="Modules\CatalogoInventario\Promociones.aspx.designer.vb">
-      <DependentUpon>Promociones.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Modules\CatalogoInventario\Promociones.aspx.vb">
-      <DependentUpon>Promociones.aspx</DependentUpon>
-      <SubType>ASPXCodebehind</SubType>
-    </Compile>
-    <Compile Include="Modules\CatalogoInventario\Stock.aspx.designer.vb">
-      <DependentUpon>Stock.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Modules\CatalogoInventario\Stock.aspx.vb">
-      <DependentUpon>Stock.aspx</DependentUpon>
-      <SubType>ASPXCodebehind</SubType>
     </Compile>
     <Compile Include="Site.Master.designer.vb">
       <DependentUpon>Site.Master</DependentUpon>

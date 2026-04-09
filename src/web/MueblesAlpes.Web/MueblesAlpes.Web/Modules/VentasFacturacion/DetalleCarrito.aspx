@@ -2,52 +2,76 @@
 
 <asp:Content ID="cBody" ContentPlaceHolderID="MainContent" runat="server">
 
-    <div class="page-header"><h2>Detalle del Carrito</h2></div>
+    <style>
+        :root {
+            --cafe-oscuro: #2f1b0f;
+            --cafe-medio: #5c3a1e;
+            --dorado: #c9973a;
+            --borde: #dcc29a;
+            --texto: #3a281b;
+            --rojo: #8f2d2d;
+            --sombra: 0 8px 24px rgba(47, 27, 15, 0.08);
+        }
+
+        .page-header { margin-bottom: 22px; border-bottom: 2px solid var(--dorado); padding-bottom: 10px; }
+        .page-header h2 { margin: 0; color: var(--cafe-medio); font-weight: 600; }
+
+        .tabla-wrap { border-radius: 14px; overflow: hidden; box-shadow: var(--sombra); border: 1px solid var(--borde); background: white; }
+
+        .tabla-detalle { width: 100%; border-collapse: collapse; }
+        .tabla-detalle th { 
+            background: linear-gradient(180deg, var(--cafe-medio) 0%, var(--cafe-oscuro) 100%); 
+            color: #f4ddb0; font-weight: 700; font-size: 13px; 
+            text-align: center; padding: 14px 12px; 
+            border: 1px solid #6d4725; 
+        }
+        .tabla-detalle td { 
+            padding: 14px 12px; border: 1px solid #eadbc2; 
+            color: var(--texto); vertical-align: middle; 
+            text-align: center; background: #fffaf3; 
+        }
+        .tabla-detalle tr:nth-child(even) td { background: #f8efe2; }
+        .tabla-detalle tr:hover td { background: #fdf6ec; }
+
+        .badge-total {
+            background: linear-gradient(135deg, var(--cafe-medio), var(--cafe-oscuro));
+            color: #f4ddb0;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 13px;
+            display: inline-block;
+        }
+
+        .alert { border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; }
+    </style>
+
+    <div class="page-header">
+        <h2>📦 Detalle de Carritos</h2>
+    </div>
 
     <asp:Panel ID="pnlMsg" runat="server" Visible="false" CssClass="alert">
         <asp:Label ID="lblMsg" runat="server"></asp:Label>
     </asp:Panel>
 
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <asp:Label ID="lblTituloForm" runat="server" Text="Agregar Producto al Carrito"></asp:Label>
-        </div>
-        <div class="panel-body">
-            <asp:HiddenField ID="hfDetalle" runat="server" Value="" />
-            <div class="row">
-                <div class="col-sm-4">
-                    <div class="form-group">
-                        <label>Carrito <span class="text-danger">*</span></label>
-                        <asp:DropDownList ID="ddlCarrito" runat="server" CssClass="form-control"></asp:DropDownList>
-                    </div>
-                </div>
-                <div class="col-sm-4">
-                    <div class="form-group">
-                        <label>Producto <span class="text-danger">*</span></label>
-                        <asp:DropDownList ID="ddlProducto" runat="server" CssClass="form-control"></asp:DropDownList>
-                    </div>
-                </div>
-                <div class="col-sm-4">
-                    <div class="form-group">
-                        <label>Cantidad <span class="text-danger">*</span></label>
-                        <asp:TextBox ID="txtCantidad" runat="server" CssClass="form-control" placeholder="1"></asp:TextBox>
-                    </div>
-                </div>
-            </div>
-            <asp:Button ID="btnGuardar"  runat="server" Text="Agregar"  CssClass="btn btn-primary" OnClick="btnGuardar_Click" />
-            <asp:Button ID="btnCancelar" runat="server" Text="Cancelar" CssClass="btn btn-default" OnClick="btnCancelar_Click" CausesValidation="false" />
-        </div>
+    <div class="tabla-wrap">
+        <asp:GridView ID="gvDetalles" runat="server"
+            AutoGenerateColumns="false"
+            CssClass="tabla-detalle"
+            EmptyDataText="No hay carritos con productos registrados."
+            GridLines="None">
+            <Columns>
+                <asp:BoundField DataField="PRE_CORRELATIVO"  HeaderText="Carrito"   ItemStyle-Width="110px" />
+                <asp:BoundField DataField="NOMBRE_CLIENTE"   HeaderText="Cliente" />
+                <asp:BoundField DataField="PRE_FECHA_INICIO" HeaderText="Fecha"     ItemStyle-Width="130px" />
+                <asp:BoundField DataField="PRODUCTOS"        HeaderText="Productos" />
+                <asp:TemplateField HeaderText="Total" ItemStyle-Width="120px" ItemStyle-HorizontalAlign="Center">
+                    <ItemTemplate>
+                        <span class="badge-total">Q <%# Eval("TOTAL", "{0:N2}") %></span>
+                    </ItemTemplate>
+                </asp:TemplateField>
+            </Columns>
+        </asp:GridView>
     </div>
-
-    <asp:GridView ID="gvDetalles" runat="server"
-                  AutoGenerateColumns="false"
-                  CssClass="table table-bordered table-hover table-striped"
-                  EmptyDataText="No hay productos en el carrito.">
-        <Columns>
-            <asp:BoundField DataField="PRE_CORRELATIVO"  HeaderText="Carrito"        ItemStyle-Width="100px" />
-            <asp:BoundField DataField="PRODUCTOS"        HeaderText="Productos" />
-            <asp:BoundField DataField="TOTAL_CANTIDAD"   HeaderText="Cantidad Total"  ItemStyle-Width="100px" />
-        </Columns>
-    </asp:GridView>
 
 </asp:Content>

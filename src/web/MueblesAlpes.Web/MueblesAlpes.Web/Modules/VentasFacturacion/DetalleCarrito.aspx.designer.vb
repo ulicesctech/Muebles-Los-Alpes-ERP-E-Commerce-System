@@ -33,69 +33,6 @@ Namespace Modules.VentasFacturacion
         Protected WithEvents lblMsg As Global.System.Web.UI.WebControls.Label
 
         '''<summary>
-        '''Control lblTituloForm.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents lblTituloForm As Global.System.Web.UI.WebControls.Label
-
-        '''<summary>
-        '''Control hfDetalle.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents hfDetalle As Global.System.Web.UI.WebControls.HiddenField
-
-        '''<summary>
-        '''Control ddlCarrito.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents ddlCarrito As Global.System.Web.UI.WebControls.DropDownList
-
-        '''<summary>
-        '''Control ddlProducto.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents ddlProducto As Global.System.Web.UI.WebControls.DropDownList
-
-        '''<summary>
-        '''Control txtCantidad.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents txtCantidad As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
-        '''Control btnGuardar.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents btnGuardar As Global.System.Web.UI.WebControls.Button
-
-        '''<summary>
-        '''Control btnCancelar.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents btnCancelar As Global.System.Web.UI.WebControls.Button
-
-        '''<summary>
         '''Control gvDetalles.
         '''</summary>
         '''<remarks>

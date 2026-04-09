@@ -245,11 +245,11 @@
             <RowStyle />
             <AlternatingRowStyle />
             <Columns>
-                <asp:BoundField DataField="FACLI_CODIGO_FACTURA" HeaderText="Código Factura" ItemStyle-Width="220px" />
-                <asp:BoundField DataField="PRE_PRESUPUESTO" HeaderText="Carrito" ItemStyle-Width="120px" />
-                <asp:BoundField DataField="EM_EMPLEADO" HeaderText="Empleado" ItemStyle-Width="120px" />
-                <asp:BoundField DataField="FACLI_FECHA" HeaderText="Fecha" ItemStyle-Width="220px" />
-            </Columns>
+    <asp:BoundField DataField="FACLI_CODIGO_FACTURA" HeaderText="Código Factura" ItemStyle-Width="220px" />
+    <asp:BoundField DataField="PRE_CORRELATIVO"      HeaderText="Carrito"        ItemStyle-Width="120px" />
+    <asp:BoundField DataField="NOMBRE_EMPLEADO"      HeaderText="Empleado"       ItemStyle-Width="200px" />
+    <asp:BoundField DataField="FACLI_FECHA"          HeaderText="Fecha"          ItemStyle-Width="220px" />
+</Columns>
         </asp:GridView>
     </div>
 
