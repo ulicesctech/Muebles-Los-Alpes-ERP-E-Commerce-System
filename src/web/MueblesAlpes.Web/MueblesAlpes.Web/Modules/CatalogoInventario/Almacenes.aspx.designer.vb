@@ -96,6 +96,78 @@ Namespace Modules.CatalogoInventario
         Protected WithEvents btnCancelar As Global.System.Web.UI.WebControls.Button
 
         '''<summary>
+        '''pnlNichos control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents pnlNichos As Global.System.Web.UI.WebControls.Panel
+
+        '''<summary>
+        '''lblAlmacenNombre control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents lblAlmacenNombre As Global.System.Web.UI.WebControls.Label
+
+        '''<summary>
+        '''hfAlmacenId control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents hfAlmacenId As Global.System.Web.UI.WebControls.HiddenField
+
+        '''<summary>
+        '''txtNicNumero control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents txtNicNumero As Global.System.Web.UI.WebControls.TextBox
+
+        '''<summary>
+        '''txtNicZona control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents txtNicZona As Global.System.Web.UI.WebControls.TextBox
+
+        '''<summary>
+        '''txtNicCaracteristica control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents txtNicCaracteristica As Global.System.Web.UI.WebControls.TextBox
+
+        '''<summary>
+        '''btnCrearNicho control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents btnCrearNicho As Global.System.Web.UI.WebControls.Button
+
+        '''<summary>
+        '''gvNichos control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents gvNichos As Global.System.Web.UI.WebControls.GridView
+
+        '''<summary>
         '''gvAlmacenes control.
         '''</summary>
         '''<remarks>

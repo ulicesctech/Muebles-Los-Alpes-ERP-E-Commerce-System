@@ -1,0 +1,27 @@
+CREATE OR REPLACE PACKAGE PKG_CLI_CARRITO AS
+  PROCEDURE CARRITO_CREAR(
+    p_correlativo   IN VARCHAR2,
+    p_cliente       IN NUMBER,
+    p_id            OUT NUMBER
+  );
+  PROCEDURE CARRITO_AGREGAR_DETALLE(
+    p_carrito       IN NUMBER,
+    p_hist_precio   IN NUMBER,
+    p_cantidad      IN NUMBER,
+    p_id            OUT NUMBER
+  );
+  PROCEDURE CARRITO_ELIMINAR_DETALLE(
+    p_id IN NUMBER
+  );
+  PROCEDURE CARRITO_LISTAR(
+    p_data OUT SYS_REFCURSOR
+  );
+  PROCEDURE CARRITO_VACIAR(
+    p_carrito IN NUMBER
+  );
+  PROCEDURE CARRITO_BUSCAR(
+    p_cliente IN NUMBER,
+    p_data OUT SYS_REFCURSOR
+  );
+END PKG_CLI_CARRITO;
+/

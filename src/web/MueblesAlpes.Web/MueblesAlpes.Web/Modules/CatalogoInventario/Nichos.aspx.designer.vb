@@ -33,6 +33,15 @@ Namespace Modules.CatalogoInventario
         Protected WithEvents lblMsg As Global.System.Web.UI.WebControls.Label
 
         '''<summary>
+        '''pnlFormEditar control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents pnlFormEditar As Global.System.Web.UI.WebControls.Panel
+
+        '''<summary>
         '''lblTituloForm control.
         '''</summary>
         '''<remarks>

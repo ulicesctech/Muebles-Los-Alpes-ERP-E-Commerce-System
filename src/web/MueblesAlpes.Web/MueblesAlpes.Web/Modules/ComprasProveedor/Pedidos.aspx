@@ -47,7 +47,7 @@
 
 <div class="breadcrumb-mod">
     <a href='<%: ResolveUrl("~/") %>'>🏠 Inicio</a> /
-    <a href='<%: ResolveUrl("~/Modules/ComprasProveedor/Index.aspx") %>'>💳 Cuentas proveedor</a> /
+    <a href='<%: ResolveUrl("~/Modules/ComprasProveedor/Index.aspx") %>'>💳 Cuentas por Pagar</a> /
     <strong style="color:#5C3A1E;">Pedidos</strong>
 </div>
 <div class="page-title">📋 Gestión de Pedidos</div>

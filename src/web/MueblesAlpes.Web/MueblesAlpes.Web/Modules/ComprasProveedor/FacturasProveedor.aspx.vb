@@ -27,13 +27,10 @@ Namespace Modules.ComprasProveedor
         End Sub
 
         Private Sub CargarGrilla(Optional texto As String = "")
-            Try
-                gvFacturas.DataSource = If(String.IsNullOrWhiteSpace(texto),
-                                          FacturaProveedorService.Listar(),
-                                          FacturaProveedorService.Buscar(texto))
-                gvFacturas.DataBind()
+            gvFacturas.DataSource = If(String.IsNullOrWhiteSpace(texto), FacturaProveedorService.Listar(), FacturaProveedorService.Buscar(texto))
+            gvFacturas.DataBind()
             Catch ex As Exception
-                MostrarError("Tuvimos un problema al mostrar la lista de facturas.")
+            MostrarError("Tuvimos un problema al mostrar la lista de facturas.")
             End Try
         End Sub
 
@@ -56,22 +53,18 @@ Namespace Modules.ComprasProveedor
 
                 If modo = "nuevo" Then
                     FacturaProveedorService.Registrar(orcNueva, codigo)
-                    MostrarExito("¡Excelente! La factura ha sido registrada correctamente.")
+                    MostrarExito("Factura registrada correctamente.")
                 Else
+                    ' SOLUCIÓN AL ERROR BC30057:
                     ' hfKey.Value contiene la OC original antes del cambio
                     FacturaProveedorService.Actualizar(hfKey.Value, orcNueva, codigo)
-                    MostrarExito("¡Hecho! Los datos de la factura se han actualizado con éxito.")
+                    MostrarExito("Factura actualizada correctamente.")
                 End If
 
                 Limpiar()
                 CargarGrilla()
             Catch ex As Exception
-                ' Manejo de errores de base de datos
-                If ex.Message.Contains("ORA-00001") Then
-                    MostrarError("No se pudo guardar: Esta orden ya tiene una factura asignada o el código de factura ya existe.")
-                Else
-                    MostrarError("Hubo un inconveniente técnico al guardar los datos: " & ex.Message)
-                End If
+                MostrarError("Error: " & ex.Message)
             End Try
         End Sub
 
@@ -87,12 +80,12 @@ Namespace Modules.ComprasProveedor
 
                     If filas.Length > 0 Then
                         Dim fila As DataRow = filas(0)
-                        hfKey.Value = idOriginal
+                        hfKey.Value = idOriginal ' Llave primaria original
                         hfModo.Value = "editar"
                         txtCodigoFac.Text = fila("FACPRO_CODIGO_FACTURA").ToString()
                         ddlOrden.SelectedValue = idOriginal
-
-                        lblTituloForm.Text = "📝 Editando Factura de Orden: " & ddlOrden.SelectedItem.Text
+                        ddlOrden.Enabled = True ' Se permite cambiar la orden
+                        lblTituloForm.Text = "Editar Factura"
                         btnGuardar.Text = "💾 Actualizar"
                         pnlMsg.Visible = False
                     End If
@@ -105,14 +98,7 @@ Namespace Modules.ComprasProveedor
                     FacturaProveedorService.Eliminar(idOriginal)
                     Limpiar()
                     CargarGrilla()
-                    MostrarExito("La factura ha sido eliminada del sistema correctamente.")
-                Catch ex As Exception
-                    If ex.Message.Contains("ORA-02292") Then
-                        MostrarError("No se puede eliminar: Esta factura ya tiene pagos o registros contables asociados.")
-                    Else
-                        MostrarError("Hubo un problema al intentar borrar el registro.")
-                    End If
-                End Try
+                    MostrarExito("Factura eliminada.")
             End If
         End Sub
 
@@ -137,20 +123,23 @@ Namespace Modules.ComprasProveedor
             txtCodigoFac.Text = ""
             ddlOrden.Enabled = True
             ddlOrden.SelectedIndex = 0
-            lblTituloForm.Text = "➕ Registrar Factura"
+            lblTituloForm.Text = "Registrar Factura"
             btnGuardar.Text = "💾 Guardar"
+            pnlMsg.Visible = False
         End Sub
 
-        ' --- Métodos de Mensajería Amigable ---
+        Protected Sub btnCancelar_Click(sender As Object, e As EventArgs)
+            Limpiar()
+        End Sub
 
         Private Sub MostrarError(msg As String)
-            lblMsg.Text = "<span><strong>Lo sentimos:</strong> " & msg & "</span>"
+            lblMsg.Text = "⚠️ " & msg
             pnlMsg.CssClass = "alert-err"
             pnlMsg.Visible = True
         End Sub
 
         Private Sub MostrarExito(msg As String)
-            lblMsg.Text = "<span><strong>¡Hecho!</strong> " & msg & "</span>"
+            lblMsg.Text = "✅ " & msg
             pnlMsg.CssClass = "alert-ok"
             pnlMsg.Visible = True
         End Sub

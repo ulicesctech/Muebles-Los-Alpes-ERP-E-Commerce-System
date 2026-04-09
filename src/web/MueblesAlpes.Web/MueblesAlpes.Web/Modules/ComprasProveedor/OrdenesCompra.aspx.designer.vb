@@ -42,6 +42,15 @@ Namespace Modules.ComprasProveedor
         Protected WithEvents lblTituloForm As Global.System.Web.UI.WebControls.Label
 
         '''<summary>
+        '''Control hfKey.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents hfKey As Global.System.Web.UI.WebControls.HiddenField
+
+        '''<summary>
         '''Control hfModo.
         '''</summary>
         '''<remarks>
@@ -49,15 +58,6 @@ Namespace Modules.ComprasProveedor
         '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         '''</remarks>
         Protected WithEvents hfModo As Global.System.Web.UI.WebControls.HiddenField
-
-        '''<summary>
-        '''Control txtIDOrden.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents txtIDOrden As Global.System.Web.UI.WebControls.TextBox
 
         '''<summary>
         '''Control txtCodigo.

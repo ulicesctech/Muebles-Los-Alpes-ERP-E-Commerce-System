@@ -39,7 +39,7 @@
 
 <div class="breadcrumb-mod">
     <a href='<%: ResolveUrl("~/") %>'>🏠 Inicio</a> /
-    <a href='<%: ResolveUrl("~/Modules/ComprasProveedor/Index.aspx") %>'>💳 Compras proveedor</a> /
+    <a href='<%: ResolveUrl("~/Modules/ComprasProveedor/Index.aspx") %>'>💳 Cuentas por Pagar</a> /
     <strong style="color:#5C3A1E;">Proveedores</strong>
 </div>
 

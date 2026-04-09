@@ -5,12 +5,15 @@ Imports System
 Imports System.Data
 Imports Oracle.ManagedDataAccess.Client
 
+' ============================================================
+' RUTA: Modules/ComprasProveedor/OrdenesCompra.aspx.vb
+' ============================================================
 Namespace Modules.ComprasProveedor
 
     Partial Public Class OrdenesCompra
         Inherits System.Web.UI.Page
 
-        Protected Sub Page_Load(sender As Object, e As EventArgs) Handles Me.Load
+        Protected Sub Page_Load(sender As Object, e As EventArgs)
             If Not IsPostBack Then
                 CargarProveedores()
                 LimpiarFormulario()
@@ -28,7 +31,7 @@ Namespace Modules.ComprasProveedor
                 ddlProveedor.DataBind()
                 ddlProveedor.Items.Insert(0, New ListItem("-- Seleccione un proveedor --", "0"))
             Catch ex As Exception
-                MostrarError("No logramos obtener la lista de proveedores. Por favor, intenta recargar la página.")
+                MostrarError("Error al cargar proveedores: " & ex.Message)
             End Try
         End Sub
 
@@ -39,7 +42,7 @@ Namespace Modules.ComprasProveedor
                                           OrdenCompraService.Buscar(texto))
                 gvOrdenes.DataBind()
             Catch ex As Exception
-                MostrarError("Tuvimos un problema al cargar el listado de órdenes. Intenta nuevamente.")
+                MostrarError("Error al cargar la lista: " & ex.Message)
             End Try
         End Sub
 
@@ -67,30 +70,26 @@ Namespace Modules.ComprasProveedor
                 Dim total As Decimal = Convert.ToDecimal(txtTotal.Text.Trim())
 
                 If modo = "nuevo" Then
-                    ' Se pasa idOrden como primer parámetro (p_orc_key)
-                    OrdenCompraService.Crear(idOrden, codigo, provId, total)
-                    MostrarExito("¡Excelente! La orden de compra ha sido registrada correctamente.")
+                    ' El paquete de Oracle generará la PK internamente
+                    OrdenCompraService.Crear(codigo, provId, total)
+                    MostrarExito("Orden registrada correctamente.")
                 Else
-                    ' En edición, el ID viene del campo (que está deshabilitado pero mantiene el valor)
-                    OrdenCompraService.Actualizar(idOrden, codigo, provId, total)
-                    MostrarExito("¡Hecho! Los cambios en la orden se han guardado con éxito.")
+                    ' En edición usamos la llave original guardada
+                    Dim orcKey As String = hfKey.Value
+                    OrdenCompraService.Actualizar(orcKey, codigo, provId, total)
+                    MostrarExito("Orden actualizada correctamente.")
                 End If
 
                 LimpiarFormulario()
                 CargarGrilla()
             Catch ex As Exception
-                ' Captura de error de código o ID duplicado (Llave Primaria)
-                If ex.Message.Contains("ORA-00001") Or ex.Message.ToLower().Contains("unique") Then
-                    MostrarError("Ya existe una orden registrada con ese ID o Código. Por favor, verifica los datos.")
-                Else
-                    MostrarError("No pudimos guardar los datos en este momento. Error técnico: " & ex.Message)
-                End If
+                MostrarError("Error al guardar: " & ex.Message)
             End Try
         End Sub
 
         Protected Sub btnCancelar_Click(sender As Object, e As EventArgs)
             LimpiarFormulario()
-            pnlMsg.Visible = False
+            CargarGrilla()
         End Sub
 
         ' ── Eventos de la Grilla ────────────────────────────
@@ -108,7 +107,7 @@ Namespace Modules.ComprasProveedor
 
                         If filas.Length > 0 Then
                             Dim fila As DataRow = filas(0)
-
+                            hfKey.Value = orcKey
                             hfModo.Value = "editar"
 
                             ' Bloqueamos el ID porque es la llave primaria y no se debe editar
@@ -122,7 +121,8 @@ Namespace Modules.ComprasProveedor
                             Dim item As ListItem = ddlProveedor.Items.FindByValue(provId)
                             If item IsNot Nothing Then ddlProveedor.SelectedValue = provId
 
-                            lblTituloForm.Text = "📝 Editando Orden: " & orcKey
+
+                            lblTituloForm.Text = "Editar Orden de Compra"
                             btnGuardar.Text = "💾 Actualizar"
                             pnlMsg.Visible = False
                         End If
@@ -133,15 +133,12 @@ Namespace Modules.ComprasProveedor
                 Case "Eliminar"
                     Try
                         OrdenCompraService.Eliminar(orcKey)
+                        MostrarExito("Orden eliminada correctamente.")
                         LimpiarFormulario()
                         CargarGrilla()
                         MostrarExito("La orden de compra ha sido eliminada del sistema correctamente.")
                     Catch ex As Exception
-                        If ex.Message.Contains("ORA-02292") Then
-                            MostrarError("No se puede eliminar: Esta orden ya tiene movimientos asociados.")
-                        Else
-                            MostrarError("Hubo un inconveniente al intentar borrar el registro.")
-                        End If
+                        MostrarError("Error al eliminar: " & ex.Message)
                     End Try
             End Select
         End Sub
@@ -154,44 +151,50 @@ Namespace Modules.ComprasProveedor
             End If
 
             If String.IsNullOrWhiteSpace(txtCodigo.Text) Then
-                MostrarError("¡Ups! Olvidaste ingresar el código de referencia.") : Return False
+                MostrarError("El código es obligatorio.") : Return False
             End If
 
+            ' QUITA EL "AndAlso hfModo.Value = 'nuevo'"
             If ddlProveedor.SelectedValue = "0" Then
-                MostrarError("Por favor, selecciona un proveedor de la lista.") : Return False
+                MostrarError("Debe seleccionar un proveedor.") : Return False
             End If
 
             Dim total As Decimal
             If Not Decimal.TryParse(txtTotal.Text.Trim(), total) OrElse total < 0 Then
-                MostrarError("El monto total debe ser un número válido (mayor o igual a 0).") : Return False
+                MostrarError("Ingrese un total válido mayor o igual a 0.") : Return False
             End If
             Return True
         End Function
 
         Private Sub LimpiarFormulario()
+            hfKey.Value = ""
             hfModo.Value = "nuevo"
-            txtIDOrden.Text = ""
-            txtIDOrden.Enabled = True ' Se habilita para nuevos registros
+
+            ' El usuario ingresa el código manualmente
             txtCodigo.Text = ""
-            txtTotal.Text = "0"
+            txtCodigo.ReadOnly = False
+
+            txtTotal.Text = ""
             ddlProveedor.SelectedIndex = 0
-            lblTituloForm.Text = "➕ Nueva Orden de Compra"
+            lblTituloForm.Text = "Nueva Orden de Compra"
             btnGuardar.Text = "💾 Guardar"
+            pnlMsg.Visible = False
         End Sub
 
         ' --- Métodos de Mensajería ---
 
         Private Sub MostrarError(msg As String)
-            lblMsg.Text = "<span><strong>Lo sentimos:</strong> " & msg & "</span>"
+            lblMsg.Text = "<span>⚠️ " & msg & "</span>"
             pnlMsg.CssClass = "alert-err"
             pnlMsg.Visible = True
         End Sub
 
         Private Sub MostrarExito(msg As String)
-            lblMsg.Text = "<span><strong>¡Hecho!</strong> " & msg & "</span>"
+            lblMsg.Text = "<span>✅ " & msg & "</span>"
             pnlMsg.CssClass = "alert-ok"
             pnlMsg.Visible = True
         End Sub
 
     End Class
+
 End Namespace

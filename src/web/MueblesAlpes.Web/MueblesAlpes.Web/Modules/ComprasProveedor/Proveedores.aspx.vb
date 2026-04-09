@@ -9,18 +9,20 @@ Namespace Modules.ComprasProveedor
         Inherits System.Web.UI.Page
 
         Protected Sub Page_Load(sender As Object, e As EventArgs) Handles Me.Load
-            If Not IsPostBack Then
-                LimpiarFormulario()
-                CargarGrilla()
-            End If
+            If Not IsPostBack Then CargarGrilla()
         End Sub
 
         Private Sub CargarGrilla()
             Try
-                gvProveedores.DataSource = ProveedorService.Listar()
+                ' Si el campo de búsqueda tiene texto, usamos Buscar, si no, Listar
+                If String.IsNullOrEmpty(txtBuscar.Text.Trim()) Then
+                    gvProveedores.DataSource = ProveedorService.Listar()
+                Else
+                    gvProveedores.DataSource = ProveedorService.Buscar(txtBuscar.Text.Trim())
+                End If
                 gvProveedores.DataBind()
             Catch ex As Exception
-                MostrarError("No logramos cargar la lista de proveedores. Por favor, intenta recargar la página.")
+                MostrarError("Error al cargar datos: " & ex.Message)
             End Try
         End Sub
 
@@ -32,70 +34,63 @@ Namespace Modules.ComprasProveedor
                 Dim id As Decimal = Convert.ToDecimal(hfId.Value)
 
                 If id = 0 Then
-                    ProveedorService.Crear(txtNit.Text.Trim(), txtNombre.Text.Trim(), txtAvenida.Text.Trim(), txtZona.Text.Trim(), txtDireccion.Text.Trim(), txtTelefono.Text.Trim())
-                    MostrarExito("¡Excelente! El nuevo proveedor <strong>" & txtNombre.Text.Trim() & "</strong> ha sido registrado correctamente.")
+                    ProveedorService.Crear(txtNit.Text, txtNombre.Text, txtAvenida.Text, txtZona.Text, txtDireccion.Text, txtTelefono.Text)
+                    MostrarExito("Proveedor creado correctamente.")
                 Else
-                    ProveedorService.Actualizar(id, txtNit.Text.Trim(), txtNombre.Text.Trim(), txtAvenida.Text.Trim(), txtZona.Text.Trim(), txtDireccion.Text.Trim(), txtTelefono.Text.Trim())
-                    MostrarExito("Los cambios en la información de <strong>" & txtNombre.Text.Trim() & "</strong> se han guardado con éxito.")
+                    ProveedorService.Actualizar(id, txtNit.Text, txtNombre.Text, txtAvenida.Text, txtZona.Text, txtDireccion.Text, txtTelefono.Text)
+                    MostrarExito("Proveedor actualizado correctamente.")
                 End If
 
                 LimpiarFormulario()
                 CargarGrilla()
             Catch ex As Exception
-                ' Manejo de NIT duplicado
-                If ex.Message.Contains("ORA-00001") Then
-                    MostrarError("No se pudo guardar: Ya existe un proveedor registrado con el NIT <strong>" & txtNit.Text & "</strong>.")
-                Else
-                    MostrarError("Tuvimos un inconveniente al intentar guardar los datos. Error: " & ex.Message)
-                End If
+                ' Aquí caerá el mensaje de "No se puede actualizar..." si hay error de integridad
+                MostrarError(ex.Message)
             End Try
         End Sub
 
         Protected Sub gvProveedores_RowCommand(sender As Object, e As GridViewCommandEventArgs)
-            If e.CommandArgument Is Nothing OrElse String.IsNullOrEmpty(e.CommandArgument.ToString()) Then Return
+            Try
+                Dim id As Decimal = Convert.ToDecimal(e.CommandArgument)
 
-            Dim id As Decimal = Convert.ToDecimal(e.CommandArgument)
+                If e.CommandName = "Editar" Then
+                    Try
+                        ' Recuperamos la fila para obtener los datos actuales
+                        Dim btn As LinkButton = DirectCast(e.CommandSource, LinkButton)
+                        Dim row As GridViewRow = DirectCast(btn.NamingContainer, GridViewRow)
 
-            If e.CommandName = "Editar" Then
-                Try
-                    ' Recuperamos la fila para obtener los datos actuales
-                    Dim btn As LinkButton = DirectCast(e.CommandSource, LinkButton)
-                    Dim row As GridViewRow = DirectCast(btn.NamingContainer, GridViewRow)
+                        hfId.Value = id.ToString()
+                        txtNit.Text = Server.HtmlDecode(row.Cells(1).Text).Trim().Replace("&nbsp;", "")
+                        txtNombre.Text = Server.HtmlDecode(row.Cells(2).Text).Trim().Replace("&nbsp;", "")
+                        txtTelefono.Text = Server.HtmlDecode(row.Cells(3).Text).Trim().Replace("&nbsp;", "")
+                        txtAvenida.Text = Server.HtmlDecode(row.Cells(4).Text).Trim().Replace("&nbsp;", "")
+                        txtZona.Text = Server.HtmlDecode(row.Cells(5).Text).Trim().Replace("&nbsp;", "")
+                        txtDireccion.Text = Server.HtmlDecode(row.Cells(6).Text).Trim().Replace("&nbsp;", "")
 
-                    hfId.Value = id.ToString()
-                    txtNit.Text = Server.HtmlDecode(row.Cells(1).Text).Trim().Replace("&nbsp;", "")
-                    txtNombre.Text = Server.HtmlDecode(row.Cells(2).Text).Trim().Replace("&nbsp;", "")
-                    txtTelefono.Text = Server.HtmlDecode(row.Cells(3).Text).Trim().Replace("&nbsp;", "")
-                    txtAvenida.Text = Server.HtmlDecode(row.Cells(4).Text).Trim().Replace("&nbsp;", "")
-                    txtZona.Text = Server.HtmlDecode(row.Cells(5).Text).Trim().Replace("&nbsp;", "")
-                    txtDireccion.Text = Server.HtmlDecode(row.Cells(6).Text).Trim().Replace("&nbsp;", "")
+                        ' Bloqueamos el NIT en edición para evitar inconsistencias
+                        txtNit.Enabled = False
+                        lblTituloForm.Text = "Editando: " & txtNombre.Text
+                        btnGuardar.Text = "💾 Actualizar"
+                        pnlMsg.Visible = False ' Limpiar mensajes previos al editar
 
-                    ' Bloqueamos el NIT en edición para evitar inconsistencias
-                    txtNit.Enabled = False
-                    lblTituloForm.Text = "📝 Editando: " & txtNombre.Text
-                    btnGuardar.Text = "💾 Actualizar Información"
-                    pnlMsg.Visible = False
+                        ElseIf e.CommandName = "Eliminar" Then
+                        ' --- CAMBIO CLAVE AQUÍ ---
+                        ProveedorService.Eliminar(id)
+                        MostrarExito("Proveedor eliminado correctamente.")
+                        CargarGrilla()
+                        MostrarExito("¡Hecho! El proveedor ha sido eliminado del sistema de forma segura.")
+                    Catch ex As Exception
+                        If ex.Message.Contains("ORA-02292") Then
+                            MostrarError("No se puede eliminar: Este proveedor ya tiene registros vinculados (órdenes, facturas o reclamos).")
+                        Else
+                            MostrarError("Hubo un inconveniente al intentar eliminar el registro.")
+                        End If
 
-                    ' Un pequeño feedback visual para que el usuario sepa que subió al formulario
-                    MostrarExito("Datos cargados. Puedes realizar los cambios necesarios arriba.")
-                Catch
-                    MostrarError("No pudimos recuperar la información del proveedor para editarla.")
-                End Try
-
-            ElseIf e.CommandName = "Eliminar" Then
-                Try
-                    ProveedorService.Eliminar(id)
-                    LimpiarFormulario()
-                    CargarGrilla()
-                    MostrarExito("¡Hecho! El proveedor ha sido eliminado del sistema de forma segura.")
-                Catch ex As Exception
-                    If ex.Message.Contains("ORA-02292") Then
-                        MostrarError("No se puede eliminar: Este proveedor ya tiene registros vinculados (órdenes, facturas o reclamos).")
-                    Else
-                        MostrarError("Hubo un inconveniente al intentar eliminar el registro.")
-                    End If
-                End Try
-            End If
+                    Catch ex As Exception
+                        ' Aquí se captura el error ORA-02292 que lanzamos desde ProveedorService
+                        MostrarError(ex.Message)
+                    End Try
+                End If
         End Sub
 
         Protected Sub btnBuscar_Click(sender As Object, e As EventArgs)
@@ -131,25 +126,22 @@ Namespace Modules.ComprasProveedor
 
         Private Sub LimpiarFormulario()
             hfId.Value = "0"
-            txtNit.Text = ""
-            txtNombre.Text = ""
-            txtTelefono.Text = ""
-            txtAvenida.Text = ""
-            txtZona.Text = ""
-            txtDireccion.Text = ""
+            txtNit.Text = "" : txtNombre.Text = "" : txtTelefono.Text = ""
+            txtAvenida.Text = "" : txtZona.Text = "" : txtDireccion.Text = ""
             txtNit.Enabled = True
             btnGuardar.Text = "💾 Guardar"
-            lblTituloForm.Text = "➕ Nuevo Proveedor"
+            lblTituloForm.Text = "Nuevo Proveedor"
+            pnlMsg.Visible = False
         End Sub
 
         Private Sub MostrarError(msg As String)
-            lblMsg.Text = "<span><strong>Lo sentimos:</strong> " & msg & "</span>"
+            lblMsg.Text = "⚠️ " & msg
             pnlMsg.CssClass = "alert-err"
             pnlMsg.Visible = True
         End Sub
 
         Private Sub MostrarExito(msg As String)
-            lblMsg.Text = "<span><strong>¡Hecho!</strong> " & msg & "</span>"
+            lblMsg.Text = "✅ " & msg
             pnlMsg.CssClass = "alert-ok"
             pnlMsg.Visible = True
         End Sub

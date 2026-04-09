@@ -15,7 +15,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: Arial, sans-serif; background: #f0ebe0; color: #333; }
 
-        /* NAV */
         .nav-main { background: #1a0e05; padding: 0 30px; border-bottom: 2px solid #C9973A; }
         .nav-main > ul { list-style: none; display: flex; margin: 0; padding: 0; }
         .nav-main > ul > li { position: relative; }
@@ -39,8 +38,6 @@
             border-bottom-color: #C9973A;
             background: rgba(201,151,58,0.06);
         }
-
-        /* DROPDOWN */
         .nav-main > ul > li:hover .dropdown-nav { display: block; }
         .dropdown-nav {
             display: none;
@@ -83,16 +80,12 @@
             display: block;
             border-bottom: 1px solid rgba(201,151,58,0.15);
         }
-
-        /* CONTENT */
         .content-wrapper {
             max-width: 1200px;
             margin: 0 auto;
             padding: 28px 15px;
             min-height: calc(100vh - 380px);
         }
-
-        /* BOOTSTRAP OVERRIDES */
         .panel { border-radius: 12px; border-color: #e0d0b8; box-shadow: 0 2px 8px rgba(92,58,30,0.08); }
         .panel-default > .panel-heading {
             background: linear-gradient(135deg, #5C3A1E, #7a4f2a);
@@ -112,8 +105,6 @@
         }
         .table-striped > tbody > tr:nth-of-type(odd) { background-color: #fdf6ec; }
         .table > tbody > tr > td { vertical-align: middle; }
-
-        /* FOOTER */
         .footer-main {
             background: #0d0703;
             color: #f0d9a0;
@@ -189,30 +180,19 @@
 
         <%-- HEADER --%>
         <div style="background:#111; padding:14px 30px; display:flex; align-items:center; gap:24px; border-bottom:3px solid #C9973A; min-height:85px;">
-
-            <%-- LOGO --%>
             <a runat="server" href="~/" style="flex-shrink:0; text-decoration:none;">
-                <img src='<%: ResolveUrl("~/Content/MueblesLosAlpes.png") %>'
-                     alt="Muebles Los Alpes"
-                     style="height:65px; width:auto; display:block;" />
+                <img src='<%: ResolveUrl("~/Content/MueblesLosAlpes.png") %>' alt="Muebles Los Alpes" style="height:65px; width:auto; display:block;" />
             </a>
-
-            <%-- BUSCADOR --%>
             <div style="flex:1; max-width:620px; margin:0 auto; height:52px; display:flex;">
-                <input type="text"
-                       placeholder="Buscar en toda la tienda..."
+                <input type="text" placeholder="Buscar en toda la tienda..."
                        style="flex:1; min-width:0; height:52px; padding:0 22px; background:#1e1e1e; border:2px solid #C9973A; border-right:none; border-radius:6px 0 0 6px; color:#f0d9a0; font-size:14px; font-family:Arial,sans-serif; outline:none;" />
                 <button type="button"
                         style="height:52px; width:62px; background:#C9973A; border:2px solid #C9973A; border-left:none; border-radius:0 6px 6px 0; color:white; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;"
                         onmouseover="this.style.background='#a87a2e';"
-                        onmouseout="this.style.background='#C9973A';">
-                    &#128269;
-                </button>
+                        onmouseout="this.style.background='#C9973A';">&#128269;</button>
             </div>
-
-            <%-- ACCIONES --%>
             <div style="display:flex; gap:4px; align-items:center; margin-left:auto; flex-shrink:0;">
-                <a runat="server" href="~/Modules/AuthUsuarios/"
+                <a runat="server" href="~/Modules/AuthUsuarios/Index.aspx"
                    style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 16px; border-radius:8px; text-decoration:none; color:rgba(240,217,160,0.75); font-size:11px; font-family:Arial,sans-serif;"
                    onmouseover="this.style.background='rgba(201,151,58,0.12)'; this.style.color='#C9973A';"
                    onmouseout="this.style.background='transparent'; this.style.color='rgba(240,217,160,0.75)';">
@@ -230,7 +210,7 @@
                     </svg>
                     <span>Alertas</span>
                 </a>
-                <a runat="server" href="~/Modules/AuthUsuarios/"
+                <a runat="server" href="~/Modules/AuthUsuarios/Cliente/LoginEmpleado.aspx"
                    style="display:flex; align-items:center; gap:8px; padding:12px 24px; background:#C9973A; color:#1a0e05; border-radius:8px; text-decoration:none; font-size:13px; font-weight:bold; font-family:Arial,sans-serif; margin-left:8px; letter-spacing:0.3px;"
                    onmouseover="this.style.background='#a87a2e'; this.style.color='white';"
                    onmouseout="this.style.background='#C9973A'; this.style.color='#1a0e05';">
@@ -252,32 +232,43 @@
                         <a runat="server" href="~/Modules/CatalogoInventario/Materiales.aspx">Materiales</a>
                         <a runat="server" href="~/Modules/CatalogoInventario/Tipos.aspx">Tipos</a>
                         <a runat="server" href="~/Modules/CatalogoInventario/Productos.aspx">Productos</a>
+                        <a runat="server" href="~/Modules/CatalogoInventario/Precios.aspx">Precios</a>
+                        <a runat="server" href="~/Modules/CatalogoInventario/Promociones.aspx">Promociones</a>
                         <span class="dropdown-header-nav">Bodega</span>
                         <a runat="server" href="~/Modules/CatalogoInventario/Almacenes.aspx">Almacenes</a>
                         <a runat="server" href="~/Modules/CatalogoInventario/Nichos.aspx">Nichos</a>
+                        <a runat="server" href="~/Modules/CatalogoInventario/Stock.aspx">Stock</a>
                     </div>
                 </li>
                 <li>
                     <a href="#">Auth &amp; Usuarios &#9660;</a>
                     <div class="dropdown-nav">
-                        <a runat="server" href="~/Modules/AuthUsuarios/">Dashboard</a>
+                        <a runat="server" href="~/Modules/AuthUsuarios/Index.aspx">Dashboard</a>
+                        <a runat="server" href="~/Modules/AuthUsuarios/Cliente/LoginEmpleado.aspx">Login Empleado</a>
+                        <a runat="server" href="~/Modules/AuthUsuarios/Cliente/LoginCliente.aspx">Login Cliente</a>
+                        <a runat="server" href="~/Modules/AuthUsuarios/Cliente/Puestos.aspx">Puestos</a>
+                        <a runat="server" href="~/Modules/AuthUsuarios/Admin/GrupoUsuario.aspx">Grupo Usuario</a>
+                        <a runat="server" href="~/Modules/AuthUsuarios/Admin/Permisos.aspx">Permisos</a>
                     </div>
                 </li>
                 <li>
                     <a href="#">Compras &amp; Proveedor &#9660;</a>
                     <div class="dropdown-nav">
                         <a runat="server" href="~/Modules/ComprasProveedor/Index.aspx">Dashboard</a>
-                        <a runat="server" href="~/Modules/ComprasProveedor/FacturasProveedor.aspx">Facturas</a>
-                        <a runat="server" href="~/Modules/ComprasProveedor/OrdenesCompra.aspx">Ordenes Compra</a>
-                        <a runat="server" href="~/Modules/ComprasProveedor/Pedidos.aspx">Pedidos</a>
                         <a runat="server" href="~/Modules/ComprasProveedor/Proveedores.aspx">Proveedores</a>
+                        <a runat="server" href="~/Modules/ComprasProveedor/OrdenesCompra.aspx">Ordenes de Compra</a>
+                        <a runat="server" href="~/Modules/ComprasProveedor/Pedidos.aspx">Pedidos</a>
+                        <a runat="server" href="~/Modules/ComprasProveedor/FacturasProveedor.aspx">Facturas</a>
                         <a runat="server" href="~/Modules/ComprasProveedor/ReclamosProveedor.aspx">Reclamos</a>
                     </div>
                 </li>
                 <li>
                     <a href="#">Ventas &amp; Facturacion &#9660;</a>
                     <div class="dropdown-nav">
-                        <a runat="server" href="~/Modules/VentasFacturacion/">Dashboard</a>
+                        <a runat="server" href="~/Modules/VentasFacturacion/Index.aspx">Dashboard</a>
+                        <a runat="server" href="~/Modules/VentasFacturacion/Carrito.aspx">Carrito</a>
+                        <a runat="server" href="~/Modules/VentasFacturacion/DetalleCarrito.aspx">Detalle Carrito</a>
+                        <a runat="server" href="~/Modules/VentasFacturacion/Factura.aspx">Factura</a>
                     </div>
                 </li>
             </ul>
@@ -293,19 +284,16 @@
         <div class="footer-main">
             <div class="footer-inner">
                 <div>
-                    <img src='<%: ResolveUrl("~/Content/MueblesLosAlpes.png") %>'
-                         alt="Muebles Los Alpes"
-                         style="height:65px; width:auto; display:block; opacity:0.9;" />
+                    <img src='<%: ResolveUrl("~/Content/MueblesLosAlpes.png") %>' alt="Muebles Los Alpes" style="height:65px; width:auto; display:block; opacity:0.9;" />
                     <p>Santos &amp; Familia — Desde 1978.<br />Diseno &amp; Confort Hogareno.<br />Guatemala</p>
                 </div>
                 <div>
                     <h5>Modulos</h5>
                     <a runat="server" href="~/Modules/CatalogoInventario/Index.aspx">Catalogo &amp; Inventario</a>
-                    <a runat="server" href="~/Modules/AuthUsuarios/">Auth &amp; Usuarios</a>
+                    <a runat="server" href="~/Modules/AuthUsuarios/Index.aspx">Auth &amp; Usuarios</a>
                     <a runat="server" href="~/Modules/ComprasProveedor/Index.aspx">Compras &amp; Proveedor</a>
-                    <a runat="server" href="~/Modules/VentasFacturacion/">Ventas &amp; Facturacion</a>
+                    <a runat="server" href="~/Modules/VentasFacturacion/Index.aspx">Ventas &amp; Facturacion</a>
                 </div>
-                
                 <div>
                     <h5>Tecnologia</h5>
                     <a href="#">ASP.NET Web Forms VB.NET</a>
