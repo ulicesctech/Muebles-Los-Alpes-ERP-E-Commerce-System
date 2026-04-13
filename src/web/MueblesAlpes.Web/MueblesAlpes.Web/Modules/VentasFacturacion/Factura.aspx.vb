@@ -87,7 +87,14 @@ Namespace Modules.VentasFacturacion
                 conn.Open()
                 cmd.ExecuteNonQuery()
                 txtCodigoFactura.Text = pCodigo.Value.ToString()
-                MostrarMensaje("Factura generada exitosamente. Código: " & txtCodigoFactura.Text, "alert-success")
+
+                ' Descontar stock de cada producto del carrito
+                Dim cmdStock As New OracleCommand("PKG_CLI_CARRITO.CARRITO_FACTURAR", conn)
+                cmdStock.CommandType = CommandType.StoredProcedure
+                cmdStock.Parameters.Add("p_carrito", OracleDbType.Int32).Value = Convert.ToInt32(ddlCarrito.SelectedValue)
+                cmdStock.ExecuteNonQuery()
+
+                MostrarMensaje("Factura generada exitosamente. Codigo: " & txtCodigoFactura.Text, "alert-success")
                 CargarFacturas()
             Catch ex As Exception
                 MostrarMensaje("Error: " & ex.Message, "alert-danger")

@@ -1,6 +1,8 @@
 ' ============================================================
 ' RUTA: Modules/ComprasProveedor/Pedidos.aspx.vb
 ' ============================================================
+Imports Oracle.ManagedDataAccess.Client
+
 Namespace Modules.ComprasProveedor
 
     Partial Public Class Pedidos
@@ -107,6 +109,22 @@ Namespace Modules.ComprasProveedor
                     Catch ex As Exception
                         MostrarError("Error al eliminar: " & ex.Message)
                     End Try
+
+                Case "Recibir"
+                    Try
+                        Dim conn As New OracleConnection(ConfigurationManager.ConnectionStrings("OracleConn").ConnectionString)
+                        Dim cmdRec As New OracleCommand("PKG_CP_BOD_PEDIDO.PED_RECIBIR_TODO", conn)
+                        cmdRec.CommandType = CommandType.StoredProcedure
+                        cmdRec.Parameters.Add("p_ped_id", OracleDbType.Decimal).Value = id
+                        conn.Open()
+                        cmdRec.ExecuteNonQuery()
+                        conn.Close()
+                        MostrarExito("Pedido recibido. Stock actualizado correctamente.")
+                        CargarGrilla()
+                    Catch ex As Exception
+                        MostrarError("Error al recibir: " & ex.Message)
+                    End Try
+
             End Select
         End Sub
 

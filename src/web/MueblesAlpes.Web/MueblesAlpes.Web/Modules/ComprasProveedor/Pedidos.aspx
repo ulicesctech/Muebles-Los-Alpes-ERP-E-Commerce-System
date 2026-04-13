@@ -115,7 +115,7 @@
                 <ItemTemplate>
                     <div class="actions-cell">
                         <asp:LinkButton CommandName="Editar"   CommandArgument='<%# Eval("PED_PEDIDO") %>' runat="server" CssClass="btn-edit-t">✏️ Editar</asp:LinkButton>
-                        <asp:LinkButton CommandName="Eliminar" CommandArgument='<%# Eval("PED_PEDIDO") %>' runat="server" CssClass="btn-del-t" OnClientClick="return confirm('¿Eliminar este pedido y sus detalles?');">🗑 Eliminar</asp:LinkButton>
+                        <asp:LinkButton CommandName="Recibir" CommandArgument='<%# Eval("PED_PEDIDO") %>' runat="server" CssClass="btn-edit-t" style="background:#f0fff4; color:#276749; border-color:#9ae6b4;" OnClientClick="return confirm('Marcar como recibido y actualizar stock?');">Recibir</asp:LinkButton>
                     </div>
                 </ItemTemplate>
             </asp:TemplateField>
