@@ -410,8 +410,10 @@
     <Compile Include="App_Code\Services\CatalogoInventario\PromocionService.vb" />
     <Compile Include="App_Code\Services\CatalogoInventario\StockService.vb" />
     <Compile Include="App_Code\Services\CatalogoInventario\TipoService.vb" />
+    <Compile Include="App_Code\Services\ComprasProveedor\DetallePedidoService.vb" />
     <Compile Include="App_Code\Services\ComprasProveedor\FacturaProveedorService.vb" />
     <Compile Include="App_Code\Services\ComprasProveedor\OrdenCompraService.vb" />
+    <Compile Include="App_Code\Services\ComprasProveedor\OrdenDetallePedidoService.vb" />
     <Compile Include="App_Code\Services\ComprasProveedor\PedidoService.vb" />
     <Compile Include="App_Code\Services\ComprasProveedor\ProveedorService.vb" />
     <Compile Include="App_Code\Services\ComprasProveedor\ReclamoProveedorService.vb" />

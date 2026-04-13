@@ -55,6 +55,10 @@
             <a href='<%: ResolveUrl("~/Modules/ComprasProveedor/Proveedores.aspx") %>' style="color:#2d7a2d;">Gestionar <span>&#8594;</span></a>
         </div>
     </div>
+
+<div class="section-label">📝 Documentación y Órdenes</div>
+<div class="crud-grid three-col">
+    
     <div class="crud-card">
         <div class="crud-card-body">
             <div class="crud-icon">&#128203;</div>
@@ -64,6 +68,10 @@
         <div class="crud-card-footer" style="background:#fff5f5;">
             <a href='<%: ResolveUrl("~/Modules/ComprasProveedor/ReclamosProveedor.aspx") %>' style="color:#c53030;">Gestionar <span>&#8594;</span></a>
         </div>
+        <div class="crud-card-footer" style="background:#fdfcfb;">
+            <a href='<%: ResolveUrl("~/Modules/ComprasProveedor/Pedidos.aspx") %>' style="color:#C9973A;">
+                Gestionar Pedidos <span class="arrow">→</span>
+            </a>
     </div>
 </div>
 
@@ -79,6 +87,7 @@
             <a href='<%: ResolveUrl("~/Modules/ComprasProveedor/OrdenesCompra.aspx") %>' style="color:#2d7a2d;">Gestionar <span>&#8594;</span></a>
         </div>
     </div>
+
     <div class="crud-card">
         <div class="crud-card-body">
             <div class="crud-icon">&#128667;</div>
