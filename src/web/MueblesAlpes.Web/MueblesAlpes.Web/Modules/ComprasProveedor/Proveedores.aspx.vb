@@ -14,7 +14,6 @@ Namespace Modules.ComprasProveedor
 
         Private Sub CargarGrilla()
             Try
-                ' Si el campo de búsqueda tiene texto, usamos Buscar, si no, Listar
                 If String.IsNullOrEmpty(txtBuscar.Text.Trim()) Then
                     gvProveedores.DataSource = ProveedorService.Listar()
                 Else
@@ -27,7 +26,6 @@ Namespace Modules.ComprasProveedor
         End Sub
 
         Protected Sub btnGuardar_Click(sender As Object, e As EventArgs)
-            ' Validación amigable
             If Not ValidarCampos() Then Return
 
             Try
@@ -44,57 +42,54 @@ Namespace Modules.ComprasProveedor
                 LimpiarFormulario()
                 CargarGrilla()
             Catch ex As Exception
-                ' Aquí caerá el mensaje de "No se puede actualizar..." si hay error de integridad
                 MostrarError(ex.Message)
             End Try
         End Sub
 
         Protected Sub gvProveedores_RowCommand(sender As Object, e As GridViewCommandEventArgs)
-            Try
-                Dim id As Decimal = Convert.ToDecimal(e.CommandArgument)
+            ' Validación de argumento para evitar errores de conversión
+            If e.CommandArgument Is Nothing OrElse String.IsNullOrEmpty(e.CommandArgument.ToString()) Then Return
 
-                If e.CommandName = "Editar" Then
-                    Try
-                        ' Recuperamos la fila para obtener los datos actuales
-                        Dim btn As LinkButton = DirectCast(e.CommandSource, LinkButton)
-                        Dim row As GridViewRow = DirectCast(btn.NamingContainer, GridViewRow)
+            Dim id As Decimal = Convert.ToDecimal(e.CommandArgument)
 
-                        hfId.Value = id.ToString()
-                        txtNit.Text = Server.HtmlDecode(row.Cells(1).Text).Trim().Replace("&nbsp;", "")
-                        txtNombre.Text = Server.HtmlDecode(row.Cells(2).Text).Trim().Replace("&nbsp;", "")
-                        txtTelefono.Text = Server.HtmlDecode(row.Cells(3).Text).Trim().Replace("&nbsp;", "")
-                        txtAvenida.Text = Server.HtmlDecode(row.Cells(4).Text).Trim().Replace("&nbsp;", "")
-                        txtZona.Text = Server.HtmlDecode(row.Cells(5).Text).Trim().Replace("&nbsp;", "")
-                        txtDireccion.Text = Server.HtmlDecode(row.Cells(6).Text).Trim().Replace("&nbsp;", "")
+            If e.CommandName = "Editar" Then
+                Try
+                    Dim btn As LinkButton = DirectCast(e.CommandSource, LinkButton)
+                    Dim row As GridViewRow = DirectCast(btn.NamingContainer, GridViewRow)
 
-                        ' Bloqueamos el NIT en edición para evitar inconsistencias
-                        txtNit.Enabled = False
-                        lblTituloForm.Text = "Editando: " & txtNombre.Text
-                        btnGuardar.Text = "💾 Actualizar"
-                        pnlMsg.Visible = False ' Limpiar mensajes previos al editar
+                    hfId.Value = id.ToString()
+                    txtNit.Text = Server.HtmlDecode(row.Cells(1).Text).Trim().Replace("&nbsp;", "")
+                    txtNombre.Text = Server.HtmlDecode(row.Cells(2).Text).Trim().Replace("&nbsp;", "")
+                    txtTelefono.Text = Server.HtmlDecode(row.Cells(3).Text).Trim().Replace("&nbsp;", "")
+                    txtAvenida.Text = Server.HtmlDecode(row.Cells(4).Text).Trim().Replace("&nbsp;", "")
+                    txtZona.Text = Server.HtmlDecode(row.Cells(5).Text).Trim().Replace("&nbsp;", "")
+                    txtDireccion.Text = Server.HtmlDecode(row.Cells(6).Text).Trim().Replace("&nbsp;", "")
 
-                        ElseIf e.CommandName = "Eliminar" Then
-                        ' --- CAMBIO CLAVE AQUÍ ---
-                        ProveedorService.Eliminar(id)
-                        MostrarExito("Proveedor eliminado correctamente.")
-                        CargarGrilla()
-                        MostrarExito("¡Hecho! El proveedor ha sido eliminado del sistema de forma segura.")
-                    Catch ex As Exception
-                        If ex.Message.Contains("ORA-02292") Then
-                            MostrarError("No se puede eliminar: Este proveedor ya tiene registros vinculados (órdenes, facturas o reclamos).")
-                        Else
-                            MostrarError("Hubo un inconveniente al intentar eliminar el registro.")
-                        End If
+                    txtNit.Enabled = False
+                    lblTituloForm.Text = "Editando: " & txtNombre.Text
+                    btnGuardar.Text = "💾 Actualizar"
+                    pnlMsg.Visible = False
+                Catch ex As Exception
+                    MostrarError("No se pudieron cargar los datos para editar.")
+                End Try
 
-                    Catch ex As Exception
-                        ' Aquí se captura el error ORA-02292 que lanzamos desde ProveedorService
-                        MostrarError(ex.Message)
-                    End Try
-                End If
+            ElseIf e.CommandName = "Eliminar" Then
+                Try
+                    ProveedorService.Eliminar(id)
+                    MostrarExito("¡Hecho! El proveedor ha sido eliminado del sistema de forma segura.")
+                    CargarGrilla()
+                Catch ex As Exception
+                    ' Manejo específico de error de integridad referencial de Oracle (ORA-02292)
+                    If ex.Message.Contains("ORA-02292") Then
+                        MostrarError("No se puede eliminar: Este proveedor ya tiene registros vinculados (órdenes, facturas o reclamos).")
+                    Else
+                        MostrarError("Hubo un inconveniente al intentar eliminar el registro: " & ex.Message)
+                    End If
+                End Try
+            End If
         End Sub
 
         Protected Sub btnBuscar_Click(sender As Object, e As EventArgs)
-            ' Aquí podrías llamar a un método de búsqueda si el Service lo permite
             CargarGrilla()
         End Sub
 
@@ -109,7 +104,7 @@ Namespace Modules.ComprasProveedor
             pnlMsg.Visible = False
         End Sub
 
-        ' --- Métodos Auxiliares y de Mensajería ---
+        ' --- Métodos Auxiliares ---
 
         Private Function ValidarCampos() As Boolean
             If String.IsNullOrWhiteSpace(txtNit.Text) Then

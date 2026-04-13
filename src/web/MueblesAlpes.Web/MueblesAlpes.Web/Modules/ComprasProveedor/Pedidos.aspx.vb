@@ -1,172 +1,282 @@
-' ============================================================
-' RUTA: Modules/ComprasProveedor/Pedidos.aspx.vb
-' ============================================================
 Imports System.Data
+Imports MueblesAlpes.Web.Modules.ComprasProveedor
 
 Namespace Modules.ComprasProveedor
 
-    Partial Public Class Pedidos
+    Public Class Pedidos
         Inherits System.Web.UI.Page
 
-        Protected Sub Page_Load(sender As Object, e As EventArgs)
+        ' ══════════════════════════════════════════════════
+        ' PAGE LOAD
+        ' ══════════════════════════════════════════════════
+        Protected Sub Page_Load(sender As Object, e As EventArgs) Handles Me.Load
             If Not IsPostBack Then
-                LimpiarFormulario()
-                CargarGrilla()
+                CargarPedidos()
             End If
         End Sub
 
-        ' ── Carga de Datos ──────────────────────────────────
-        Private Sub CargarGrilla(Optional texto As String = "")
+        ' ══════════════════════════════════════════════════
+        ' HELPERS
+        ' ══════════════════════════════════════════════════
+        Private Sub CargarPedidos()
+            gvPedidos.EditIndex = -1
+            gvPedidos.DataSource = PedidoService.Listar()
+            gvPedidos.DataBind()
+        End Sub
+
+        Private Sub CargarProductos()
+            Dim dt As DataTable = DetallePedidoService.ListarProductosDisponibles()
+            ddlProducto.DataSource = dt
+            ddlProducto.DataTextField = "PRO_NOMBRE"
+            ddlProducto.DataValueField = "HIP_HISTORIAL_PRECIO"
+            ddlProducto.DataBind()
+            ddlProducto.Items.Insert(0, New ListItem("-- Seleccione producto --", "0"))
+        End Sub
+
+        Private Sub CargarDetallesPedido(pedidoId As Integer)
+            gvDetalles.EditIndex = -1
+            Dim dt As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
+            gvDetalles.DataSource = dt
+            gvDetalles.DataBind()
+            RecalcularYActualizarTotal(dt, pedidoId)
+        End Sub
+
+        ' Carga los datos de la cabecera del pedido en los labels del panel de detalle
+        Private Sub CargarInfoCabecera(pedidoId As Integer)
+            Dim dtPed As DataTable = PedidoService.ObtenerPorId(pedidoId)
+            If dtPed IsNot Nothing AndAlso dtPed.Rows.Count > 0 Then
+                lblCabeceraCode.Text = dtPed.Rows(0)("PED_CODIGO").ToString()
+                lblCabeceraFecha.Text = String.Format("{0:dd/MM/yyyy}", dtPed.Rows(0)("PED_FECHA"))
+                lblCabeceraFormaPago.Text = dtPed.Rows(0)("PED_FORMA_PAGO").ToString()
+            End If
+        End Sub
+
+        Private Sub RecalcularYActualizarTotal(dt As DataTable, pedidoId As Integer)
+            Dim total As Decimal = 0
+            For Each row As DataRow In dt.Rows
+                total += Convert.ToDecimal(row("DETPE_CANTIDAD_SOLICITADA")) * Convert.ToDecimal(row("HIP_PRECIO"))
+            Next
+
+            lblTotalDetalle.Text = total.ToString("N2")
+
+            Dim dtPed As DataTable = PedidoService.ObtenerPorId(pedidoId)
+            If dtPed IsNot Nothing AndAlso dtPed.Rows.Count > 0 Then
+                Dim codigo As String = dtPed.Rows(0)("PED_CODIGO").ToString()
+                Dim formaPago As String = dtPed.Rows(0)("PED_FORMA_PAGO").ToString()
+                PedidoService.Actualizar(pedidoId, codigo, formaPago, total)
+            End If
+        End Sub
+
+        Private Sub MostrarMensaje(msg As String, esError As Boolean)
+            lblMsg.Text = msg
+            lblMsg.CssClass = If(esError, "alert-err", "alert-ok")
+            pnlMsg.Visible = True
+        End Sub
+
+        Private Sub OcultarMensaje()
+            pnlMsg.Visible = False
+        End Sub
+
+        ' ══════════════════════════════════════════════════
+        ' NUEVA CABECERA
+        ' ══════════════════════════════════════════════════
+        Private Sub BloquearCabecera()
+            txtCodigo.ReadOnly = True
+            ddlFormaPago.Enabled = False
+            btnGuardar.Enabled = False
+        End Sub
+
+        Private Sub DesbloquearCabecera()
+            txtCodigo.ReadOnly = False
+            ddlFormaPago.Enabled = True
+            btnGuardar.Enabled = True
+        End Sub
+
+        Protected Sub btnNuevoPedido_Click(sender As Object, e As EventArgs)
+            OcultarMensaje()
+            hfPedidoActivo.Value = "0"
+            txtCodigo.Text = ""
+            ddlFormaPago.SelectedIndex = 0
+            DesbloquearCabecera()
+            pnlFormCabecera.Visible = True
+            pnlDetalleContenedor.Visible = False
+        End Sub
+
+        Protected Sub btnGuardar_Click(sender As Object, e As EventArgs)
+            OcultarMensaje()
             Try
-                gvPedidos.DataSource = If(String.IsNullOrWhiteSpace(texto),
-                                          PedidoService.Listar(),
-                                          PedidoService.Buscar(texto))
-                gvPedidos.DataBind()
+                If String.IsNullOrEmpty(txtCodigo.Text.Trim()) Then
+                    MostrarMensaje("Ingrese el codigo del pedido.", True)
+                    Exit Sub
+                End If
+
+                Dim nuevoId As Decimal = PedidoService.Crear(txtCodigo.Text.Trim(), ddlFormaPago.SelectedValue, 0)
+
+                hfPedidoActivo.Value = nuevoId.ToString()
+                lblIdSeleccionado.Text = nuevoId.ToString()
+
+                CargarProductos()
+                CargarDetallesPedido(Convert.ToInt32(nuevoId))
+                CargarInfoCabecera(Convert.ToInt32(nuevoId))
+
+                ' Bloquear cabecera y mostrar detalle debajo sin ocultar el form
+                BloquearCabecera()
+                pnlDetalleContenedor.Visible = True
+                CargarPedidos()
+                MostrarMensaje("Pedido #" & nuevoId & " creado. Agrega los productos y presiona 'Finalizar Pedido'.", False)
             Catch ex As Exception
-                MostrarError("Error al cargar datos: " & ex.Message)
+                MostrarMensaje("Error al crear pedido: " & ex.Message, True)
             End Try
         End Sub
 
-        ' ── Acciones de Búsqueda ────────────────────────────
+        ' ══════════════════════════════════════════════════
+        ' GRID PRINCIPAL — con sub-grid de detalles
+        ' ══════════════════════════════════════════════════
+        Protected Sub gvPedidos_RowCommand(sender As Object, e As GridViewCommandEventArgs)
+            OcultarMensaje()
+            If e.CommandName = "VerDetalle" OrElse e.CommandName = "Editar" Then
+                Dim pedidoId As Integer = Convert.ToInt32(e.CommandArgument)
+                hfPedidoActivo.Value = pedidoId.ToString()
+                lblIdSeleccionado.Text = pedidoId.ToString()
+
+                CargarProductos()
+                CargarDetallesPedido(pedidoId)
+                CargarInfoCabecera(pedidoId)
+
+                pnlDetalleContenedor.Visible = True
+                pnlFormCabecera.Visible = False
+            ElseIf e.CommandName = "Eliminar" Then
+                Try
+                    PedidoService.Eliminar(Convert.ToInt32(e.CommandArgument))
+                    CargarPedidos()
+                    pnlDetalleContenedor.Visible = False
+                    MostrarMensaje("Pedido eliminado.", False)
+                Catch ex As Exception
+                    MostrarMensaje("Error: " & ex.Message, True)
+                End Try
+            End If
+        End Sub
+
+        ' Carga el sub-grid de productos dentro de cada fila del listado
+        Protected Sub gvPedidos_RowDataBound(sender As Object, e As GridViewRowEventArgs)
+            If e.Row.RowType = DataControlRowType.DataRow Then
+                Dim pedidoId As Integer = Convert.ToInt32(gvPedidos.DataKeys(e.Row.RowIndex).Value)
+                Dim gvSub As GridView = CType(e.Row.FindControl("gvSubDetalles"), GridView)
+                If gvSub IsNot Nothing Then
+                    Dim dt As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
+                    gvSub.DataSource = dt
+                    gvSub.DataBind()
+                    gvSub.Visible = (dt.Rows.Count > 0)
+                End If
+            End If
+        End Sub
+
+        ' ══════════════════════════════════════════════════
+        ' GESTION DE PRODUCTOS (DETALLES)
+        ' ══════════════════════════════════════════════════
+        Protected Sub btnAgregarItem_Click(sender As Object, e As EventArgs)
+            OcultarMensaje()
+            Try
+                Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
+                Dim historialId As Integer = Convert.ToInt32(ddlProducto.SelectedValue)
+                Dim cantidad As Integer = 0
+
+                If Not Integer.TryParse(txtCantSolicitada.Text, cantidad) OrElse cantidad <= 0 Then
+                    MostrarMensaje("Ingrese una cantidad valida mayor a cero.", True)
+                    Return
+                End If
+
+                If historialId = 0 Then
+                    MostrarMensaje("Seleccione un producto.", True)
+                    Return
+                End If
+
+                If pedidoId > 0 Then
+                    DetallePedidoService.Insertar(pedidoId, historialId, cantidad)
+                    txtCantSolicitada.Text = ""
+                    CargarDetallesPedido(pedidoId)
+                    CargarPedidos()
+                    MostrarMensaje("Producto agregado.", False)
+                End If
+            Catch ex As Exception
+                MostrarMensaje("Error al agregar producto: " & ex.Message, True)
+            End Try
+        End Sub
+
+        Protected Sub gvDetalles_RowCommand(sender As Object, e As GridViewCommandEventArgs)
+            If e.CommandName = "BorrarItem" Then
+                Try
+                    Dim detalleId As Integer = Convert.ToInt32(e.CommandArgument)
+                    Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
+
+                    DetallePedidoService.Eliminar(detalleId)
+                    CargarDetallesPedido(pedidoId)
+                    CargarPedidos()
+                    MostrarMensaje("Producto removido.", False)
+                Catch ex As Exception
+                    MostrarMensaje("Error: " & ex.Message, True)
+                End Try
+            End If
+        End Sub
+
+        Protected Sub gvDetalles_RowEditing(sender As Object, e As GridViewEditEventArgs)
+            gvDetalles.EditIndex = e.NewEditIndex
+            CargarDetallesPedido(Convert.ToInt32(hfPedidoActivo.Value))
+        End Sub
+
+        Protected Sub gvDetalles_RowCancelingEdit(sender As Object, e As GridViewCancelEditEventArgs)
+            gvDetalles.EditIndex = -1
+            CargarDetallesPedido(Convert.ToInt32(hfPedidoActivo.Value))
+        End Sub
+
+        Protected Sub gvDetalles_RowUpdating(sender As Object, e As GridViewUpdateEventArgs)
+            Try
+                Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
+                Dim row As GridViewRow = gvDetalles.Rows(e.RowIndex)
+                Dim detalleId As Integer = Convert.ToInt32(gvDetalles.DataKeys(e.RowIndex).Value)
+
+                Dim cantSol As Integer
+                Dim cantRec As Integer
+
+                If Not Integer.TryParse(CType(row.FindControl("txtECantSol"), TextBox).Text, cantSol) OrElse cantSol < 0 Then
+                    MostrarMensaje("Cantidad solicitada invalida.", True) : Return
+                End If
+                If Not Integer.TryParse(CType(row.FindControl("txtECantRec"), TextBox).Text, cantRec) OrElse cantRec < 0 Then
+                    MostrarMensaje("Cantidad recibida invalida.", True) : Return
+                End If
+
+                DetallePedidoService.Actualizar(detalleId, cantSol, cantRec)
+
+                gvDetalles.EditIndex = -1
+                CargarDetallesPedido(pedidoId)
+                CargarPedidos()
+                MostrarMensaje("Item actualizado.", False)
+            Catch ex As Exception
+                MostrarMensaje("Error al guardar: " & ex.Message, True)
+            End Try
+        End Sub
+
+        ' ══════════════════════════════════════════════════
+        ' BUSQUEDA
+        ' ══════════════════════════════════════════════════
         Protected Sub btnBuscar_Click(sender As Object, e As EventArgs)
-            CargarGrilla(txtBuscar.Text.Trim())
+            OcultarMensaje()
+            gvPedidos.DataSource = PedidoService.Buscar(txtBuscar.Text.Trim())
+            gvPedidos.DataBind()
         End Sub
 
         Protected Sub btnLimpiar_Click(sender As Object, e As EventArgs)
             txtBuscar.Text = ""
-            LimpiarFormulario()
-            CargarGrilla()
+            OcultarMensaje()
+            CargarPedidos()
         End Sub
 
-        ' ── Guardar / Actualizar ───────────────────────────
-        Protected Sub btnGuardar_Click(sender As Object, e As EventArgs)
-            ' Validación básica
-            If String.IsNullOrWhiteSpace(txtCodigo.Text) Then
-                MostrarError("El código es obligatorio.")
-                Return
-            End If
-
-            Try
-                Dim id As Decimal = Convert.ToDecimal(hfId.Value)
-                Dim codigo As String = txtCodigo.Text.Trim()
-                Dim formaPago As String = ddlFormaPago.SelectedValue
-                Dim total As Decimal = Convert.ToDecimal(txtTotal.Text.Trim())
-
-                ' Obtenemos el total (ahora disponible tanto en creación como edición)
-                Dim total As Decimal = 0
-                Decimal.TryParse(txtTotal.Text.Trim(), total)
-
-                If id = 0 Then
-                    ' NUEVO: Ahora pasamos el total al crear
-                    PedidoService.Crear(codigo, formaPago, total)
-                    MostrarExito("Pedido creado correctamente.")
-                Else
-                    ' ACTUALIZAR
-                    PedidoService.Actualizar(id, codigo, formaPago, total)
-                    MostrarExito("Pedido actualizado correctamente.")
-                End If
-
-                LimpiarFormulario()
-                CargarGrilla()
-            Catch ex As Exception
-                MostrarError("Error al guardar: " & ex.Message)
-            End Try
-        End Sub
-
-        Protected Sub btnCancelar_Click(sender As Object, e As EventArgs)
-            LimpiarFormulario()
-            CargarGrilla()
-        End Sub
-
-        ' ── Eventos de la Grilla ────────────────────────────
-        Protected Sub gvPedidos_RowCommand(sender As Object, e As GridViewCommandEventArgs)
-            ' Evitar errores con comandos automáticos de la grilla
-            If String.IsNullOrEmpty(e.CommandArgument.ToString()) Then Return
-
-            Dim id As Decimal = Convert.ToDecimal(e.CommandArgument)
-
-            Select Case e.CommandName
-                Case "Editar"
-                    Try
-                        Dim dt As DataTable = PedidoService.Listar()
-                        ' Buscamos la fila en el DataTable
-                        Dim filas As DataRow() = dt.Select("PED_PEDIDO = " & id)
-
-                        If filas.Length > 0 Then
-                            Dim fila As DataRow = filas(0)
-                            hfId.Value = id.ToString()
-                            txtCodigo.Text = fila("PED_CODIGO").ToString()
-                            txtTotal.Text = fila("PED_TOTAL").ToString()
-                            ddlFormaPago.SelectedValue = fila("PED_FORMA_PAGO").ToString()
-
-                            ' Ajustes de interfaz
-                            txtCodigo.Enabled = False ' El código no se suele editar por integridad
-                            lblTituloForm.Text = "Editar Pedido"
-                            btnGuardar.Text = "💾 Actualizar"
-                            pnlMsg.Visible = False
-                        End If
-                    Catch
-                        MostrarError("No pudimos recuperar la información del pedido para editarla.")
-                    End Try
-
-                Case "Eliminar"
-                    Try
-                        PedidoService.Eliminar(id)
-                        MostrarExito("Pedido eliminado correctamente.")
-                        LimpiarFormulario()
-                        CargarGrilla()
-                        MostrarExito("¡Listo! El pedido ha sido eliminado del sistema de forma segura.")
-                    Catch ex As Exception
-                        MostrarError("Error al eliminar: " & ex.Message)
-                    End Try
-            End Select
-        End Sub
-
-        ' ── Métodos Auxiliares ──────────────────────────────
-        Private Function ValidarFormulario() As Boolean
-            If String.IsNullOrWhiteSpace(txtCodigo.Text) Then
-                MostrarError("Por favor, ingresa un código para el pedido. Es un dato necesario.")
-                Return False
-            End If
-
-            Dim total As Decimal
-            If Not Decimal.TryParse(txtTotal.Text.Trim(), total) OrElse total < 0 Then
-                MostrarError("El monto total debe ser un número válido mayor o igual a 0.")
-                Return False
-            End If
-
-            If ddlFormaPago.SelectedIndex = 0 Then
-                MostrarError("Debes seleccionar una forma de pago para este pedido.")
-                Return False
-            End If
-
-            Return True
-        End Function
-
-        Private Sub LimpiarFormulario()
-            hfId.Value = "0"
-            txtCodigo.Text = ""
-            txtTotal.Text = "0" ' Valor por defecto
-            ddlFormaPago.SelectedIndex = 0
-
-            ' UI defaults
-            txtCodigo.Enabled = True
-            lblTituloForm.Text = "Nuevo Pedido"
-            btnGuardar.Text = "💾 Guardar"
-            pnlMsg.Visible = False
-        End Sub
-
-        ' --- Mensajería ---
-        Private Sub MostrarError(msg As String)
-            lblMsg.Text = "<span>⚠️ " & msg & "</span>"
-            pnlMsg.CssClass = "alert-err"
-            pnlMsg.Visible = True
-        End Sub
-
-        Private Sub MostrarExito(msg As String)
-            lblMsg.Text = "<span>✅ " & msg & "</span>"
-            pnlMsg.CssClass = "alert-ok"
-            pnlMsg.Visible = True
+        Protected Sub btnCerrarDetalle_Click(sender As Object, e As EventArgs)
+            pnlDetalleContenedor.Visible = False
+            pnlFormCabecera.Visible = False
+            DesbloquearCabecera()
+            OcultarMensaje()
+            CargarPedidos()
         End Sub
 
     End Class

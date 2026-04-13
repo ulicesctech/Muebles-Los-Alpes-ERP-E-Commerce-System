@@ -1,6 +1,3 @@
-' ============================================================
-' RUTA: Modules/ComprasProveedor/FacturasProveedor.aspx.vb
-' ============================================================
 Imports System.Data
 
 Namespace Modules.ComprasProveedor
@@ -27,15 +24,16 @@ Namespace Modules.ComprasProveedor
         End Sub
 
         Private Sub CargarGrilla(Optional texto As String = "")
-            gvFacturas.DataSource = If(String.IsNullOrWhiteSpace(texto), FacturaProveedorService.Listar(), FacturaProveedorService.Buscar(texto))
-            gvFacturas.DataBind()
+            ' ERROR CORREGIDO: Faltaba el inicio del bloque 'Try'
+            Try
+                gvFacturas.DataSource = If(String.IsNullOrWhiteSpace(texto), FacturaProveedorService.Listar(), FacturaProveedorService.Buscar(texto))
+                gvFacturas.DataBind()
             Catch ex As Exception
-            MostrarError("Tuvimos un problema al mostrar la lista de facturas.")
+                MostrarError("Tuvimos un problema al mostrar la lista de facturas.")
             End Try
         End Sub
 
         Protected Sub btnGuardar_Click(sender As Object, e As EventArgs)
-            ' Validación amigable
             If ddlOrden.SelectedIndex = 0 Then
                 MostrarError("Por favor, selecciona la orden de compra que deseas facturar.")
                 Return
@@ -55,8 +53,6 @@ Namespace Modules.ComprasProveedor
                     FacturaProveedorService.Registrar(orcNueva, codigo)
                     MostrarExito("Factura registrada correctamente.")
                 Else
-                    ' SOLUCIÓN AL ERROR BC30057:
-                    ' hfKey.Value contiene la OC original antes del cambio
                     FacturaProveedorService.Actualizar(hfKey.Value, orcNueva, codigo)
                     MostrarExito("Factura actualizada correctamente.")
                 End If
@@ -80,11 +76,11 @@ Namespace Modules.ComprasProveedor
 
                     If filas.Length > 0 Then
                         Dim fila As DataRow = filas(0)
-                        hfKey.Value = idOriginal ' Llave primaria original
+                        hfKey.Value = idOriginal
                         hfModo.Value = "editar"
                         txtCodigoFac.Text = fila("FACPRO_CODIGO_FACTURA").ToString()
                         ddlOrden.SelectedValue = idOriginal
-                        ddlOrden.Enabled = True ' Se permite cambiar la orden
+                        ddlOrden.Enabled = True
                         lblTituloForm.Text = "Editar Factura"
                         btnGuardar.Text = "💾 Actualizar"
                         pnlMsg.Visible = False
@@ -99,6 +95,10 @@ Namespace Modules.ComprasProveedor
                     Limpiar()
                     CargarGrilla()
                     MostrarExito("Factura eliminada.")
+                    ' ERROR CORREGIDO: Faltaba cerrar el Try y el bloque Catch
+                Catch ex As Exception
+                    MostrarError("No se pudo eliminar la factura.")
+                End Try
             End If
         End Sub
 
@@ -112,6 +112,7 @@ Namespace Modules.ComprasProveedor
             CargarGrilla()
         End Sub
 
+        ' ERROR CORREGIDO: Había dos definiciones de btnCancelar_Click. He consolidado una sola.
         Protected Sub btnCancelar_Click(sender As Object, e As EventArgs)
             Limpiar()
             pnlMsg.Visible = False
@@ -126,10 +127,6 @@ Namespace Modules.ComprasProveedor
             lblTituloForm.Text = "Registrar Factura"
             btnGuardar.Text = "💾 Guardar"
             pnlMsg.Visible = False
-        End Sub
-
-        Protected Sub btnCancelar_Click(sender As Object, e As EventArgs)
-            Limpiar()
         End Sub
 
         Private Sub MostrarError(msg As String)
