@@ -1,8 +1,5 @@
--- ============================================================
--- PKG_BOD_PRODUCTO.pkb
--- ============================================================
 CREATE OR REPLACE PACKAGE BODY PKG_BOD_PRODUCTO AS
- 
+
   PROCEDURE CREAR(
     p_referencia IN VARCHAR2, p_nombre IN VARCHAR2, p_descripcion IN VARCHAR2,
     p_tip_tipo IN NUMBER, p_mat_material IN NUMBER,
@@ -34,7 +31,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_PRODUCTO AS
       p_color, p_peso, p_foto
     );
   END;
- 
+
   PROCEDURE ACTUALIZAR(
     p_referencia IN VARCHAR2, p_nombre IN VARCHAR2, p_descripcion IN VARCHAR2,
     p_tip_tipo IN NUMBER, p_mat_material IN NUMBER,
@@ -69,16 +66,31 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_PRODUCTO AS
       RAISE_APPLICATION_ERROR(-20013, 'BOD_PRODUCTO: no existe.');
     END IF;
   END;
- 
+
   PROCEDURE ACTUALIZAR_FOTO(p_referencia IN VARCHAR2, p_foto IN BLOB) IS
     v_ref VARCHAR2(40);
   BEGIN
     v_ref := TRIM(p_referencia);
     IF v_ref IS NULL THEN RAISE_APPLICATION_ERROR(-20014, 'BOD_PRODUCTO: referencia obligatoria.'); END IF;
     UPDATE BOD_PRODUCTO SET pro_foto = p_foto WHERE pro_referencia = v_ref;
-    IF SQL%ROWCOUNT = 0 THEN RAISE_APPLICATION_ERROR(-20015, 'BOD_PRODUCTO: no existe para actualizar foto.'); END IF;
+    IF SQL%ROWCOUNT = 0 THEN
+      RAISE_APPLICATION_ERROR(-20015, 'BOD_PRODUCTO: no existe para actualizar foto.');
+    END IF;
   END;
- 
+
+  -- Llamado automáticamente por PKG_BOD_HISTORIAL_PRECIO_VENTA al registrar precio de venta
+  PROCEDURE ACTUALIZAR_PRECIO(p_referencia IN VARCHAR2, p_precio IN NUMBER) IS
+    v_ref VARCHAR2(40);
+  BEGIN
+    v_ref := TRIM(p_referencia);
+    IF v_ref IS NULL THEN RAISE_APPLICATION_ERROR(-20023, 'BOD_PRODUCTO: referencia obligatoria.'); END IF;
+    IF p_precio < 0 THEN RAISE_APPLICATION_ERROR(-20024, 'BOD_PRODUCTO: precio no puede ser negativo.'); END IF;
+    UPDATE BOD_PRODUCTO SET pro_precio = p_precio WHERE pro_referencia = v_ref;
+    IF SQL%ROWCOUNT = 0 THEN
+      RAISE_APPLICATION_ERROR(-20025, 'BOD_PRODUCTO: no existe para actualizar precio.');
+    END IF;
+  END;
+
   PROCEDURE ELIMINAR(p_referencia IN VARCHAR2) IS
     v_ref  VARCHAR2(40);
     v_used NUMBER;
@@ -92,7 +104,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_PRODUCTO AS
     DELETE FROM BOD_PRODUCTO WHERE pro_referencia = v_ref;
     IF SQL%ROWCOUNT = 0 THEN RAISE_APPLICATION_ERROR(-20019, 'BOD_PRODUCTO: no existe.'); END IF;
   END;
- 
+
   PROCEDURE OBTENER(p_referencia IN VARCHAR2, p_data OUT SYS_REFCURSOR) IS
     v_ref VARCHAR2(40);
   BEGIN
@@ -103,14 +115,13 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_PRODUCTO AS
              p.tip_tipo, t.tip_descripcion,
              p.mat_material, m.mat_descripcion,
              p.pro_alto_cm, p.pro_ancho_cm, p.pro_profundidad_cm,
-             p.pro_color, p.pro_peso
+             p.pro_color, p.pro_peso, p.pro_precio
         FROM BOD_PRODUCTO p
         JOIN BOD_TIPO     t ON t.tip_tipo     = p.tip_tipo
         JOIN BOD_MATERIAL m ON m.mat_material = p.mat_material
        WHERE p.pro_referencia = v_ref;
   END;
- 
-  -- LISTAR con JOIN para mostrar descripcion de tipo y material
+
   PROCEDURE LISTAR(p_data OUT SYS_REFCURSOR) IS
   BEGIN
     OPEN p_data FOR
@@ -121,14 +132,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_PRODUCTO AS
              p.mat_material,
              m.mat_descripcion,
              p.pro_color,
-             p.pro_peso
+             p.pro_peso,
+             p.pro_precio
         FROM BOD_PRODUCTO p
         JOIN BOD_TIPO     t ON t.tip_tipo     = p.tip_tipo
         JOIN BOD_MATERIAL m ON m.mat_material = p.mat_material
        ORDER BY p.pro_nombre;
   END;
- 
-  -- BUSCAR con JOIN para mostrar descripcion de tipo y material
+
   PROCEDURE BUSCAR(p_texto IN VARCHAR2, p_data OUT SYS_REFCURSOR) IS
     v_txt VARCHAR2(4000);
   BEGIN
@@ -142,17 +153,18 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_PRODUCTO AS
              p.mat_material,
              m.mat_descripcion,
              p.pro_color,
-             p.pro_peso
+             p.pro_peso,
+             p.pro_precio
         FROM BOD_PRODUCTO p
         JOIN BOD_TIPO     t ON t.tip_tipo     = p.tip_tipo
         JOIN BOD_MATERIAL m ON m.mat_material = p.mat_material
-       WHERE UPPER(p.pro_referencia) LIKE v_txt
-          OR UPPER(p.pro_nombre)     LIKE v_txt
+       WHERE UPPER(p.pro_referencia)  LIKE v_txt
+          OR UPPER(p.pro_nombre)      LIKE v_txt
           OR UPPER(t.tip_descripcion) LIKE v_txt
           OR UPPER(m.mat_descripcion) LIKE v_txt
        ORDER BY p.pro_nombre;
   END;
- 
+
   PROCEDURE OBTENER_FOTO(p_referencia IN VARCHAR2, p_foto OUT BLOB) IS
     v_ref VARCHAR2(40);
   BEGIN
@@ -163,6 +175,6 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_PRODUCTO AS
     WHEN NO_DATA_FOUND THEN
       RAISE_APPLICATION_ERROR(-20022, 'BOD_PRODUCTO: no existe para obtener foto.');
   END;
- 
+
 END PKG_BOD_PRODUCTO;
 /

@@ -2,26 +2,17 @@ Imports System.Data
 Imports Oracle.ManagedDataAccess.Client
 Imports MueblesAlpes.Web.Modules.ComprasProveedor
 
-' ============================================================
-' RUTA: Modules/ComprasProveedor/Pedidos.aspx.vb
-' ============================================================
 Namespace Modules.ComprasProveedor
 
     Public Class Pedidos
         Inherits System.Web.UI.Page
 
-        ' ══════════════════════════════════════════════════
-        ' PAGE LOAD
-        ' ══════════════════════════════════════════════════
         Protected Sub Page_Load(sender As Object, e As EventArgs) Handles Me.Load
             If Not IsPostBack Then
                 CargarPedidos()
             End If
         End Sub
 
-        ' ══════════════════════════════════════════════════
-        ' HELPERS
-        ' ══════════════════════════════════════════════════
         Private Sub CargarPedidos()
             gvPedidos.EditIndex = -1
             gvPedidos.DataSource = PedidoService.Listar()
@@ -57,7 +48,8 @@ Namespace Modules.ComprasProveedor
         Private Sub RecalcularYActualizarTotal(dt As DataTable, pedidoId As Integer)
             Dim total As Decimal = 0
             For Each row As DataRow In dt.Rows
-                total += Convert.ToDecimal(row("DETPE_CANTIDAD_SOLICITADA")) * Convert.ToDecimal(row("HIP_PRECIO"))
+                ' Ahora usa DETPE_PRECIO_UNITARIO en vez de HIP_PRECIO
+                total += Convert.ToDecimal(row("DETPE_CANTIDAD_SOLICITADA")) * Convert.ToDecimal(row("DETPE_PRECIO_UNITARIO"))
             Next
             lblTotalDetalle.Text = total.ToString("N2")
             Dim dtPed As DataTable = PedidoService.ObtenerPorId(pedidoId)
@@ -78,9 +70,6 @@ Namespace Modules.ComprasProveedor
             pnlMsg.Visible = False
         End Sub
 
-        ' ══════════════════════════════════════════════════
-        ' CABECERA
-        ' ══════════════════════════════════════════════════
         Private Sub BloquearCabecera()
             txtCodigo.ReadOnly = True
             ddlFormaPago.Enabled = False
@@ -125,9 +114,6 @@ Namespace Modules.ComprasProveedor
             End Try
         End Sub
 
-        ' ══════════════════════════════════════════════════
-        ' GRID PRINCIPAL
-        ' ══════════════════════════════════════════════════
         Protected Sub gvPedidos_RowCommand(sender As Object, e As GridViewCommandEventArgs)
             OcultarMensaje()
             If e.CommandName = "VerDetalle" OrElse e.CommandName = "Editar" Then
@@ -153,17 +139,20 @@ Namespace Modules.ComprasProveedor
             ElseIf e.CommandName = "Recibir" Then
                 Try
                     Dim pedidoId As Integer = Convert.ToInt32(e.CommandArgument)
-                    Dim conn As New OracleConnection(ConfigurationManager.ConnectionStrings("OracleConn").ConnectionString)
-                    Dim cmdRec As New OracleCommand("PKG_CP_BOD_PEDIDO.PED_RECIBIR_TODO", conn)
-                    cmdRec.CommandType = CommandType.StoredProcedure
-                    cmdRec.Parameters.Add("p_ped_id", OracleDbType.Decimal).Value = pedidoId
-                    conn.Open()
-                    cmdRec.ExecuteNonQuery()
-                    conn.Close()
+                    Using conn As New OracleConnection(ConfigurationManager.ConnectionStrings("OracleConn").ConnectionString)
+                        Using cmdRec As New OracleCommand("PKG_CP_BOD_PEDIDO.PED_RECIBIR_TODO", conn)
+                            cmdRec.CommandType = CommandType.StoredProcedure
+                            cmdRec.Parameters.Add("p_ped_id", OracleDbType.Decimal).Value = pedidoId
+                            conn.Open()
+                            cmdRec.ExecuteNonQuery()
+                        End Using
+                    End Using
                     CargarPedidos()
-                    MostrarMensaje("Pedido recibido. Stock actualizado correctamente.", False)
+                    MostrarMensaje("Pedido #" & pedidoId & " recibido. Stock actualizado.", False)
+                Catch ex As OracleException
+                    MostrarMensaje("Error Oracle: " & ex.Message & " | C�digo: " & ex.Number, True)
                 Catch ex As Exception
-                    MostrarMensaje("Error al recibir: " & ex.Message, True)
+                    MostrarMensaje("Error general: " & ex.Message, True)
                 End Try
             End If
         End Sub
@@ -181,17 +170,20 @@ Namespace Modules.ComprasProveedor
             End If
         End Sub
 
-        ' ══════════════════════════════════════════════════
-        ' GESTION DE PRODUCTOS (DETALLES)
-        ' ══════════════════════════════════════════════════
         Protected Sub btnAgregarItem_Click(sender As Object, e As EventArgs)
             OcultarMensaje()
             Try
                 Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
                 Dim historialId As Integer = Convert.ToInt32(ddlProducto.SelectedValue)
                 Dim cantidad As Integer = 0
+                Dim precio As Decimal = 0
+
                 If Not Integer.TryParse(txtCantSolicitada.Text, cantidad) OrElse cantidad <= 0 Then
                     MostrarMensaje("Ingrese una cantidad valida mayor a cero.", True)
+                    Return
+                End If
+                If Not Decimal.TryParse(txtPrecioUnitario.Text.Replace(",", "."), precio) OrElse precio <= 0 Then
+                    MostrarMensaje("Ingrese un precio de compra valido mayor a cero.", True)
                     Return
                 End If
                 If historialId = 0 Then
@@ -199,8 +191,9 @@ Namespace Modules.ComprasProveedor
                     Return
                 End If
                 If pedidoId > 0 Then
-                    DetallePedidoService.Insertar(pedidoId, historialId, cantidad)
+                    DetallePedidoService.Insertar(pedidoId, historialId, cantidad, precio)
                     txtCantSolicitada.Text = ""
+                    txtPrecioUnitario.Text = ""
                     CargarDetallesPedido(pedidoId)
                     CargarPedidos()
                     MostrarMensaje("Producto agregado.", False)
@@ -242,13 +235,19 @@ Namespace Modules.ComprasProveedor
                 Dim detalleId As Integer = Convert.ToInt32(gvDetalles.DataKeys(e.RowIndex).Value)
                 Dim cantSol As Integer
                 Dim cantRec As Integer
+                Dim precio As Decimal
+
                 If Not Integer.TryParse(CType(row.FindControl("txtECantSol"), TextBox).Text, cantSol) OrElse cantSol < 0 Then
                     MostrarMensaje("Cantidad solicitada invalida.", True) : Return
                 End If
                 If Not Integer.TryParse(CType(row.FindControl("txtECantRec"), TextBox).Text, cantRec) OrElse cantRec < 0 Then
                     MostrarMensaje("Cantidad recibida invalida.", True) : Return
                 End If
-                DetallePedidoService.Actualizar(detalleId, cantSol, cantRec)
+                If Not Decimal.TryParse(CType(row.FindControl("txtEPrecio"), TextBox).Text.Replace(",", "."), precio) OrElse precio < 0 Then
+                    MostrarMensaje("Precio unitario invalido.", True) : Return
+                End If
+
+                DetallePedidoService.Actualizar(detalleId, cantSol, cantRec, precio)
                 gvDetalles.EditIndex = -1
                 CargarDetallesPedido(pedidoId)
                 CargarPedidos()
@@ -258,9 +257,6 @@ Namespace Modules.ComprasProveedor
             End Try
         End Sub
 
-        ' ══════════════════════════════════════════════════
-        ' BUSQUEDA
-        ' ══════════════════════════════════════════════════
         Protected Sub btnBuscar_Click(sender As Object, e As EventArgs)
             OcultarMensaje()
             gvPedidos.DataSource = PedidoService.Buscar(txtBuscar.Text.Trim())

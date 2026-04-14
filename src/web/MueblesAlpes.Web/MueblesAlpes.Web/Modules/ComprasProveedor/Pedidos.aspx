@@ -123,13 +123,13 @@
                                         Visible="false">
                                         <Columns>
                                             <asp:BoundField DataField="PRO_NOMBRE" HeaderText="Producto" />
-                                            <asp:TemplateField HeaderText="Precio" ItemStyle-Width="90px">
-                                                <ItemTemplate>Q <%# String.Format("{0:N2}", Eval("HIP_PRECIO")) %></ItemTemplate>
+                                            <asp:TemplateField HeaderText="Precio Compra" ItemStyle-Width="100px">
+                                                <ItemTemplate>Q <%# String.Format("{0:N2}", Eval("DETPE_PRECIO_UNITARIO")) %></ItemTemplate>
                                             </asp:TemplateField>
                                             <asp:BoundField DataField="DETPE_CANTIDAD_SOLICITADA" HeaderText="Solicitado" ItemStyle-Width="80px" />
                                             <asp:BoundField DataField="DETPE_CANTIDAD_RECIBIDA"   HeaderText="Recibido"   ItemStyle-Width="75px" />
                                             <asp:TemplateField HeaderText="Subtotal" ItemStyle-Width="90px">
-                                                <ItemTemplate>Q <%# String.Format("{0:N2}", Convert.ToDecimal(Eval("HIP_PRECIO")) * Convert.ToDecimal(Eval("DETPE_CANTIDAD_SOLICITADA"))) %></ItemTemplate>
+                                                <ItemTemplate>Q <%# String.Format("{0:N2}", Convert.ToDecimal(Eval("DETPE_PRECIO_UNITARIO")) * Convert.ToDecimal(Eval("DETPE_CANTIDAD_SOLICITADA"))) %></ItemTemplate>
                                             </asp:TemplateField>
                                         </Columns>
                                     </asp:GridView>
@@ -216,6 +216,8 @@
                     <div><strong>Fecha</strong><asp:Label ID="lblCabeceraFecha" runat="server" /></div>
                     <div><strong>Forma de Pago</strong><asp:Label ID="lblCabeceraFormaPago" runat="server" /></div>
                 </div>
+
+                <%-- AGREGAR PRODUCTO --%>
                 <div class="add-item-box">
                     <p class="sub-head">Agregar Producto</p>
                     <div class="f-row">
@@ -228,12 +230,19 @@
                             <asp:TextBox ID="txtCantSolicitada" runat="server" CssClass="form-control"
                                 TextMode="Number" placeholder="0" />
                         </div>
+                        <div class="f-group" style="max-width:160px;">
+                            <label>Precio de Compra (Q)</label>
+                            <asp:TextBox ID="txtPrecioUnitario" runat="server" CssClass="form-control"
+                                placeholder="0.00" />
+                        </div>
                         <div style="display:flex; align-items:flex-end;">
                             <asp:Button ID="btnAgregarItem" runat="server" Text="+ Anadir"
                                 CssClass="btn-gold" OnClick="btnAgregarItem_Click" />
                         </div>
                     </div>
                 </div>
+
+                <%-- GRID DETALLES --%>
                 <div class="table-card">
                     <asp:GridView ID="gvDetalles" runat="server"
                         AutoGenerateColumns="false"
@@ -249,9 +258,13 @@
                                 <ItemTemplate><%# Eval("PRO_NOMBRE") %></ItemTemplate>
                                 <EditItemTemplate><%# Eval("PRO_NOMBRE") %></EditItemTemplate>
                             </asp:TemplateField>
-                            <asp:TemplateField HeaderText="Precio Unit." ItemStyle-Width="110px">
-                                <ItemTemplate>Q <%# String.Format("{0:N2}", Eval("HIP_PRECIO")) %></ItemTemplate>
-                                <EditItemTemplate>Q <%# String.Format("{0:N2}", Eval("HIP_PRECIO")) %></EditItemTemplate>
+                            <asp:TemplateField HeaderText="Precio Compra (Q)" ItemStyle-Width="150px">
+                                <ItemTemplate>Q <%# String.Format("{0:N2}", Eval("DETPE_PRECIO_UNITARIO")) %></ItemTemplate>
+                                <EditItemTemplate>
+                                    <asp:TextBox ID="txtEPrecio" runat="server"
+                                        Text='<%# Eval("DETPE_PRECIO_UNITARIO") %>'
+                                        CssClass="edit-input" style="width:90px;" />
+                                </EditItemTemplate>
                             </asp:TemplateField>
                             <asp:TemplateField HeaderText="Solicitado" ItemStyle-Width="110px">
                                 <ItemTemplate><%# Eval("DETPE_CANTIDAD_SOLICITADA") %></ItemTemplate>
@@ -271,7 +284,7 @@
                             </asp:TemplateField>
                             <asp:TemplateField HeaderText="Subtotal" ItemStyle-Width="110px">
                                 <ItemTemplate>
-                                    Q <%# String.Format("{0:N2}", Convert.ToDecimal(Eval("DETPE_CANTIDAD_SOLICITADA")) * Convert.ToDecimal(Eval("HIP_PRECIO"))) %>
+                                    Q <%# String.Format("{0:N2}", Convert.ToDecimal(Eval("DETPE_CANTIDAD_SOLICITADA")) * Convert.ToDecimal(Eval("DETPE_PRECIO_UNITARIO"))) %>
                                 </ItemTemplate>
                                 <EditItemTemplate></EditItemTemplate>
                             </asp:TemplateField>
@@ -303,6 +316,7 @@
                         </EmptyDataTemplate>
                     </asp:GridView>
                 </div>
+
                 <div class="total-bar">
                     <span class="total-bar-label">TOTAL ACUMULADO:</span>
                     <span class="total-bar-valor">Q <asp:Label ID="lblTotalDetalle" runat="server" Text="0.00" /></span>
