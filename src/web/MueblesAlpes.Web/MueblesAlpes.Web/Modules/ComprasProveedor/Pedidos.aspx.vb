@@ -1,6 +1,5 @@
 Imports System.Data
 Imports Oracle.ManagedDataAccess.Client
-Imports MueblesAlpes.Web.Modules.ComprasProveedor
 
 Namespace Modules.ComprasProveedor
 
@@ -48,7 +47,6 @@ Namespace Modules.ComprasProveedor
         Private Sub RecalcularYActualizarTotal(dt As DataTable, pedidoId As Integer)
             Dim total As Decimal = 0
             For Each row As DataRow In dt.Rows
-                ' Ahora usa DETPE_PRECIO_UNITARIO en vez de HIP_PRECIO
                 total += Convert.ToDecimal(row("DETPE_CANTIDAD_SOLICITADA")) * Convert.ToDecimal(row("DETPE_PRECIO_UNITARIO"))
             Next
             lblTotalDetalle.Text = total.ToString("N2")

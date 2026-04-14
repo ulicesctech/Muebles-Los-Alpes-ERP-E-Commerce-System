@@ -178,19 +178,25 @@
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />
     <Content Include="favicon.ico" />
+    <Content Include="Modules\AuthUsuarios\Admin\GrupoUsuario.aspx" />
+    <Content Include="Modules\AuthUsuarios\Admin\Permisos.aspx" />
+    <Content Include="Modules\AuthUsuarios\Ascensos.aspx" />
+    <Content Include="Modules\AuthUsuarios\Clientes.aspx" />
+    <Content Include="Modules\AuthUsuarios\Empleados.aspx" />
+    <Content Include="Modules\AuthUsuarios\LoginCliente.aspx" />
+    <Content Include="Modules\AuthUsuarios\LoginEmpleado.aspx" />
+    <Content Include="Modules\AuthUsuarios\Puestos.aspx" />
     <Content Include="Modules\CatalogoInventario\Precios.aspx" />
     <Content Include="Modules\CatalogoInventario\Promociones.aspx" />
     <Content Include="Modules\CatalogoInventario\Stock.aspx" />
+    <Content Include="Modules\Cliente\Login.aspx" />
+    <Content Include="Modules\Cliente\Registro.aspx" />
     <Content Include="Web.config" />
     <Content Include="Bundle.config" />
     <Content Include="Site.Master" />
     <Content Include="Site.Mobile.Master" />
     <Content Include="ViewSwitcher.ascx" />
-    <!-- AUTH USUARIOS - Default en raiz de AuthUsuarios -->
     <Content Include="Modules\AuthUsuarios\Index.aspx" />
-    <!-- AUTH USUARIOS - Admin -->
-    <!-- AUTH USUARIOS - Cliente -->
-    <!-- CATALOGO INVENTARIO -->
     <Content Include="Modules\CatalogoInventario\Almacenes.aspx" />
     <Content Include="Modules\CatalogoInventario\Categorias.aspx" />
     <Content Include="Modules\CatalogoInventario\Index.aspx" />
@@ -198,29 +204,27 @@
     <Content Include="Modules\CatalogoInventario\Nichos.aspx" />
     <Content Include="Modules\CatalogoInventario\Productos.aspx" />
     <Content Include="Modules\CatalogoInventario\Tipos.aspx" />
-    <!-- COMPRAS PROVEEDOR -->
     <Content Include="Modules\ComprasProveedor\FacturasProveedor.aspx" />
     <Content Include="Modules\ComprasProveedor\Index.aspx" />
     <Content Include="Modules\ComprasProveedor\OrdenesCompra.aspx" />
     <Content Include="Modules\ComprasProveedor\Pedidos.aspx" />
     <Content Include="Modules\ComprasProveedor\Proveedores.aspx" />
     <Content Include="Modules\ComprasProveedor\ReclamosProveedor.aspx" />
-    <!-- VENTAS FACTURACION -->
     <Content Include="Modules\VentasFacturacion\Carrito.aspx" />
     <Content Include="Modules\VentasFacturacion\DetalleCarrito.aspx" />
     <Content Include="Modules\VentasFacturacion\Factura.aspx" />
     <Content Include="Modules\VentasFacturacion\Index.aspx" />
-    <!-- GITKEEP -->
     <Content Include="Modules\AuthUsuarios\.gitkeep" />
     <Content Include="Modules\CatalogoInventario\.gitkeep" />
     <Content Include="Modules\ComprasProveedor\.gitkeep" />
     <Content Include="Modules\VentasFacturacion\.gitkeep" />
+    <Content Include="Modules\Cliente\.gitkeep" />
     <Content Include="App_Code\Models\.gitkeep" />
     <Content Include="App_Code\Services\.gitkeep" />
     <Content Include="App_Code\Utils\.gitkeep" />
     <Content Include="App_Code\Common\.gitkeep" />
     <Content Include="App_Code\Data\.gitkeep" />
-    <!-- BIN -->
+    <Content Include="App_Code\Services\Cliente\.gitkeep" />
     <Content Include="bin\Antlr3.Runtime.dll" />
     <Content Include="bin\Antlr3.Runtime.pdb" />
     <Content Include="bin\Microsoft.AspNet.FriendlyUrls.dll" />
@@ -300,7 +304,6 @@
     <Content Include="bin\roslyn\vbc.exe.config" />
     <Content Include="bin\roslyn\vbc.rsp" />
     <Content Include="bin\roslyn\VBCSCompiler.exe.config" />
-    <!-- CSS -->
     <Content Include="Content\Site.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
@@ -334,7 +337,6 @@
     <Content Include="Content\bootstrap-utilities.min.css.map" />
     <Content Include="Content\bootstrap-utilities.rtl.css.map" />
     <Content Include="Content\bootstrap-utilities.rtl.min.css.map" />
-    <!-- SCRIPTS -->
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.bundle.js.map" />
@@ -375,7 +377,6 @@
     <Content Include="Scripts\WebForms\MSAjax\MicrosoftAjaxTimer.js" />
     <Content Include="Scripts\WebForms\MSAjax\MicrosoftAjaxWebForms.js" />
     <Content Include="Scripts\WebForms\MSAjax\MicrosoftAjaxWebServices.js" />
-    <!-- OBJ -->
     <Content Include="obj\Debug\MueblesAlpes.Web.dll" />
     <Content Include="obj\Debug\MueblesAlpes.Web.pdb" />
     <Content Include="obj\Debug\MueblesAlpes.Web.vbproj.FileListAbsolute.txt" />
@@ -392,14 +393,14 @@
   <ItemGroup>
     <!-- SERVICES -->
     <Compile Include="App_Code\Data\OracleDb.vb" />
-    <Content Include="App_Code\Services\AuthUsuarios\AscensoService.vb" />
-    <Content Include="App_Code\Services\AuthUsuarios\ClienteService.vb" />
-    <Content Include="App_Code\Services\AuthUsuarios\EmpleadoService.vb" />
-    <Content Include="App_Code\Services\AuthUsuarios\GrupoUsuarioService.vb" />
-    <Content Include="App_Code\Services\AuthUsuarios\LoginClienteService.vb" />
-    <Content Include="App_Code\Services\AuthUsuarios\LoginEmpleadoService.vb" />
-    <Content Include="App_Code\Services\AuthUsuarios\PermisoService.vb" />
-    <Content Include="App_Code\Services\AuthUsuarios\PuestoService.vb" />
+    <Compile Include="App_Code\Services\AuthUsuarios\AscensoService.vb" />
+    <Compile Include="App_Code\Services\AuthUsuarios\ClienteService.vb" />
+    <Compile Include="App_Code\Services\AuthUsuarios\EmpleadoService.vb" />
+    <Compile Include="App_Code\Services\AuthUsuarios\GrupoUsuarioService.vb" />
+    <Compile Include="App_Code\Services\AuthUsuarios\LoginClienteService.vb" />
+    <Compile Include="App_Code\Services\AuthUsuarios\LoginEmpleadoService.vb" />
+    <Compile Include="App_Code\Services\AuthUsuarios\PermisoService.vb" />
+    <Compile Include="App_Code\Services\AuthUsuarios\PuestoService.vb" />
     <Compile Include="App_Code\Services\CatalogoInventario\AlmacenService.vb" />
     <Compile Include="App_Code\Services\CatalogoInventario\CategoriaService.vb" />
     <Compile Include="App_Code\Services\CatalogoInventario\HistorialPrecioService.vb" />
@@ -410,6 +411,7 @@
     <Compile Include="App_Code\Services\CatalogoInventario\PromocionService.vb" />
     <Compile Include="App_Code\Services\CatalogoInventario\StockService.vb" />
     <Compile Include="App_Code\Services\CatalogoInventario\TipoService.vb" />
+    <Compile Include="App_Code\Services\Cliente\AuthClienteService.vb" />
     <Compile Include="App_Code\Services\ComprasProveedor\DetallePedidoService.vb" />
     <Compile Include="App_Code\Services\ComprasProveedor\FacturaProveedorService.vb" />
     <Compile Include="App_Code\Services\ComprasProveedor\OrdenCompraService.vb" />
@@ -445,6 +447,62 @@
     <Compile Include="Global.asax.vb">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Modules\AuthUsuarios\Admin\GrupoUsuario.aspx.designer.vb">
+      <DependentUpon>GrupoUsuario.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\Admin\GrupoUsuario.aspx.vb">
+      <DependentUpon>GrupoUsuario.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\Admin\Permisos.aspx.designer.vb">
+      <DependentUpon>Permisos.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\Admin\Permisos.aspx.vb">
+      <DependentUpon>Permisos.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\Ascensos.aspx.designer.vb">
+      <DependentUpon>Ascensos.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\Ascensos.aspx.vb">
+      <DependentUpon>Ascensos.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\Clientes.aspx.designer.vb">
+      <DependentUpon>Clientes.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\Clientes.aspx.vb">
+      <DependentUpon>Clientes.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\Empleados.aspx.designer.vb">
+      <DependentUpon>Empleados.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\Empleados.aspx.vb">
+      <DependentUpon>Empleados.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\LoginCliente.aspx.designer.vb">
+      <DependentUpon>LoginCliente.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\LoginCliente.aspx.vb">
+      <DependentUpon>LoginCliente.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\LoginEmpleado.aspx.designer.vb">
+      <DependentUpon>LoginEmpleado.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\LoginEmpleado.aspx.vb">
+      <DependentUpon>LoginEmpleado.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\Puestos.aspx.designer.vb">
+      <DependentUpon>Puestos.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\Puestos.aspx.vb">
+      <DependentUpon>Puestos.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="Modules\CatalogoInventario\Precios.aspx.designer.vb">
       <DependentUpon>Precios.aspx</DependentUpon>
     </Compile>
@@ -464,6 +522,20 @@
     </Compile>
     <Compile Include="Modules\CatalogoInventario\Stock.aspx.vb">
       <DependentUpon>Stock.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Cliente\Login.aspx.designer.vb">
+      <DependentUpon>Login.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Cliente\Login.aspx.vb">
+      <DependentUpon>Login.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Cliente\Registro.aspx.designer.vb">
+      <DependentUpon>Registro.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Cliente\Registro.aspx.vb">
+      <DependentUpon>Registro.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
     </Compile>
     <Compile Include="Site.Master.designer.vb">
@@ -487,7 +559,6 @@
     <Compile Include="Site.Mobile.Master.designer.vb">
       <DependentUpon>Site.Mobile.Master</DependentUpon>
     </Compile>
-    <!-- AUTH USUARIOS - Default en raiz (una sola vez) -->
     <Compile Include="Modules\AuthUsuarios\Index.aspx.designer.vb">
       <DependentUpon>Index.aspx</DependentUpon>
     </Compile>
@@ -495,9 +566,6 @@
       <DependentUpon>Index.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <!-- AUTH USUARIOS - Admin -->
-    <!-- AUTH USUARIOS - Cliente -->
-    <!-- CATALOGO INVENTARIO -->
     <Compile Include="Modules\CatalogoInventario\Almacenes.aspx.designer.vb">
       <DependentUpon>Almacenes.aspx</DependentUpon>
     </Compile>
@@ -547,7 +615,6 @@
       <DependentUpon>Tipos.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <!-- COMPRAS PROVEEDOR -->
     <Compile Include="Modules\ComprasProveedor\FacturasProveedor.aspx.designer.vb">
       <DependentUpon>FacturasProveedor.aspx</DependentUpon>
     </Compile>
@@ -590,7 +657,6 @@
       <DependentUpon>ReclamosProveedor.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <!-- VENTAS FACTURACION -->
     <Compile Include="Modules\VentasFacturacion\Carrito.aspx.designer.vb">
       <DependentUpon>Carrito.aspx</DependentUpon>
     </Compile>
@@ -619,7 +685,6 @@
       <DependentUpon>Index.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <!-- MY PROJECT -->
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -650,6 +715,26 @@
     <EmbeddedResource Include="obj\Debug\MueblesAlpes.Web.Resources.resources" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Handlers\Auth\AuthHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\AlmacenesHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\CategoriasHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\HistorialPreciosHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\MaterialesHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\NichosHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\ProductosHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\PromocionesHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\StockHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\TiposHandler.ashx" />
+    <Content Include="Handlers\Cliente\CatalogoClienteHandler.ashx" />
+    <Content Include="Handlers\Cliente\MisComprasHandler.ashx" />
+    <Content Include="Handlers\ComprasProveedor\OrdenesCompraHandler.ashx" />
+    <Content Include="Handlers\ComprasProveedor\PedidosHandler.ashx" />
+    <Content Include="Handlers\ComprasProveedor\ProveedoresHandler.ashx" />
+    <Content Include="Handlers\Reportes\ReporteComprasHandler.ashx" />
+    <Content Include="Handlers\Reportes\ReporteStockHandler.ashx" />
+    <Content Include="Handlers\Reportes\ReporteVentasHandler.ashx" />
+    <Content Include="Handlers\VentasFacturacion\CarritoHandler.ashx" />
+    <Content Include="Handlers\VentasFacturacion\FacturaHandler.ashx" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
