@@ -17,6 +17,35 @@ Namespace Modules.CatalogoInventario
                 LimpiarNichos()
                 txtFechaInicio.Text = DateTime.Now.ToString("yyyy-MM-dd")
                 CargarHistorialTodos()
+
+                Dim refParam As String = Request.QueryString("ref")
+                Dim precioParam As String = Request.QueryString("precio")
+                Dim readonlyParam As String = Request.QueryString("readonly")
+
+                If Not String.IsNullOrEmpty(refParam) Then
+                    Dim item = ddlProducto.Items.FindByValue(refParam)
+                    If item IsNot Nothing Then
+                        ddlProducto.SelectedValue = refParam
+                        ddlProducto_SelectedIndexChanged(Nothing, EventArgs.Empty)
+                    End If
+                End If
+
+                ' Modo solo-lectura: viene desde Pedidos → Recibido
+                If readonlyParam = "1" Then
+                    ddlProducto.Enabled = False
+                    txtFechaInicio.ReadOnly = True
+
+                    ' Pre-cargar precio desde el pedido
+                    If Not String.IsNullOrEmpty(precioParam) Then
+                        txtPrecio.Text = precioParam
+                        txtPrecio.ReadOnly = True
+                    End If
+
+                    ' Mostrar banner informativo
+                    Dim pedidoParam As String = Request.QueryString("pedido")
+                    MostrarInfo("Registrando precio de recepcion desde el Pedido #" & pedidoParam &
+                        ". Producto y precio pre-cargados. Solo selecciona el almacen y nicho.")
+                End If
             End If
         End Sub
 
@@ -111,8 +140,21 @@ Namespace Modules.CatalogoInventario
                 Dim fila As DataRow() = dt.Select("PRO_REFERENCIA = '" & ddlProducto.SelectedValue & "'")
                 If fila.Length > 0 Then
                     lblNombreProducto.Text = fila(0)("PRO_NOMBRE").ToString()
-                    lblTipo.Text = fila(0)("TIP_DESCRIPCION").ToString()
-                    lblMaterial.Text = fila(0)("MAT_DESCRIPCION").ToString()
+                    ' Verificacion segura — columnas con JOIN pueden variar
+                    If dt.Columns.Contains("TIP_DESCRIPCION") Then
+                        lblTipo.Text = fila(0)("TIP_DESCRIPCION").ToString()
+                    ElseIf dt.Columns.Contains("TIP_TIPO") Then
+                        lblTipo.Text = fila(0)("TIP_TIPO").ToString()
+                    Else
+                        lblTipo.Text = ""
+                    End If
+                    If dt.Columns.Contains("MAT_DESCRIPCION") Then
+                        lblMaterial.Text = fila(0)("MAT_DESCRIPCION").ToString()
+                    ElseIf dt.Columns.Contains("MAT_MATERIAL") Then
+                        lblMaterial.Text = fila(0)("MAT_MATERIAL").ToString()
+                    Else
+                        lblMaterial.Text = ""
+                    End If
                     pnlInfoProducto.Visible = True
                 End If
                 CargarHistorial(ddlProducto.SelectedValue)
@@ -190,6 +232,16 @@ Namespace Modules.CatalogoInventario
                     Convert.ToDecimal(txtPrecio.Text.Trim()),
                     Convert.ToDateTime(txtFechaInicio.Text.Trim())
                 )
+
+                ' Si vino desde Pedidos, redirigir de vuelta
+                Dim pedidoParam As String = Request.QueryString("pedido")
+                If Not String.IsNullOrEmpty(pedidoParam) Then
+                    Response.Redirect(ResolveUrl("~/Modules/ComprasProveedor/Pedidos.aspx") &
+                                      "?pedido=" & pedidoParam)
+                    Return
+                End If
+
+                ' Flujo normal
                 MostrarExito("Precio registrado correctamente.")
                 txtPrecio.Text = ""
                 txtFechaInicio.Text = DateTime.Now.ToString("yyyy-MM-dd")
@@ -228,6 +280,14 @@ Namespace Modules.CatalogoInventario
             pnlMsg.Visible = True
         End Sub
 
+
+        Private Sub MostrarInfo(msg As String)
+            lblMsg.Text = msg
+            pnlMsg.CssClass = "alert-ok"
+            pnlMsg.Visible = True
+        End Sub
+
     End Class
+
 
 End Namespace

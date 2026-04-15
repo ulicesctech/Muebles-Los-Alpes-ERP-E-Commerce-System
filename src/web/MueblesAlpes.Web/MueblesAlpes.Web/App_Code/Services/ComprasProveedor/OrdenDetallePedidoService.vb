@@ -50,4 +50,11 @@ Public Class OrdenDetallePedidoService
         Return OracleDb.ExecRefCursor(PKG & ".ODP_LISTAR_POR_ORDEN", ps, "p_data")
     End Function
 
+    Public Shared Function BuscarPorPedido(pedidoId As Integer) As DataTable
+        Dim ps As New List(Of OracleParameter) From {
+        New OracleParameter("p_ped_id", OracleDbType.Int32, pedidoId, ParameterDirection.Input)
+    }
+        Return OracleDb.ExecRefCursor(PKG & ".ODP_LISTAR_POR_PEDIDO", ps, "p_data")
+    End Function
+
 End Class
