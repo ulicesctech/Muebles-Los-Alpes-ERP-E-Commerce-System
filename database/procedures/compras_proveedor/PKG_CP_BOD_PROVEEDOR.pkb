@@ -1,32 +1,50 @@
-CREATE OR REPLACE PACKAGE BODY PKG_CP_BOD_PROVEEDOR AS
-    PROCEDURE assert_not_null(p_val IN VARCHAR2, p_msg IN VARCHAR2) IS
-    BEGIN IF TRIM(p_val) IS NULL THEN RAISE_APPLICATION_ERROR(-20101, p_msg); END IF; END;
-
-    PROCEDURE PROV_CREAR(p_nit IN VARCHAR2, p_nombre IN VARCHAR2, p_avenida IN VARCHAR2, p_zona IN VARCHAR2, p_direccion IN VARCHAR2, p_telefono IN VARCHAR2, p_id OUT NUMBER) IS
+CREATE OR REPLACE PACKAGE BODY PKG_CP_FAC_FACTURA_PROV AS
+    PROCEDURE FAC_PROV_REGISTRAR(p_orc_key IN VARCHAR2, p_fac_cod IN VARCHAR2) IS
     BEGIN
-        assert_not_null(p_nit, 'NIT obligatorio.');
-        assert_not_null(p_nombre, 'Nombre obligatorio.');
-        INSERT INTO BOD_PROVEEDOR(prov_nit, prov_nombre, prov_avenida, prov_zona, prov_direccion, prov_telefono)
-        VALUES (TRIM(p_nit), TRIM(p_nombre), TRIM(p_avenida), TRIM(p_zona), TRIM(p_direccion), TRIM(p_telefono))
-        RETURNING prov_proveedor INTO p_id;
+        INSERT INTO FAC_FACTURA_PROVEEDOR(orc_orden_compra, facpro_codigo_factura, facpro_fecha)
+        VALUES (p_orc_key, p_fac_cod, SYSDATE);
+        COMMIT;
+    EXCEPTION WHEN OTHERS THEN ROLLBACK; RAISE;
     END;
 
-    PROCEDURE PROV_ACTUALIZAR(p_id IN NUMBER, p_nit IN VARCHAR2, p_nombre IN VARCHAR2, p_avenida IN VARCHAR2, p_zona IN VARCHAR2, p_direccion IN VARCHAR2, p_telefono IN VARCHAR2) IS
+    PROCEDURE FAC_PROV_ACTUALIZAR(p_orc_key IN VARCHAR2, p_fac_cod IN VARCHAR2) IS
     BEGIN
-        UPDATE BOD_PROVEEDOR SET prov_nit = TRIM(p_nit), prov_nombre = TRIM(p_nombre), prov_avenida = TRIM(p_avenida),
-            prov_zona = TRIM(p_zona), prov_direccion = TRIM(p_direccion), prov_telefono = TRIM(p_telefono)
-        WHERE prov_proveedor = p_id;
+        UPDATE FAC_FACTURA_PROVEEDOR 
+        SET facpro_codigo_factura = p_fac_cod
+        WHERE orc_orden_compra = p_orc_key;
+        COMMIT;
+    EXCEPTION WHEN OTHERS THEN ROLLBACK; RAISE;
     END;
 
-    PROCEDURE PROV_ELIMINAR(p_id IN NUMBER) IS
-        v_cnt NUMBER;
+    PROCEDURE FAC_PROV_ELIMINAR(p_orc_key IN VARCHAR2) IS
     BEGIN
-        SELECT COUNT(1) INTO v_cnt FROM BOD_ORDEN_COMPRA WHERE prov_proveedor = p_id;
-        IF v_cnt > 0 THEN RAISE_APPLICATION_ERROR(-20102, 'No se puede eliminar: El proveedor tiene órdenes asociadas.'); END IF;
-        DELETE FROM BOD_PROVEEDOR WHERE prov_proveedor = p_id;
+        DELETE FROM FAC_FACTURA_PROVEEDOR WHERE orc_orden_compra = p_orc_key;
+        COMMIT;
+    EXCEPTION WHEN OTHERS THEN ROLLBACK; RAISE;
     END;
 
-    PROCEDURE PROV_LISTAR(p_data OUT SYS_REFCURSOR) IS
-    BEGIN OPEN p_data FOR SELECT * FROM BOD_PROVEEDOR ORDER BY prov_nombre; END;
-END PKG_CP_BOD_PROVEEDOR;
+    PROCEDURE FAC_PROV_LISTAR(p_data OUT SYS_REFCURSOR) IS
+    BEGIN 
+        OPEN p_data FOR 
+            SELECT f.*, o.orc_codigo, p.prov_nombre
+            FROM FAC_FACTURA_PROVEEDOR f
+            JOIN BOD_ORDEN_COMPRA o ON f.orc_orden_compra = o.orc_orden_compra
+            JOIN BOD_PROVEEDOR p ON o.prov_proveedor = p.prov_proveedor
+            ORDER BY f.facpro_fecha DESC; 
+    END;
+
+    PROCEDURE FAC_PROV_LISTAR_ID(p_orc_key IN VARCHAR2, p_data OUT SYS_REFCURSOR) IS
+    BEGIN 
+        OPEN p_data FOR SELECT * FROM FAC_FACTURA_PROVEEDOR WHERE orc_orden_compra = p_orc_key; 
+    END;
+
+    PROCEDURE FAC_PROV_BUSCAR(p_fac_cod IN VARCHAR2, p_data OUT SYS_REFCURSOR) IS
+    BEGIN
+        OPEN p_data FOR 
+            SELECT f.*, o.orc_codigo
+            FROM FAC_FACTURA_PROVEEDOR f
+            JOIN BOD_ORDEN_COMPRA o ON f.orc_orden_compra = o.orc_orden_compra
+            WHERE f.facpro_codigo_factura LIKE '%' || p_fac_cod || '%';
+    END;
+END PKG_CP_FAC_FACTURA_PROV;
 /

@@ -139,11 +139,18 @@
             <asp:BoundField DataField="MAT_DESCRIPCION" HeaderText="Material" ItemStyle-Width="120px" />
             <asp:BoundField DataField="PRO_COLOR"       HeaderText="Color"    ItemStyle-Width="90px" />
             <asp:BoundField DataField="PRO_PESO"        HeaderText="Peso kg"  ItemStyle-Width="80px" />
+            <asp:TemplateField HeaderText="Precio Venta" ItemStyle-Width="110px">
+    <ItemTemplate>
+        <span style="font-weight:bold; color:#276749;">
+            Q <%# String.Format("{0:N2}", Eval("PRO_PRECIO")) %>
+        </span>
+    </ItemTemplate>
+</asp:TemplateField>
             <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="200px">
                 <ItemTemplate>
                     <div class="actions-cell">
                         <asp:LinkButton CommandName="Editar"   CommandArgument='<%# Eval("PRO_REFERENCIA") %>' runat="server" CssClass="btn-edit-t">✏️ Editar</asp:LinkButton>
-                        <asp:LinkButton CommandName="Eliminar" CommandArgument='<%# Eval("PRO_REFERENCIA") %>' runat="server" CssClass="btn-del-t" OnClientClick="return confirm('¿Eliminar este producto?');">🗑 Eliminar</asp:LinkButton>
+                        <asp:LinkButton CommandName="Eliminar" CommandArgument='<%# Eval("PRO_REFERENCIA") %>' runat="server" CssClass="btn-del-t" OnClientClick="return confirm('¿Eliminar este producto?');">Eliminar</asp:LinkButton>
                     </div>
                 </ItemTemplate>
             </asp:TemplateField>

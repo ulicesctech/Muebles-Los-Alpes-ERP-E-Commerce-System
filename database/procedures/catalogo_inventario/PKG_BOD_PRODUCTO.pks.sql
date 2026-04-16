@@ -1,6 +1,3 @@
--- ============================================================
--- PKG_BOD_PRODUCTO.pks
--- ============================================================
 CREATE OR REPLACE PACKAGE PKG_BOD_PRODUCTO AS
   PROCEDURE CREAR(
     p_referencia IN VARCHAR2, p_nombre IN VARCHAR2, p_descripcion IN VARCHAR2,
@@ -15,6 +12,7 @@ CREATE OR REPLACE PACKAGE PKG_BOD_PRODUCTO AS
     p_color IN VARCHAR2, p_peso IN NUMBER
   );
   PROCEDURE ACTUALIZAR_FOTO(p_referencia IN VARCHAR2, p_foto IN BLOB);
+  PROCEDURE ACTUALIZAR_PRECIO(p_referencia IN VARCHAR2, p_precio IN NUMBER);
   PROCEDURE ELIMINAR(p_referencia IN VARCHAR2);
   PROCEDURE OBTENER(p_referencia IN VARCHAR2, p_data OUT SYS_REFCURSOR);
   PROCEDURE LISTAR(p_data OUT SYS_REFCURSOR);

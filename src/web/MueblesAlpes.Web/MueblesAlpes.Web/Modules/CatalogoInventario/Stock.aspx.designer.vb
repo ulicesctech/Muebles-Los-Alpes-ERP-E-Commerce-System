@@ -132,15 +132,6 @@ Namespace Modules.CatalogoInventario
         Protected WithEvents pnlPrecioVigente As Global.System.Web.UI.WebControls.Panel
 
         '''<summary>
-        '''lblHipId control.
-        '''</summary>
-        '''<remarks>
-        '''Auto-generated field.
-        '''To modify move field declaration from designer file to code-behind file.
-        '''</remarks>
-        Protected WithEvents lblHipId As Global.System.Web.UI.WebControls.Label
-
-        '''<summary>
         '''lblPrecioVigente control.
         '''</summary>
         '''<remarks>
@@ -157,24 +148,6 @@ Namespace Modules.CatalogoInventario
         '''To modify move field declaration from designer file to code-behind file.
         '''</remarks>
         Protected WithEvents pnlAvisoPrecio As Global.System.Web.UI.WebControls.Panel
-
-        '''<summary>
-        '''txtPrecio control.
-        '''</summary>
-        '''<remarks>
-        '''Auto-generated field.
-        '''To modify move field declaration from designer file to code-behind file.
-        '''</remarks>
-        Protected WithEvents txtPrecio As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
-        '''txtFechaInicio control.
-        '''</summary>
-        '''<remarks>
-        '''Auto-generated field.
-        '''To modify move field declaration from designer file to code-behind file.
-        '''</remarks>
-        Protected WithEvents txtFechaInicio As Global.System.Web.UI.WebControls.TextBox
 
         '''<summary>
         '''pnlStockActual control.
@@ -204,15 +177,6 @@ Namespace Modules.CatalogoInventario
         Protected WithEvents lblDisponible As Global.System.Web.UI.WebControls.Label
 
         '''<summary>
-        '''lblReservado control.
-        '''</summary>
-        '''<remarks>
-        '''Auto-generated field.
-        '''To modify move field declaration from designer file to code-behind file.
-        '''</remarks>
-        Protected WithEvents lblReservado As Global.System.Web.UI.WebControls.Label
-
-        '''<summary>
         '''lblMinimo control.
         '''</summary>
         '''<remarks>
@@ -231,6 +195,24 @@ Namespace Modules.CatalogoInventario
         Protected WithEvents lblMaximo As Global.System.Web.UI.WebControls.Label
 
         '''<summary>
+        '''txtCantidadEntrada control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents txtCantidadEntrada As Global.System.Web.UI.WebControls.TextBox
+
+        '''<summary>
+        '''btnEntrada control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents btnEntrada As Global.System.Web.UI.WebControls.Button
+
+        '''<summary>
         '''txtDisponible control.
         '''</summary>
         '''<remarks>
@@ -238,15 +220,6 @@ Namespace Modules.CatalogoInventario
         '''To modify move field declaration from designer file to code-behind file.
         '''</remarks>
         Protected WithEvents txtDisponible As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
-        '''txtReservado control.
-        '''</summary>
-        '''<remarks>
-        '''Auto-generated field.
-        '''To modify move field declaration from designer file to code-behind file.
-        '''</remarks>
-        Protected WithEvents txtReservado As Global.System.Web.UI.WebControls.TextBox
 
         '''<summary>
         '''txtMinimo control.
@@ -283,6 +256,60 @@ Namespace Modules.CatalogoInventario
         '''To modify move field declaration from designer file to code-behind file.
         '''</remarks>
         Protected WithEvents btnCancelar As Global.System.Web.UI.WebControls.Button
+
+        '''<summary>
+        '''pnlSinStock control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents pnlSinStock As Global.System.Web.UI.WebControls.Panel
+
+        '''<summary>
+        '''txtDisponibleNuevo control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents txtDisponibleNuevo As Global.System.Web.UI.WebControls.TextBox
+
+        '''<summary>
+        '''txtMinimoNuevo control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents txtMinimoNuevo As Global.System.Web.UI.WebControls.TextBox
+
+        '''<summary>
+        '''txtMaximoNuevo control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents txtMaximoNuevo As Global.System.Web.UI.WebControls.TextBox
+
+        '''<summary>
+        '''btnCrearStock control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents btnCrearStock As Global.System.Web.UI.WebControls.Button
+
+        '''<summary>
+        '''btnCancelar2 control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents btnCancelar2 As Global.System.Web.UI.WebControls.Button
 
         '''<summary>
         '''gvStock control.
