@@ -78,15 +78,6 @@ Namespace Modules.ComprasProveedor
         Protected WithEvents gvPedidos As Global.System.Web.UI.WebControls.GridView
 
         '''<summary>
-        '''Control gvSubProductos.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents gvSubProductos As Global.System.Web.UI.WebControls.GridView
-
-        '''<summary>
         '''Control pnlFormCabecera.
         '''</summary>
         '''<remarks>
@@ -195,13 +186,22 @@ Namespace Modules.ComprasProveedor
         Protected WithEvents lblCabeceraFecha As Global.System.Web.UI.WebControls.Label
 
         '''<summary>
-        '''Control lblCabeceraFormaPago.
+        '''Control ddlCabeceraFormaPago.
         '''</summary>
         '''<remarks>
         '''Campo generado automáticamente.
         '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         '''</remarks>
-        Protected WithEvents lblCabeceraFormaPago As Global.System.Web.UI.WebControls.Label
+        Protected WithEvents ddlCabeceraFormaPago As Global.System.Web.UI.WebControls.DropDownList
+
+        '''<summary>
+        '''Control btnGuardarCabecera.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents btnGuardarCabecera As Global.System.Web.UI.WebControls.Button
 
         '''<summary>
         '''Control ddlProducto.

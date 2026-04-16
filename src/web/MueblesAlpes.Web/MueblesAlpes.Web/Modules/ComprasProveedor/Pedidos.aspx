@@ -48,15 +48,14 @@
     .btn-precio-t:hover { background:#8B5E3C; color:white; }
     .add-item-box { background:#fdf8f3; padding:15px; border-radius:10px; border:1px solid #e8d8c0; margin-bottom:15px; }
     .total-box { padding:14px 16px; background:#fdf6ec; border-radius:8px; border:1px solid #e8d8c0; font-size:16px; font-weight:bold; color:#5C3A1E; font-family:Georgia,serif; margin-top:12px; }
-    .cabecera-info { background:#fdf8f3; border:1px solid #e8d8c0; border-radius:8px; padding:12px 16px; margin-bottom:14px; display:flex; gap:24px; flex-wrap:wrap; font-family:Arial,sans-serif; font-size:13px; color:#5C3A1E; }
-    .cabecera-info strong { font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:#8B5E3C; display:block; margin-bottom:2px; }
+    .cabecera-info { background:#fdf8f3; border:1px solid #e8d8c0; border-radius:8px; padding:12px 16px; margin-bottom:14px; display:flex; gap:24px; flex-wrap:wrap; align-items:flex-end; font-family:Arial,sans-serif; font-size:13px; color:#5C3A1E; }
+    .cabecera-info strong { font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:#8B5E3C; display:block; margin-bottom:4px; }
     .section-label { font-size:12px; font-weight:bold; color:#5C3A1E; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; }
     .empty-state { text-align:center; padding:40px 20px; color:#aaa; font-family:Arial,sans-serif; }
     .recibir-box { margin-top:8px; padding:10px 12px; background:#f0fff4; border:1px solid #9ae6b4; border-radius:8px; }
     .recibir-box label { font-size:11px; font-weight:bold; color:#276749; text-transform:uppercase; display:block; margin-bottom:6px; }
     .info-nota { font-size:11px; color:#8B5E3C; font-style:italic; margin-top:4px; font-family:Arial,sans-serif; }
     .edit-input { padding:7px 10px; border:2px solid #C9973A; border-radius:6px; font-size:13px; font-family:Arial,sans-serif; background:white; width:100%; box-sizing:border-box; outline:none; }
-    /* Sub-grid de items dentro del listado de pedidos */
     .sub-ped-table { width:100%; border-collapse:collapse; font-family:Arial,sans-serif; font-size:12px; margin-top:6px; }
     .sub-ped-table thead tr { background:#f5ece0; }
     .sub-ped-table thead th { padding:5px 10px; color:#5C3A1E; font-size:10px; font-weight:bold; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-bottom:1px solid #e8d8c0; }
@@ -114,7 +113,6 @@
                                 "<span class='badge-pago'>CONTADO</span>") %>
                         </ItemTemplate>
                     </asp:TemplateField>
-                    <%-- Sub-grid: muestra todos los items del pedido con producto, material, cantidades --%>
                     <asp:TemplateField HeaderText="Productos / Items">
                         <ItemTemplate>
                             <asp:GridView ID="gvSubProductos" runat="server"
@@ -125,9 +123,9 @@
                                     <asp:BoundField DataField="PRO_NOMBRE" HeaderText="Producto" />
                                     <asp:TemplateField HeaderText="Material">
                                         <ItemTemplate>
-                                            <%# If(IsDBNull(Eval("PRO_REFERENCIA")) OrElse String.IsNullOrEmpty(Eval("PRO_REFERENCIA").ToString()),
+                                            <%# If(IsDBNull(Eval("MATERIAL")) OrElse String.IsNullOrEmpty(Eval("MATERIAL").ToString()),
                                                 "<span class='badge-pendiente'>—</span>",
-                                                Eval("PRO_REFERENCIA").ToString()) %>
+                                                Eval("MATERIAL").ToString()) %>
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Sol." ItemStyle-Width="55px">
@@ -136,22 +134,21 @@
                                     <asp:TemplateField HeaderText="Rec." ItemStyle-Width="55px">
                                         <ItemTemplate><%# Eval("DETPE_CANTIDAD_RECIBIDA") %></ItemTemplate>
                                     </asp:TemplateField>
-                                    <asp:TemplateField HeaderText="Precio" ItemStyle-Width="90px">
+                                    <%--<asp:TemplateField HeaderText="Precio" ItemStyle-Width="90px">
                                         <ItemTemplate>
                                             <%# If(Not IsDBNull(Eval("HIP_PRECIO")) AndAlso Convert.ToDecimal(Eval("HIP_PRECIO")) > 0,
                                                 "Q " & String.Format("{0:N2}", Eval("HIP_PRECIO")),
                                                 "<span class='badge-pendiente'>Pend. OC</span>") %>
                                         </ItemTemplate>
-                                    </asp:TemplateField>
+                                    </asp:TemplateField>--%>
                                 </Columns>
                                 <EmptyDataTemplate>
                                     <span style="color:#aaa;font-size:11px;font-style:italic;">Sin productos</span>
                                 </EmptyDataTemplate>
                             </asp:GridView>
-                            <%-- Total del pedido abajo del sub-grid --%>
-                            <div style="margin-top:6px; padding:4px 10px; background:#fdf6ec; border-radius:6px; border:1px solid #e8d8c0; font-size:12px; font-weight:bold; color:#5C3A1E; font-family:Arial,sans-serif; display:inline-block;">
+                           <%-- <div style="margin-top:6px; padding:4px 10px; background:#fdf6ec; border-radius:6px; border:1px solid #e8d8c0; font-size:12px; font-weight:bold; color:#5C3A1E; font-family:Arial,sans-serif; display:inline-block;">
                                 Total: Q <%# String.Format("{0:N2}", Eval("PED_TOTAL")) %>
-                            </div>
+                            </div>--%>
                         </ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="170px" ItemStyle-VerticalAlign="Top">
@@ -216,11 +213,24 @@
     <div class="form-card-body">
         <asp:HiddenField ID="hfPedidoActivo"   runat="server" Value="0" />
         <asp:HiddenField ID="hfDetalleRecibir" runat="server" Value="0" />
+
         <div class="cabecera-info">
-            <div><strong>Codigo</strong><asp:Label        ID="lblCabeceraCode"      runat="server" /></div>
-            <div><strong>Fecha</strong><asp:Label         ID="lblCabeceraFecha"     runat="server" /></div>
-            <div><strong>Forma de Pago</strong><asp:Label ID="lblCabeceraFormaPago" runat="server" /></div>
+            <div><strong>Codigo</strong><asp:Label ID="lblCabeceraCode" runat="server" /></div>
+            <div><strong>Fecha</strong><asp:Label  ID="lblCabeceraFecha" runat="server" /></div>
+            <div>
+                <strong>Forma de Pago</strong>
+                <asp:DropDownList ID="ddlCabeceraFormaPago" runat="server" CssClass="form-control" style="width:140px; padding:5px 10px; font-size:13px;">
+                    <asp:ListItem Text="Contado" Value="CONTADO" />
+                    <asp:ListItem Text="Credito" Value="CREDITO" />
+                </asp:DropDownList>
+            </div>
+            <div style="display:flex;align-items:flex-end;">
+                <asp:Button ID="btnGuardarCabecera" runat="server" Text="&#10003; Guardar"
+                    CssClass="btn-save-t" OnClick="btnGuardarCabecera_Click"
+                    CausesValidation="false" />
+            </div>
         </div>
+
         <div class="section-label">&#43; Agregar Producto</div>
         <div class="add-item-box">
             <div class="f-row">
@@ -240,6 +250,7 @@
                 </div>
             </div>
         </div>
+
         <div class="table-card">
             <asp:GridView ID="gvDetalles" runat="server"
                 AutoGenerateColumns="false"
@@ -256,6 +267,21 @@
                         <ItemTemplate><%# Eval("PRO_NOMBRE") %></ItemTemplate>
                         <EditItemTemplate><%# Eval("PRO_NOMBRE") %></EditItemTemplate>
                     </asp:TemplateField>
+
+                    <%-- NUEVO: Material desde mat_descripcion via paquete --%>
+                    <asp:TemplateField HeaderText="Material">
+                        <ItemTemplate>
+                            <%# If(IsDBNull(Eval("MATERIAL")) OrElse String.IsNullOrEmpty(Eval("MATERIAL").ToString()),
+                                "<span class='badge-pendiente'>—</span>",
+                                Eval("MATERIAL").ToString()) %>
+                        </ItemTemplate>
+                        <EditItemTemplate>
+                            <%# If(IsDBNull(Eval("MATERIAL")) OrElse String.IsNullOrEmpty(Eval("MATERIAL").ToString()),
+                                "—", Eval("MATERIAL").ToString()) %>
+                        </EditItemTemplate>
+                    </asp:TemplateField>
+
+                    <%--
                     <asp:TemplateField HeaderText="Precio Asignado" ItemStyle-Width="140px">
                         <ItemTemplate>
                             <%# If(Not IsDBNull(Eval("HIP_PRECIO")) AndAlso Convert.ToDecimal(Eval("HIP_PRECIO")) > 0,
@@ -268,6 +294,8 @@
                                 "Pendiente OC") %>
                         </EditItemTemplate>
                     </asp:TemplateField>
+                    --%>
+
                     <asp:TemplateField HeaderText="Solicitado" ItemStyle-Width="100px">
                         <ItemTemplate><%# Eval("DETPE_CANTIDAD_SOLICITADA") %></ItemTemplate>
                         <EditItemTemplate>
@@ -276,6 +304,7 @@
                                 CssClass="edit-input" style="width:70px;" />
                         </EditItemTemplate>
                     </asp:TemplateField>
+
                     <asp:TemplateField HeaderText="Recibido" ItemStyle-Width="160px">
                         <ItemTemplate>
                             <%# Eval("DETPE_CANTIDAD_RECIBIDA") %>
@@ -300,6 +329,8 @@
                         </ItemTemplate>
                         <EditItemTemplate><%# Eval("DETPE_CANTIDAD_RECIBIDA") %></EditItemTemplate>
                     </asp:TemplateField>
+
+                    <%--
                     <asp:TemplateField HeaderText="Subtotal" ItemStyle-Width="120px">
                         <ItemTemplate>
                             <%# If(Not IsDBNull(Eval("HIP_PRECIO")) AndAlso Convert.ToDecimal(Eval("HIP_PRECIO")) > 0,
@@ -308,6 +339,8 @@
                         </ItemTemplate>
                         <EditItemTemplate></EditItemTemplate>
                     </asp:TemplateField>
+                    --%>
+
                     <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="220px">
                         <ItemTemplate>
                             <div class="actions-cell">
@@ -335,9 +368,10 @@
                 </EmptyDataTemplate>
             </asp:GridView>
         </div>
-        <div class="total-box">
+
+        <!--<div class="total-box">
             Total: Q <asp:Label ID="lblTotalDetalle" runat="server" Text="0.00" />
-        </div>
+        </div>-->
         <div class="f-row" style="margin-top:16px;">
             <asp:Button ID="btnFinalizarPedido" runat="server" Text="&#10003; Finalizar Pedido"
                 CssClass="btn-green" OnClick="btnFinalizarPedido_Click" />

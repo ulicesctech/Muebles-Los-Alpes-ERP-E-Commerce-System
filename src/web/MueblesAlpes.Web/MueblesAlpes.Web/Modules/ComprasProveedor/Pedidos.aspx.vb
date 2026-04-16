@@ -52,9 +52,13 @@ Namespace Modules.ComprasProveedor
             If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
                 lblCabeceraCode.Text = dt.Rows(0)("PED_CODIGO").ToString()
                 lblCabeceraFecha.Text = String.Format("{0:dd/MM/yyyy}", dt.Rows(0)("PED_FECHA"))
-                lblCabeceraFormaPago.Text = dt.Rows(0)("PED_FORMA_PAGO").ToString()
+                ' Pre-seleccionar la forma de pago actual en el dropdown
+                Dim formaPago As String = dt.Rows(0)("PED_FORMA_PAGO").ToString()
+                Dim item As System.Web.UI.WebControls.ListItem = ddlCabeceraFormaPago.Items.FindByValue(formaPago)
+                If item IsNot Nothing Then ddlCabeceraFormaPago.SelectedValue = formaPago
             End If
         End Sub
+
 
         Private Sub RecalcularTotal(dt As DataTable, pedidoId As Integer)
             Dim total As Decimal = 0
@@ -69,11 +73,11 @@ Namespace Modules.ComprasProveedor
             Dim dtPed As DataTable = PedidoService.ObtenerPorId(pedidoId)
             If dtPed IsNot Nothing AndAlso dtPed.Rows.Count > 0 Then
                 PedidoService.Actualizar(
-                    Convert.ToDecimal(pedidoId),
-                    dtPed.Rows(0)("PED_CODIGO").ToString(),
-                    dtPed.Rows(0)("PED_FORMA_PAGO").ToString(),
-                    total
-                )
+                        Convert.ToDecimal(pedidoId),
+                        dtPed.Rows(0)("PED_CODIGO").ToString(),
+                        dtPed.Rows(0)("PED_FORMA_PAGO").ToString(),
+                        total
+                    )
             End If
         End Sub
 
@@ -99,13 +103,32 @@ Namespace Modules.ComprasProveedor
             pnlMsg.Visible = False
         End Sub
 
+        Protected Sub btnGuardarCabecera_Click(sender As Object, e As EventArgs)
+            Try
+                Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
+                Dim dt As DataTable = PedidoService.ObtenerPorId(pedidoId)
+                If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
+                    PedidoService.Actualizar(
+                    Convert.ToDecimal(pedidoId),
+                    dt.Rows(0)("PED_CODIGO").ToString(),
+                    ddlCabeceraFormaPago.SelectedValue,
+                    Convert.ToDecimal(dt.Rows(0)("PED_TOTAL"))
+                )
+                    CargarPedidos()
+                    MostrarMensaje("Forma de pago actualizada correctamente.", False)
+                End If
+            Catch ex As Exception
+                MostrarMensaje("Error: " & ex.Message, True)
+            End Try
+        End Sub
+
         Protected Sub btnGuardar_Click(sender As Object, e As EventArgs)
             Try
                 If String.IsNullOrEmpty(txtCodigo.Text.Trim()) Then
                     MostrarMensaje("Ingresa el codigo del pedido.", True) : Exit Sub
                 End If
                 Dim nuevoId As Decimal = PedidoService.Crear(txtCodigo.Text.Trim(),
-                                                              ddlFormaPago.SelectedValue, 0)
+                                                                  ddlFormaPago.SelectedValue, 0)
                 hfPedidoActivo.Value = nuevoId.ToString()
                 lblIdSeleccionado.Text = nuevoId.ToString()
                 CargarProductosDropDown()
@@ -253,11 +276,13 @@ Namespace Modules.ComprasProveedor
 
             ElseIf e.CommandName = "ConfirmarRecibido" Then
                 Try
+                    ' 1. Extraer argumentos del comando
                     Dim partes As String() = e.CommandArgument.ToString().Split("|")
                     Dim detalleId As Integer = Convert.ToInt32(partes(0))
                     Dim proRef As String = If(partes.Length > 1, partes(1), "")
                     Dim cantSol As Integer = Convert.ToInt32(If(partes.Length > 2, partes(2), "0"))
 
+                    ' 2. Capturar cantidad recibida desde el TextBox del GridView
                     Dim cantRecibida As Integer = 0
                     For Each row As GridViewRow In gvDetalles.Rows
                         Dim pnl As Panel = CType(row.FindControl("pnlRecibir"), Panel)
@@ -268,6 +293,7 @@ Namespace Modules.ComprasProveedor
                         End If
                     Next
 
+                    ' 3. Validaciones de negocio
                     If cantRecibida < 0 Then
                         MostrarMensaje("Cantidad recibida invalida.", True) : Exit Sub
                     End If
@@ -276,31 +302,50 @@ Namespace Modules.ComprasProveedor
                         Exit Sub
                     End If
 
+                    ' 4. Buscar detalles de la Orden de Compra asociada al pedido
                     Dim dtOrdenes As DataTable = OrdenDetallePedidoService.BuscarPorPedido(pedidoId)
                     If dtOrdenes Is Nothing OrElse dtOrdenes.Rows.Count = 0 Then
-                        MostrarMensaje("Este pedido no tiene una Orden de Compra asociada. Vinculala primero desde Ordenes de Compra.", True)
+                        MostrarMensaje("Este pedido no tiene una Orden de Compra asociada. Vinculala primero.", True)
                         hfDetalleRecibir.Value = "0"
                         CargarDetallesPedido(pedidoId)
                         Exit Sub
                     End If
 
-                    Dim dtActual As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
-                    Dim filaAct = dtActual.Select("DETPE_DETALLE_PEDIDO = " & detalleId)
-                    Dim cantSolActual As Integer = If(filaAct.Length > 0,
-                                                      Convert.ToInt32(filaAct(0)("DETPE_CANTIDAD_SOLICITADA")),
-                                                      cantSol)
+                    ' 5. CORRECCIÓN: Buscar el material del item actual para obtener su precio específico
+                    ' Se obtiene la lista de detalles del pedido para identificar el material del item actual
+                    Dim dtDetalle As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
+                    Dim filaDetalle = dtDetalle.Select("DETPE_DETALLE_PEDIDO = " & detalleId)
+                    Dim materialItem As String = If(filaDetalle.Length > 0, filaDetalle(0)("MATERIAL").ToString().Trim(), "")
+
+                    ' Se busca en la Orden de Compra la fila que coincida con el material
+                    Dim filasODP = dtOrdenes.Select("TRIM(ODP_MATERIAL) = '" & materialItem.Replace("'", "''") & "'")
+                    Dim precioODP As Decimal = 0
+
+                    If filasODP.Length > 0 Then
+                        ' Se asigna el precio específico encontrado en la orden
+                        precioODP = Convert.ToDecimal(filasODP(0)("ODP_PRECIO"))
+                    Else
+                        ' Fallback: Si no hay coincidencia exacta por material, usa el primer precio disponible
+                        precioODP = Convert.ToDecimal(dtOrdenes.Rows(0)("ODP_PRECIO"))
+                        MostrarMensaje("No se encontro precio especifico. Se uso el primer precio disponible.", False)
+                    End If
+
+                    ' 6. Actualizar la cantidad recibida en el detalle del pedido
+                    ' Se mantiene la cantidad solicitada actual consultada de la base de datos
+                    Dim cantSolActual As Integer = If(filaDetalle.Length > 0,
+                                             Convert.ToInt32(filaDetalle(0)("DETPE_CANTIDAD_SOLICITADA")),
+                                             cantSol)
                     DetallePedidoService.Actualizar(detalleId, cantSolActual, cantRecibida)
 
-                    Dim precioODP As String = Convert.ToDecimal(dtOrdenes.Rows(0)("ODP_PRECIO")).ToString(
-                        "F2", System.Globalization.CultureInfo.InvariantCulture)
-
+                    ' 7. Preparar parámetros y redirigir
+                    Dim precioODPStr As String = precioODP.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)
                     hfDetalleRecibir.Value = "0"
 
                     Response.Redirect(ResolveUrl("~/Modules/CatalogoInventario/Precios.aspx") &
-                                      "?ref=" & proRef &
-                                      "&pedido=" & pedidoId &
-                                      "&precio=" & precioODP &
-                                      "&readonly=1")
+                              "?ref=" & proRef &
+                              "&pedido=" & pedidoId &
+                              "&precio=" & precioODPStr &
+                              "&readonly=1")
                 Catch ex As Exception
                     MostrarMensaje("Error: " & ex.Message, True)
                 End Try

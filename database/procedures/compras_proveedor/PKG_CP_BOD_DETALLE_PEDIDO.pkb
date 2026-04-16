@@ -101,32 +101,33 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_DETALLE_PEDIDO AS
              ORDER BY p.pro_nombre;
     END DET_PED_LISTAR_PRODUCTOS_BASE;
 
-    PROCEDURE DET_PED_LISTAR_TODOS_PRODUCTOS(p_data OUT SYS_REFCURSOR) IS
-    BEGIN
-        OPEN p_data FOR
-            SELECT p.pro_referencia,
-                   p.pro_nombre,
-                   NVL(
-                       (SELECT h.hip_precio
-                          FROM BOD_HISTORIAL_PRECIO h
-                         WHERE h.pro_referencia = p.pro_referencia
-                           AND h.hip_fecha_final IS NULL
-                           AND ROWNUM = 1), 0) AS precio_sugerido,
-                   NVL(
-                       (SELECT h.nic_nicho
-                          FROM BOD_HISTORIAL_PRECIO h
-                         WHERE h.pro_referencia = p.pro_referencia
-                           AND h.hip_fecha_final IS NULL
-                           AND ROWNUM = 1), 0) AS nic_nicho_vigente,
-                   NVL(
-                       (SELECT h.hip_historial_precio
-                          FROM BOD_HISTORIAL_PRECIO h
-                         WHERE h.pro_referencia = p.pro_referencia
-                           AND h.hip_fecha_final IS NULL
-                           AND ROWNUM = 1), 0) AS hip_id_vigente
-              FROM BOD_PRODUCTO p
-             ORDER BY p.pro_nombre;
-    END DET_PED_LISTAR_TODOS_PRODUCTOS;
+PROCEDURE DET_PED_LISTAR_TODOS_PRODUCTOS(p_data OUT SYS_REFCURSOR) IS
+BEGIN
+    OPEN p_data FOR
+        SELECT p.pro_referencia,
+               p.pro_nombre || ' — ' || NVL(m.mat_descripcion, '?') AS pro_nombre,
+               NVL(
+                   (SELECT h.hip_precio
+                      FROM BOD_HISTORIAL_PRECIO h
+                     WHERE h.pro_referencia = p.pro_referencia
+                       AND h.hip_fecha_final IS NULL
+                       AND ROWNUM = 1), 0) AS precio_sugerido,
+               NVL(
+                   (SELECT h.nic_nicho
+                      FROM BOD_HISTORIAL_PRECIO h
+                     WHERE h.pro_referencia = p.pro_referencia
+                       AND h.hip_fecha_final IS NULL
+                       AND ROWNUM = 1), 0) AS nic_nicho_vigente,
+               NVL(
+                   (SELECT h.hip_historial_precio
+                      FROM BOD_HISTORIAL_PRECIO h
+                     WHERE h.pro_referencia = p.pro_referencia
+                       AND h.hip_fecha_final IS NULL
+                       AND ROWNUM = 1), 0) AS hip_id_vigente
+          FROM BOD_PRODUCTO p
+          LEFT JOIN BOD_MATERIAL m ON m.mat_material = p.mat_material
+         ORDER BY p.pro_nombre;
+END DET_PED_LISTAR_TODOS_PRODUCTOS;
 
     PROCEDURE DET_PED_ACTUALIZAR_HISTORIAL(
         p_detpe_id IN NUMBER,
