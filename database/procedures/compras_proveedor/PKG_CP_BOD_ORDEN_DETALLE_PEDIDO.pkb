@@ -69,22 +69,21 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_ORDEN_DETALLE_PEDIDO AS
     END ODP_LISTAR_POR_ORDEN;
 
     PROCEDURE ODP_LISTAR_POR_PEDIDO(
-    p_ped_id IN NUMBER,
-    p_data   OUT SYS_REFCURSOR
-) IS
-BEGIN
-    OPEN p_data FOR
-        SELECT d.odp_id,        -- El nuevo ID único de la secuencia
-               d.odp_precio,    -- El precio que pactaste en la orden
-               d.odp_material,
-               p.pro_referencia -- ¡ESTO ES VITAL PARA COMPARAR!
-          FROM BOD_ORDEN_DETALLE_PEDIDO d
-          JOIN BOD_DETALLE_PEDIDO dp ON d.ped_pedido = dp.ped_pedido 
-          -- Necesitamos unir con la tabla de productos para obtener la referencia
-          JOIN BOD_HISTORIAL_PRECIO h ON dp.hip_historial_precio = h.hip_historial_precio
-          JOIN BOD_PRODUCTO p ON h.pro_producto = p.pro_producto
-         WHERE d.ped_pedido = p_ped_id;
-END ODP_LISTAR_POR_PEDIDO;
+        p_ped_id IN NUMBER,
+        p_data   OUT SYS_REFCURSOR
+    ) IS
+    BEGIN
+        OPEN p_data FOR
+            SELECT odp_orden_detalle_pedido,
+                   orc_orden_compra,
+                   ped_pedido,
+                   odp_material,
+                   odp_precio,
+                   odp_cantidad
+              FROM BOD_ORDEN_DETALLE_PEDIDO
+             WHERE ped_pedido = p_ped_id
+             ORDER BY odp_orden_detalle_pedido;
+    END ODP_LISTAR_POR_PEDIDO;
 
 END PKG_BOD_ORDEN_DETALLE_PEDIDO;
 /
