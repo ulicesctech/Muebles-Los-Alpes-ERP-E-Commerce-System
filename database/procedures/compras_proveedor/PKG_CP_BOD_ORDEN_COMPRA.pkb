@@ -107,7 +107,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_CP_BOD_ORDEN_COMPRA AS
              ORDER BY o.orc_fecha DESC;
     END ORC_BUSCAR;
 
-    -- Busca pedidos: devuelve UNA fila por pedido (cabecera solamente)
+    -- Busca pedidos: UNA fila por pedido (cabecera)
     PROCEDURE ORC_BUSCAR_PEDIDOS(
         p_texto IN VARCHAR2,
         p_data  OUT SYS_REFCURSOR
@@ -120,7 +120,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_CP_BOD_ORDEN_COMPRA AS
                    pe.ped_forma_pago,
                    pe.ped_total,
                    COUNT(d.detpe_detalle_pedido) AS total_items
-              FROM BOD_PEDIDO         pe
+              FROM BOD_PEDIDO           pe
               LEFT JOIN BOD_DETALLE_PEDIDO d ON d.ped_pedido = pe.ped_pedido
              WHERE UPPER(pe.ped_codigo)   LIKE '%' || UPPER(NVL(p_texto, '')) || '%'
                 OR TO_CHAR(pe.ped_pedido) LIKE '%' || NVL(p_texto, '') || '%'
@@ -128,7 +128,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_CP_BOD_ORDEN_COMPRA AS
              ORDER BY pe.ped_fecha DESC;
     END ORC_BUSCAR_PEDIDOS;
 
-    -- Devuelve todos los items (detalles) de un pedido con producto y material
+    -- Devuelve todos los items de un pedido usando pro_referencia de BOD_DETALLE_PEDIDO
+    -- Funciona aunque hip_historial_precio sea NULL
     PROCEDURE ORC_DETALLES_PEDIDO(
         p_ped_id IN NUMBER,
         p_data   OUT SYS_REFCURSOR
@@ -137,16 +138,20 @@ CREATE OR REPLACE PACKAGE BODY PKG_CP_BOD_ORDEN_COMPRA AS
         OPEN p_data FOR
             SELECT d.detpe_detalle_pedido,
                    d.ped_pedido,
-                   d.hip_historial_precio,
-                   d.detpe_cantidad_solicitada  AS cantidad,
-                   h.hip_precio                 AS precio_ref,
-                   p.pro_referencia,
-                   p.pro_nombre                 AS producto_nombre,
-                   m.mat_descripcion            AS material
+                   d.detpe_cantidad_solicitada           AS cantidad,
+                   -- Nombre del producto desde pro_referencia directa
+                   NVL(p.pro_nombre, d.pro_referencia)  AS producto_nombre,
+                   -- Material desde producto via pro_referencia directa
+                   NVL(m.mat_descripcion, '—')          AS material,
+                   -- Precio desde historial si existe, 0 si no
+                   NVL(h.hip_precio, 0)                  AS precio_ref,
+                   d.pro_referencia
               FROM BOD_DETALLE_PEDIDO   d
-              JOIN BOD_HISTORIAL_PRECIO h ON h.hip_historial_precio = d.hip_historial_precio
-              JOIN BOD_PRODUCTO         p ON p.pro_referencia       = h.pro_referencia
-              JOIN BOD_MATERIAL         m ON m.mat_material         = p.mat_material
+              -- pro_referencia directa en la tabla → JOIN a producto y material
+              LEFT JOIN BOD_PRODUCTO         p  ON p.pro_referencia       = d.pro_referencia
+              LEFT JOIN BOD_MATERIAL         m  ON m.mat_material         = p.mat_material
+              -- historial solo para precio de referencia (puede ser NULL)
+              LEFT JOIN BOD_HISTORIAL_PRECIO h  ON h.hip_historial_precio = d.hip_historial_precio
              WHERE d.ped_pedido = p_ped_id
              ORDER BY d.detpe_detalle_pedido;
     END ORC_DETALLES_PEDIDO;

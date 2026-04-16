@@ -58,18 +58,22 @@ Namespace Modules.ComprasProveedor
 
         Private Sub RecalcularTotal(dt As DataTable, pedidoId As Integer)
             Dim total As Decimal = 0
-            For Each row As DataRow In dt.Rows
-                Dim precio As Decimal = If(IsDBNull(row("HIP_PRECIO")), 0D, Convert.ToDecimal(row("HIP_PRECIO")))
-                Dim cantidad As Decimal = If(IsDBNull(row("DETPE_CANTIDAD_SOLICITADA")), 0D, Convert.ToDecimal(row("DETPE_CANTIDAD_SOLICITADA")))
-                total += precio * cantidad
-            Next
+            If dt IsNot Nothing Then
+                For Each row As DataRow In dt.Rows
+                    Dim precio As Decimal = If(IsDBNull(row("HIP_PRECIO")), 0D, Convert.ToDecimal(row("HIP_PRECIO")))
+                    Dim cantidad As Decimal = If(IsDBNull(row("DETPE_CANTIDAD_SOLICITADA")), 0D, Convert.ToDecimal(row("DETPE_CANTIDAD_SOLICITADA")))
+                    total += (precio * cantidad)
+                Next
+            End If
             lblTotalDetalle.Text = total.ToString("N2")
             Dim dtPed As DataTable = PedidoService.ObtenerPorId(pedidoId)
             If dtPed IsNot Nothing AndAlso dtPed.Rows.Count > 0 Then
-                PedidoService.Actualizar(pedidoId,
-                                         dtPed.Rows(0)("PED_CODIGO").ToString(),
-                                         dtPed.Rows(0)("PED_FORMA_PAGO").ToString(),
-                                         total)
+                PedidoService.Actualizar(
+                    Convert.ToDecimal(pedidoId),
+                    dtPed.Rows(0)("PED_CODIGO").ToString(),
+                    dtPed.Rows(0)("PED_FORMA_PAGO").ToString(),
+                    total
+                )
             End If
         End Sub
 
@@ -158,14 +162,15 @@ Namespace Modules.ComprasProveedor
         End Sub
 
         '========================
-        ' DROPDOWN PRODUCTO — solo para mostrar nombre, sin precio
+        ' DROPDOWN PRODUCTO
         '========================
         Protected Sub ddlProducto_SelectedIndexChanged(sender As Object, e As EventArgs)
-            ' Solo refresca la seleccion — no hay precio que mostrar en Pedidos
+            ' Solo refresca la seleccion — el precio se asigna desde la Orden de Compra
         End Sub
 
         '========================
-        ' AGREGAR PRODUCTO — solo cantidad, sin precio
+        ' AGREGAR PRODUCTO
+        ' CAMBIO: pasa proRef a Insertar para guardar en BOD_DETALLE_PEDIDO.pro_referencia
         '========================
         Protected Sub btnAgregarItem_Click(sender As Object, e As EventArgs)
             Try
@@ -180,36 +185,34 @@ Namespace Modules.ComprasProveedor
                     MostrarMensaje("Ingresa una cantidad valida.", True) : Exit Sub
                 End If
 
-                ' Buscar historial vigente del producto para usar como referencia
-                ' Si no tiene precio aun, usamos hip_id = 0 y se asignara al recibir desde OC
                 Dim dt As DataTable = DetallePedidoService.ListarTodosProductos()
                 Dim filas = dt.Select("PRO_REFERENCIA = '" & proRef & "'")
+
+                ' 0 = sin historial aun — NULLIF en el paquete lo convierte a NULL en BD
                 Dim hipId As Integer = 0
-
                 If filas.Length > 0 Then
-                    hipId = Convert.ToInt32(filas(0)("HIP_ID_VIGENTE"))
+                    If Not IsDBNull(filas(0)("HIP_ID_VIGENTE")) Then
+                        Dim v As Integer = Convert.ToInt32(filas(0)("HIP_ID_VIGENTE"))
+                        If v > 0 Then hipId = v
+                    End If
                 End If
 
-                ' hipId puede ser 0 si el producto no tiene precio aun — es valido en este flujo
-                ' El precio se asignara cuando se vincule a una Orden de Compra y se confirme recibido
-                If hipId = 0 Then
-                    ' Buscar si al menos existe un historial (aunque no sea vigente)
-                    ' Si no existe nada, igual se agrega — el precio llegara desde la OC
-                    MostrarMensaje("Producto agregado. Recuerda vincular este pedido a una Orden de Compra para asignarle precio.", False)
-                End If
-
-                DetallePedidoService.Insertar(pedidoId, If(hipId > 0, hipId, 1), cantidad)
+                ' Ahora pasamos proRef para que el listado pueda mostrar
+                ' el nombre del producto aunque no haya historial asignado
+                DetallePedidoService.Insertar(pedidoId, hipId, proRef, cantidad)
 
                 txtCantSolicitada.Text = ""
                 ddlProducto.SelectedIndex = 0
-
                 CargarDetallesPedido(pedidoId)
                 CargarPedidos()
-                If hipId > 0 Then
+
+                If hipId = 0 Then
+                    MostrarMensaje("Producto agregado. Recuerda vincular este pedido a una Orden de Compra para asignarle precio.", False)
+                Else
                     MostrarMensaje("Producto agregado correctamente.", False)
                 End If
             Catch ex As Exception
-                MostrarMensaje("Error: " & ex.Message, True)
+                MostrarMensaje("Error al agregar item: " & ex.Message, True)
             End Try
         End Sub
 
@@ -231,7 +234,6 @@ Namespace Modules.ComprasProveedor
                 End Try
 
             ElseIf e.CommandName = "MarcarRecibido" Then
-                ' Mostrar panel inline de recibir para esta fila
                 hfDetalleRecibir.Value = e.CommandArgument.ToString()
                 gvDetalles.EditIndex = -1
                 CargarDetallesPedido(pedidoId)
@@ -247,7 +249,6 @@ Namespace Modules.ComprasProveedor
                     Dim proRef As String = If(partes.Length > 1, partes(1), "")
                     Dim cantSol As Integer = Convert.ToInt32(If(partes.Length > 2, partes(2), "0"))
 
-                    ' Leer cantidad recibida del TextBox visible en la fila activa
                     Dim cantRecibida As Integer = 0
                     For Each row As GridViewRow In gvDetalles.Rows
                         Dim pnl As Panel = CType(row.FindControl("pnlRecibir"), Panel)
@@ -266,7 +267,6 @@ Namespace Modules.ComprasProveedor
                         Exit Sub
                     End If
 
-                    ' Verificar que existe orden de compra asociada
                     Dim dtOrdenes As DataTable = OrdenDetallePedidoService.BuscarPorPedido(pedidoId)
                     If dtOrdenes Is Nothing OrElse dtOrdenes.Rows.Count = 0 Then
                         MostrarMensaje("Este pedido no tiene una Orden de Compra asociada. Vinculala primero desde Ordenes de Compra.", True)
@@ -275,7 +275,6 @@ Namespace Modules.ComprasProveedor
                         Exit Sub
                     End If
 
-                    ' Actualizar cantidad recibida en BD
                     Dim dtActual As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
                     Dim filaAct = dtActual.Select("DETPE_DETALLE_PEDIDO = " & detalleId)
                     Dim cantSolActual As Integer = If(filaAct.Length > 0,
@@ -283,13 +282,11 @@ Namespace Modules.ComprasProveedor
                                                       cantSol)
                     DetallePedidoService.Actualizar(detalleId, cantSolActual, cantRecibida)
 
-                    ' Tomar precio desde ODP de la orden asociada
-                    Dim precioODP As String = dtOrdenes.Rows(0)("ODP_PRECIO").ToString()
+                    Dim precioODP As String = Convert.ToDecimal(dtOrdenes.Rows(0)("ODP_PRECIO")).ToString(
+                        "F2", System.Globalization.CultureInfo.InvariantCulture)
 
                     hfDetalleRecibir.Value = "0"
 
-                    ' Redirigir a Precios para registrar el historial de precio
-                    ' Precios.aspx cerrara el vigente anterior y creara uno nuevo con este precio
                     Response.Redirect(ResolveUrl("~/Modules/CatalogoInventario/Precios.aspx") &
                                       "?ref=" & proRef &
                                       "&pedido=" & pedidoId &
@@ -301,7 +298,6 @@ Namespace Modules.ComprasProveedor
             End If
         End Sub
 
-        ' Controla qué fila muestra el panel inline de recibir
         Protected Sub gvDetalles_RowDataBound(sender As Object, e As GridViewRowEventArgs)
             If e.Row.RowType = DataControlRowType.DataRow Then
                 Dim detalleActivo As Integer = 0
@@ -332,25 +328,19 @@ Namespace Modules.ComprasProveedor
                 Dim row As GridViewRow = gvDetalles.Rows(e.RowIndex)
                 Dim detalleId As Integer = Convert.ToInt32(gvDetalles.DataKeys(e.RowIndex).Value)
                 Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
-
                 Dim txtSol As TextBox = CType(row.FindControl("txtESolicitada"), TextBox)
-                If txtSol Is Nothing Then
-                    MostrarMensaje("Error al encontrar el campo de cantidad.", True)
-                    gvDetalles.EditIndex = -1
-                    CargarDetallesPedido(pedidoId)
-                    Exit Sub
-                End If
-
                 Dim solicitada As Integer
-                If Not Integer.TryParse(txtSol.Text.Trim(), solicitada) OrElse solicitada <= 0 Then
+
+                If txtSol Is Nothing OrElse Not Integer.TryParse(txtSol.Text.Trim(), solicitada) OrElse solicitada <= 0 Then
                     MostrarMensaje("Cantidad solicitada invalida.", True) : Exit Sub
                 End If
 
-                ' Preservar cantidad recibida actual
                 Dim dtActual As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
                 Dim filaAct = dtActual.Select("DETPE_DETALLE_PEDIDO = " & detalleId)
-                Dim recibida As Integer = If(filaAct.Length > 0,
-                                              Convert.ToInt32(filaAct(0)("DETPE_CANTIDAD_RECIBIDA")), 0)
+                Dim recibida As Integer = 0
+                If filaAct.Length > 0 AndAlso Not IsDBNull(filaAct(0)("DETPE_CANTIDAD_RECIBIDA")) Then
+                    recibida = Convert.ToInt32(filaAct(0)("DETPE_CANTIDAD_RECIBIDA"))
+                End If
 
                 DetallePedidoService.Actualizar(detalleId, solicitada, recibida)
                 gvDetalles.EditIndex = -1

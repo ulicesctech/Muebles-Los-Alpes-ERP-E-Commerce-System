@@ -3,14 +3,20 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_DETALLE_PEDIDO AS
     PROCEDURE DET_PED_INSERTAR(
         p_ped_pedido      IN NUMBER,
         p_hip_historial   IN NUMBER,
+        p_pro_referencia  IN VARCHAR2,
         p_cant_solicitada IN NUMBER,
         p_cant_recibida   IN NUMBER DEFAULT 0
     ) IS
     BEGIN
         INSERT INTO BOD_DETALLE_PEDIDO
-            (ped_pedido, hip_historial_precio, detpe_cantidad_solicitada, detpe_cantidad_recibida)
+            (ped_pedido, hip_historial_precio, pro_referencia,
+             detpe_cantidad_solicitada, detpe_cantidad_recibida)
         VALUES
-            (p_ped_pedido, p_hip_historial, p_cant_solicitada, p_cant_recibida);
+            (p_ped_pedido,
+             NULLIF(p_hip_historial, 0),
+             TRIM(p_pro_referencia),
+             p_cant_solicitada,
+             p_cant_recibida);
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN ROLLBACK; RAISE;
@@ -40,6 +46,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_DETALLE_PEDIDO AS
         WHEN OTHERS THEN ROLLBACK; RAISE;
     END DET_PED_ELIMINAR;
 
+    -- LEFT JOIN a historial y producto — funciona con o sin historial asignado
     PROCEDURE DET_PED_LISTAR_POR_PEDIDO(
         p_ped_pedido IN NUMBER,
         p_data       OUT SYS_REFCURSOR
@@ -51,12 +58,15 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_DETALLE_PEDIDO AS
                    d.hip_historial_precio,
                    d.detpe_cantidad_solicitada,
                    d.detpe_cantidad_recibida,
-                   h.hip_precio,
-                   p.pro_nombre,
-                   p.pro_referencia
+                   NVL(h.hip_precio, 0)        AS hip_precio,
+                   -- Nombre del producto: desde historial si existe, si no desde pro_referencia directa
+                   NVL(p.pro_nombre,
+                       NVL(p2.pro_nombre, d.pro_referencia)) AS pro_nombre,
+                   NVL(d.pro_referencia, h.pro_referencia)   AS pro_referencia
               FROM BOD_DETALLE_PEDIDO   d
-              JOIN BOD_HISTORIAL_PRECIO h ON d.hip_historial_precio = h.hip_historial_precio
-              JOIN BOD_PRODUCTO         p ON h.pro_referencia       = p.pro_referencia
+              LEFT JOIN BOD_HISTORIAL_PRECIO h  ON h.hip_historial_precio = d.hip_historial_precio
+              LEFT JOIN BOD_PRODUCTO         p  ON p.pro_referencia       = h.pro_referencia
+              LEFT JOIN BOD_PRODUCTO         p2 ON p2.pro_referencia      = d.pro_referencia
              WHERE d.ped_pedido = p_ped_pedido
              ORDER BY d.detpe_detalle_pedido;
     END DET_PED_LISTAR_POR_PEDIDO;
@@ -97,25 +107,19 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_DETALLE_PEDIDO AS
                           FROM BOD_HISTORIAL_PRECIO h
                          WHERE h.pro_referencia = p.pro_referencia
                            AND h.hip_fecha_final IS NULL
-                           AND ROWNUM = 1),
-                       0
-                   ) AS precio_sugerido,
+                           AND ROWNUM = 1), 0) AS precio_sugerido,
                    NVL(
                        (SELECT h.nic_nicho
                           FROM BOD_HISTORIAL_PRECIO h
                          WHERE h.pro_referencia = p.pro_referencia
                            AND h.hip_fecha_final IS NULL
-                           AND ROWNUM = 1),
-                       0
-                   ) AS nic_nicho_vigente,
+                           AND ROWNUM = 1), 0) AS nic_nicho_vigente,
                    NVL(
                        (SELECT h.hip_historial_precio
                           FROM BOD_HISTORIAL_PRECIO h
                          WHERE h.pro_referencia = p.pro_referencia
                            AND h.hip_fecha_final IS NULL
-                           AND ROWNUM = 1),
-                       0
-                   ) AS hip_id_vigente
+                           AND ROWNUM = 1), 0) AS hip_id_vigente
               FROM BOD_PRODUCTO p
              ORDER BY p.pro_nombre;
     END DET_PED_LISTAR_TODOS_PRODUCTOS;

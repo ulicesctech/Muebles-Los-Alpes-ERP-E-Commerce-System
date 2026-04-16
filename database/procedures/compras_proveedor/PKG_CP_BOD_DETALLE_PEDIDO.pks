@@ -2,6 +2,7 @@ CREATE OR REPLACE PACKAGE PKG_BOD_DETALLE_PEDIDO AS
     PROCEDURE DET_PED_INSERTAR(
         p_ped_pedido      IN NUMBER,
         p_hip_historial   IN NUMBER,
+        p_pro_referencia  IN VARCHAR2,
         p_cant_solicitada IN NUMBER,
         p_cant_recibida   IN NUMBER DEFAULT 0
     );

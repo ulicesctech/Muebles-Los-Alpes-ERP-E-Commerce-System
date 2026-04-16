@@ -97,7 +97,7 @@
                         <ItemTemplate><span class="badge-id"><%# Eval("PED_PEDIDO") %></span></ItemTemplate>
                     </asp:TemplateField>
                     <asp:BoundField DataField="PED_CODIGO" HeaderText="Codigo" />
-                    <asp:BoundField DataField="producto" HeaderText="PRODUCTO" />
+                    <asp:BoundField DataField="PRO_NOMBRE" HeaderText="PRODUCTO" />
         <asp:BoundField DataField="material" HeaderText="MATERIAL" />
         <asp:BoundField DataField="cantidad_solicitada" HeaderText="CANT. SOLICITADA" />
         <asp:BoundField DataField="cantidad_ingresada" HeaderText="CANT. RECIBIDA" />

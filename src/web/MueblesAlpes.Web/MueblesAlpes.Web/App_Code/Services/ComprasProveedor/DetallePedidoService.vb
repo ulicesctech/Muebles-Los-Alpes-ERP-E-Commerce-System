@@ -4,10 +4,12 @@ Imports Oracle.ManagedDataAccess.Client
 Public Class DetallePedidoService
     Private Const PKG As String = "PKG_BOD_DETALLE_PEDIDO"
 
-    Public Shared Sub Insertar(pedidoId As Integer, hipId As Integer, cantidad As Integer)
+    Public Shared Sub Insertar(pedidoId As Integer, hipId As Integer,
+                               proReferencia As String, cantidad As Integer)
         Dim ps As New List(Of OracleParameter) From {
             New OracleParameter("p_ped_pedido", OracleDbType.Decimal, pedidoId, ParameterDirection.Input),
             New OracleParameter("p_hip_historial", OracleDbType.Decimal, hipId, ParameterDirection.Input),
+            New OracleParameter("p_pro_referencia", OracleDbType.Varchar2, proReferencia, ParameterDirection.Input),
             New OracleParameter("p_cant_solicitada", OracleDbType.Decimal, cantidad, ParameterDirection.Input)
         }
         OracleDb.ExecNonQuery(PKG & ".DET_PED_INSERTAR", ps)
