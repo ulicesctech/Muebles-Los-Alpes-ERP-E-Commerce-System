@@ -1,8 +1,7 @@
 <%@ Page Language="VB" AutoEventWireup="true" CodeBehind="Pedidos.aspx.vb"
-    Inherits="MueblesAlpes.Web.Modules.ComprasProveedor.Pedidos"
-    MasterPageFile="~/Site.Master"
-    ContentType="text/html" ResponseEncoding="utf-8" %>
-
+        Inherits="MueblesAlpes.Web.Modules.ComprasProveedor.Pedidos"
+        MasterPageFile="~/Site.Master"
+        ContentType="text/html" ResponseEncoding="utf-8" %>
 <asp:Content ID="cBody" ContentPlaceHolderID="MainContent" runat="server">
 <meta charset="utf-8" />
 <style>
@@ -32,7 +31,7 @@
     .table-card thead th { padding:12px 16px; color:#f0d9a0; font-size:11px; font-weight:bold; text-transform:uppercase; letter-spacing:0.5px; text-align:left; }
     .table-card tbody tr { border-bottom:1px solid #f5ece0; }
     .table-card tbody tr:last-child { border-bottom:none; }
-    .table-card tbody td { padding:12px 16px; font-size:13px; color:#444; vertical-align:middle; }
+    .table-card tbody td { padding:12px 16px; font-size:13px; color:#444; vertical-align:top; }
     .badge-id { background:#fdf6ec; color:#C9973A; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:bold; border:1px solid #e8d8c0; display:inline-block; }
     .badge-pago { background:#e6f4ea; color:#276749; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:bold; border:1px solid #b7dfc2; display:inline-block; }
     .badge-pago-credito { background:#fff3e0; color:#7d4a00; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:bold; border:1px solid #f6d198; display:inline-block; }
@@ -57,6 +56,14 @@
     .recibir-box label { font-size:11px; font-weight:bold; color:#276749; text-transform:uppercase; display:block; margin-bottom:6px; }
     .info-nota { font-size:11px; color:#8B5E3C; font-style:italic; margin-top:4px; font-family:Arial,sans-serif; }
     .edit-input { padding:7px 10px; border:2px solid #C9973A; border-radius:6px; font-size:13px; font-family:Arial,sans-serif; background:white; width:100%; box-sizing:border-box; outline:none; }
+    /* Sub-grid de items dentro del listado de pedidos */
+    .sub-ped-table { width:100%; border-collapse:collapse; font-family:Arial,sans-serif; font-size:12px; margin-top:6px; }
+    .sub-ped-table thead tr { background:#f5ece0; }
+    .sub-ped-table thead th { padding:5px 10px; color:#5C3A1E; font-size:10px; font-weight:bold; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-bottom:1px solid #e8d8c0; }
+    .sub-ped-table tbody tr { border-bottom:1px solid #fdf6ec; }
+    .sub-ped-table tbody tr:last-child { border-bottom:none; }
+    .sub-ped-table tbody td { padding:5px 10px; color:#555; }
+    .badge-pendiente { color:#aaa; font-size:11px; font-style:italic; }
 </style>
 
 <div class="breadcrumb-mod">
@@ -90,31 +97,64 @@
                 DataKeyNames="PED_PEDIDO"
                 CssClass="table"
                 GridLines="None"
-
-                OnRowCommand="gvPedidos_RowCommand">
+                OnRowCommand="gvPedidos_RowCommand"
+                OnRowDataBound="gvPedidos_RowDataBound">
                 <Columns>
-                    <asp:TemplateField HeaderText="ID" ItemStyle-Width="80px">
+                    <asp:TemplateField HeaderText="ID" ItemStyle-Width="75px">
                         <ItemTemplate><span class="badge-id"><%# Eval("PED_PEDIDO") %></span></ItemTemplate>
                     </asp:TemplateField>
                     <asp:BoundField DataField="PED_CODIGO" HeaderText="Codigo" />
-                    <asp:BoundField DataField="PRO_NOMBRE" HeaderText="PRODUCTO" />
-        <asp:BoundField DataField="material" HeaderText="MATERIAL" />
-        <asp:BoundField DataField="cantidad_solicitada" HeaderText="CANT. SOLICITADA" />
-        <asp:BoundField DataField="cantidad_ingresada" HeaderText="CANT. RECIBIDA" />
-                    <asp:TemplateField HeaderText="Fecha" ItemStyle-Width="120px">
+                    <asp:TemplateField HeaderText="Fecha" ItemStyle-Width="110px">
                         <ItemTemplate><%# String.Format("{0:dd/MM/yyyy}", Eval("PED_FECHA")) %></ItemTemplate>
                     </asp:TemplateField>
-                    <asp:TemplateField HeaderText="Forma Pago" ItemStyle-Width="120px">
+                    <asp:TemplateField HeaderText="Forma Pago" ItemStyle-Width="110px">
                         <ItemTemplate>
                             <%# If(Eval("PED_FORMA_PAGO").ToString() = "CREDITO",
                                 "<span class='badge-pago-credito'>CREDITO</span>",
                                 "<span class='badge-pago'>CONTADO</span>") %>
                         </ItemTemplate>
                     </asp:TemplateField>
-                    <asp:TemplateField HeaderText="Total" ItemStyle-Width="120px">
-                        <ItemTemplate>Q <%# String.Format("{0:N2}", Eval("PED_TOTAL")) %></ItemTemplate>
+                    <%-- Sub-grid: muestra todos los items del pedido con producto, material, cantidades --%>
+                    <asp:TemplateField HeaderText="Productos / Items">
+                        <ItemTemplate>
+                            <asp:GridView ID="gvSubProductos" runat="server"
+                                AutoGenerateColumns="false"
+                                CssClass="sub-ped-table"
+                                GridLines="None">
+                                <Columns>
+                                    <asp:BoundField DataField="PRO_NOMBRE" HeaderText="Producto" />
+                                    <asp:TemplateField HeaderText="Material">
+                                        <ItemTemplate>
+                                            <%# If(IsDBNull(Eval("PRO_REFERENCIA")) OrElse String.IsNullOrEmpty(Eval("PRO_REFERENCIA").ToString()),
+                                                "<span class='badge-pendiente'>—</span>",
+                                                Eval("PRO_REFERENCIA").ToString()) %>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                    <asp:TemplateField HeaderText="Sol." ItemStyle-Width="55px">
+                                        <ItemTemplate><%# Eval("DETPE_CANTIDAD_SOLICITADA") %></ItemTemplate>
+                                    </asp:TemplateField>
+                                    <asp:TemplateField HeaderText="Rec." ItemStyle-Width="55px">
+                                        <ItemTemplate><%# Eval("DETPE_CANTIDAD_RECIBIDA") %></ItemTemplate>
+                                    </asp:TemplateField>
+                                    <asp:TemplateField HeaderText="Precio" ItemStyle-Width="90px">
+                                        <ItemTemplate>
+                                            <%# If(Not IsDBNull(Eval("HIP_PRECIO")) AndAlso Convert.ToDecimal(Eval("HIP_PRECIO")) > 0,
+                                                "Q " & String.Format("{0:N2}", Eval("HIP_PRECIO")),
+                                                "<span class='badge-pendiente'>Pend. OC</span>") %>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                </Columns>
+                                <EmptyDataTemplate>
+                                    <span style="color:#aaa;font-size:11px;font-style:italic;">Sin productos</span>
+                                </EmptyDataTemplate>
+                            </asp:GridView>
+                            <%-- Total del pedido abajo del sub-grid --%>
+                            <div style="margin-top:6px; padding:4px 10px; background:#fdf6ec; border-radius:6px; border:1px solid #e8d8c0; font-size:12px; font-weight:bold; color:#5C3A1E; font-family:Arial,sans-serif; display:inline-block;">
+                                Total: Q <%# String.Format("{0:N2}", Eval("PED_TOTAL")) %>
+                            </div>
+                        </ItemTemplate>
                     </asp:TemplateField>
-                    <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="200px">
+                    <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="170px" ItemStyle-VerticalAlign="Top">
                         <ItemTemplate>
                             <div class="actions-cell">
                                 <asp:LinkButton CommandName="VerDetalle"
@@ -123,7 +163,7 @@
                                 <asp:LinkButton CommandName="Eliminar"
                                     CommandArgument='<%# Eval("PED_PEDIDO") %>'
                                     runat="server" CssClass="btn-del-t"
-                                    OnClientClick="return confirm('Eliminar este pedido?');">&#128465; Eliminar</asp:LinkButton>
+                                    OnClientClick="return confirm('Eliminar este pedido?');">&#128465;</asp:LinkButton>
                             </div>
                         </ItemTemplate>
                     </asp:TemplateField>
@@ -174,16 +214,13 @@
             style="background:transparent;color:#f0d9a0;border-color:#f0d9a0;" />
     </div>
     <div class="form-card-body">
-
         <asp:HiddenField ID="hfPedidoActivo"   runat="server" Value="0" />
         <asp:HiddenField ID="hfDetalleRecibir" runat="server" Value="0" />
-
         <div class="cabecera-info">
-            <div><strong>Codigo</strong><asp:Label         ID="lblCabeceraCode"      runat="server" /></div>
-            <div><strong>Fecha</strong><asp:Label          ID="lblCabeceraFecha"     runat="server" /></div>
-            <div><strong>Forma de Pago</strong><asp:Label  ID="lblCabeceraFormaPago" runat="server" /></div>
+            <div><strong>Codigo</strong><asp:Label        ID="lblCabeceraCode"      runat="server" /></div>
+            <div><strong>Fecha</strong><asp:Label         ID="lblCabeceraFecha"     runat="server" /></div>
+            <div><strong>Forma de Pago</strong><asp:Label ID="lblCabeceraFormaPago" runat="server" /></div>
         </div>
-
         <div class="section-label">&#43; Agregar Producto</div>
         <div class="add-item-box">
             <div class="f-row">
@@ -203,7 +240,6 @@
                 </div>
             </div>
         </div>
-
         <div class="table-card">
             <asp:GridView ID="gvDetalles" runat="server"
                 AutoGenerateColumns="false"
@@ -299,7 +335,6 @@
                 </EmptyDataTemplate>
             </asp:GridView>
         </div>
-
         <div class="total-box">
             Total: Q <asp:Label ID="lblTotalDetalle" runat="server" Text="0.00" />
         </div>

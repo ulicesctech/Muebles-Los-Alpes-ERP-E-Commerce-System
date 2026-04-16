@@ -46,7 +46,6 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_DETALLE_PEDIDO AS
         WHEN OTHERS THEN ROLLBACK; RAISE;
     END DET_PED_ELIMINAR;
 
-    -- LEFT JOIN a historial y producto — funciona con o sin historial asignado
     PROCEDURE DET_PED_LISTAR_POR_PEDIDO(
         p_ped_pedido IN NUMBER,
         p_data       OUT SYS_REFCURSOR
@@ -58,15 +57,20 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_DETALLE_PEDIDO AS
                    d.hip_historial_precio,
                    d.detpe_cantidad_solicitada,
                    d.detpe_cantidad_recibida,
-                   NVL(h.hip_precio, 0)        AS hip_precio,
-                   -- Nombre del producto: desde historial si existe, si no desde pro_referencia directa
-                   NVL(p.pro_nombre,
-                       NVL(p2.pro_nombre, d.pro_referencia)) AS pro_nombre,
-                   NVL(d.pro_referencia, h.pro_referencia)   AS pro_referencia
+                   NVL(h.hip_precio, 0)                           AS hip_precio,
+                   -- Nombre del producto: primero desde pro_referencia directa, luego desde historial
+                   NVL(p2.pro_nombre, NVL(p.pro_nombre, d.pro_referencia))  AS pro_nombre,
+                   -- Material: desde pro_referencia directa → BOD_PRODUCTO → BOD_MATERIAL
+                   NVL(m2.mat_descripcion, NVL(m.mat_descripcion, '—'))     AS material,
+                   NVL(d.pro_referencia, h.pro_referencia)                  AS pro_referencia
               FROM BOD_DETALLE_PEDIDO   d
+              -- Via historial (puede ser NULL)
               LEFT JOIN BOD_HISTORIAL_PRECIO h  ON h.hip_historial_precio = d.hip_historial_precio
               LEFT JOIN BOD_PRODUCTO         p  ON p.pro_referencia       = h.pro_referencia
+              LEFT JOIN BOD_MATERIAL         m  ON m.mat_material         = p.mat_material
+              -- Via pro_referencia directa (siempre disponible si se guardo correctamente)
               LEFT JOIN BOD_PRODUCTO         p2 ON p2.pro_referencia      = d.pro_referencia
+              LEFT JOIN BOD_MATERIAL         m2 ON m2.mat_material        = p2.mat_material
              WHERE d.ped_pedido = p_ped_pedido
              ORDER BY d.detpe_detalle_pedido;
     END DET_PED_LISTAR_POR_PEDIDO;

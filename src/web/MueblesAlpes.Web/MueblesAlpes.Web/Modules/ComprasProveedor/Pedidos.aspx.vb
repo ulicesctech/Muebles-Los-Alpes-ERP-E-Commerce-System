@@ -133,8 +133,20 @@ Namespace Modules.ComprasProveedor
         End Sub
 
         '========================
-        ' GRID PEDIDOS
+        ' GRID PEDIDOS — carga sub-grid de items en cada fila
         '========================
+        Protected Sub gvPedidos_RowDataBound(sender As Object, e As GridViewRowEventArgs)
+            If e.Row.RowType = DataControlRowType.DataRow Then
+                Dim pedId As Integer = Convert.ToInt32(gvPedidos.DataKeys(e.Row.RowIndex).Value)
+                Dim gvSub As GridView = CType(e.Row.FindControl("gvSubProductos"), GridView)
+                If gvSub IsNot Nothing Then
+                    Dim dt As DataTable = DetallePedidoService.ListarPorPedido(pedId)
+                    gvSub.DataSource = dt
+                    gvSub.DataBind()
+                End If
+            End If
+        End Sub
+
         Protected Sub gvPedidos_RowCommand(sender As Object, e As GridViewCommandEventArgs)
             pnlMsg.Visible = False
             If e.CommandName = "VerDetalle" Then
@@ -165,12 +177,11 @@ Namespace Modules.ComprasProveedor
         ' DROPDOWN PRODUCTO
         '========================
         Protected Sub ddlProducto_SelectedIndexChanged(sender As Object, e As EventArgs)
-            ' Solo refresca la seleccion — el precio se asigna desde la Orden de Compra
+            ' Solo refresca — precio se asigna desde Orden de Compra
         End Sub
 
         '========================
         ' AGREGAR PRODUCTO
-        ' CAMBIO: pasa proRef a Insertar para guardar en BOD_DETALLE_PEDIDO.pro_referencia
         '========================
         Protected Sub btnAgregarItem_Click(sender As Object, e As EventArgs)
             Try
@@ -197,8 +208,6 @@ Namespace Modules.ComprasProveedor
                     End If
                 End If
 
-                ' Ahora pasamos proRef para que el listado pueda mostrar
-                ' el nombre del producto aunque no haya historial asignado
                 DetallePedidoService.Insertar(pedidoId, hipId, proRef, cantidad)
 
                 txtCantSolicitada.Text = ""
