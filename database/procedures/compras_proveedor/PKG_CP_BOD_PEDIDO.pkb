@@ -58,23 +58,73 @@ CREATE OR REPLACE PACKAGE BODY PKG_CP_BOD_PEDIDO AS
             RAISE;
     END;
 
-    PROCEDURE PED_LISTAR(p_data OUT SYS_REFCURSOR) AS
-    BEGIN
-        OPEN p_data FOR
-            SELECT ped_pedido, ped_codigo, ped_fecha, ped_forma_pago, ped_total
-              FROM BOD_PEDIDO
-             ORDER BY ped_pedido DESC;
-    END;
-
+PROCEDURE PED_LISTAR(p_data OUT SYS_REFCURSOR) AS
+BEGIN
+    OPEN p_data FOR
+        SELECT 
+            p.ped_pedido, 
+            p.ped_codigo, 
+            p.ped_fecha, 
+            p.ped_forma_pago, 
+            p.ped_total,
+            -- Concatenamos los nombres de productos
+            (SELECT LISTAGG(pr2.pro_nombre, ', ') WITHIN GROUP (ORDER BY pr2.pro_nombre)
+             FROM BOD_DETALLE_PEDIDO d2
+             JOIN BOD_HISTORIAL_PRECIO h2 ON d2.hip_historial_precio = h2.hip_historial_precio
+             JOIN BOD_PRODUCTO pr2 ON h2.pro_referencia = pr2.pro_referencia
+             WHERE d2.ped_pedido = p.ped_pedido) AS producto,
+            -- Concatenamos las descripciones de materiales
+            (SELECT LISTAGG(m2.mat_descripcion, ', ') WITHIN GROUP (ORDER BY m2.mat_descripcion)
+             FROM BOD_DETALLE_PEDIDO d2
+             JOIN BOD_HISTORIAL_PRECIO h2 ON d2.hip_historial_precio = h2.hip_historial_precio
+             JOIN BOD_PRODUCTO pr2 ON h2.pro_referencia = pr2.pro_referencia
+             JOIN BOD_MATERIAL m2 ON pr2.mat_material = m2.mat_material
+             WHERE d2.ped_pedido = p.ped_pedido) AS material,
+            -- Sumamos las cantidades
+            (SELECT SUM(d3.detpe_cantidad_solicitada) 
+             FROM BOD_DETALLE_PEDIDO d3 
+             WHERE d3.ped_pedido = p.ped_pedido) AS cantidad_solicitada,
+            (SELECT SUM(d4.detpe_cantidad_recibida) 
+             FROM BOD_DETALLE_PEDIDO d4 
+             WHERE d4.ped_pedido = p.ped_pedido) AS cantidad_ingresada
+        FROM BOD_PEDIDO p
+        ORDER BY p.ped_pedido DESC;
+END;
+--añade filtros para que puedas buscar por código, nombre de producto o descripción de material.
     PROCEDURE PED_BUSCAR(p_codigo IN VARCHAR2, p_data OUT SYS_REFCURSOR) AS
-    BEGIN
-        OPEN p_data FOR
-            SELECT ped_pedido, ped_codigo, ped_fecha, ped_forma_pago, ped_total
-              FROM BOD_PEDIDO
-             WHERE UPPER(ped_codigo) LIKE '%' || UPPER(p_codigo) || '%'
-             ORDER BY ped_pedido DESC;
-    END;
-
+BEGIN
+    OPEN p_data FOR
+        SELECT * FROM (
+            SELECT 
+                p.ped_pedido, 
+                p.ped_codigo, 
+                p.ped_fecha, 
+                p.ped_forma_pago, 
+                p.ped_total,
+                (SELECT LISTAGG(pr2.pro_nombre, ', ') WITHIN GROUP (ORDER BY pr2.pro_nombre)
+                 FROM BOD_DETALLE_PEDIDO d2
+                 JOIN BOD_HISTORIAL_PRECIO h2 ON d2.hip_historial_precio = h2.hip_historial_precio
+                 JOIN BOD_PRODUCTO pr2 ON h2.pro_referencia = pr2.pro_referencia
+                 WHERE d2.ped_pedido = p.ped_pedido) AS producto,
+                (SELECT LISTAGG(m2.mat_descripcion, ', ') WITHIN GROUP (ORDER BY m2.mat_descripcion)
+                 FROM BOD_DETALLE_PEDIDO d2
+                 JOIN BOD_HISTORIAL_PRECIO h2 ON d2.hip_historial_precio = h2.hip_historial_precio
+                 JOIN BOD_PRODUCTO pr2 ON h2.pro_referencia = pr2.pro_referencia
+                 JOIN BOD_MATERIAL m2 ON pr2.mat_material = m2.mat_material
+                 WHERE d2.ped_pedido = p.ped_pedido) AS material,
+                (SELECT SUM(d3.detpe_cantidad_solicitada) 
+                 FROM BOD_DETALLE_PEDIDO d3 
+                 WHERE d3.ped_pedido = p.ped_pedido) AS cantidad_solicitada,
+                (SELECT SUM(d4.detpe_cantidad_recibida) 
+                 FROM BOD_DETALLE_PEDIDO d4 
+                 WHERE d4.ped_pedido = p.ped_pedido) AS cantidad_ingresada
+            FROM BOD_PEDIDO p
+        ) t
+        WHERE UPPER(t.ped_codigo) LIKE '%' || UPPER(p_codigo) || '%'
+           OR UPPER(t.producto)   LIKE '%' || UPPER(p_codigo) || '%'
+           OR UPPER(t.material)   LIKE '%' || UPPER(p_codigo) || '%'
+        ORDER BY t.ped_pedido DESC;
+END;
     PROCEDURE PED_OBTENER_ID(p_id IN NUMBER, p_data OUT SYS_REFCURSOR) AS
     BEGIN
         OPEN p_data FOR

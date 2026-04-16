@@ -22,8 +22,8 @@ Namespace Modules.ComprasProveedor
             Try
                 Dim dt As DataTable = OrdenCompraService.Listar()
                 ddlOrden.DataSource = dt
-                ddlOrden.DataTextField = "ORC_CODIGO"
-                ddlOrden.DataValueField = "ORC_ORDEN_COMPRA"
+                ddlOrden.DataTextField = "ORC_KEY"
+                ddlOrden.DataValueField = "ORC_KEY"
                 ddlOrden.DataBind()
                 ddlOrden.Items.Insert(0, New ListItem("-- Seleccione una orden --", ""))
             Catch ex As Exception

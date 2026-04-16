@@ -225,13 +225,21 @@ Namespace Modules.CatalogoInventario
             If ddlNicho.SelectedValue = "" Then MostrarError("Debe seleccionar un nicho.") : Return
             If txtPrecio.Text.Trim() = "" Then MostrarError("El precio es obligatorio.") : Return
             If txtFechaInicio.Text.Trim() = "" Then MostrarError("La fecha de inicio es obligatoria.") : Return
+
             Try
-                HistorialPrecioService.Registrar(
-                    ddlProducto.SelectedValue,
-                    Convert.ToDecimal(ddlNicho.SelectedValue),
-                    Convert.ToDecimal(txtPrecio.Text.Trim()),
-                    Convert.ToDateTime(txtFechaInicio.Text.Trim())
-                )
+                Dim proRef As String = ddlProducto.SelectedValue
+                Dim nichoId As Decimal = Convert.ToDecimal(ddlNicho.SelectedValue)
+                Dim precio As Decimal = Convert.ToDecimal(txtPrecio.Text.Trim())
+                Dim fechaInicio As Date = Convert.ToDateTime(txtFechaInicio.Text.Trim())
+                Dim readonlyParam As String = Request.QueryString("readonly")
+
+                ' Si viene de Recibido: primero cerrar el vigente anterior con la fecha actual
+                If readonlyParam = "1" Then
+                    HistorialPrecioService.CerrarVigente(proRef, nichoId, fechaInicio)
+                End If
+
+                ' Registrar nuevo precio (sin cerrar nada — eso ya se hizo arriba si aplica)
+                HistorialPrecioService.Registrar(proRef, nichoId, precio, fechaInicio)
 
                 ' Si vino desde Pedidos, redirigir de vuelta
                 Dim pedidoParam As String = Request.QueryString("pedido")
@@ -246,7 +254,7 @@ Namespace Modules.CatalogoInventario
                 txtPrecio.Text = ""
                 txtFechaInicio.Text = DateTime.Now.ToString("yyyy-MM-dd")
                 ddlNicho_SelectedIndexChanged(Nothing, EventArgs.Empty)
-                CargarHistorial(ddlProducto.SelectedValue)
+                CargarHistorial(proRef)
             Catch ex As Exception
                 MostrarError("Error al registrar: " & ex.Message)
             End Try

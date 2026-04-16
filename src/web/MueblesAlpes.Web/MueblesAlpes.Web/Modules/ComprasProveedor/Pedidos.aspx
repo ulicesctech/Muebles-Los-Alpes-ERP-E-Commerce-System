@@ -30,8 +30,7 @@
     .table-card table { width:100%; border-collapse:collapse; font-family:Arial,sans-serif; }
     .table-card thead tr { background:linear-gradient(135deg,#5C3A1E,#8B5E3C); }
     .table-card thead th { padding:12px 16px; color:#f0d9a0; font-size:11px; font-weight:bold; text-transform:uppercase; letter-spacing:0.5px; text-align:left; }
-    .table-card tbody tr { border-bottom:1px solid #f5ece0; transition:background 0.15s; }
-    .table-card tbody tr:hover { background:#fdf8f3; }
+    .table-card tbody tr { border-bottom:1px solid #f5ece0; }
     .table-card tbody tr:last-child { border-bottom:none; }
     .table-card tbody td { padding:12px 16px; font-size:13px; color:#444; vertical-align:middle; }
     .badge-id { background:#fdf6ec; color:#C9973A; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:bold; border:1px solid #e8d8c0; display:inline-block; }
@@ -52,10 +51,12 @@
     .total-box { padding:14px 16px; background:#fdf6ec; border-radius:8px; border:1px solid #e8d8c0; font-size:16px; font-weight:bold; color:#5C3A1E; font-family:Georgia,serif; margin-top:12px; }
     .cabecera-info { background:#fdf8f3; border:1px solid #e8d8c0; border-radius:8px; padding:12px 16px; margin-bottom:14px; display:flex; gap:24px; flex-wrap:wrap; font-family:Arial,sans-serif; font-size:13px; color:#5C3A1E; }
     .cabecera-info strong { font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:#8B5E3C; display:block; margin-bottom:2px; }
-    .precio-sugerido { font-size:11px; color:#8B5E3C; margin-top:4px; font-family:Arial,sans-serif; }
-    .edit-input { padding:7px 10px; border:2px solid #C9973A; border-radius:6px; font-size:13px; font-family:Arial,sans-serif; background:white; width:100%; box-sizing:border-box; outline:none; }
     .section-label { font-size:12px; font-weight:bold; color:#5C3A1E; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; }
     .empty-state { text-align:center; padding:40px 20px; color:#aaa; font-family:Arial,sans-serif; }
+    .recibir-box { margin-top:8px; padding:10px 12px; background:#f0fff4; border:1px solid #9ae6b4; border-radius:8px; }
+    .recibir-box label { font-size:11px; font-weight:bold; color:#276749; text-transform:uppercase; display:block; margin-bottom:6px; }
+    .info-nota { font-size:11px; color:#8B5E3C; font-style:italic; margin-top:4px; font-family:Arial,sans-serif; }
+    .edit-input { padding:7px 10px; border:2px solid #C9973A; border-radius:6px; font-size:13px; font-family:Arial,sans-serif; background:white; width:100%; box-sizing:border-box; outline:none; }
 </style>
 
 <div class="breadcrumb-mod">
@@ -63,7 +64,6 @@
     <a href='<%: ResolveUrl("~/Modules/ComprasProveedor/Index.aspx") %>'>&#128722; Compras</a> /
     <strong style="color:#5C3A1E;">Pedidos</strong>
 </div>
-
 <div class="page-title">&#128203; Gestion de Pedidos</div>
 
 <asp:Panel ID="pnlMsg" runat="server" Visible="false">
@@ -90,14 +90,17 @@
                 DataKeyNames="PED_PEDIDO"
                 CssClass="table"
                 GridLines="None"
+
                 OnRowCommand="gvPedidos_RowCommand">
                 <Columns>
                     <asp:TemplateField HeaderText="ID" ItemStyle-Width="80px">
-                        <ItemTemplate>
-                            <span class="badge-id"><%# Eval("PED_PEDIDO") %></span>
-                        </ItemTemplate>
+                        <ItemTemplate><span class="badge-id"><%# Eval("PED_PEDIDO") %></span></ItemTemplate>
                     </asp:TemplateField>
                     <asp:BoundField DataField="PED_CODIGO" HeaderText="Codigo" />
+                    <asp:BoundField DataField="producto" HeaderText="PRODUCTO" />
+        <asp:BoundField DataField="material" HeaderText="MATERIAL" />
+        <asp:BoundField DataField="cantidad_solicitada" HeaderText="CANT. SOLICITADA" />
+        <asp:BoundField DataField="cantidad_ingresada" HeaderText="CANT. RECIBIDA" />
                     <asp:TemplateField HeaderText="Fecha" ItemStyle-Width="120px">
                         <ItemTemplate><%# String.Format("{0:dd/MM/yyyy}", Eval("PED_FECHA")) %></ItemTemplate>
                     </asp:TemplateField>
@@ -136,9 +139,7 @@
 <!-- ====== FORM NUEVO PEDIDO ====== -->
 <asp:Panel ID="pnlFormCabecera" runat="server" Visible="false">
 <div class="form-card">
-    <div class="form-card-head">
-        <span>&#9999; Nuevo Pedido</span>
-    </div>
+    <div class="form-card-head"><span>&#9999; Nuevo Pedido</span></div>
     <div class="form-card-body">
         <div class="f-row">
             <div class="f-group">
@@ -167,39 +168,32 @@
 <asp:Panel ID="pnlDetalleContenedor" runat="server" Visible="false">
 <div class="form-card">
     <div class="form-card-head">
-        <span>&#128230; PRODUCTOS DEL PEDIDO:
-            <asp:Label ID="lblIdSeleccionado" runat="server" />
-        </span>
+        <span>&#128230; PRODUCTOS DEL PEDIDO: <asp:Label ID="lblIdSeleccionado" runat="server" /></span>
         <asp:Button ID="btnCerrarDetalle" runat="server" Text="X Cerrar"
             CssClass="btn-outline" OnClick="btnCerrarDetalle_Click" CausesValidation="false"
             style="background:transparent;color:#f0d9a0;border-color:#f0d9a0;" />
     </div>
     <div class="form-card-body">
 
-        <asp:HiddenField ID="hfPedidoActivo" runat="server" Value="0" />
+        <asp:HiddenField ID="hfPedidoActivo"   runat="server" Value="0" />
+        <asp:HiddenField ID="hfDetalleRecibir" runat="server" Value="0" />
 
         <div class="cabecera-info">
-            <div><strong>Codigo</strong><asp:Label ID="lblCabeceraCode" runat="server" /></div>
-            <div><strong>Fecha</strong><asp:Label ID="lblCabeceraFecha" runat="server" /></div>
-            <div><strong>Forma de Pago</strong><asp:Label ID="lblCabeceraFormaPago" runat="server" /></div>
+            <div><strong>Codigo</strong><asp:Label         ID="lblCabeceraCode"      runat="server" /></div>
+            <div><strong>Fecha</strong><asp:Label          ID="lblCabeceraFecha"     runat="server" /></div>
+            <div><strong>Forma de Pago</strong><asp:Label  ID="lblCabeceraFormaPago" runat="server" /></div>
         </div>
 
         <div class="section-label">&#43; Agregar Producto</div>
         <div class="add-item-box">
             <div class="f-row">
-                <div class="f-group" style="flex:2;">
+                <div class="f-group" style="flex:3;">
                     <label>Producto *</label>
                     <asp:DropDownList ID="ddlProducto" runat="server" CssClass="form-control"
                         AutoPostBack="true" OnSelectedIndexChanged="ddlProducto_SelectedIndexChanged" />
-                    <div class="precio-sugerido">
-                        Precio sugerido: Q <asp:Label ID="lblPrecioSugerido" runat="server" Text="--" />
-                    </div>
+                    <div class="info-nota">El precio se asignara al recibir la mercancia desde la Orden de Compra.</div>
                 </div>
-                <div class="f-group">
-                    <label>Precio Manual *</label>
-                    <asp:TextBox ID="txtPrecioManual" runat="server" CssClass="form-control" placeholder="0.00" />
-                </div>
-                <div class="f-group">
+                <div class="f-group" style="max-width:140px;">
                     <label>Cantidad *</label>
                     <asp:TextBox ID="txtCantSolicitada" runat="server" CssClass="form-control" placeholder="0" />
                 </div>
@@ -219,65 +213,86 @@
                 OnRowCommand="gvDetalles_RowCommand"
                 OnRowEditing="gvDetalles_RowEditing"
                 OnRowCancelingEdit="gvDetalles_RowCancelingEdit"
-                OnRowUpdating="gvDetalles_RowUpdating">
+                OnRowUpdating="gvDetalles_RowUpdating"
+                OnRowDataBound="gvDetalles_RowDataBound">
                 <Columns>
                     <asp:TemplateField HeaderText="Producto">
                         <ItemTemplate><%# Eval("PRO_NOMBRE") %></ItemTemplate>
+                        <EditItemTemplate><%# Eval("PRO_NOMBRE") %></EditItemTemplate>
                     </asp:TemplateField>
-                    <asp:TemplateField HeaderText="Precio" ItemStyle-Width="120px">
-                        <ItemTemplate>Q <%# String.Format("{0:N2}", Eval("HIP_PRECIO")) %></ItemTemplate>
+                    <asp:TemplateField HeaderText="Precio Asignado" ItemStyle-Width="140px">
+                        <ItemTemplate>
+                            <%# If(Not IsDBNull(Eval("HIP_PRECIO")) AndAlso Convert.ToDecimal(Eval("HIP_PRECIO")) > 0,
+                                "Q " & String.Format("{0:N2}", Eval("HIP_PRECIO")),
+                                "<span style='color:#aaa;font-size:11px;'>Pendiente OC</span>") %>
+                        </ItemTemplate>
                         <EditItemTemplate>
-                            <asp:TextBox ID="txtEPrecio" runat="server"
-                                Text='<%# Eval("HIP_PRECIO") %>' CssClass="edit-input" style="width:90px;" />
+                            <%# If(Not IsDBNull(Eval("HIP_PRECIO")) AndAlso Convert.ToDecimal(Eval("HIP_PRECIO")) > 0,
+                                "Q " & String.Format("{0:N2}", Eval("HIP_PRECIO")),
+                                "Pendiente OC") %>
                         </EditItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Solicitado" ItemStyle-Width="100px">
-    <ItemTemplate><%# Eval("DETPE_CANTIDAD_SOLICITADA") %></ItemTemplate>
-    <EditItemTemplate>
-        <%# Eval("DETPE_CANTIDAD_SOLICITADA") %>
-        <asp:HiddenField ID="hfSolicitadaEdit"
-            runat="server"
-            Value='<%# Eval("DETPE_CANTIDAD_SOLICITADA") %>' />
-    </EditItemTemplate>
-</asp:TemplateField>
-
-<asp:TemplateField HeaderText="Recibido" ItemStyle-Width="100px">
-    <ItemTemplate><%# Eval("DETPE_CANTIDAD_RECIBIDA") %></ItemTemplate>
-    <EditItemTemplate>
-        <asp:TextBox ID="txtERecibida" runat="server"
-            Text='<%# Eval("DETPE_CANTIDAD_RECIBIDA") %>'
-            CssClass="edit-input" style="width:70px;" />
-    </EditItemTemplate>
-</asp:TemplateField>
+                        <ItemTemplate><%# Eval("DETPE_CANTIDAD_SOLICITADA") %></ItemTemplate>
+                        <EditItemTemplate>
+                            <asp:TextBox ID="txtESolicitada" runat="server"
+                                Text='<%# Eval("DETPE_CANTIDAD_SOLICITADA") %>'
+                                CssClass="edit-input" style="width:70px;" />
+                        </EditItemTemplate>
+                    </asp:TemplateField>
+                    <asp:TemplateField HeaderText="Recibido" ItemStyle-Width="160px">
+                        <ItemTemplate>
+                            <%# Eval("DETPE_CANTIDAD_RECIBIDA") %>
+                            <asp:Panel ID="pnlRecibir" runat="server" Visible="false">
+                                <div class="recibir-box">
+                                    <label>Cantidad recibida:</label>
+                                    <asp:TextBox ID="txtCantRecibir" runat="server"
+                                        Text='<%# Eval("DETPE_CANTIDAD_RECIBIDA") %>'
+                                        CssClass="edit-input" style="width:75px; margin-bottom:8px;" />
+                                    <div class="actions-cell">
+                                        <asp:LinkButton CommandName="ConfirmarRecibido"
+                                            CommandArgument='<%# Eval("DETPE_DETALLE_PEDIDO") & "|" & Eval("PRO_REFERENCIA") & "|" & Eval("DETPE_CANTIDAD_SOLICITADA") %>'
+                                            runat="server" CssClass="btn-save-t"
+                                            CausesValidation="false">&#10003; Confirmar</asp:LinkButton>
+                                        <asp:LinkButton CommandName="CancelarRecibido"
+                                            CommandArgument='<%# Eval("DETPE_DETALLE_PEDIDO") %>'
+                                            runat="server" CssClass="btn-cancel-t"
+                                            CausesValidation="false">&#10005; Cancelar</asp:LinkButton>
+                                    </div>
+                                </div>
+                            </asp:Panel>
+                        </ItemTemplate>
+                        <EditItemTemplate><%# Eval("DETPE_CANTIDAD_RECIBIDA") %></EditItemTemplate>
+                    </asp:TemplateField>
                     <asp:TemplateField HeaderText="Subtotal" ItemStyle-Width="120px">
                         <ItemTemplate>
-                            Q <%# String.Format("{0:N2}", Convert.ToDecimal(Eval("HIP_PRECIO")) * Convert.ToDecimal(Eval("DETPE_CANTIDAD_SOLICITADA"))) %>
+                            <%# If(Not IsDBNull(Eval("HIP_PRECIO")) AndAlso Convert.ToDecimal(Eval("HIP_PRECIO")) > 0,
+                                "Q " & String.Format("{0:N2}", Convert.ToDecimal(Eval("HIP_PRECIO")) * Convert.ToDecimal(Eval("DETPE_CANTIDAD_SOLICITADA"))),
+                                "--") %>
                         </ItemTemplate>
                         <EditItemTemplate></EditItemTemplate>
                     </asp:TemplateField>
-                  <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="240px">
-    <ItemTemplate>
-        <div class="actions-cell">
-            <asp:LinkButton CommandName="Edit"
-                runat="server" CssClass="btn-edit-t"
-                CausesValidation="false">&#9999; Editar</asp:LinkButton>
-            <asp:LinkButton CommandName="MarcarRecibido"
-                CommandArgument='<%# Eval("DETPE_DETALLE_PEDIDO") & "|" & Eval("PRO_REFERENCIA") & "|" & Eval("HIP_PRECIO") %>'
-                runat="server" CssClass="btn-precio-t"
-                CausesValidation="false">&#10003; Recibido</asp:LinkButton>
-            <asp:LinkButton CommandName="BorrarItem"
-                CommandArgument='<%# Eval("DETPE_DETALLE_PEDIDO") %>'
-                runat="server" CssClass="btn-del-t"
-                OnClientClick="return confirm('Eliminar este producto?');">&#128465;</asp:LinkButton>
-        </div>
-    </ItemTemplate>
-    <EditItemTemplate>
-        <div class="actions-cell">
-            <asp:LinkButton CommandName="Update" runat="server" CssClass="btn-save-t">&#10003; Guardar</asp:LinkButton>
-            <asp:LinkButton CommandName="Cancel" runat="server" CssClass="btn-cancel-t">&#10005; Cancelar</asp:LinkButton>
-        </div>
-    </EditItemTemplate>
-</asp:TemplateField>
+                    <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="220px">
+                        <ItemTemplate>
+                            <div class="actions-cell">
+                                <asp:LinkButton CommandName="Edit"
+                                    runat="server" CssClass="btn-edit-t" CausesValidation="false">&#9999; Editar</asp:LinkButton>
+                                <asp:LinkButton CommandName="MarcarRecibido"
+                                    CommandArgument='<%# Eval("DETPE_DETALLE_PEDIDO") %>'
+                                    runat="server" CssClass="btn-precio-t" CausesValidation="false">&#10003; Recibido</asp:LinkButton>
+                                <asp:LinkButton CommandName="BorrarItem"
+                                    CommandArgument='<%# Eval("DETPE_DETALLE_PEDIDO") %>'
+                                    runat="server" CssClass="btn-del-t"
+                                    OnClientClick="return confirm('Eliminar este producto?');">&#128465;</asp:LinkButton>
+                            </div>
+                        </ItemTemplate>
+                        <EditItemTemplate>
+                            <div class="actions-cell">
+                                <asp:LinkButton CommandName="Update" runat="server" CssClass="btn-save-t" CausesValidation="false">&#10003; Guardar</asp:LinkButton>
+                                <asp:LinkButton CommandName="Cancel" runat="server" CssClass="btn-cancel-t" CausesValidation="false">&#10005; Cancelar</asp:LinkButton>
+                            </div>
+                        </EditItemTemplate>
+                    </asp:TemplateField>
                 </Columns>
                 <EmptyDataTemplate>
                     <div class="empty-state"><p>No hay productos en este pedido.</p></div>
@@ -288,12 +303,10 @@
         <div class="total-box">
             Total: Q <asp:Label ID="lblTotalDetalle" runat="server" Text="0.00" />
         </div>
-
         <div class="f-row" style="margin-top:16px;">
             <asp:Button ID="btnFinalizarPedido" runat="server" Text="&#10003; Finalizar Pedido"
                 CssClass="btn-green" OnClick="btnFinalizarPedido_Click" />
         </div>
-
     </div>
 </div>
 </asp:Panel>

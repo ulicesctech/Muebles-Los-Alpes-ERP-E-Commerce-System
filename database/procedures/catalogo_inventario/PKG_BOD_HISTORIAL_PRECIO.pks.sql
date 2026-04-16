@@ -2,13 +2,21 @@
 -- PKG_BOD_HISTORIAL_PRECIO.pks
 -- ============================================================
 CREATE OR REPLACE PACKAGE PKG_BOD_HISTORIAL_PRECIO AS
-  PROCEDURE REGISTRAR(
+PROCEDURE REGISTRAR(
     p_pro_referencia IN VARCHAR2,
     p_nic_nicho      IN NUMBER,
     p_precio         IN NUMBER,
     p_fecha_inicio   IN DATE,
     p_id_out         OUT NUMBER
   );
+ 
+  -- Cierra el precio vigente actual (pone hip_fecha_final = p_fecha_cierre)
+  PROCEDURE CERRAR_VIGENTE(
+    p_pro_referencia IN VARCHAR2,
+    p_nic_nicho      IN NUMBER,
+    p_fecha_cierre   IN DATE
+  );
+ 
   PROCEDURE VIGENTE(
     p_pro_referencia IN VARCHAR2,
     p_nic_nicho      IN NUMBER,

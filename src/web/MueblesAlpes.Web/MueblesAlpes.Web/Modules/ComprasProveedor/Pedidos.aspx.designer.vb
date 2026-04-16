@@ -159,6 +159,15 @@ Namespace Modules.ComprasProveedor
         Protected WithEvents hfPedidoActivo As Global.System.Web.UI.WebControls.HiddenField
 
         '''<summary>
+        '''Control hfDetalleRecibir.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents hfDetalleRecibir As Global.System.Web.UI.WebControls.HiddenField
+
+        '''<summary>
         '''Control lblCabeceraCode.
         '''</summary>
         '''<remarks>
@@ -193,24 +202,6 @@ Namespace Modules.ComprasProveedor
         '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         '''</remarks>
         Protected WithEvents ddlProducto As Global.System.Web.UI.WebControls.DropDownList
-
-        '''<summary>
-        '''Control lblPrecioSugerido.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents lblPrecioSugerido As Global.System.Web.UI.WebControls.Label
-
-        '''<summary>
-        '''Control txtPrecioManual.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents txtPrecioManual As Global.System.Web.UI.WebControls.TextBox
 
         '''<summary>
         '''Control txtCantSolicitada.

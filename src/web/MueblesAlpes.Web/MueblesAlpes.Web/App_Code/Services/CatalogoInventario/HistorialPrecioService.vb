@@ -30,7 +30,16 @@ Public Class HistorialPrecioService
         }
         OracleDb.ExecNonQuery(PKG & ".REGISTRAR_EN_TODOS", ps)
     End Sub
-
+    Public Shared Sub CerrarVigente(proReferencia As String,
+                                    nicNicho As Decimal,
+                                    fechaCierre As Date)
+        Dim ps As New List(Of OracleParameter) From {
+            New OracleParameter("p_pro_referencia", OracleDbType.Varchar2, proReferencia, ParameterDirection.Input),
+            New OracleParameter("p_nic_nicho", OracleDbType.Decimal, nicNicho, ParameterDirection.Input),
+            New OracleParameter("p_fecha_cierre", OracleDbType.Date, fechaCierre, ParameterDirection.Input)
+        }
+        OracleDb.ExecNonQuery(PKG & ".CERRAR_VIGENTE", ps)
+    End Sub
     Public Shared Function Vigente(proReferencia As String, nicNicho As Decimal) As DataTable
         Dim ps As New List(Of OracleParameter) From {
             New OracleParameter("p_pro_referencia", OracleDbType.Varchar2, proReferencia, ParameterDirection.Input),

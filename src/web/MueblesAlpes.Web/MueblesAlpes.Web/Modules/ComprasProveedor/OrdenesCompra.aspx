@@ -10,8 +10,8 @@
     .breadcrumb-mod { background:white; border:1px solid #e8d8c0; border-radius:8px; padding:10px 16px; margin-bottom:20px; font-size:13px; font-family:Arial,sans-serif; color:#888; }
     .breadcrumb-mod a { color:#C9973A; text-decoration:none; }
     .page-title { font-size:22px; color:#5C3A1E; font-family:Georgia,serif; margin:0 0 20px; }
-    .alert-ok  { padding:12px 18px; border-radius:8px; font-size:13px; margin-bottom:20px; background:#f0fff4; color:#276749; border-left:4px solid #48bb78; }
-    .alert-err { padding:12px 18px; border-radius:8px; font-size:13px; margin-bottom:20px; background:#fff5f5; color:#c53030; border-left:4px solid #fc8181; }
+    .alert-ok  { padding:12px 18px; border-radius:8px; font-size:13px; margin-bottom:20px; background:#f0fff4; color:#276749; border-left:4px solid #48bb78; font-family:Arial,sans-serif; }
+    .alert-err { padding:12px 18px; border-radius:8px; font-size:13px; margin-bottom:20px; background:#fff5f5; color:#c53030; border-left:4px solid #fc8181; font-family:Arial,sans-serif; }
     .form-card { background:white; border-radius:12px; border:1px solid #e8d8c0; overflow:hidden; margin-bottom:24px; box-shadow:0 2px 8px rgba(92,58,30,0.06); }
     .form-card-head { background:linear-gradient(135deg,#5C3A1E,#8B5E3C); padding:14px 20px; display:flex; justify-content:space-between; align-items:center; }
     .form-card-head span { color:#f0d9a0; font-size:14px; font-weight:bold; font-family:Arial,sans-serif; }
@@ -27,7 +27,6 @@
     .btn-green:hover { background:linear-gradient(135deg,#1a4d35,#0f3020); }
     .btn-outline { background:white; color:#5C3A1E; border:2px solid #e8d8c0; padding:10px 18px; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; cursor:pointer; white-space:nowrap; }
     .btn-outline:hover { border-color:#C9973A; color:#C9973A; }
-    /* Grid principal */
     .table-card { background:white; border-radius:12px; border:1px solid #e8d8c0; overflow:hidden; box-shadow:0 2px 8px rgba(92,58,30,0.06); margin-top:10px; }
     .table-card table { width:100%; border-collapse:collapse; font-family:Arial,sans-serif; }
     .table-card thead tr { background:linear-gradient(135deg,#5C3A1E,#8B5E3C); }
@@ -46,22 +45,35 @@
     .btn-save-t:hover { background:#276749; color:white; }
     .btn-cancel-t { background:#f7fafc; color:#4a5568; border:1px solid #cbd5e0; padding:5px 12px; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer; white-space:nowrap; }
     .btn-cancel-t:hover { background:#4a5568; color:white; }
-    /* Sub-grid de ítems dentro del listado */
-    .sub-items-wrap { margin-top:8px; }
+    /* Sub-tablas dentro del listado principal */
+    .sub-items-wrap { margin-top:6px; }
     .sub-items-table { width:100%; border-collapse:collapse; font-family:Arial,sans-serif; font-size:12px; }
     .sub-items-table thead tr { background:#f5ece0; }
-    .sub-items-table thead th { padding:6px 10px; color:#5C3A1E; font-size:10px; font-weight:bold; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-bottom:1px solid #e8d8c0; }
+    .sub-items-table thead th { padding:5px 10px; color:#5C3A1E; font-size:10px; font-weight:bold; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-bottom:1px solid #e8d8c0; }
     .sub-items-table tbody tr { border-bottom:1px solid #fdf6ec; }
     .sub-items-table tbody tr:last-child { border-bottom:none; }
     .sub-items-table tbody td { padding:5px 10px; color:#555; }
-    .sub-items-label { font-size:10px; font-weight:bold; color:#8B5E3C; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
-    /* Panel agregar ítem */
+    /* Panel busqueda pedidos */
     .add-item-box { background:#fdf8f3; padding:15px; border-radius:10px; border:1px solid #e8d8c0; margin-bottom:15px; }
     .total-box { padding:14px 16px; background:#fdf6ec; border-radius:8px; border:1px solid #e8d8c0; font-size:16px; font-weight:bold; color:#5C3A1E; font-family:Georgia,serif; margin-top:12px; display:flex; justify-content:space-between; align-items:center; }
     .edit-input { padding:7px 10px; border:2px solid #C9973A; border-radius:6px; font-size:13px; font-family:Arial,sans-serif; background:white; width:100%; box-sizing:border-box; outline:none; }
     .empty-state { text-align:center; padding:40px 20px; color:#aaa; font-family:Arial,sans-serif; }
-    .finalizar-bar { background:#f0fff4; border:1px solid #9ae6b4; border-radius:10px; padding:14px 18px; margin-top:14px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
-    .finalizar-bar span { font-size:13px; color:#276749; font-family:Arial,sans-serif; }
+    .section-label { font-size:12px; font-weight:bold; color:#5C3A1E; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; }
+    /* Items pedido con precio editable */
+    .pedido-sel-box { background:#f0fff4; border:1px solid #9ae6b4; border-radius:8px; padding:14px 16px; margin-top:10px; }
+    .items-precio-table { width:100%; border-collapse:collapse; font-family:Arial,sans-serif; font-size:13px; }
+    .items-precio-table thead tr { background:#e8f5e9; }
+    .items-precio-table thead th { padding:9px 12px; color:#276749; font-size:11px; font-weight:bold; text-transform:uppercase; text-align:left; border-bottom:2px solid #9ae6b4; }
+    .items-precio-table tbody tr { border-bottom:1px solid #f0fff4; }
+    .items-precio-table tbody td { padding:9px 12px; color:#333; vertical-align:middle; }
+    .precio-input { padding:7px 10px; border:2px solid #9ae6b4; border-radius:6px; font-size:13px; font-family:Arial,sans-serif; background:white; width:110px; box-sizing:border-box; outline:none; }
+    .precio-input:focus { border-color:#276749; }
+    /* Tabla busqueda pedidos expandida */
+    .ped-detail-row { background:#fafdf7; }
+    .ped-detail-row td { padding:0 !important; }
+    .ped-inner-table { width:100%; border-collapse:collapse; font-family:Arial,sans-serif; font-size:12px; }
+    .ped-inner-table td { padding:5px 14px; color:#555; border-bottom:1px solid #f0fff4; }
+    .ped-inner-table th { padding:5px 14px; color:#276749; font-size:10px; font-weight:bold; text-transform:uppercase; background:#e8f5e9; }
 </style>
 
 <div class="breadcrumb-mod">
@@ -69,17 +81,13 @@
     <a href='<%: ResolveUrl("~/Modules/ComprasProveedor/Index.aspx") %>'>&#128722; Compras</a> /
     <strong style="color:#5C3A1E;">Ordenes de Compra</strong>
 </div>
-
 <div class="page-title">&#128722; Gestion de Ordenes de Compra</div>
-
-<asp:UpdatePanel ID="upOrdenes" runat="server">
-<ContentTemplate>
 
 <asp:Panel ID="pnlMsg" runat="server" Visible="false">
     <asp:Label ID="lblMsg" runat="server" />
 </asp:Panel>
 
-<!-- ===== LISTADO ===== -->
+<!-- ====== LISTADO ORDENES ====== -->
 <div class="form-card">
     <div class="form-card-head">
         <span>&#128203; LISTADO DE ORDENES</span>
@@ -98,27 +106,22 @@
                 AutoGenerateColumns="false"
                 DataKeyNames="ORC_KEY"
                 CssClass="table"
+                GridLines="None"
                 OnRowCommand="gvOrdenes_RowCommand"
                 OnRowDeleting="gvOrdenes_RowDeleting"
                 OnRowEditing="gvOrdenes_RowEditing"
                 OnRowCancelingEdit="gvOrdenes_RowCancelingEdit"
                 OnRowUpdating="gvOrdenes_RowUpdating"
-                OnRowDataBound="gvOrdenes_RowDataBound"
-                GridLines="None">
+                OnRowDataBound="gvOrdenes_RowDataBound">
                 <Columns>
-
                     <asp:TemplateField HeaderText="ID" ItemStyle-Width="110px">
-                        <ItemTemplate>
-                            <span class="badge-id"><%# Eval("ORC_KEY") %></span>
-                        </ItemTemplate>
+                        <ItemTemplate><span class="badge-id"><%# Eval("ORC_KEY") %></span></ItemTemplate>
                     </asp:TemplateField>
-
-                    <asp:BoundField DataField="CODIGO"    HeaderText="Codigo"   />
-                    <asp:BoundField DataField="PROVEEDOR" HeaderText="Proveedor"/>
-                    <asp:BoundField DataField="FECHA"     HeaderText="Fecha"    ItemStyle-Width="150px"/>
-
-                    <%-- Columna combinada: Total + sub-grid de ítems --%>
-                    <asp:TemplateField HeaderText="Total / Items">
+                    <asp:BoundField DataField="CODIGO"    HeaderText="Codigo" />
+                    <asp:BoundField DataField="PROVEEDOR" HeaderText="Proveedor" />
+                    <asp:BoundField DataField="FECHA"     HeaderText="Fecha" ItemStyle-Width="130px" />
+                    <%-- Columna items: muestra pedido, producto, material, precio, cantidad --%>
+                    <asp:TemplateField HeaderText="Items / Total">
                         <ItemTemplate>
                             <div class="sub-items-wrap">
                                 <asp:GridView ID="gvSubItems" runat="server"
@@ -127,30 +130,29 @@
                                     GridLines="None"
                                     Visible="false">
                                     <Columns>
+                                        <asp:BoundField DataField="PED_CODIGO"   HeaderText="Pedido"   ItemStyle-Width="65px" />
                                         <asp:BoundField DataField="ODP_MATERIAL" HeaderText="Material" />
                                         <asp:TemplateField HeaderText="Precio" ItemStyle-Width="80px">
                                             <ItemTemplate>Q <%# String.Format("{0:N2}", Eval("ODP_PRECIO")) %></ItemTemplate>
                                         </asp:TemplateField>
-                                        <asp:BoundField DataField="ODP_CANTIDAD" HeaderText="Cant." ItemStyle-Width="55px"/>
+                                        <asp:BoundField DataField="ODP_CANTIDAD" HeaderText="Cant." ItemStyle-Width="55px" />
                                         <asp:TemplateField HeaderText="Subtotal" ItemStyle-Width="90px">
                                             <ItemTemplate>Q <%# String.Format("{0:N2}", Convert.ToDecimal(Eval("ODP_PRECIO")) * Convert.ToDecimal(Eval("ODP_CANTIDAD"))) %></ItemTemplate>
                                         </asp:TemplateField>
                                     </Columns>
                                 </asp:GridView>
-                                <%-- Fila de total visible siempre --%>
-                                <div style="margin-top:6px; padding:5px 10px; background:#fdf6ec; border-radius:6px; border:1px solid #e8d8c0; font-size:12px; font-weight:bold; color:#5C3A1E; font-family:Arial,sans-serif; display:inline-block;">
+                                <div style="margin-top:6px; padding:4px 10px; background:#fdf6ec; border-radius:6px; border:1px solid #e8d8c0; font-size:12px; font-weight:bold; color:#5C3A1E; font-family:Arial,sans-serif; display:inline-block;">
                                     Total: Q <%# String.Format("{0:N2}", Eval("TOTAL")) %>
                                 </div>
                             </div>
                         </ItemTemplate>
                     </asp:TemplateField>
-
-                    <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="190px" ItemStyle-VerticalAlign="Top">
+                    <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="180px" ItemStyle-VerticalAlign="Top">
                         <ItemTemplate>
                             <div class="actions-cell">
                                 <asp:LinkButton CommandName="VerDetalle"
                                     CommandArgument='<%# Eval("ORC_KEY") %>'
-                                    runat="server" CssClass="btn-edit-t">&#128230; Editar Items</asp:LinkButton>
+                                    runat="server" CssClass="btn-edit-t">&#128230; Editar</asp:LinkButton>
                                 <asp:LinkButton CommandName="Delete"
                                     CommandArgument='<%# Eval("ORC_KEY") %>'
                                     runat="server" CssClass="btn-del-t"
@@ -158,7 +160,6 @@
                             </div>
                         </ItemTemplate>
                     </asp:TemplateField>
-
                 </Columns>
                 <EmptyDataTemplate>
                     <div class="empty-state"><p>No hay ordenes registradas.</p></div>
@@ -168,12 +169,10 @@
     </div>
 </div>
 
-<!-- ===== FORM NUEVA ORDEN ===== -->
+<!-- ====== FORM NUEVA ORDEN ====== -->
 <asp:Panel ID="pnlFormCabecera" runat="server" Visible="false">
 <div class="form-card">
-    <div class="form-card-head">
-        <span>&#9999; Nueva Orden de Compra</span>
-    </div>
+    <div class="form-card-head"><span>&#9999; Nueva Orden de Compra</span></div>
     <div class="form-card-body">
         <asp:HiddenField ID="hfKey" runat="server" />
         <div class="f-row">
@@ -190,40 +189,148 @@
                 <asp:DropDownList ID="ddlProveedor" runat="server" CssClass="form-control" />
             </div>
         </div>
+
+        <hr style="border:1px solid #e8d8c0; margin:18px 0;" />
+
+        <div class="section-label">&#128203; Vincular Pedido</div>
+        <div class="add-item-box">
+            <div class="f-row" style="margin-bottom:12px;">
+                <asp:TextBox ID="txtBuscarPedido" runat="server" CssClass="form-control"
+                    placeholder="Buscar pedido por codigo o ID..." style="flex:3;" />
+                <asp:Button ID="btnBuscarPedido" runat="server" Text="&#128269; Buscar"
+                    CssClass="btn-gold" OnClick="btnBuscarPedido_Click" CausesValidation="false" />
+            </div>
+
+            <%-- Resultados: 1 fila por pedido + sub-grid de items visible --%>
+            <asp:Panel ID="pnlResultadosPedidos" runat="server" Visible="false">
+                <div class="table-card" style="margin-bottom:12px;">
+                    <asp:GridView ID="gvBuscarPedidos" runat="server"
+                        AutoGenerateColumns="false"
+                        DataKeyNames="PED_PEDIDO"
+                        CssClass="table"
+                        GridLines="None"
+                        OnRowDataBound="gvBuscarPedidos_RowDataBound"
+                        OnRowCommand="gvBuscarPedidos_RowCommand">
+                        <Columns>
+                            <asp:TemplateField HeaderText="ID" ItemStyle-Width="70px">
+                                <ItemTemplate><span class="badge-id"><%# Eval("PED_PEDIDO") %></span></ItemTemplate>
+                            </asp:TemplateField>
+                            <asp:BoundField DataField="PED_CODIGO"     HeaderText="Codigo" />
+                            <asp:TemplateField HeaderText="Fecha" ItemStyle-Width="110px">
+                                <ItemTemplate><%# String.Format("{0:dd/MM/yyyy}", Eval("PED_FECHA")) %></ItemTemplate>
+                            </asp:TemplateField>
+                            <%-- Sub-grid inline: muestra producto y material de cada item --%>
+                            <asp:TemplateField HeaderText="Productos / Items">
+                                <ItemTemplate>
+                                    <asp:GridView ID="gvSubItemsBuscar" runat="server"
+                                        AutoGenerateColumns="false"
+                                        CssClass="sub-items-table"
+                                        GridLines="None">
+                                        <Columns>
+                                            <asp:BoundField DataField="PRODUCTO_NOMBRE" HeaderText="Producto" />
+                                            <asp:BoundField DataField="MATERIAL"        HeaderText="Material" />
+                                            <asp:TemplateField HeaderText="Cant." ItemStyle-Width="55px">
+                                                <ItemTemplate><%# Eval("CANTIDAD") %></ItemTemplate>
+                                            </asp:TemplateField>
+                                        </Columns>
+                                        <EmptyDataTemplate><span style="color:#aaa;font-size:11px;">Sin items</span></EmptyDataTemplate>
+                                    </asp:GridView>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                            <asp:TemplateField HeaderText="" ItemStyle-Width="130px" ItemStyle-VerticalAlign="Top">
+                                <ItemTemplate>
+                                    <asp:LinkButton CommandName="VerItemsPedido"
+                                        CommandArgument='<%# Eval("PED_PEDIDO") & "|" & Eval("PED_CODIGO") %>'
+                                        runat="server" CssClass="btn-edit-t"
+                                        CausesValidation="false">&#10003; Seleccionar</asp:LinkButton>
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                        </Columns>
+                        <EmptyDataTemplate>
+                            <div class="empty-state"><p>No se encontraron pedidos.</p></div>
+                        </EmptyDataTemplate>
+                    </asp:GridView>
+                </div>
+            </asp:Panel>
+
+            <%-- Pedido seleccionado: items con precio en BLANCO para ingresar manualmente --%>
+            <asp:Panel ID="pnlItemsPedido" runat="server" Visible="false">
+                <asp:HiddenField ID="hfPedidoVinculado" runat="server" Value="0" />
+                <div class="pedido-sel-box">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <div style="font-size:13px; font-weight:bold; color:#276749; font-family:Arial,sans-serif;">
+                            &#128203; Pedido #<asp:Label ID="lblPedidoId" runat="server" /> —
+                            <asp:Label ID="lblPedidoCodigo" runat="server" />
+                            <span style="font-size:11px; color:#555; font-weight:normal; margin-left:8px;">
+                                Ingresa el precio de compra para cada item
+                            </span>
+                        </div>
+                        <asp:LinkButton ID="lnkQuitarPedido" runat="server"
+                            CssClass="btn-del-t" CausesValidation="false"
+                            OnClick="lnkQuitarPedido_Click">&#10005; Quitar</asp:LinkButton>
+                    </div>
+                    <asp:GridView ID="gvItemsPedido" runat="server"
+                        AutoGenerateColumns="false"
+                        DataKeyNames="DETPE_DETALLE_PEDIDO"
+                        CssClass="items-precio-table"
+                        GridLines="None">
+                        <Columns>
+                            <asp:BoundField DataField="PRODUCTO_NOMBRE" HeaderText="Producto" />
+                            <asp:BoundField DataField="MATERIAL"        HeaderText="Material" />
+                            <asp:TemplateField HeaderText="Cantidad" ItemStyle-Width="80px">
+                                <ItemTemplate><%# Eval("CANTIDAD") %></ItemTemplate>
+                            </asp:TemplateField>
+                            <%-- Precio SIEMPRE en blanco — se ingresa manualmente --%>
+                            <asp:TemplateField HeaderText="Precio ODP (Q) *" ItemStyle-Width="160px">
+                                <ItemTemplate>
+                                    <asp:TextBox ID="txtPrecioItem" runat="server"
+                                        CssClass="precio-input"
+                                        placeholder="0.00"
+                                        Text="" />
+                                    <asp:HiddenField ID="hfDetpeId"  runat="server" Value='<%# Eval("DETPE_DETALLE_PEDIDO") %>' />
+                                    <asp:HiddenField ID="hfMaterial" runat="server" Value='<%# Eval("MATERIAL") %>' />
+                                    <asp:HiddenField ID="hfCantidad" runat="server" Value='<%# Eval("CANTIDAD") %>' />
+                                </ItemTemplate>
+                            </asp:TemplateField>
+                        </Columns>
+                        <EmptyDataTemplate>
+                            <div class="empty-state"><p>Este pedido no tiene items.</p></div>
+                        </EmptyDataTemplate>
+                    </asp:GridView>
+                </div>
+            </asp:Panel>
+        </div>
+
         <div class="f-row" style="margin-top:12px;">
-            <asp:Button ID="btnGuardar"  runat="server" Text="Guardar y Agregar Items"
+            <asp:Button ID="btnGuardar" runat="server" Text="&#10003; Confirmar Orden"
                 CssClass="btn-gold" OnClick="btnGuardar_Click" />
-            <asp:Button ID="btnCancelar" runat="server" Text="Cancelar"
+            <asp:Button ID="btnCancelar" runat="server" Text="&#10005; Cancelar"
                 CssClass="btn-outline" OnClick="btnCancelar_Click" CausesValidation="false" />
         </div>
     </div>
 </div>
 </asp:Panel>
 
-<!-- ===== DETALLE / EDICION DE ITEMS ===== -->
+<!-- ====== DETALLE / EDICION DE ITEMS ====== -->
 <asp:Panel ID="pnlDetalleOrden" runat="server" Visible="false">
 <div class="form-card">
     <div class="form-card-head">
-        <span>&#128230; ITEMS DE LA ORDEN:
-            <asp:Label ID="lblOrdenSeleccionada" runat="server" />
-        </span>
+        <span>&#128230; ITEMS DE LA ORDEN: <asp:Label ID="lblOrdenSeleccionada" runat="server" /></span>
         <asp:Button ID="btnCerrarDetalle" runat="server" Text="X Cerrar"
             CssClass="btn-outline" OnClick="btnCerrarDetalle_Click" CausesValidation="false"
             style="background:transparent;color:#f0d9a0;border-color:#f0d9a0;" />
     </div>
     <div class="form-card-body">
-
         <asp:HiddenField ID="hfOrdenActiva" runat="server" />
-
-        <!-- Agregar ítem -->
-        <div class="add-item-box">
+       <!-- <div class="add-item-box">
+            <p class="section-label" style="margin:0 0 10px;">+ Agregar Item Manual</p>
             <div class="f-row">
                 <div class="f-group">
                     <label>Material</label>
                     <asp:TextBox ID="txtMat" runat="server" CssClass="form-control" placeholder="Ej: Madera de pino" />
                 </div>
                 <div class="f-group">
-                    <label>Precio</label>
+                    <label>Precio (Q)</label>
                     <asp:TextBox ID="txtPre" runat="server" CssClass="form-control" placeholder="0.00" />
                 </div>
                 <div class="f-group">
@@ -235,51 +342,49 @@
                         CssClass="btn-gold" OnClick="btnAddMat_Click" />
                 </div>
             </div>
-        </div>
-
-        <!-- Grid ítems con edición inline -->
+        </div>-->
         <div class="table-card">
             <asp:GridView ID="gvItemsOrden" runat="server"
                 AutoGenerateColumns="false"
                 DataKeyNames="ODP_ORDEN_DETALLE_PEDIDO"
                 CssClass="table"
+                GridLines="None"
                 OnRowCommand="gvItemsOrden_RowCommand"
                 OnRowEditing="gvItemsOrden_RowEditing"
                 OnRowCancelingEdit="gvItemsOrden_RowCancelingEdit"
-                OnRowUpdating="gvItemsOrden_RowUpdating"
-                GridLines="None">
+                OnRowUpdating="gvItemsOrden_RowUpdating">
                 <Columns>
-
+                    <asp:TemplateField HeaderText="Pedido" ItemStyle-Width="80px">
+                        <ItemTemplate><span class="badge-id"><%# Eval("PED_PEDIDO") %></span></ItemTemplate>
+                        <EditItemTemplate><span class="badge-id"><%# Eval("PED_PEDIDO") %></span></EditItemTemplate>
+                    </asp:TemplateField>
                     <asp:TemplateField HeaderText="Material">
                         <ItemTemplate><%# Eval("ODP_MATERIAL") %></ItemTemplate>
                         <EditItemTemplate>
                             <asp:TextBox ID="txtEMat" runat="server" Text='<%# Eval("ODP_MATERIAL") %>' CssClass="edit-input" />
                         </EditItemTemplate>
                     </asp:TemplateField>
-
                     <asp:TemplateField HeaderText="Precio" ItemStyle-Width="120px">
                         <ItemTemplate>Q <%# String.Format("{0:N2}", Eval("ODP_PRECIO")) %></ItemTemplate>
                         <EditItemTemplate>
                             <asp:TextBox ID="txtEPre" runat="server" Text='<%# Eval("ODP_PRECIO") %>' CssClass="edit-input" style="width:90px;" />
                         </EditItemTemplate>
                     </asp:TemplateField>
-
-                    <asp:TemplateField HeaderText="Cantidad" ItemStyle-Width="100px">
+                    <asp:TemplateField HeaderText="Cantidad" ItemStyle-Width="90px">
                         <ItemTemplate><%# Eval("ODP_CANTIDAD") %></ItemTemplate>
                         <EditItemTemplate>
-                            <asp:TextBox ID="txtECan" runat="server" Text='<%# Eval("ODP_CANTIDAD") %>' CssClass="edit-input" style="width:70px;" />
+                            <%# Eval("ODP_CANTIDAD") %>
+                            <asp:HiddenField ID="hfECan" runat="server" Value='<%# Eval("ODP_CANTIDAD") %>' />
                         </EditItemTemplate>
                     </asp:TemplateField>
-
                     <asp:TemplateField HeaderText="Subtotal" ItemStyle-Width="110px">
                         <ItemTemplate>Q <%# String.Format("{0:N2}", Convert.ToDecimal(Eval("ODP_PRECIO")) * Convert.ToDecimal(Eval("ODP_CANTIDAD"))) %></ItemTemplate>
                         <EditItemTemplate></EditItemTemplate>
                     </asp:TemplateField>
-
                     <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="200px">
                         <ItemTemplate>
                             <div class="actions-cell">
-                                <asp:LinkButton CommandName="Edit" runat="server" CssClass="btn-edit-t">&#9999; Editar</asp:LinkButton>
+                                <asp:LinkButton CommandName="Edit" runat="server" CssClass="btn-edit-t" CausesValidation="false">&#9999; Editar</asp:LinkButton>
                                 <asp:LinkButton CommandName="BorrarItem"
                                     CommandArgument='<%# Eval("ODP_ORDEN_DETALLE_PEDIDO") %>'
                                     runat="server" CssClass="btn-del-t"
@@ -288,20 +393,17 @@
                         </ItemTemplate>
                         <EditItemTemplate>
                             <div class="actions-cell">
-                                <asp:LinkButton CommandName="Update" runat="server" CssClass="btn-save-t">&#10003; Guardar</asp:LinkButton>
-                                <asp:LinkButton CommandName="Cancel" runat="server" CssClass="btn-cancel-t">&#10005; Cancelar</asp:LinkButton>
+                                <asp:LinkButton CommandName="Update" runat="server" CssClass="btn-save-t" CausesValidation="false">&#10003; Guardar</asp:LinkButton>
+                                <asp:LinkButton CommandName="Cancel" runat="server" CssClass="btn-cancel-t" CausesValidation="false">&#10005; Cancelar</asp:LinkButton>
                             </div>
                         </EditItemTemplate>
                     </asp:TemplateField>
-
                 </Columns>
                 <EmptyDataTemplate>
-                    <div class="empty-state"><p>No hay items en esta orden. Agrega el primero arriba.</p></div>
+                    <div class="empty-state"><p>No hay items en esta orden.</p></div>
                 </EmptyDataTemplate>
             </asp:GridView>
         </div>
-
-        <!-- Total + botón Finalizar -->
         <div class="total-box">
             <span>Total: Q <asp:Label ID="lblTotalOrden" runat="server" Text="0.00" /></span>
             <asp:Button ID="btnFinalizarOrden" runat="server"
@@ -311,12 +413,8 @@
                 CausesValidation="false"
                 OnClientClick="return confirm('Finalizar y cerrar la carga de items para esta orden?');" />
         </div>
-
     </div>
 </div>
 </asp:Panel>
-
-</ContentTemplate>
-</asp:UpdatePanel>
 
 </asp:Content>

@@ -1,5 +1,4 @@
 Imports System.Data
-Imports MueblesAlpes.Web.Modules.ComprasProveedor
 
 Namespace Modules.ComprasProveedor
 
@@ -9,8 +8,6 @@ Namespace Modules.ComprasProveedor
         Protected Sub Page_Load(sender As Object, e As EventArgs) Handles Me.Load
             If Not IsPostBack Then
                 CargarPedidos()
-
-                ' Si regresa desde Precios, reabrir el detalle del pedido
                 Dim pedidoParam As String = Request.QueryString("pedido")
                 If Not String.IsNullOrEmpty(pedidoParam) Then
                     Dim pedidoId As Integer = Convert.ToInt32(pedidoParam)
@@ -40,8 +37,6 @@ Namespace Modules.ComprasProveedor
             ddlProducto.DataValueField = "PRO_REFERENCIA"
             ddlProducto.DataBind()
             ddlProducto.Items.Insert(0, New System.Web.UI.WebControls.ListItem("-- Seleccione producto --", ""))
-            lblPrecioSugerido.Text = "--"
-            txtPrecioManual.Text = ""
         End Sub
 
         Private Sub CargarDetallesPedido(pedidoId As Integer)
@@ -141,6 +136,7 @@ Namespace Modules.ComprasProveedor
             If e.CommandName = "VerDetalle" Then
                 Dim pedidoId As Integer = Convert.ToInt32(e.CommandArgument)
                 hfPedidoActivo.Value = pedidoId.ToString()
+                hfDetalleRecibir.Value = "0"
                 lblIdSeleccionado.Text = pedidoId.ToString()
                 CargarProductosDropDown()
                 CargarDetallesPedido(pedidoId)
@@ -162,90 +158,56 @@ Namespace Modules.ComprasProveedor
         End Sub
 
         '========================
-        ' DROPDOWN PRODUCTO
+        ' DROPDOWN PRODUCTO — solo para mostrar nombre, sin precio
         '========================
         Protected Sub ddlProducto_SelectedIndexChanged(sender As Object, e As EventArgs)
-            If String.IsNullOrEmpty(ddlProducto.SelectedValue) Then
-                lblPrecioSugerido.Text = "--"
-                txtPrecioManual.Text = ""
-                Return
-            End If
-            Try
-                Dim dt As DataTable = DetallePedidoService.ListarTodosProductos()
-                Dim filas = dt.Select("PRO_REFERENCIA = '" & ddlProducto.SelectedValue & "'")
-                If filas.Length > 0 Then
-                    Dim precioSug As Decimal = Convert.ToDecimal(filas(0)("PRECIO_SUGERIDO"))
-                    If precioSug > 0 Then
-                        lblPrecioSugerido.Text = precioSug.ToString("N2")
-                        txtPrecioManual.Text = precioSug.ToString("N2")
-                    Else
-                        lblPrecioSugerido.Text = "Sin precio vigente"
-                        txtPrecioManual.Text = ""
-                    End If
-                End If
-            Catch
-                lblPrecioSugerido.Text = "--"
-            End Try
+            ' Solo refresca la seleccion — no hay precio que mostrar en Pedidos
         End Sub
 
         '========================
-        ' AGREGAR PRODUCTO
+        ' AGREGAR PRODUCTO — solo cantidad, sin precio
         '========================
         Protected Sub btnAgregarItem_Click(sender As Object, e As EventArgs)
             Try
                 Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
                 Dim proRef As String = ddlProducto.SelectedValue
                 Dim cantidad As Integer
-                Dim precio As Decimal
 
                 If String.IsNullOrEmpty(proRef) Then
                     MostrarMensaje("Selecciona un producto.", True) : Exit Sub
                 End If
-                If Not Integer.TryParse(txtCantSolicitada.Text, cantidad) OrElse cantidad <= 0 Then
+                If Not Integer.TryParse(txtCantSolicitada.Text.Trim(), cantidad) OrElse cantidad <= 0 Then
                     MostrarMensaje("Ingresa una cantidad valida.", True) : Exit Sub
                 End If
-                If Not Decimal.TryParse(txtPrecioManual.Text.Replace(",", "."),
-                                        System.Globalization.NumberStyles.Any,
-                                        System.Globalization.CultureInfo.InvariantCulture,
-                                        precio) OrElse precio <= 0 Then
-                    MostrarMensaje("Ingresa un precio valido.", True) : Exit Sub
-                End If
 
-                ' Obtener datos del producto
+                ' Buscar historial vigente del producto para usar como referencia
+                ' Si no tiene precio aun, usamos hip_id = 0 y se asignara al recibir desde OC
                 Dim dt As DataTable = DetallePedidoService.ListarTodosProductos()
                 Dim filas = dt.Select("PRO_REFERENCIA = '" & proRef & "'")
                 Dim hipId As Integer = 0
-                Dim nichoId As Integer = 0
 
                 If filas.Length > 0 Then
                     hipId = Convert.ToInt32(filas(0)("HIP_ID_VIGENTE"))
-                    nichoId = Convert.ToInt32(filas(0)("NIC_NICHO_VIGENTE"))
                 End If
 
+                ' hipId puede ser 0 si el producto no tiene precio aun — es valido en este flujo
+                ' El precio se asignara cuando se vincule a una Orden de Compra y se confirme recibido
                 If hipId = 0 Then
-                    MostrarMensaje("Este producto no tiene precio registrado. Usa 'Registrar Precio' para asignarle uno primero.", True)
-                    Exit Sub
+                    ' Buscar si al menos existe un historial (aunque no sea vigente)
+                    ' Si no existe nada, igual se agrega — el precio llegara desde la OC
+                    MostrarMensaje("Producto agregado. Recuerda vincular este pedido a una Orden de Compra para asignarle precio.", False)
                 End If
 
-                ' Si precio manual difiere del vigente, registrar nuevo precio
-                Dim precioVigente As Decimal = Convert.ToDecimal(filas(0)("PRECIO_SUGERIDO"))
-                If precio <> precioVigente Then
-                    Dim nuevoHip As Decimal = HistorialPrecioService.Registrar(
-                        proRef, nichoId, precio, DateTime.Now
-                    )
-                    hipId = Convert.ToInt32(nuevoHip)
-                End If
-
-                DetallePedidoService.Insertar(pedidoId, hipId, cantidad)
+                DetallePedidoService.Insertar(pedidoId, If(hipId > 0, hipId, 1), cantidad)
 
                 txtCantSolicitada.Text = ""
-                txtPrecioManual.Text = ""
-                lblPrecioSugerido.Text = "--"
                 ddlProducto.SelectedIndex = 0
 
                 CargarDetallesPedido(pedidoId)
                 CargarPedidos()
-                MostrarMensaje("Producto agregado correctamente.", False)
+                If hipId > 0 Then
+                    MostrarMensaje("Producto agregado correctamente.", False)
+                End If
             Catch ex As Exception
                 MostrarMensaje("Error: " & ex.Message, True)
             End Try
@@ -260,6 +222,7 @@ Namespace Modules.ComprasProveedor
             If e.CommandName = "BorrarItem" Then
                 Try
                     DetallePedidoService.Eliminar(Convert.ToInt32(e.CommandArgument))
+                    hfDetalleRecibir.Value = "0"
                     CargarDetallesPedido(pedidoId)
                     CargarPedidos()
                     MostrarMensaje("Producto eliminado.", False)
@@ -268,28 +231,93 @@ Namespace Modules.ComprasProveedor
                 End Try
 
             ElseIf e.CommandName = "MarcarRecibido" Then
-                ' Verificar que tiene una orden de compra asociada
-                Dim partes As String() = e.CommandArgument.ToString().Split("|")
-                Dim proRef As String = If(partes.Length > 1, partes(1), "")
-                Dim precio As String = If(partes.Length > 2, partes(2), "0")
+                ' Mostrar panel inline de recibir para esta fila
+                hfDetalleRecibir.Value = e.CommandArgument.ToString()
+                gvDetalles.EditIndex = -1
+                CargarDetallesPedido(pedidoId)
 
-                ' Buscar si existe ODP asociado a este pedido
-                Dim dtOrdenes As DataTable = OrdenDetallePedidoService.BuscarPorPedido(pedidoId)
-                If dtOrdenes Is Nothing OrElse dtOrdenes.Rows.Count = 0 Then
-                    MostrarMensaje("Este pedido no tiene una Orden de Compra asociada. Debes vincularla primero desde Ordenes de Compra.", True)
-                    Exit Sub
+            ElseIf e.CommandName = "CancelarRecibido" Then
+                hfDetalleRecibir.Value = "0"
+                CargarDetallesPedido(pedidoId)
+
+            ElseIf e.CommandName = "ConfirmarRecibido" Then
+                Try
+                    Dim partes As String() = e.CommandArgument.ToString().Split("|")
+                    Dim detalleId As Integer = Convert.ToInt32(partes(0))
+                    Dim proRef As String = If(partes.Length > 1, partes(1), "")
+                    Dim cantSol As Integer = Convert.ToInt32(If(partes.Length > 2, partes(2), "0"))
+
+                    ' Leer cantidad recibida del TextBox visible en la fila activa
+                    Dim cantRecibida As Integer = 0
+                    For Each row As GridViewRow In gvDetalles.Rows
+                        Dim pnl As Panel = CType(row.FindControl("pnlRecibir"), Panel)
+                        If pnl IsNot Nothing AndAlso pnl.Visible Then
+                            Dim txt As TextBox = CType(row.FindControl("txtCantRecibir"), TextBox)
+                            If txt IsNot Nothing Then Integer.TryParse(txt.Text.Trim(), cantRecibida)
+                            Exit For
+                        End If
+                    Next
+
+                    If cantRecibida < 0 Then
+                        MostrarMensaje("Cantidad recibida invalida.", True) : Exit Sub
+                    End If
+                    If cantRecibida > cantSol Then
+                        MostrarMensaje("La cantidad recibida no puede superar la solicitada (" & cantSol & ").", True)
+                        Exit Sub
+                    End If
+
+                    ' Verificar que existe orden de compra asociada
+                    Dim dtOrdenes As DataTable = OrdenDetallePedidoService.BuscarPorPedido(pedidoId)
+                    If dtOrdenes Is Nothing OrElse dtOrdenes.Rows.Count = 0 Then
+                        MostrarMensaje("Este pedido no tiene una Orden de Compra asociada. Vinculala primero desde Ordenes de Compra.", True)
+                        hfDetalleRecibir.Value = "0"
+                        CargarDetallesPedido(pedidoId)
+                        Exit Sub
+                    End If
+
+                    ' Actualizar cantidad recibida en BD
+                    Dim dtActual As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
+                    Dim filaAct = dtActual.Select("DETPE_DETALLE_PEDIDO = " & detalleId)
+                    Dim cantSolActual As Integer = If(filaAct.Length > 0,
+                                                      Convert.ToInt32(filaAct(0)("DETPE_CANTIDAD_SOLICITADA")),
+                                                      cantSol)
+                    DetallePedidoService.Actualizar(detalleId, cantSolActual, cantRecibida)
+
+                    ' Tomar precio desde ODP de la orden asociada
+                    Dim precioODP As String = dtOrdenes.Rows(0)("ODP_PRECIO").ToString()
+
+                    hfDetalleRecibir.Value = "0"
+
+                    ' Redirigir a Precios para registrar el historial de precio
+                    ' Precios.aspx cerrara el vigente anterior y creara uno nuevo con este precio
+                    Response.Redirect(ResolveUrl("~/Modules/CatalogoInventario/Precios.aspx") &
+                                      "?ref=" & proRef &
+                                      "&pedido=" & pedidoId &
+                                      "&precio=" & precioODP &
+                                      "&readonly=1")
+                Catch ex As Exception
+                    MostrarMensaje("Error: " & ex.Message, True)
+                End Try
+            End If
+        End Sub
+
+        ' Controla qué fila muestra el panel inline de recibir
+        Protected Sub gvDetalles_RowDataBound(sender As Object, e As GridViewRowEventArgs)
+            If e.Row.RowType = DataControlRowType.DataRow Then
+                Dim detalleActivo As Integer = 0
+                Integer.TryParse(hfDetalleRecibir.Value, detalleActivo)
+                If detalleActivo > 0 Then
+                    Dim detalleId As Integer = Convert.ToInt32(gvDetalles.DataKeys(e.Row.RowIndex).Value)
+                    Dim pnl As Panel = CType(e.Row.FindControl("pnlRecibir"), Panel)
+                    If pnl IsNot Nothing Then
+                        pnl.Visible = (detalleId = detalleActivo)
+                    End If
                 End If
-
-                ' Redirigir a Precios con datos pre-cargados y en modo solo-lectura
-                Response.Redirect(ResolveUrl("~/Modules/CatalogoInventario/Precios.aspx") &
-                          "?ref=" & proRef &
-                          "&pedido=" & pedidoId &
-                          "&precio=" & precio &
-                          "&readonly=1")
             End If
         End Sub
 
         Protected Sub gvDetalles_RowEditing(sender As Object, e As GridViewEditEventArgs)
+            hfDetalleRecibir.Value = "0"
             gvDetalles.EditIndex = e.NewEditIndex
             CargarDetallesPedido(Convert.ToInt32(hfPedidoActivo.Value))
         End Sub
@@ -305,34 +333,30 @@ Namespace Modules.ComprasProveedor
                 Dim detalleId As Integer = Convert.ToInt32(gvDetalles.DataKeys(e.RowIndex).Value)
                 Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
 
-                ' Solicitada viene del HiddenField — no editable
-                Dim hfSol As HiddenField = CType(row.FindControl("hfSolicitadaEdit"), HiddenField)
-                Dim txtRec As TextBox = CType(row.FindControl("txtERecibida"), TextBox)
-
-                If hfSol Is Nothing OrElse txtRec Is Nothing Then
-                    MostrarMensaje("Error al encontrar los campos.", True)
+                Dim txtSol As TextBox = CType(row.FindControl("txtESolicitada"), TextBox)
+                If txtSol Is Nothing Then
+                    MostrarMensaje("Error al encontrar el campo de cantidad.", True)
                     gvDetalles.EditIndex = -1
                     CargarDetallesPedido(pedidoId)
                     Exit Sub
                 End If
 
                 Dim solicitada As Integer
-                Dim recibida As Integer
+                If Not Integer.TryParse(txtSol.Text.Trim(), solicitada) OrElse solicitada <= 0 Then
+                    MostrarMensaje("Cantidad solicitada invalida.", True) : Exit Sub
+                End If
 
-                If Not Integer.TryParse(hfSol.Value.Trim(), solicitada) Then solicitada = 0
-                If Not Integer.TryParse(txtRec.Text.Trim(), recibida) OrElse recibida < 0 Then
-                    MostrarMensaje("Cantidad recibida invalida.", True) : Exit Sub
-                End If
-                If recibida > solicitada Then
-                    MostrarMensaje("La cantidad recibida no puede superar la solicitada (" & solicitada & ").", True)
-                    Exit Sub
-                End If
+                ' Preservar cantidad recibida actual
+                Dim dtActual As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
+                Dim filaAct = dtActual.Select("DETPE_DETALLE_PEDIDO = " & detalleId)
+                Dim recibida As Integer = If(filaAct.Length > 0,
+                                              Convert.ToInt32(filaAct(0)("DETPE_CANTIDAD_RECIBIDA")), 0)
 
                 DetallePedidoService.Actualizar(detalleId, solicitada, recibida)
                 gvDetalles.EditIndex = -1
                 CargarDetallesPedido(pedidoId)
                 CargarPedidos()
-                MostrarMensaje("Cantidad recibida actualizada.", False)
+                MostrarMensaje("Item actualizado.", False)
             Catch ex As Exception
                 MostrarMensaje("Error: " & ex.Message, True)
             End Try

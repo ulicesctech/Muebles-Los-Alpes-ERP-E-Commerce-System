@@ -77,7 +77,7 @@
     <asp:GridView ID="gvFacturas" runat="server" AutoGenerateColumns="false" CssClass="table" OnRowCommand="gvFacturas_RowCommand" GridLines="None" Width="100%">
         <Columns>
             <asp:TemplateField HeaderText="Orden de Compra">
-                <ItemTemplate><span class="badge-key"><%# Eval("ORC_CODIGO") %></span></ItemTemplate>
+                <ItemTemplate><span class="badge-key"><%# Eval("ORC_ORDEN_COMPRA") %></span></ItemTemplate>
             </asp:TemplateField>
             <asp:TemplateField HeaderText="Cód. Factura">
                 <ItemTemplate><span class="badge-fac"><%# Eval("FACPRO_CODIGO_FACTURA") %></span></ItemTemplate>

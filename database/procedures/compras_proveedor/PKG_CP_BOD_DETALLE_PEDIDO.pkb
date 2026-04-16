@@ -120,5 +120,18 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_DETALLE_PEDIDO AS
              ORDER BY p.pro_nombre;
     END DET_PED_LISTAR_TODOS_PRODUCTOS;
 
+    PROCEDURE DET_PED_ACTUALIZAR_HISTORIAL(
+        p_detpe_id IN NUMBER,
+        p_hip_id   IN NUMBER
+    ) IS
+    BEGIN
+        UPDATE BOD_DETALLE_PEDIDO
+           SET hip_historial_precio = p_hip_id
+         WHERE detpe_detalle_pedido = p_detpe_id;
+        COMMIT;
+    EXCEPTION
+        WHEN OTHERS THEN ROLLBACK; RAISE;
+    END DET_PED_ACTUALIZAR_HISTORIAL;
+
 END PKG_BOD_DETALLE_PEDIDO;
 /

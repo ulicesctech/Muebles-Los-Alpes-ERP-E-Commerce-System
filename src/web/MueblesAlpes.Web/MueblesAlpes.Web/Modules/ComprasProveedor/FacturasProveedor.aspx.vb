@@ -14,8 +14,8 @@ Namespace Modules.ComprasProveedor
         Private Sub CargarOrdenes()
             Try
                 ddlOrden.DataSource = OrdenCompraService.Listar()
-                ddlOrden.DataTextField = "ORC_CODIGO"
-                ddlOrden.DataValueField = "ORC_ORDEN_COMPRA"
+                ddlOrden.DataTextField = "ORC_KEY"
+                ddlOrden.DataValueField = "ORC_KEY"
                 ddlOrden.DataBind()
                 ddlOrden.Items.Insert(0, New ListItem("-- Seleccione una orden --", ""))
             Catch ex As Exception

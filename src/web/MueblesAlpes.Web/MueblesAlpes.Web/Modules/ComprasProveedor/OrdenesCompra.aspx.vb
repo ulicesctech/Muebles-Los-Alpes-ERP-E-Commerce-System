@@ -13,7 +13,7 @@ Namespace Modules.ComprasProveedor
         End Sub
 
         '========================
-        ' LISTADO
+        ' HELPERS
         '========================
         Private Sub CargarOrdenes()
             gvOrdenes.DataSource = OrdenCompraService.Listar()
@@ -21,16 +21,12 @@ Namespace Modules.ComprasProveedor
         End Sub
 
         Private Sub CargarProveedores()
-            CargarProveedoresEnDropDown(ddlProveedor)
-        End Sub
-
-        Private Sub CargarProveedoresEnDropDown(ddl As DropDownList)
             Dim dt As DataTable = ProveedorService.Listar()
-            ddl.DataSource = dt
-            ddl.DataTextField = "PROV_NOMBRE"
-            ddl.DataValueField = "PROV_PROVEEDOR"
-            ddl.DataBind()
-            ddl.Items.Insert(0, New System.Web.UI.WebControls.ListItem("-- Seleccione --", "0"))
+            ddlProveedor.DataSource = dt
+            ddlProveedor.DataTextField = "PROV_NOMBRE"
+            ddlProveedor.DataValueField = "PROV_PROVEEDOR"
+            ddlProveedor.DataBind()
+            ddlProveedor.Items.Insert(0, New System.Web.UI.WebControls.ListItem("-- Seleccione --", "0"))
         End Sub
 
         Private Sub MostrarMsg(texto As String, esError As Boolean)
@@ -39,40 +35,53 @@ Namespace Modules.ComprasProveedor
             pnlMsg.Visible = True
         End Sub
 
-        '========================
-        ' HELPERS ESTADO CABECERA
-        '========================
-        Private Sub BloquearCabecera()
-            txtIDOrden.ReadOnly = True
-            txtCodigo.ReadOnly = True
-            ddlProveedor.Enabled = False
-            btnGuardar.Enabled = False
-        End Sub
-
-        Private Sub DesbloquearCabecera()
-            txtIDOrden.ReadOnly = False
-            txtCodigo.ReadOnly = False
-            ddlProveedor.Enabled = True
-            btnGuardar.Enabled = True
-        End Sub
-
         Private Sub CerrarTodosLosPaneles()
             pnlFormCabecera.Visible = False
             pnlDetalleOrden.Visible = False
+            pnlResultadosPedidos.Visible = False
+            pnlItemsPedido.Visible = False
             pnlMsg.Visible = False
-            DesbloquearCabecera()
+            hfKey.Value = ""
+            hfPedidoVinculado.Value = "0"
+        End Sub
+
+        Private Sub ActualizarTotalOrden(orcKey As String)
+            Dim dt As DataTable = OrdenDetallePedidoService.ListarPorOrden(orcKey)
+            Dim total As Decimal = 0
+            For Each row As DataRow In dt.Rows
+                Dim p As Decimal = If(IsDBNull(row("ODP_PRECIO")), 0D, Convert.ToDecimal(row("ODP_PRECIO")))
+                Dim c As Decimal = If(IsDBNull(row("ODP_CANTIDAD")), 0D, Convert.ToDecimal(row("ODP_CANTIDAD")))
+                total += p * c
+            Next
+            OrdenCompraService.ActualizarTotal(orcKey, total)
+        End Sub
+
+        Private Sub CargarDetalle(orcKey As String)
+            Dim dt As DataTable = OrdenDetallePedidoService.ListarPorOrden(orcKey)
+            gvItemsOrden.DataSource = dt
+            gvItemsOrden.DataBind()
+            CalcularTotal(dt)
+        End Sub
+
+        Private Sub CalcularTotal(dt As DataTable)
+            Dim total As Decimal = 0
+            For Each row As DataRow In dt.Rows
+                Dim p As Decimal = If(IsDBNull(row("ODP_PRECIO")), 0D, Convert.ToDecimal(row("ODP_PRECIO")))
+                Dim c As Decimal = If(IsDBNull(row("ODP_CANTIDAD")), 0D, Convert.ToDecimal(row("ODP_CANTIDAD")))
+                total += p * c
+            Next
+            lblTotalOrden.Text = total.ToString("N2")
         End Sub
 
         '========================
-        ' BOTONES CABECERA
+        ' BOTONES PRINCIPALES
         '========================
         Protected Sub btnNuevaOrden_Click(sender As Object, e As EventArgs)
+            CerrarTodosLosPaneles()
             pnlFormCabecera.Visible = True
-            pnlDetalleOrden.Visible = False
-            pnlMsg.Visible = False
             txtIDOrden.Text = ""
             txtCodigo.Text = ""
-            DesbloquearCabecera()
+            txtBuscarPedido.Text = ""
             If ddlProveedor.Items.Count > 0 Then ddlProveedor.SelectedIndex = 0
         End Sub
 
@@ -84,38 +93,10 @@ Namespace Modules.ComprasProveedor
             CerrarTodosLosPaneles()
         End Sub
 
-        Protected Sub btnGuardar_Click(sender As Object, e As EventArgs)
-            Try
-                Dim orcKey As String = txtIDOrden.Text.Trim()
-                Dim codigo As String = txtCodigo.Text.Trim()
-                Dim provId As Decimal = Convert.ToDecimal(ddlProveedor.SelectedValue)
-
-                If String.IsNullOrEmpty(orcKey) OrElse String.IsNullOrEmpty(codigo) OrElse provId = 0 Then
-                    MostrarMsg("Complete todos los campos requeridos.", True)
-                    Exit Sub
-                End If
-
-                OrdenCompraService.Crear(orcKey, codigo, provId, 0)
-
-                BloquearCabecera()
-
-                hfOrdenActiva.Value = orcKey
-                lblOrdenSeleccionada.Text = orcKey
-                pnlDetalleOrden.Visible = True
-
-                CargarOrdenes()
-                CargarDetalle(orcKey)
-                MostrarMsg("Orden creada. Agrega los items y presiona 'Finalizar Orden'.", False)
-            Catch ex As Exception
-                MostrarMsg("Error: " & ex.Message, True)
-            End Try
-        End Sub
-
         Protected Sub btnFinalizarOrden_Click(sender As Object, e As EventArgs)
             Try
-                Dim orcKey As String = hfOrdenActiva.Value
-                If Not String.IsNullOrEmpty(orcKey) Then
-                    ActualizarTotalOrden(orcKey)
+                If Not String.IsNullOrEmpty(hfOrdenActiva.Value) Then
+                    ActualizarTotalOrden(hfOrdenActiva.Value)
                 End If
                 CargarOrdenes()
                 CerrarTodosLosPaneles()
@@ -126,7 +107,147 @@ Namespace Modules.ComprasProveedor
         End Sub
 
         '========================
-        ' GRID ORDENES
+        ' GUARDAR NUEVA ORDEN
+        '========================
+        Protected Sub btnGuardar_Click(sender As Object, e As EventArgs)
+            Try
+                Dim orcKey As String = txtIDOrden.Text.Trim()
+                Dim codigo As String = txtCodigo.Text.Trim()
+                Dim provId As Decimal = Convert.ToDecimal(ddlProveedor.SelectedValue)
+
+                If String.IsNullOrEmpty(orcKey) Then
+                    MostrarMsg("Ingresa el ID de la orden.", True) : Exit Sub
+                End If
+                If String.IsNullOrEmpty(codigo) Then
+                    MostrarMsg("Ingresa el codigo.", True) : Exit Sub
+                End If
+                If provId = 0 Then
+                    MostrarMsg("Selecciona un proveedor.", True) : Exit Sub
+                End If
+
+                ' Crear la orden
+                OrdenCompraService.Crear(orcKey, codigo, provId, 0)
+                hfKey.Value = orcKey
+
+                ' Si hay pedido vinculado, insertar un ODP por cada item del grid con precio manual
+                Dim pedId As Integer = Convert.ToInt32(hfPedidoVinculado.Value)
+                If pedId > 0 Then
+                    Dim itemsInsertados As Integer = 0
+                    Dim itemsSinPrecio As Integer = 0
+
+                    For Each row As GridViewRow In gvItemsPedido.Rows
+                        Dim txtPrecio As TextBox = CType(row.FindControl("txtPrecioItem"), TextBox)
+                        Dim hfMat As HiddenField = CType(row.FindControl("hfMaterial"), HiddenField)
+                        Dim hfCant As HiddenField = CType(row.FindControl("hfCantidad"), HiddenField)
+
+                        If txtPrecio Is Nothing OrElse hfMat Is Nothing OrElse hfCant Is Nothing Then
+                            Continue For
+                        End If
+
+                        Dim precio As Decimal = 0
+                        Dim cantidad As Integer = 0
+                        Dim material As String = hfMat.Value
+
+                        If Not Decimal.TryParse(txtPrecio.Text.Trim().Replace(",", "."),
+                                                System.Globalization.NumberStyles.Any,
+                                                System.Globalization.CultureInfo.InvariantCulture, precio) OrElse precio <= 0 Then
+                            itemsSinPrecio += 1
+                            Continue For
+                        End If
+
+                        Integer.TryParse(hfCant.Value, cantidad)
+                        If cantidad <= 0 Then cantidad = 1
+
+                        OrdenDetallePedidoService.Insertar(orcKey, pedId, material, precio, cantidad)
+                        itemsInsertados += 1
+                    Next
+
+                    If itemsSinPrecio > 0 AndAlso itemsInsertados = 0 Then
+                        MostrarMsg("Debes ingresar el precio para al menos un item antes de confirmar.", True)
+                        ' Revertir la creacion de la orden
+                        OrdenCompraService.Eliminar(orcKey)
+                        Exit Sub
+                    ElseIf itemsSinPrecio > 0 Then
+                        MostrarMsg(itemsInsertados & " item(s) insertados. " & itemsSinPrecio & " item(s) sin precio fueron omitidos.", False)
+                    End If
+                End If
+
+                ' Calcular total
+                ActualizarTotalOrden(orcKey)
+
+                ' Abrir panel de edicion
+                hfOrdenActiva.Value = orcKey
+                lblOrdenSeleccionada.Text = orcKey
+                pnlFormCabecera.Visible = False
+                pnlDetalleOrden.Visible = True
+                pnlItemsPedido.Visible = False
+                pnlResultadosPedidos.Visible = False
+                hfPedidoVinculado.Value = "0"
+                CargarOrdenes()
+                CargarDetalle(orcKey)
+
+                If String.IsNullOrEmpty(lblMsg.Text) Then
+                    MostrarMsg("Orden creada correctamente. Puedes agregar mas items o finalizar.", False)
+                End If
+            Catch ex As Exception
+                MostrarMsg("Error: " & ex.Message, True)
+            End Try
+        End Sub
+
+        '========================
+        ' BUSCAR PEDIDOS (1 fila por pedido con items visibles)
+        '========================
+        Protected Sub btnBuscarPedido_Click(sender As Object, e As EventArgs)
+            Dim texto As String = txtBuscarPedido.Text.Trim()
+            Dim dt As DataTable = OrdenCompraService.BuscarPedidos(texto)
+            gvBuscarPedidos.DataSource = dt
+            gvBuscarPedidos.DataBind()
+            pnlResultadosPedidos.Visible = True
+            pnlItemsPedido.Visible = False
+        End Sub
+
+        ' Carga el sub-grid de items dentro de cada fila del buscador de pedidos
+        Protected Sub gvBuscarPedidos_RowDataBound(sender As Object, e As GridViewRowEventArgs)
+            If e.Row.RowType = DataControlRowType.DataRow Then
+                Dim pedId As Integer = Convert.ToInt32(gvBuscarPedidos.DataKeys(e.Row.RowIndex).Value)
+                Dim gvSub As GridView = CType(e.Row.FindControl("gvSubItemsBuscar"), GridView)
+                If gvSub IsNot Nothing Then
+                    Dim dt As DataTable = OrdenCompraService.DetallesPedido(pedId)
+                    gvSub.DataSource = dt
+                    gvSub.DataBind()
+                End If
+            End If
+        End Sub
+
+        Protected Sub gvBuscarPedidos_RowCommand(sender As Object, e As GridViewCommandEventArgs)
+            If e.CommandName = "VerItemsPedido" Then
+                Dim partes As String() = e.CommandArgument.ToString().Split("|")
+                Dim pedId As Integer = Convert.ToInt32(partes(0))
+                Dim pedCod As String = If(partes.Length > 1, partes(1), "")
+
+                ' Cargar items del pedido — precio SIEMPRE en blanco
+                Dim dt As DataTable = OrdenCompraService.DetallesPedido(pedId)
+
+                hfPedidoVinculado.Value = pedId.ToString()
+                lblPedidoId.Text = pedId.ToString()
+                lblPedidoCodigo.Text = pedCod
+
+                gvItemsPedido.DataSource = dt
+                gvItemsPedido.DataBind()
+
+                pnlItemsPedido.Visible = True
+                pnlResultadosPedidos.Visible = False
+                txtBuscarPedido.Text = ""
+            End If
+        End Sub
+
+        Protected Sub lnkQuitarPedido_Click(sender As Object, e As EventArgs)
+            hfPedidoVinculado.Value = "0"
+            pnlItemsPedido.Visible = False
+        End Sub
+
+        '========================
+        ' GRID ORDENES PRINCIPAL
         '========================
         Protected Sub gvOrdenes_RowCommand(sender As Object, e As GridViewCommandEventArgs)
             If e.CommandName = "VerDetalle" Then
@@ -144,9 +265,7 @@ Namespace Modules.ComprasProveedor
             Try
                 Dim orcKey As String = gvOrdenes.DataKeys(e.RowIndex).Value.ToString()
                 OrdenCompraService.Eliminar(orcKey)
-                If hfOrdenActiva.Value = orcKey Then
-                    pnlDetalleOrden.Visible = False
-                End If
+                If hfOrdenActiva.Value = orcKey Then pnlDetalleOrden.Visible = False
                 CargarOrdenes()
                 MostrarMsg("Orden eliminada.", False)
             Catch ex As Exception
@@ -165,21 +284,11 @@ Namespace Modules.ComprasProveedor
         End Sub
 
         Protected Sub gvOrdenes_RowUpdating(sender As Object, e As GridViewUpdateEventArgs)
-            Try
-                Dim row As GridViewRow = gvOrdenes.Rows(e.RowIndex)
-                Dim orcKey As String = gvOrdenes.DataKeys(e.RowIndex).Value.ToString()
-                Dim codigo As String = CType(row.FindControl("txtEditCodigo"), TextBox).Text
-                Dim provId As Decimal = Convert.ToDecimal(CType(row.FindControl("ddlEditProv"), DropDownList).SelectedValue)
-
-                OrdenCompraService.Actualizar(orcKey, codigo, provId, 0)
-                gvOrdenes.EditIndex = -1
-                CargarOrdenes()
-            Catch ex As Exception
-                MostrarMsg("Error: " & ex.Message, True)
-            End Try
+            gvOrdenes.EditIndex = -1
+            CargarOrdenes()
         End Sub
 
-        ' Sub-grid de ítems dentro de cada fila del listado principal
+        ' Carga el sub-grid de items dentro del listado principal de ordenes
         Protected Sub gvOrdenes_RowDataBound(sender As Object, e As GridViewRowEventArgs)
             If e.Row.RowType = DataControlRowType.DataRow Then
                 Dim orcKey As String = gvOrdenes.DataKeys(e.Row.RowIndex).Value.ToString()
@@ -194,72 +303,7 @@ Namespace Modules.ComprasProveedor
         End Sub
 
         '========================
-        ' DETALLE ORDEN (panel edición)
-        '========================
-        Private Sub CargarDetalle(orcKey As String)
-            Dim dt As DataTable = OrdenDetallePedidoService.ListarPorOrden(orcKey)
-            gvItemsOrden.DataSource = dt
-            gvItemsOrden.DataBind()
-            CalcularTotal(dt)
-        End Sub
-
-        Private Sub CalcularTotal(dt As DataTable)
-            Dim total As Decimal = 0
-            For Each row As DataRow In dt.Rows
-                Dim precio As Decimal = If(IsDBNull(row("ODP_PRECIO")), 0D, Convert.ToDecimal(row("ODP_PRECIO")))
-                Dim cantidad As Decimal = If(IsDBNull(row("ODP_CANTIDAD")), 0D, Convert.ToDecimal(row("ODP_CANTIDAD")))
-                total += precio * cantidad
-            Next
-            lblTotalOrden.Text = total.ToString("N2")
-        End Sub
-
-        '========================
-        ' AGREGAR ITEM
-        '========================
-        Protected Sub btnAddMat_Click(sender As Object, e As EventArgs)
-            Try
-                Dim orcKey As String = hfOrdenActiva.Value
-                Dim material As String = txtMat.Text.Trim()
-                Dim precio As Decimal
-                Dim cantidad As Integer
-
-                If String.IsNullOrEmpty(material) Then
-                    MostrarMsg("Ingrese el material.", True) : Exit Sub
-                End If
-                If Not Decimal.TryParse(txtPre.Text, precio) Then
-                    MostrarMsg("Precio invalido.", True) : Exit Sub
-                End If
-                If Not Integer.TryParse(txtCan.Text, cantidad) Then
-                    MostrarMsg("Cantidad invalida.", True) : Exit Sub
-                End If
-
-                OrdenDetallePedidoService.Insertar(orcKey, 1, material, precio, cantidad)
-
-                txtMat.Text = ""
-                txtPre.Text = ""
-                txtCan.Text = ""
-
-                CargarDetalle(orcKey)
-                ActualizarTotalOrden(orcKey)
-                CargarOrdenes()
-            Catch ex As Exception
-                MostrarMsg("Error: " & ex.Message, True)
-            End Try
-        End Sub
-
-        Private Sub ActualizarTotalOrden(orcKey As String)
-            Dim dt As DataTable = OrdenDetallePedidoService.ListarPorOrden(orcKey)
-            Dim total As Decimal = 0
-            For Each row As DataRow In dt.Rows
-                Dim p As Decimal = If(IsDBNull(row("ODP_PRECIO")), 0D, Convert.ToDecimal(row("ODP_PRECIO")))
-                Dim c As Decimal = If(IsDBNull(row("ODP_CANTIDAD")), 0D, Convert.ToDecimal(row("ODP_CANTIDAD")))
-                total += p * c
-            Next
-            OrdenCompraService.ActualizarTotal(orcKey, total)
-        End Sub
-
-        '========================
-        ' GRID DETALLE — edición inline
+        ' GRID ITEMS DETALLE ORDEN
         '========================
         Protected Sub gvItemsOrden_RowEditing(sender As Object, e As GridViewEditEventArgs)
             gvItemsOrden.EditIndex = e.NewEditIndex
@@ -276,11 +320,20 @@ Namespace Modules.ComprasProveedor
                 Dim row As GridViewRow = gvItemsOrden.Rows(e.RowIndex)
                 Dim id As Integer = Convert.ToInt32(gvItemsOrden.DataKeys(e.RowIndex).Value)
                 Dim material As String = CType(row.FindControl("txtEMat"), TextBox).Text.Trim()
-                Dim precio As Decimal = Convert.ToDecimal(CType(row.FindControl("txtEPre"), TextBox).Text)
-                Dim cantidad As Integer = Convert.ToInt32(CType(row.FindControl("txtECan"), TextBox).Text)
+                Dim precio As Decimal
+                Dim hfCan As HiddenField = CType(row.FindControl("hfECan"), HiddenField)
+                Dim cantidad As Integer = Convert.ToInt32(hfCan.Value)
+
+                If String.IsNullOrEmpty(material) Then
+                    MostrarMsg("El material es obligatorio.", True) : Exit Sub
+                End If
+                If Not Decimal.TryParse(CType(row.FindControl("txtEPre"), TextBox).Text.Trim().Replace(",", "."),
+                                        System.Globalization.NumberStyles.Any,
+                                        System.Globalization.CultureInfo.InvariantCulture, precio) OrElse precio <= 0 Then
+                    MostrarMsg("Precio invalido.", True) : Exit Sub
+                End If
 
                 OrdenDetallePedidoService.Actualizar(id, material, precio, cantidad)
-
                 gvItemsOrden.EditIndex = -1
                 CargarDetalle(hfOrdenActiva.Value)
                 ActualizarTotalOrden(hfOrdenActiva.Value)
@@ -304,7 +357,41 @@ Namespace Modules.ComprasProveedor
         End Sub
 
         '========================
-        ' BUSCAR / LIMPIAR
+        ' AGREGAR ITEM MANUAL
+        '========================
+        Protected Sub btnAddMat_Click(sender As Object, e As EventArgs)
+            Try
+                Dim orcKey As String = hfOrdenActiva.Value
+                Dim material As String = txtMat.Text.Trim()
+                Dim precio As Decimal
+                Dim cantidad As Integer
+
+                If String.IsNullOrEmpty(material) Then
+                    MostrarMsg("Ingrese el material.", True) : Exit Sub
+                End If
+                If Not Decimal.TryParse(txtPre.Text.Trim().Replace(",", "."),
+                                        System.Globalization.NumberStyles.Any,
+                                        System.Globalization.CultureInfo.InvariantCulture, precio) OrElse precio <= 0 Then
+                    MostrarMsg("Precio invalido.", True) : Exit Sub
+                End If
+                If Not Integer.TryParse(txtCan.Text.Trim(), cantidad) OrElse cantidad <= 0 Then
+                    MostrarMsg("Cantidad invalida.", True) : Exit Sub
+                End If
+
+                OrdenDetallePedidoService.Insertar(orcKey, 0, material, precio, cantidad)
+                txtMat.Text = ""
+                txtPre.Text = ""
+                txtCan.Text = ""
+                CargarDetalle(orcKey)
+                ActualizarTotalOrden(orcKey)
+                CargarOrdenes()
+            Catch ex As Exception
+                MostrarMsg("Error: " & ex.Message, True)
+            End Try
+        End Sub
+
+        '========================
+        ' BUSCAR / LIMPIAR ORDENES
         '========================
         Protected Sub btnBuscar_Click(sender As Object, e As EventArgs)
             Dim filtro As String = txtBuscar.Text.Trim()

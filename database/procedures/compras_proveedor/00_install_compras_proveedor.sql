@@ -2,14 +2,14 @@
 -- SCRIPT MAESTRO INTEGRAL (17 ELEMENTOS) - MÓDULO COMPRAS
 -- ============================================================
 DEFINE ruta = "C:\Users\AGALVEZ\Documents\Muebleria oficial\Muebles-Los-Alpes-ERP-E-Commerce-System\database\procedures\compras_proveedor"
-DEFINE ruta_catalogo = "C:\Users\AGALVEZ\Documents\Muebleria oficial\Muebles-Los-Alpes-ERP-E-Commerce-System\database\procedures\catalogo_inventario"
+--DEFINE ruta_catalogo = "C:\Users\AGALVEZ\Documents\Muebleria oficial\Muebles-Los-Alpes-ERP-E-Commerce-System\database\procedures\catalogo_inventario"
 
 PROMPT >>> INICIANDO INSTALACION DESDE: &&ruta
 
 -- 0. DEPENDENCIAS EXTERNAS (requeridas por compras)
 -- Stock es necesario para PKG_CP_BOD_PEDIDO.PED_RECIBIR y PED_RECIBIR_TODO
-@@"&&ruta_catalogo\PKG_BOD_STOCK.pks.sql"
-@@"&&ruta_catalogo\PKG_BOD_STOCK.pkb.sql"
+--@@"&&ruta_catalogo\PKG_BOD_STOCK.pks.sql"
+--@@"&&ruta_catalogo\PKG_BOD_STOCK.pkb.sql"
 
 -- 1. MÓDULO BODEGA (10 Elementos)
 -- Proveedores (2)
@@ -57,7 +57,7 @@ ORDER BY object_name, object_type;
 PROMPT >>> CONTEO TOTAL DE COMPONENTES:
 SELECT COUNT(*) FROM user_objects
 WHERE object_name IN (
-    'PKG_BOD_STOCK',
+    --'PKG_BOD_STOCK',
     'PKG_CP_BOD_PROVEEDOR',
     'PKG_CP_BOD_PEDIDO',
     'PKG_BOD_DETALLE_PEDIDO',

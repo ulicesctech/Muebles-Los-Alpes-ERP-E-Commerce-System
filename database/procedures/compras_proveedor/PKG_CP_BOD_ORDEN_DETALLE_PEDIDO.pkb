@@ -49,21 +49,23 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_ORDEN_DETALLE_PEDIDO AS
             RAISE;
     END ODP_ELIMINAR;
 
-    PROCEDURE ODP_LISTAR_POR_ORDEN(
+  PROCEDURE ODP_LISTAR_POR_ORDEN(
         p_orc_key IN VARCHAR2,
         p_data    OUT SYS_REFCURSOR
     ) IS
     BEGIN
         OPEN p_data FOR
-            SELECT odp_orden_detalle_pedido,
-                   orc_orden_compra,
-                   ped_pedido,
-                   odp_material,
-                   odp_precio,
-                   odp_cantidad
-              FROM BOD_ORDEN_DETALLE_PEDIDO
-             WHERE orc_orden_compra = p_orc_key
-             ORDER BY odp_orden_detalle_pedido;
+            SELECT d.odp_orden_detalle_pedido,
+                   d.orc_orden_compra,
+                   d.ped_pedido,
+                   p.ped_codigo,        -- Ahora sí lo traerá de la tabla BOD_PEDIDO
+                   d.odp_material,
+                   d.odp_precio,
+                   d.odp_cantidad
+              FROM BOD_ORDEN_DETALLE_PEDIDO d
+              LEFT JOIN BOD_PEDIDO p ON d.ped_pedido = p.ped_pedido -- Unimos las tablas
+             WHERE d.orc_orden_compra = p_orc_key
+             ORDER BY d.odp_orden_detalle_pedido;
     END ODP_LISTAR_POR_ORDEN;
 
     PROCEDURE ODP_LISTAR_POR_PEDIDO(
