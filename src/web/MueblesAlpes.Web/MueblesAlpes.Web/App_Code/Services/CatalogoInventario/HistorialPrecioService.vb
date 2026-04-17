@@ -3,14 +3,19 @@ Imports Oracle.ManagedDataAccess.Client
 ' ============================================================
 ' RUTA: App_Code/Services/CatalogoInventario/HistorialPrecioService.vb
 ' Package: PKG_BOD_HISTORIAL_PRECIO
+'
+' CAMBIOS vs version anterior:
+'   + CerrarTodos    : llama a PKG.CERRAR_TODOS (sin filtro de nicho).
+'   + RegistrarGlobal: llama a PKG.REGISTRAR_GLOBAL (atomico).
 ' ============================================================
 Public Class HistorialPrecioService
     Private Const PKG As String = "PKG_BOD_HISTORIAL_PRECIO"
 
+    ' Inserta un precio real nuevo (nicho y precio obligatorios).
     Public Shared Function Registrar(proReferencia As String,
-                                      nicNicho As Decimal,
-                                      precio As Decimal,
-                                      fechaInicio As Date) As Decimal
+                                     nicNicho As Decimal,
+                                     precio As Decimal,
+                                     fechaInicio As Date) As Decimal
         Dim ps As New List(Of OracleParameter) From {
             New OracleParameter("p_pro_referencia", OracleDbType.Varchar2, proReferencia, ParameterDirection.Input),
             New OracleParameter("p_nic_nicho", OracleDbType.Decimal, nicNicho, ParameterDirection.Input),
@@ -20,30 +25,16 @@ Public Class HistorialPrecioService
         Return OracleDb.ExecOutNumber(PKG & ".REGISTRAR", ps, "p_id_out")
     End Function
 
-    ' *** CAMBIE AHORITA: nuevo metodo que llama a REGISTRAR_SEMILLA en Oracle.
-    ' Inserta un historial con precio=0 y nicho placeholder sin validaciones,
-    ' solo para vincular la pro_referencia al BOD_DETALLE_PEDIDO al agregar
-    ' un item al pedido antes de tener Orden de Compra.
-    ' Retorna el hip_historial_precio generado.
+    ' Inserta semilla con nic_nicho=NULL y hip_precio=NULL.
+    ' Se usa al agregar un item al pedido antes de tener Orden de Compra.
     Public Shared Function RegistrarSemilla(proReferencia As String) As Decimal
         Dim ps As New List(Of OracleParameter) From {
             New OracleParameter("p_pro_referencia", OracleDbType.Varchar2, proReferencia, ParameterDirection.Input)
         }
         Return OracleDb.ExecOutNumber(PKG & ".REGISTRAR_SEMILLA", ps, "p_id_out")
     End Function
-    ' *** FIN CAMBIE AHORITA
 
-    Public Shared Sub RegistrarEnTodos(proReferencia As String,
-                                        precio As Decimal,
-                                        fechaInicio As Date)
-        Dim ps As New List(Of OracleParameter) From {
-            New OracleParameter("p_pro_referencia", OracleDbType.Varchar2, proReferencia, ParameterDirection.Input),
-            New OracleParameter("p_precio", OracleDbType.Decimal, precio, ParameterDirection.Input),
-            New OracleParameter("p_fecha_inicio", OracleDbType.Date, fechaInicio, ParameterDirection.Input)
-        }
-        OracleDb.ExecNonQuery(PKG & ".REGISTRAR_EN_TODOS", ps)
-    End Sub
-
+    ' Cierra el vigente de un nicho especifico (se conserva para usos puntuales).
     Public Shared Sub CerrarVigente(proReferencia As String,
                                     nicNicho As Decimal,
                                     fechaCierre As Date)
@@ -55,6 +46,35 @@ Public Class HistorialPrecioService
         OracleDb.ExecNonQuery(PKG & ".CERRAR_VIGENTE", ps)
     End Sub
 
+    ' NUEVO: Cierra TODOS los vigentes del producto sin importar nicho/almacen.
+    ' Incluye semillas (nic_nicho IS NULL) que aun no tienen hip_fecha_final.
+    ' Se llama en el flujo readonly ANTES de ActualizarSemilla.
+    Public Shared Sub CerrarTodos(proReferencia As String, fechaCierre As Date)
+        Dim ps As New List(Of OracleParameter) From {
+            New OracleParameter("p_pro_referencia", OracleDbType.Varchar2, proReferencia, ParameterDirection.Input),
+            New OracleParameter("p_fecha_cierre", OracleDbType.Date, fechaCierre, ParameterDirection.Input)
+        }
+        OracleDb.ExecNonQuery(PKG & ".CERRAR_TODOS", ps)
+    End Sub
+
+    ' NUEVO: Atomico en Oracle: cierra todos los vigentes del producto
+    ' e inserta el nuevo registro vigente unico con el nicho seleccionado.
+    ' Reemplaza el par CerrarVigente + Registrar en el flujo normal de Precios.aspx.
+    Public Shared Function RegistrarGlobal(proReferencia As String,
+                                           nicNicho As Decimal,
+                                           precio As Decimal,
+                                           fechaInicio As Date) As Decimal
+        Dim ps As New List(Of OracleParameter) From {
+            New OracleParameter("p_pro_referencia", OracleDbType.Varchar2, proReferencia, ParameterDirection.Input),
+            New OracleParameter("p_nic_nicho", OracleDbType.Decimal, nicNicho, ParameterDirection.Input),
+            New OracleParameter("p_precio", OracleDbType.Decimal, precio, ParameterDirection.Input),
+            New OracleParameter("p_fecha_inicio", OracleDbType.Date, fechaInicio, ParameterDirection.Input)
+        }
+        Return OracleDb.ExecOutNumber(PKG & ".REGISTRAR_GLOBAL", ps, "p_id_out")
+    End Function
+
+    ' Actualiza la semilla con nicho, precio y fecha reales
+    ' al confirmar la recepcion desde Precios.aspx (flujo readonly).
     Public Shared Sub ActualizarSemilla(hipId As Decimal,
                                         nicNicho As Decimal,
                                         precio As Decimal,
@@ -68,6 +88,7 @@ Public Class HistorialPrecioService
         OracleDb.ExecNonQuery(PKG & ".ACTUALIZAR_SEMILLA", ps)
     End Sub
 
+    ' Retorna el vigente REAL (precio NOT NULL) de un producto/nicho.
     Public Shared Function Vigente(proReferencia As String, nicNicho As Decimal) As DataTable
         Dim ps As New List(Of OracleParameter) From {
             New OracleParameter("p_pro_referencia", OracleDbType.Varchar2, proReferencia, ParameterDirection.Input),
