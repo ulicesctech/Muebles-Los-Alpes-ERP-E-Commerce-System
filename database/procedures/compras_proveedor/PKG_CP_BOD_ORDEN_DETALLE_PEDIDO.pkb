@@ -49,10 +49,12 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_ORDEN_DETALLE_PEDIDO AS
             RAISE;
     END ODP_ELIMINAR;
 
-    -- PRO_NOMBRE se obtiene via:
-    --   odp_material (texto) = mat_descripcion → BOD_MATERIAL → BOD_PRODUCTO
-    -- Esto da el producto correcto por cada item, no el primero del pedido.
-    -- PED_FORMA_PAGO viene de BOD_PEDIDO.
+    -- PRO_NOMBRE: subquery que busca en BOD_DETALLE_PEDIDO del mismo pedido
+    -- el item cuyo material (via BOD_MATERIAL → BOD_PRODUCTO) coincide con odp_material.
+    -- Si no encuentra coincidencia muestra odp_material como fallback.
+    -- PED_FORMA_PAGO: join directo con BOD_PEDIDO.
+    -- No se hace JOIN directo con BOD_MATERIAL/BOD_PRODUCTO para evitar
+    -- multiplicacion o perdida de filas cuando hay materiales repetidos.
     PROCEDURE ODP_LISTAR_POR_ORDEN(
         p_orc_key IN VARCHAR2,
         p_data    OUT SYS_REFCURSOR
@@ -65,13 +67,21 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_ORDEN_DETALLE_PEDIDO AS
                    pe.ped_codigo,
                    pe.ped_forma_pago,
                    d.odp_material,
-                   NVL(pr.pro_nombre, d.odp_material) AS pro_nombre,
+                   NVL(
+                       (SELECT pr.pro_nombre
+                          FROM BOD_DETALLE_PEDIDO  dp
+                          JOIN BOD_HISTORIAL_PRECIO h  ON h.hip_historial_precio = dp.hip_historial_precio
+                          JOIN BOD_PRODUCTO         pr ON pr.pro_referencia      = h.pro_referencia
+                          JOIN BOD_MATERIAL         m  ON m.mat_material         = pr.mat_material
+                         WHERE dp.ped_pedido = d.ped_pedido
+                           AND UPPER(TRIM(m.mat_descripcion)) = UPPER(TRIM(d.odp_material))
+                           AND ROWNUM = 1),
+                       d.odp_material
+                   ) AS pro_nombre,
                    d.odp_precio,
                    d.odp_cantidad
               FROM BOD_ORDEN_DETALLE_PEDIDO d
-              LEFT JOIN BOD_PEDIDO   pe ON pe.ped_pedido      = d.ped_pedido
-              LEFT JOIN BOD_MATERIAL mat ON UPPER(TRIM(mat.mat_descripcion)) = UPPER(TRIM(d.odp_material))
-              LEFT JOIN BOD_PRODUCTO pr  ON pr.mat_material   = mat.mat_material
+              LEFT JOIN BOD_PEDIDO pe ON pe.ped_pedido = d.ped_pedido
              WHERE d.orc_orden_compra = p_orc_key
              ORDER BY d.odp_orden_detalle_pedido;
     END ODP_LISTAR_POR_ORDEN;

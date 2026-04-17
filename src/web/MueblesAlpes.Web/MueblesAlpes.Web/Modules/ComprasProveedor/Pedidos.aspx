@@ -1,4 +1,4 @@
-<%@ Page Language="VB" AutoEventWireup="true" CodeBehind="Pedidos.aspx.vb"
+ï»¿<%@ Page Language="VB" AutoEventWireup="true" CodeBehind="Pedidos.aspx.vb"
         Inherits="MueblesAlpes.Web.Modules.ComprasProveedor.Pedidos"
         MasterPageFile="~/Site.Master"
         ContentType="text/html" ResponseEncoding="utf-8" %>
@@ -124,7 +124,7 @@
                                     <asp:TemplateField HeaderText="Material">
                                         <ItemTemplate>
                                             <%# If(IsDBNull(Eval("MATERIAL")) OrElse String.IsNullOrEmpty(Eval("MATERIAL").ToString()),
-                                                "<span class='badge-pendiente'>—</span>",
+                                                "<span class='badge-pendiente'>ï¿½</span>",
                                                 Eval("MATERIAL").ToString()) %>
                                         </ItemTemplate>
                                     </asp:TemplateField>
@@ -272,12 +272,12 @@
                     <asp:TemplateField HeaderText="Material">
                         <ItemTemplate>
                             <%# If(IsDBNull(Eval("MATERIAL")) OrElse String.IsNullOrEmpty(Eval("MATERIAL").ToString()),
-                                "<span class='badge-pendiente'>—</span>",
+                                "<span class='badge-pendiente'>ï¿½</span>",
                                 Eval("MATERIAL").ToString()) %>
                         </ItemTemplate>
                         <EditItemTemplate>
                             <%# If(IsDBNull(Eval("MATERIAL")) OrElse String.IsNullOrEmpty(Eval("MATERIAL").ToString()),
-                                "—", Eval("MATERIAL").ToString()) %>
+                                "ï¿½", Eval("MATERIAL").ToString()) %>
                         </EditItemTemplate>
                     </asp:TemplateField>
 
@@ -300,7 +300,8 @@
                         <ItemTemplate><%# Eval("DETPE_CANTIDAD_SOLICITADA") %></ItemTemplate>
                         <EditItemTemplate>
                             <asp:TextBox ID="txtESolicitada" runat="server"
-                                Text='<%# Eval("DETPE_CANTIDAD_SOLICITADA") %>'
+                                Text=""
+                                placeholder="0"
                                 CssClass="edit-input" style="width:70px;" />
                         </EditItemTemplate>
                     </asp:TemplateField>

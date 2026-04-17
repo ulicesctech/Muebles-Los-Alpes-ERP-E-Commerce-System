@@ -360,11 +360,10 @@
         <div class="total-box">
             <span>Total: Q <asp:Label ID="lblTotalOrden" runat="server" Text="0.00" /></span>
             <asp:Button ID="btnFinalizarOrden" runat="server"
-                Text="&#10003; Finalizar Orden"
-                CssClass="btn-green"
+                Text="&#10005; Cerrar"
+                CssClass="btn-outline"
                 OnClick="btnFinalizarOrden_Click"
-                CausesValidation="false"
-                OnClientClick="return confirm('Finalizar y cerrar la carga de items para esta orden?');" />
+                CausesValidation="false" />
         </div>
     </div>
 </div>

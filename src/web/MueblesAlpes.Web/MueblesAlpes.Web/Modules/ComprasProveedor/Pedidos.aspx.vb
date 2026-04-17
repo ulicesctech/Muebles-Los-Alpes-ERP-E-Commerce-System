@@ -217,6 +217,13 @@ Namespace Modules.ComprasProveedor
                     MostrarMensaje("Ingresa una cantidad valida.", True) : Exit Sub
                 End If
 
+                ' Validar que el pedido no tenga ya una Orden de Compra asociada
+                Dim dtOC As DataTable = OrdenDetallePedidoService.BuscarPorPedido(pedidoId)
+                If dtOC IsNot Nothing AndAlso dtOC.Rows.Count > 0 Then
+                    MostrarMensaje("No se pueden agregar productos porque este pedido ya tiene una Orden de Compra asociada.", True)
+                    Exit Sub
+                End If
+
                 ' Validar que el producto no este ya en el pedido
                 Dim dtActual As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
                 For Each fila As DataRow In dtActual.Rows
