@@ -22,6 +22,13 @@ Namespace Modules.CatalogoInventario
                 Dim precioParam As String = Request.QueryString("precio")
                 Dim readonlyParam As String = Request.QueryString("readonly")
 
+                ' *** CAMBIE AHORITA: se leen los nuevos parametros hip y detpe del QueryString.
+                ' hip   = ID del BOD_HISTORIAL_PRECIO semilla creado al agregar el item al pedido.
+                ' detpe = ID del BOD_DETALLE_PEDIDO (referencia para trazabilidad).
+                Dim hipParam As String = Request.QueryString("hip")
+                Dim detpeParam As String = Request.QueryString("detpe")
+                ' *** FIN CAMBIE AHORITA
+
                 If Not String.IsNullOrEmpty(refParam) Then
                     Dim item = ddlProducto.Items.FindByValue(refParam)
                     If item IsNot Nothing Then
@@ -35,16 +42,41 @@ Namespace Modules.CatalogoInventario
                     ddlProducto.Enabled = False
                     txtFechaInicio.ReadOnly = True
 
-                    ' Pre-cargar precio desde el pedido
+                    ' *** CAMBIE AHORITA: se guardan hip y detpe en los hidden fields del ASPX
+                    ' para que btnRegistrar_Click los use al momento de confirmar el precio.
+                    hfHipSemilla.Value = If(String.IsNullOrEmpty(hipParam), "0", hipParam)
+                    hfDetpeId.Value = If(String.IsNullOrEmpty(detpeParam), "0", detpeParam)
+                    ' *** FIN CAMBIE AHORITA
+
+                    ' Pre-cargar precio desde la Orden de Compra (no editable)
                     If Not String.IsNullOrEmpty(precioParam) Then
                         txtPrecio.Text = precioParam
                         txtPrecio.ReadOnly = True
                     End If
 
+                    ' *** CAMBIE AHORITA: se carga Producto y Material desde BOD_PRODUCTO
+                    ' usando la pro_referencia del QueryString y se muestran en el panel
+                    ' readonly pnlReadonlyProducto (no editable). El dropdown se oculta.
+                    If Not String.IsNullOrEmpty(refParam) Then
+                        Try
+                            Dim dtProd As DataTable = ProductoService.Listar()
+                            Dim filaProd As DataRow() = dtProd.Select("PRO_REFERENCIA = '" & refParam & "'")
+                            If filaProd.Length > 0 Then
+                                lblROProducto.Text = filaProd(0)("PRO_NOMBRE").ToString()
+                                lblROMaterial.Text = If(dtProd.Columns.Contains("MAT_DESCRIPCION"),
+                                                        filaProd(0)("MAT_DESCRIPCION").ToString(), "")
+                                pnlReadonlyProducto.Visible = True
+                            End If
+                        Catch
+                            ' Si falla el join, se queda el dropdown con el valor preseleccionado
+                        End Try
+                    End If
+                    ' *** FIN CAMBIE AHORITA
+
                     ' Mostrar banner informativo
                     Dim pedidoParam As String = Request.QueryString("pedido")
                     MostrarInfo("Registrando precio de recepcion desde el Pedido #" & pedidoParam &
-                        ". Producto y precio pre-cargados. Solo selecciona el almacen y nicho.")
+                        ". Producto y precio pre-cargados desde la Orden de Compra. Selecciona el almacen y nicho.")
                 End If
             End If
         End Sub
@@ -85,7 +117,6 @@ Namespace Modules.CatalogoInventario
         ' FILTRO POR MES
         ' =============================================
         Private Sub CargarFiltroMes()
-            ' Meses
             ddlMes.Items.Clear()
             ddlMes.Items.Add(New ListItem("-- Todos --", "0"))
             ddlMes.Items.Add(New ListItem("Enero", "1"))
@@ -101,7 +132,6 @@ Namespace Modules.CatalogoInventario
             ddlMes.Items.Add(New ListItem("Noviembre", "11"))
             ddlMes.Items.Add(New ListItem("Diciembre", "12"))
 
-            ' Anios — desde 2023 hasta el actual
             ddlAnio.Items.Clear()
             Dim anioActual As Integer = DateTime.Now.Year
             For i As Integer = anioActual To 2023 Step -1
@@ -140,7 +170,6 @@ Namespace Modules.CatalogoInventario
                 Dim fila As DataRow() = dt.Select("PRO_REFERENCIA = '" & ddlProducto.SelectedValue & "'")
                 If fila.Length > 0 Then
                     lblNombreProducto.Text = fila(0)("PRO_NOMBRE").ToString()
-                    ' Verificacion segura — columnas con JOIN pueden variar
                     If dt.Columns.Contains("TIP_DESCRIPCION") Then
                         lblTipo.Text = fila(0)("TIP_DESCRIPCION").ToString()
                     ElseIf dt.Columns.Contains("TIP_TIPO") Then
@@ -187,8 +216,12 @@ Namespace Modules.CatalogoInventario
                     Convert.ToDecimal(ddlNicho.SelectedValue)
                 )
                 If dtVigente.Rows.Count > 0 Then
-                    lblPrecioNicho.Text = String.Format("{0:C2}", dtVigente.Rows(0)("HIP_PRECIO"))
-                    pnlPrecioNicho.Visible = True
+                    Dim precioActual As Decimal = Convert.ToDecimal(dtVigente.Rows(0)("HIP_PRECIO"))
+                    ' Solo mostrar el badge si el vigente tiene precio real (no es semilla)
+                    If precioActual > 0 Then
+                        lblPrecioNicho.Text = String.Format("{0:C2}", precioActual)
+                        pnlPrecioNicho.Visible = True
+                    End If
                 End If
             Catch ex As Exception
                 ' Sin precio vigente aun
@@ -233,23 +266,57 @@ Namespace Modules.CatalogoInventario
                 Dim fechaInicio As Date = Convert.ToDateTime(txtFechaInicio.Text.Trim())
                 Dim readonlyParam As String = Request.QueryString("readonly")
 
-                ' Si viene de Recibido: primero cerrar el vigente anterior con la fecha actual
+                ' *** CAMBIE AHORITA: flujo completamente reescrito para modo readonly.
+                ' Cuando viene desde Pedidos → Recibido se ACTUALIZA la semilla existente
+                ' en lugar de crear un registro nuevo. Logica:
+                '   a) Si ya hay un vigente real (precio > 0) con DIFERENTE precio:
+                '      cerrar el vigente anterior y actualizar la semilla con datos reales.
+                '   b) Si el vigente tiene el MISMO precio: solo actualizar la semilla
+                '      (sin duplicar registros).
+                '   c) Si no hay vigente real previo: actualizar la semilla directamente.
+                ' En todos los casos de readonly se llama a ActualizarSemilla para
+                ' completar la semilla con nicho, precio y fecha reales.
                 If readonlyParam = "1" Then
+                    Dim hipSemilla As Decimal = Convert.ToDecimal(hfHipSemilla.Value)
+
+                    ' Buscar si ya hay un vigente real (precio > 0) para este producto y nicho
+                    Dim dtVigente As DataTable = HistorialPrecioService.Vigente(proRef, nichoId)
+                    Dim precioVigente As Decimal = 0
+                    Dim hayVigenteReal As Boolean = False
+
+                    If dtVigente IsNot Nothing AndAlso dtVigente.Rows.Count > 0 Then
+                        Dim pvTemp As Decimal = Convert.ToDecimal(dtVigente.Rows(0)("HIP_PRECIO"))
+                        ' Se ignora la propia semilla (precio=0) como "vigente anterior"
+                        If pvTemp > 0 Then
+                            precioVigente = pvTemp
+                            hayVigenteReal = True
+                        End If
+                    End If
+
+                    If hayVigenteReal AndAlso precioVigente <> precio Then
+                        ' Caso a: precio diferente → cerrar el anterior, actualizar semilla
+                        HistorialPrecioService.CerrarVigente(proRef, nichoId, fechaInicio)
+                        HistorialPrecioService.ActualizarSemilla(hipSemilla, nichoId, precio, fechaInicio)
+                    Else
+                        ' Caso b y c: mismo precio o sin vigente real → solo actualizar semilla
+                        HistorialPrecioService.ActualizarSemilla(hipSemilla, nichoId, precio, fechaInicio)
+                    End If
+
+                    ' Redirigir de vuelta a Pedidos para que el usuario finalice
+                    Dim pedidoParam As String = Request.QueryString("pedido")
+                    If Not String.IsNullOrEmpty(pedidoParam) Then
+                        Response.Redirect(ResolveUrl("~/Modules/ComprasProveedor/Pedidos.aspx") &
+                                          "?pedido=" & pedidoParam)
+                        Return
+                    End If
+                Else
+                    ' *** FIN CAMBIE AHORITA (inicio flujo normal sin cambios)
+                    ' Flujo normal (no viene de pedido): cerrar vigente y registrar nuevo
                     HistorialPrecioService.CerrarVigente(proRef, nichoId, fechaInicio)
+                    HistorialPrecioService.Registrar(proRef, nichoId, precio, fechaInicio)
                 End If
 
-                ' Registrar nuevo precio (sin cerrar nada — eso ya se hizo arriba si aplica)
-                HistorialPrecioService.Registrar(proRef, nichoId, precio, fechaInicio)
-
-                ' Si vino desde Pedidos, redirigir de vuelta
-                Dim pedidoParam As String = Request.QueryString("pedido")
-                If Not String.IsNullOrEmpty(pedidoParam) Then
-                    Response.Redirect(ResolveUrl("~/Modules/ComprasProveedor/Pedidos.aspx") &
-                                      "?pedido=" & pedidoParam)
-                    Return
-                End If
-
-                ' Flujo normal
+                ' Flujo normal: mensaje y limpieza
                 MostrarExito("Precio registrado correctamente.")
                 txtPrecio.Text = ""
                 txtFechaInicio.Text = DateTime.Now.ToString("yyyy-MM-dd")
@@ -288,7 +355,6 @@ Namespace Modules.CatalogoInventario
             pnlMsg.Visible = True
         End Sub
 
-
         Private Sub MostrarInfo(msg As String)
             lblMsg.Text = msg
             pnlMsg.CssClass = "alert-ok"
@@ -296,6 +362,5 @@ Namespace Modules.CatalogoInventario
         End Sub
 
     End Class
-
 
 End Namespace

@@ -33,6 +33,24 @@ Namespace Modules.CatalogoInventario
         Protected WithEvents lblMsg As Global.System.Web.UI.WebControls.Label
 
         '''<summary>
+        '''Control hfHipSemilla.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents hfHipSemilla As Global.System.Web.UI.WebControls.HiddenField
+
+        '''<summary>
+        '''Control hfDetpeId.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents hfDetpeId As Global.System.Web.UI.WebControls.HiddenField
+
+        '''<summary>
         '''Control ddlProducto.
         '''</summary>
         '''<remarks>
@@ -76,6 +94,33 @@ Namespace Modules.CatalogoInventario
         '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         '''</remarks>
         Protected WithEvents lblMaterial As Global.System.Web.UI.WebControls.Label
+
+        '''<summary>
+        '''Control pnlReadonlyProducto.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents pnlReadonlyProducto As Global.System.Web.UI.WebControls.Panel
+
+        '''<summary>
+        '''Control lblROProducto.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents lblROProducto As Global.System.Web.UI.WebControls.Label
+
+        '''<summary>
+        '''Control lblROMaterial.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents lblROMaterial As Global.System.Web.UI.WebControls.Label
 
         '''<summary>
         '''Control ddlAlmacen.

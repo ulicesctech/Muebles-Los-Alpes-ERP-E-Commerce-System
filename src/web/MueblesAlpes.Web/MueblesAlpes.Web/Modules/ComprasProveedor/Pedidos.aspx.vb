@@ -52,13 +52,11 @@ Namespace Modules.ComprasProveedor
             If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
                 lblCabeceraCode.Text = dt.Rows(0)("PED_CODIGO").ToString()
                 lblCabeceraFecha.Text = String.Format("{0:dd/MM/yyyy}", dt.Rows(0)("PED_FECHA"))
-                ' Pre-seleccionar la forma de pago actual en el dropdown
                 Dim formaPago As String = dt.Rows(0)("PED_FORMA_PAGO").ToString()
                 Dim item As System.Web.UI.WebControls.ListItem = ddlCabeceraFormaPago.Items.FindByValue(formaPago)
                 If item IsNot Nothing Then ddlCabeceraFormaPago.SelectedValue = formaPago
             End If
         End Sub
-
 
         Private Sub RecalcularTotal(dt As DataTable, pedidoId As Integer)
             Dim total As Decimal = 0
@@ -219,30 +217,21 @@ Namespace Modules.ComprasProveedor
                     MostrarMensaje("Ingresa una cantidad valida.", True) : Exit Sub
                 End If
 
-                Dim dt As DataTable = DetallePedidoService.ListarTodosProductos()
-                Dim filas = dt.Select("PRO_REFERENCIA = '" & proRef & "'")
-
-                ' 0 = sin historial aun — NULLIF en el paquete lo convierte a NULL en BD
-                Dim hipId As Integer = 0
-                If filas.Length > 0 Then
-                    If Not IsDBNull(filas(0)("HIP_ID_VIGENTE")) Then
-                        Dim v As Integer = Convert.ToInt32(filas(0)("HIP_ID_VIGENTE"))
-                        If v > 0 Then hipId = v
-                    End If
-                End If
-
-                DetallePedidoService.Insertar(pedidoId, hipId, proRef, cantidad)
+                ' *** CAMBIE AHORITA: se usa RegistrarSemilla (llama REGISTRAR_SEMILLA en Oracle)
+                ' en lugar de Registrar con precio=0, porque REGISTRAR valida precio > 0
+                ' y lanzaba ORA-20003. REGISTRAR_SEMILLA inserta precio=0 y nicho placeholder
+                ' sin validaciones, solo para hacer el JOIN con BOD_PRODUCTO en el listado
+                ' y traer PRO_NOMBRE y MAT_DESCRIPCION. Nicho y precio reales se asignan
+                ' despues en la pantalla de Precios al confirmar la recepcion.
+                Dim hipSemilla As Decimal = HistorialPrecioService.RegistrarSemilla(proRef)
+                DetallePedidoService.Insertar(pedidoId, CInt(hipSemilla), proRef, cantidad)
+                ' *** FIN CAMBIE AHORITA
 
                 txtCantSolicitada.Text = ""
                 ddlProducto.SelectedIndex = 0
                 CargarDetallesPedido(pedidoId)
                 CargarPedidos()
-
-                If hipId = 0 Then
-                    MostrarMensaje("Producto agregado. Recuerda vincular este pedido a una Orden de Compra para asignarle precio.", False)
-                Else
-                    MostrarMensaje("Producto agregado correctamente.", False)
-                End If
+                MostrarMensaje("Producto agregado. Vincula este pedido a una Orden de Compra para asignar precio.", False)
             Catch ex As Exception
                 MostrarMensaje("Error al agregar item: " & ex.Message, True)
             End Try
@@ -294,9 +283,13 @@ Namespace Modules.ComprasProveedor
                     Next
 
                     ' 3. Validaciones de negocio
-                    If cantRecibida < 0 Then
-                        MostrarMensaje("Cantidad recibida invalida.", True) : Exit Sub
+                    ' *** CAMBIE AHORITA: se agrego validacion de cantidad > 0 obligatoria.
+                    ' Si cantRecibida = 0 o negativa no se permite continuar a Precios.
+                    If cantRecibida <= 0 Then
+                        MostrarMensaje("La cantidad recibida debe ser mayor a 0 para continuar.", True)
+                        Exit Sub
                     End If
+                    ' *** FIN CAMBIE AHORITA
                     If cantRecibida > cantSol Then
                         MostrarMensaje("La cantidad recibida no puede superar la solicitada (" & cantSol & ").", True)
                         Exit Sub
@@ -311,41 +304,51 @@ Namespace Modules.ComprasProveedor
                         Exit Sub
                     End If
 
-                    ' 5. CORRECCIÓN: Buscar el material del item actual para obtener su precio específico
-                    ' Se obtiene la lista de detalles del pedido para identificar el material del item actual
+                    ' 5. Obtener el material y hip_historial_precio del item actual
                     Dim dtDetalle As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
                     Dim filaDetalle = dtDetalle.Select("DETPE_DETALLE_PEDIDO = " & detalleId)
                     Dim materialItem As String = If(filaDetalle.Length > 0, filaDetalle(0)("MATERIAL").ToString().Trim(), "")
 
-                    ' Se busca en la Orden de Compra la fila que coincida con el material
+                    ' *** CAMBIE AHORITA: se lee el HIP_HISTORIAL_PRECIO de la fila del detalle
+                    ' para enviarlo a Precios como parametro "hip" y poder actualizar la semilla.
+                    Dim hipSemillaId As String = "0"
+                    If filaDetalle.Length > 0 AndAlso Not IsDBNull(filaDetalle(0)("HIP_HISTORIAL_PRECIO")) Then
+                        hipSemillaId = filaDetalle(0)("HIP_HISTORIAL_PRECIO").ToString()
+                    End If
+                    ' *** FIN CAMBIE AHORITA
+
+                    ' Buscar precio en la Orden de Compra por material
                     Dim filasODP = dtOrdenes.Select("TRIM(ODP_MATERIAL) = '" & materialItem.Replace("'", "''") & "'")
                     Dim precioODP As Decimal = 0
 
                     If filasODP.Length > 0 Then
-                        ' Se asigna el precio específico encontrado en la orden
                         precioODP = Convert.ToDecimal(filasODP(0)("ODP_PRECIO"))
                     Else
-                        ' Fallback: Si no hay coincidencia exacta por material, usa el primer precio disponible
                         precioODP = Convert.ToDecimal(dtOrdenes.Rows(0)("ODP_PRECIO"))
                         MostrarMensaje("No se encontro precio especifico. Se uso el primer precio disponible.", False)
                     End If
 
                     ' 6. Actualizar la cantidad recibida en el detalle del pedido
-                    ' Se mantiene la cantidad solicitada actual consultada de la base de datos
                     Dim cantSolActual As Integer = If(filaDetalle.Length > 0,
                                              Convert.ToInt32(filaDetalle(0)("DETPE_CANTIDAD_SOLICITADA")),
                                              cantSol)
                     DetallePedidoService.Actualizar(detalleId, cantSolActual, cantRecibida)
 
-                    ' 7. Preparar parámetros y redirigir
+                    ' 7. Redirigir a Precios con los parametros necesarios
+                    ' *** CAMBIE AHORITA: se agregan &detpe= y &hip= al redirect.
+                    ' detpe = ID del BOD_DETALLE_PEDIDO (por si se necesita en Precios).
+                    ' hip   = ID del historial semilla a actualizar en Precios.
                     Dim precioODPStr As String = precioODP.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)
                     hfDetalleRecibir.Value = "0"
 
                     Response.Redirect(ResolveUrl("~/Modules/CatalogoInventario/Precios.aspx") &
                               "?ref=" & proRef &
                               "&pedido=" & pedidoId &
+                              "&detpe=" & detalleId &
+                              "&hip=" & hipSemillaId &
                               "&precio=" & precioODPStr &
                               "&readonly=1")
+                    ' *** FIN CAMBIE AHORITA
                 Catch ex As Exception
                     MostrarMensaje("Error: " & ex.Message, True)
                 End Try

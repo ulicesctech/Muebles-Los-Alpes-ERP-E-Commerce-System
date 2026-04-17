@@ -36,10 +36,13 @@
     .table-card tbody td { padding:11px 16px; color:#333; vertical-align:middle; }
     .badge-vigente  { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:bold; background:#f0fff4; color:#2d7a2d; border:1px solid #9ae6b4; }
     .badge-historico { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:bold; background:#fdf6ec; color:#C9973A; border:1px solid #e8d0a0; }
+    .badge-semilla { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:bold; background:#f5f5f5; color:#888; border:1px solid #ddd; }
     .alert-ok  { background:#f0fff4; border:1px solid #9ae6b4; color:#276749; padding:10px 16px; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; margin-bottom:16px; }
     .alert-err { background:#fff5f5; border:1px solid #fed7d7; color:#c53030; padding:10px 16px; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; margin-bottom:16px; }
     .back-link { display:inline-flex; align-items:center; gap:6px; color:#C9973A; font-size:13px; font-family:Arial,sans-serif; text-decoration:none; margin-top:20px; padding:8px 14px; border-radius:6px; border:1px solid #e8d8c0; background:white; transition:all 0.2s; }
     .back-link:hover { border-color:#C9973A; background:#fdf6ec; text-decoration:none; color:#C9973A; }
+    .readonly-badge { background:#fff8e8; border:1px solid #f0c040; border-radius:8px; padding:10px 14px; font-size:13px; font-family:Arial,sans-serif; color:#7a5500; margin-top:8px; }
+    .readonly-badge strong { color:#5C3A1E; }
 </style>
 
 <div class="breadcrumb-mod">
@@ -63,6 +66,15 @@
 <%-- FORMULARIO --%>
 <div class="form-card">
     <h4>&#128221; Registrar Nuevo Precio</h4>
+
+    <%-- *** CAMBIE AHORITA: hidden fields para transportar el hip semilla y el detpe
+         cuando se llega desde Pedidos → Confirmar Recibido.
+         hfHipSemilla = ID del BOD_HISTORIAL_PRECIO semilla a actualizar.
+         hfDetpeId    = ID del BOD_DETALLE_PEDIDO (referencia, por si se necesita). --%>
+    <asp:HiddenField ID="hfHipSemilla" runat="server" Value="0" />
+    <asp:HiddenField ID="hfDetpeId"    runat="server" Value="0" />
+    <%-- *** FIN CAMBIE AHORITA --%>
+
     <div class="form-grid">
         <div class="form-group">
             <label>Producto *</label>
@@ -77,7 +89,23 @@
                     Material: <strong><asp:Label ID="lblMaterial" runat="server" /></strong>
                 </div>
             </asp:Panel>
+
+            <%-- *** CAMBIE AHORITA: panel que reemplaza el dropdown en modo readonly.
+                 Muestra Producto y Material como texto no editable, cargados desde
+                 BOD_PRODUCTO via la pro_referencia recibida en el QueryString.
+                 Solo visible cuando readonly=1 (viene desde Pedidos → Recibido). --%>
+            <asp:Panel ID="pnlReadonlyProducto" runat="server" Visible="false">
+                <div class="readonly-badge">
+                    <strong>Producto:</strong> <asp:Label ID="lblROProducto" runat="server" /><br />
+                    <strong>Material:</strong> <asp:Label ID="lblROMaterial" runat="server" />
+                    <div style="font-size:11px; color:#999; margin-top:4px; font-style:italic;">
+                        Cargado desde la Orden de Compra &mdash; no editable
+                    </div>
+                </div>
+            </asp:Panel>
+            <%-- *** FIN CAMBIE AHORITA --%>
         </div>
+
         <div class="form-group">
             <label>Almacen *</label>
             <asp:DropDownList ID="ddlAlmacen" runat="server" AutoPostBack="true"
@@ -141,13 +169,18 @@
         <asp:BoundField DataField="HIP_PRECIO"           HeaderText="Precio"       DataFormatString="{0:C2}" ItemStyle-Width="100px" />
         <asp:BoundField DataField="HIP_FECHA_INICIO"     HeaderText="Desde"        DataFormatString="{0:dd/MM/yyyy}" ItemStyle-Width="100px" />
         <asp:BoundField DataField="HIP_FECHA_FINAL"      HeaderText="Hasta"        DataFormatString="{0:dd/MM/yyyy}" ItemStyle-Width="100px" />
-        <asp:TemplateField HeaderText="Estado" ItemStyle-Width="80px">
+        <%-- *** CAMBIE AHORITA: condicion de Semilla corregida de precio=0 a precio IS NULL
+             porque ahora REGISTRAR_SEMILLA inserta NULL en hip_precio, no 0. --%>
+        <asp:TemplateField HeaderText="Estado" ItemStyle-Width="90px">
             <ItemTemplate>
-                <%# If(Eval("HIP_FECHA_FINAL") Is DBNull.Value OrElse Eval("HIP_FECHA_FINAL").ToString() = "",
-                    "<span class='badge-vigente'>Vigente</span>",
-                    "<span class='badge-historico'>Historico</span>") %>
+                <%# If(Eval("HIP_PRECIO") Is DBNull.Value,
+                    "<span class='badge-semilla'>Semilla</span>",
+                    If(Eval("HIP_FECHA_FINAL") Is DBNull.Value OrElse Eval("HIP_FECHA_FINAL").ToString() = "",
+                        "<span class='badge-vigente'>Vigente</span>",
+                        "<span class='badge-historico'>Historico</span>")) %>
             </ItemTemplate>
         </asp:TemplateField>
+        <%-- *** FIN CAMBIE AHORITA --%>
     </Columns>
 </asp:GridView>
 </div>

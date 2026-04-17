@@ -57,4 +57,15 @@ Public Class DetallePedidoService
     Public Shared Function ListarTodosProductos() As DataTable
         Return OracleDb.ExecRefCursor(PKG & ".DET_PED_LISTAR_TODOS_PRODUCTOS", Nothing, "p_data")
     End Function
+
+    Public Shared Sub ActualizarSemilla(hipId As Decimal, nicNicho As Decimal,
+                                    precio As Decimal, fechaInicio As Date)
+        Dim ps As New List(Of OracleParameter) From {
+            New OracleParameter("p_hip_id", OracleDbType.Decimal, hipId, ParameterDirection.Input),
+            New OracleParameter("p_nic_nicho", OracleDbType.Decimal, nicNicho, ParameterDirection.Input),
+            New OracleParameter("p_precio", OracleDbType.Decimal, precio, ParameterDirection.Input),
+            New OracleParameter("p_fecha_inicio", OracleDbType.Date, fechaInicio, ParameterDirection.Input)
+        }
+        OracleDb.ExecNonQuery(PKG & ".ACTUALIZAR_SEMILLA", ps)
+    End Sub
 End Class
