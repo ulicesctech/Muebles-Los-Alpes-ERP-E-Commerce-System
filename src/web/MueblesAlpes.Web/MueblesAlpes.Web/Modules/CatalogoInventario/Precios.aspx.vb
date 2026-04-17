@@ -253,11 +253,17 @@ Namespace Modules.CatalogoInventario
         ' REGISTRAR PRECIO
         ' =============================================
         Protected Sub btnRegistrar_Click(sender As Object, e As EventArgs)
+            ' *** CAMBIE AHORITA: validaciones server-side reforzadas (complementan la validacion JS)
             If ddlProducto.SelectedValue = "" Then MostrarError("Debe seleccionar un producto.") : Return
             If ddlAlmacen.SelectedValue = "" Then MostrarError("Debe seleccionar un almacen.") : Return
             If ddlNicho.SelectedValue = "" Then MostrarError("Debe seleccionar un nicho.") : Return
             If txtPrecio.Text.Trim() = "" Then MostrarError("El precio es obligatorio.") : Return
+            Dim precioValidar As Decimal
+            If Not Decimal.TryParse(txtPrecio.Text.Trim(), precioValidar) OrElse precioValidar <= 0 Then
+                MostrarError("El precio debe ser un numero mayor a 0.") : Return
+            End If
             If txtFechaInicio.Text.Trim() = "" Then MostrarError("La fecha de inicio es obligatoria.") : Return
+            ' *** FIN CAMBIE AHORITA
 
             Try
                 Dim proRef As String = ddlProducto.SelectedValue

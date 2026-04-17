@@ -135,7 +135,8 @@
         </div>
     </div>
     <div style="margin-top:18px;">
-        <asp:Button ID="btnRegistrar" runat="server" Text="Registrar Precio" CssClass="btn-gold" OnClick="btnRegistrar_Click" />
+        <%-- *** CAMBIE AHORITA: se agrego OnClientClick con validarFormulario() --%>
+        <asp:Button ID="btnRegistrar" runat="server" Text="Registrar Precio" CssClass="btn-gold" OnClick="btnRegistrar_Click" OnClientClick="return validarFormulario();" />
         <asp:Button ID="btnCancelar"  runat="server" Text="Cancelar"         CssClass="btn-outline" OnClick="btnCancelar_Click" />
     </div>
 </div>
@@ -166,7 +167,17 @@
         <asp:BoundField DataField="PRO_NOMBRE"           HeaderText="Producto" />
         <asp:BoundField DataField="NIC_NUMERO"           HeaderText="Nicho"        ItemStyle-Width="70px" />
         <asp:BoundField DataField="NIC_CARACTERISTICA"   HeaderText="Caracteristica" />
-        <asp:BoundField DataField="HIP_PRECIO"           HeaderText="Precio"       DataFormatString="{0:C2}" ItemStyle-Width="100px" />
+        <%-- *** CAMBIE AHORITA: reemplazado BoundField con formato C2 (usaba cultura
+             del servidor que mostraba XDR en lugar de Q) por TemplateField que imprime
+             explicitamente "Q " + formato N2. Las semillas muestran "Pendiente". --%>
+        <asp:TemplateField HeaderText="Precio" ItemStyle-Width="110px">
+            <ItemTemplate>
+                <%# If(Eval("HIP_PRECIO") Is DBNull.Value,
+                    "<span style='color:#aaa;font-size:11px;font-style:italic;'>Pendiente</span>",
+                    "Q " & String.Format("{0:N2}", Eval("HIP_PRECIO"))) %>
+            </ItemTemplate>
+        </asp:TemplateField>
+        <%-- *** FIN CAMBIE AHORITA --%>
         <asp:BoundField DataField="HIP_FECHA_INICIO"     HeaderText="Desde"        DataFormatString="{0:dd/MM/yyyy}" ItemStyle-Width="100px" />
         <asp:BoundField DataField="HIP_FECHA_FINAL"      HeaderText="Hasta"        DataFormatString="{0:dd/MM/yyyy}" ItemStyle-Width="100px" />
         <%-- *** CAMBIE AHORITA: condicion de Semilla corregida de precio=0 a precio IS NULL
@@ -186,5 +197,40 @@
 </div>
 
 <a class="back-link" href='<%: ResolveUrl("~/Modules/CatalogoInventario/Index.aspx") %>'>&#8592; Volver a Catalogo &amp; Inventario</a>
+
+<%-- *** CAMBIE AHORITA: validacion client-side para que ningun campo quede vacio
+     al intentar registrar. Se valida antes del postback para mejor UX. --%>
+<script type="text/javascript">
+    function validarFormulario() {
+        var errores = [];
+
+        var ddlProducto = document.getElementById('<%= ddlProducto.ClientID %>');
+        var ddlAlmacen  = document.getElementById('<%= ddlAlmacen.ClientID %>');
+        var ddlNicho    = document.getElementById('<%= ddlNicho.ClientID %>');
+        var txtPrecio   = document.getElementById('<%= txtPrecio.ClientID %>');
+        var txtFecha    = document.getElementById('<%= txtFechaInicio.ClientID %>');
+
+        if (!ddlProducto || ddlProducto.value === '')
+            errores.push('Debe seleccionar un Producto.');
+        if (!ddlAlmacen || ddlAlmacen.value === '')
+            errores.push('Debe seleccionar un Almacen.');
+        if (!ddlNicho || ddlNicho.value === '')
+            errores.push('Debe seleccionar un Nicho.');
+        if (!txtPrecio || txtPrecio.value.trim() === '' || isNaN(parseFloat(txtPrecio.value)) || parseFloat(txtPrecio.value) <= 0)
+            errores.push('El Precio debe ser un numero mayor a 0.');
+        if (!txtFecha || txtFecha.value.trim() === '')
+            errores.push('La Fecha de Inicio es obligatoria.');
+
+        if (errores.length > 0) {
+            alert('Por favor corrija los siguientes campos:
+
+' + errores.join('
+'));
+            return false;
+        }
+        return true;
+    }
+</script>
+<%-- *** FIN CAMBIE AHORITA --%>
 
 </asp:Content>
