@@ -225,7 +225,7 @@ Namespace Modules.ComprasProveedor
                 Dim pedId As Integer = Convert.ToInt32(partes(0))
                 Dim pedCod As String = If(partes.Length > 1, partes(1), "")
 
-                ' Cargar items del pedido — precio SIEMPRE en blanco
+                ' Cargar items del pedido * precio SIEMPRE en blanco
                 Dim dt As DataTable = OrdenCompraService.DetallesPedido(pedId)
 
                 hfPedidoVinculado.Value = pedId.ToString()
@@ -319,14 +319,13 @@ Namespace Modules.ComprasProveedor
             Try
                 Dim row As GridViewRow = gvItemsOrden.Rows(e.RowIndex)
                 Dim id As Integer = Convert.ToInt32(gvItemsOrden.DataKeys(e.RowIndex).Value)
-                Dim material As String = CType(row.FindControl("txtEMat"), TextBox).Text.Trim()
+                ' Material ya no es editable: se lee del HiddenField hfEMat
+                Dim hfMat As HiddenField = CType(row.FindControl("hfEMat"), HiddenField)
+                Dim material As String = If(hfMat IsNot Nothing, hfMat.Value.Trim(), "")
                 Dim precio As Decimal
                 Dim hfCan As HiddenField = CType(row.FindControl("hfECan"), HiddenField)
                 Dim cantidad As Integer = Convert.ToInt32(hfCan.Value)
 
-                If String.IsNullOrEmpty(material) Then
-                    MostrarMsg("El material es obligatorio.", True) : Exit Sub
-                End If
                 If Not Decimal.TryParse(CType(row.FindControl("txtEPre"), TextBox).Text.Trim().Replace(",", "."),
                                         System.Globalization.NumberStyles.Any,
                                         System.Globalization.CultureInfo.InvariantCulture, precio) OrElse precio <= 0 Then
@@ -359,36 +358,8 @@ Namespace Modules.ComprasProveedor
         '========================
         ' AGREGAR ITEM MANUAL
         '========================
-        Protected Sub btnAddMat_Click(sender As Object, e As EventArgs)
-            Try
-                Dim orcKey As String = hfOrdenActiva.Value
-                Dim material As String = txtMat.Text.Trim()
-                Dim precio As Decimal
-                Dim cantidad As Integer
-
-                If String.IsNullOrEmpty(material) Then
-                    MostrarMsg("Ingrese el material.", True) : Exit Sub
-                End If
-                If Not Decimal.TryParse(txtPre.Text.Trim().Replace(",", "."),
-                                        System.Globalization.NumberStyles.Any,
-                                        System.Globalization.CultureInfo.InvariantCulture, precio) OrElse precio <= 0 Then
-                    MostrarMsg("Precio invalido.", True) : Exit Sub
-                End If
-                If Not Integer.TryParse(txtCan.Text.Trim(), cantidad) OrElse cantidad <= 0 Then
-                    MostrarMsg("Cantidad invalida.", True) : Exit Sub
-                End If
-
-                OrdenDetallePedidoService.Insertar(orcKey, 0, material, precio, cantidad)
-                txtMat.Text = ""
-                txtPre.Text = ""
-                txtCan.Text = ""
-                CargarDetalle(orcKey)
-                ActualizarTotalOrden(orcKey)
-                CargarOrdenes()
-            Catch ex As Exception
-                MostrarMsg("Error: " & ex.Message, True)
-            End Try
-        End Sub
+        ' btnAddMat_Click deshabilitado: controles txtMat/txtPre/txtCan
+        ' comentados en el ASPX (seccion Agregar Item Manual oculta).
 
         '========================
         ' BUSCAR / LIMPIAR ORDENES

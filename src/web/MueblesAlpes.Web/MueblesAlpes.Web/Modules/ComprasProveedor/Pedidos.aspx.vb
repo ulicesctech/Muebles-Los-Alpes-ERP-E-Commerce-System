@@ -154,7 +154,7 @@ Namespace Modules.ComprasProveedor
         End Sub
 
         '========================
-        ' GRID PEDIDOS — carga sub-grid de items en cada fila
+        ' GRID PEDIDOS  carga sub-grid de items en cada fila
         '========================
         Protected Sub gvPedidos_RowDataBound(sender As Object, e As GridViewRowEventArgs)
             If e.Row.RowType = DataControlRowType.DataRow Then
@@ -198,7 +198,7 @@ Namespace Modules.ComprasProveedor
         ' DROPDOWN PRODUCTO
         '========================
         Protected Sub ddlProducto_SelectedIndexChanged(sender As Object, e As EventArgs)
-            ' Solo refresca — precio se asigna desde Orden de Compra
+            ' Solo refresca  precio se asigna desde Orden de Compra
         End Sub
 
         '========================
@@ -217,15 +217,18 @@ Namespace Modules.ComprasProveedor
                     MostrarMensaje("Ingresa una cantidad valida.", True) : Exit Sub
                 End If
 
-                ' *** CAMBIE AHORITA: se usa RegistrarSemilla (llama REGISTRAR_SEMILLA en Oracle)
-                ' en lugar de Registrar con precio=0, porque REGISTRAR valida precio > 0
-                ' y lanzaba ORA-20003. REGISTRAR_SEMILLA inserta precio=0 y nicho placeholder
-                ' sin validaciones, solo para hacer el JOIN con BOD_PRODUCTO en el listado
-                ' y traer PRO_NOMBRE y MAT_DESCRIPCION. Nicho y precio reales se asignan
-                ' despues en la pantalla de Precios al confirmar la recepcion.
+                ' Validar que el producto no este ya en el pedido
+                Dim dtActual As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
+                For Each fila As DataRow In dtActual.Rows
+                    If Not IsDBNull(fila("PRO_REFERENCIA")) AndAlso
+                       fila("PRO_REFERENCIA").ToString() = proRef Then
+                        MostrarMensaje("Este producto ya fue agregado al pedido. No se puede repetir.", True)
+                        Exit Sub
+                    End If
+                Next
+
                 Dim hipSemilla As Decimal = HistorialPrecioService.RegistrarSemilla(proRef)
                 DetallePedidoService.Insertar(pedidoId, CInt(hipSemilla), proRef, cantidad)
-                ' *** FIN CAMBIE AHORITA
 
                 txtCantSolicitada.Text = ""
                 ddlProducto.SelectedIndex = 0
@@ -370,9 +373,18 @@ Namespace Modules.ComprasProveedor
         End Sub
 
         Protected Sub gvDetalles_RowEditing(sender As Object, e As GridViewEditEventArgs)
+            Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
+
+            ' Verificar si este pedido ya tiene una Orden de Compra asociada
+            Dim dtOrdenes As DataTable = OrdenDetallePedidoService.BuscarPorPedido(pedidoId)
+            If dtOrdenes IsNot Nothing AndAlso dtOrdenes.Rows.Count > 0 Then
+                MostrarMensaje("No se puede editar la cantidad porque este pedido ya tiene una Orden de Compra asociada.", True)
+                Exit Sub
+            End If
+
             hfDetalleRecibir.Value = "0"
             gvDetalles.EditIndex = e.NewEditIndex
-            CargarDetallesPedido(Convert.ToInt32(hfPedidoActivo.Value))
+            CargarDetallesPedido(pedidoId)
         End Sub
 
         Protected Sub gvDetalles_RowCancelingEdit(sender As Object, e As GridViewCancelEditEventArgs)

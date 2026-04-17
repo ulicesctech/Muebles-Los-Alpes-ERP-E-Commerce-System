@@ -139,12 +139,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_CP_BOD_ORDEN_COMPRA AS
         OPEN p_data FOR
             SELECT d.detpe_detalle_pedido,
                    d.ped_pedido,
+                   pe.ped_forma_pago,
                    d.detpe_cantidad_solicitada     AS cantidad,
                    NVL(p.pro_nombre, '—')          AS producto_nombre,
                    NVL(m.mat_descripcion, '—')     AS material,
                    NVL(h.hip_precio, 0)             AS precio_ref,
                    h.pro_referencia                AS pro_referencia
               FROM BOD_DETALLE_PEDIDO   d
+              LEFT JOIN BOD_PEDIDO          pe ON pe.ped_pedido          = d.ped_pedido
               LEFT JOIN BOD_HISTORIAL_PRECIO h  ON h.hip_historial_precio = d.hip_historial_precio
               LEFT JOIN BOD_PRODUCTO         p  ON p.pro_referencia       = h.pro_referencia
               LEFT JOIN BOD_MATERIAL         m  ON m.mat_material         = p.mat_material

@@ -14,8 +14,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_ORDEN_DETALLE_PEDIDO AS
             (p_orc_key, p_ped_id, p_material, p_precio, p_cantidad);
         COMMIT;
     EXCEPTION
-        WHEN OTHERS THEN 
-            ROLLBACK; 
+        WHEN OTHERS THEN
+            ROLLBACK;
             RAISE;
     END ODP_INSERTAR;
 
@@ -33,8 +33,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_ORDEN_DETALLE_PEDIDO AS
          WHERE odp_orden_detalle_pedido = p_odp_id;
         COMMIT;
     EXCEPTION
-        WHEN OTHERS THEN 
-            ROLLBACK; 
+        WHEN OTHERS THEN
+            ROLLBACK;
             RAISE;
     END ODP_ACTUALIZAR;
 
@@ -44,12 +44,16 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_ORDEN_DETALLE_PEDIDO AS
          WHERE odp_orden_detalle_pedido = p_odp_id;
         COMMIT;
     EXCEPTION
-        WHEN OTHERS THEN 
-            ROLLBACK; 
+        WHEN OTHERS THEN
+            ROLLBACK;
             RAISE;
     END ODP_ELIMINAR;
 
-  PROCEDURE ODP_LISTAR_POR_ORDEN(
+    -- PRO_NOMBRE se obtiene via:
+    --   odp_material (texto) = mat_descripcion → BOD_MATERIAL → BOD_PRODUCTO
+    -- Esto da el producto correcto por cada item, no el primero del pedido.
+    -- PED_FORMA_PAGO viene de BOD_PEDIDO.
+    PROCEDURE ODP_LISTAR_POR_ORDEN(
         p_orc_key IN VARCHAR2,
         p_data    OUT SYS_REFCURSOR
     ) IS
@@ -58,12 +62,16 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_ORDEN_DETALLE_PEDIDO AS
             SELECT d.odp_orden_detalle_pedido,
                    d.orc_orden_compra,
                    d.ped_pedido,
-                   p.ped_codigo,        -- Ahora sí lo traerá de la tabla BOD_PEDIDO
+                   pe.ped_codigo,
+                   pe.ped_forma_pago,
                    d.odp_material,
+                   NVL(pr.pro_nombre, d.odp_material) AS pro_nombre,
                    d.odp_precio,
                    d.odp_cantidad
               FROM BOD_ORDEN_DETALLE_PEDIDO d
-              LEFT JOIN BOD_PEDIDO p ON d.ped_pedido = p.ped_pedido -- Unimos las tablas
+              LEFT JOIN BOD_PEDIDO   pe ON pe.ped_pedido      = d.ped_pedido
+              LEFT JOIN BOD_MATERIAL mat ON UPPER(TRIM(mat.mat_descripcion)) = UPPER(TRIM(d.odp_material))
+              LEFT JOIN BOD_PRODUCTO pr  ON pr.mat_material   = mat.mat_material
              WHERE d.orc_orden_compra = p_orc_key
              ORDER BY d.odp_orden_detalle_pedido;
     END ODP_LISTAR_POR_ORDEN;
