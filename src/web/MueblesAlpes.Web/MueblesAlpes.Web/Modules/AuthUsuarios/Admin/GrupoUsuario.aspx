@@ -82,24 +82,6 @@
             </asp:TemplateField>
             <asp:BoundField DataField="grupus_descripcion" HeaderText="Grupo" />
             <asp:BoundField DataField="per_permisos"       HeaderText="Permiso ID" />
-            <asp:TemplateField HeaderText="Admin">
-                <ItemTemplate><%# If(Eval("per_admin").ToString()="1","<span class='badge-ok'>✓</span>","<span class='badge-no'>✗</span>") %></ItemTemplate>
-            </asp:TemplateField>
-            <asp:TemplateField HeaderText="RH">
-                <ItemTemplate><%# If(Eval("per_rh").ToString()="1","<span class='badge-ok'>✓</span>","<span class='badge-no'>✗</span>") %></ItemTemplate>
-            </asp:TemplateField>
-            <asp:TemplateField HeaderText="Fac">
-                <ItemTemplate><%# If(Eval("per_fac").ToString()="1","<span class='badge-ok'>✓</span>","<span class='badge-no'>✗</span>") %></ItemTemplate>
-            </asp:TemplateField>
-            <asp:TemplateField HeaderText="Cli">
-                <ItemTemplate><%# If(Eval("per_cli").ToString()="1","<span class='badge-ok'>✓</span>","<span class='badge-no'>✗</span>") %></ItemTemplate>
-            </asp:TemplateField>
-            <asp:TemplateField HeaderText="Bod">
-                <ItemTemplate><%# If(Eval("per_bod").ToString()="1","<span class='badge-ok'>✓</span>","<span class='badge-no'>✗</span>") %></ItemTemplate>
-            </asp:TemplateField>
-            <asp:TemplateField HeaderText="Promo">
-                <ItemTemplate><%# If(Eval("per_promo").ToString()="1","<span class='badge-ok'>✓</span>","<span class='badge-no'>✗</span>") %></ItemTemplate>
-            </asp:TemplateField>
             <asp:TemplateField HeaderText="Acciones">
                 <ItemTemplate>
                     <div class="actions-cell">
@@ -113,7 +95,10 @@
             </asp:TemplateField>
         </Columns>
         <EmptyDataTemplate>
-            <div class="empty-state"><div style="font-size:40px;">👥</div><p>No hay grupos registrados.</p></div>
+            <div class="empty-state">
+                <div style="font-size:40px;">👥</div>
+                <p>No hay grupos registrados.</p>
+            </div>
         </EmptyDataTemplate>
     </asp:GridView>
 </div>

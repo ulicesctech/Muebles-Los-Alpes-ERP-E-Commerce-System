@@ -188,6 +188,13 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
 
             ElseIf e.CommandName = "Eliminar" Then
                 Try
+                    ' Evitar que el empleado se borre a sí mismo
+                    Dim miId As Integer = Convert.ToInt32(Session("UsuarioId"))
+                    If id = miId Then
+                        lblError.Text = "⚠️ No puedes eliminar tu propio usuario estando activo."
+                        lblError.Visible = True
+                        Return
+                    End If
                     EmpleadoService.Eliminar(id)
                     lblMensaje.Text = "🗑️ Empleado ID " & id & " eliminado."
                     lblMensaje.Visible = True

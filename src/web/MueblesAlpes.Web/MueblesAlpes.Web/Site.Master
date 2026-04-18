@@ -211,7 +211,7 @@
                     </svg>
                     <span>Alertas</span>
                 </a>
-                <a runat="server" href="~/Modules/AuthUsuarios/Cliente/LoginEmpleado.aspx"
+                <a runat="server" href="~/Modules/AuthUsuarios/LoginCliente.aspx"
                    style="display:flex; align-items:center; gap:8px; padding:12px 24px; background:#C9973A; color:#1a0e05; border-radius:8px; text-decoration:none; font-size:13px; font-weight:bold; font-family:Arial,sans-serif; margin-left:8px; letter-spacing:0.3px;"
                    onmouseover="this.style.background='#a87a2e'; this.style.color='white';"
                    onmouseout="this.style.background='#C9973A'; this.style.color='#1a0e05';">
@@ -245,11 +245,11 @@
                     <a href="#">Auth &amp; Usuarios &#9660;</a>
                     <div class="dropdown-nav">
                         <a runat="server" href="~/Modules/AuthUsuarios/Index.aspx">Dashboard</a>
-                        <a runat="server" href="~/Modules/AuthUsuarios/Cliente/LoginEmpleado.aspx">Login Empleado</a>
-                        <a runat="server" href="~/Modules/AuthUsuarios/Cliente/LoginCliente.aspx">Login Cliente</a>
-                        <a runat="server" href="~/Modules/AuthUsuarios/Cliente/Puestos.aspx">Puestos</a>
+                        <a runat="server" href="~/Modules/AuthUsuarios/LoginEmpleado.aspx">Login Empleado</a>
+                        <a runat="server" href="~/Modules/AuthUsuarios/LoginCliente.aspx">Login Cliente</a>
+                        <%-- <a runat="server" href="~/Modules/AuthUsuarios/Puestos.aspx">Puestos</a>
                         <a runat="server" href="~/Modules/AuthUsuarios/Admin/GrupoUsuario.aspx">Grupo Usuario</a>
-                        <a runat="server" href="~/Modules/AuthUsuarios/Admin/Permisos.aspx">Permisos</a>
+                        <a runat="server" href="~/Modules/AuthUsuarios/Admin/Permisos.aspx">Permisos</a> --%>
                     </div>
                 </li>
                 <li>

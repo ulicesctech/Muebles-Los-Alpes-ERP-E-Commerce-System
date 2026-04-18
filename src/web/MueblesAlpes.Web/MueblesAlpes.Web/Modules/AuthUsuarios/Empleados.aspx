@@ -148,10 +148,10 @@
                 </ItemTemplate>
             </asp:TemplateField>
             <asp:BoundField DataField="em_DPI"             HeaderText="DPI" />
-            <asp:BoundField DataField="em_nombre_completo" HeaderText="Nombre" />
+            <asp:BoundField DataField="em_primer_nombre"   HeaderText="Nombre" />
             <asp:BoundField DataField="em_primer_telefono" HeaderText="Teléfono" />
             <asp:BoundField DataField="em_direccion"       HeaderText="Dirección" />
-            <asp:BoundField DataField="rol_descripcion"    HeaderText="Rol" />
+            <asp:BoundField DataField="rol_nombre"         HeaderText="Rol" />
             <asp:TemplateField HeaderText="Acciones">
                 <ItemTemplate>
                     <div class="actions-cell">
@@ -159,7 +159,10 @@
                             CommandArgument='<%# Eval("em_empleado") %>' CssClass="btn-edit-t" />
                         <asp:LinkButton runat="server" Text="🗑" CommandName="Eliminar"
                             CommandArgument='<%# Eval("em_empleado") %>' CssClass="btn-del-t"
-                            OnClientClick="return confirm('¿Eliminar este empleado?');" />
+                            OnClientClick="return confirm('¿Eliminar este empleado?');"
+                            Visible='<%# Convert.ToInt32(Eval("em_empleado")) <> Convert.ToInt32(Session("UsuarioId")) %>' />
+                        <%# If(Convert.ToInt32(Eval("em_empleado")) = Convert.ToInt32(Session("UsuarioId")),
+                                        "<span style='font-size:11px;color:#aaa;padding:6px;'>👤 Tú</span>", "") %>
                     </div>
                 </ItemTemplate>
             </asp:TemplateField>

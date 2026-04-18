@@ -203,7 +203,11 @@
             </asp:TemplateField>
             <asp:BoundField DataField="cli_tipodocumento"   HeaderText="Tipo Doc" />
             <asp:BoundField DataField="cli_numdocumento"    HeaderText="Documento" />
-            <asp:BoundField DataField="cli_nombre_completo" HeaderText="Nombre" />
+            <asp:TemplateField HeaderText="Nombre">
+                <ItemTemplate>
+                    <%# Eval("cli_primer_nombre").ToString().Trim() & " " & Eval("cli_primer_apellido").ToString().Trim() %>
+                </ItemTemplate>
+            </asp:TemplateField>
             <asp:BoundField DataField="cli_email"           HeaderText="Email" />
             <asp:BoundField DataField="cli_primer_telefono" HeaderText="Teléfono" />
             <asp:BoundField DataField="cli_pais"            HeaderText="País" />

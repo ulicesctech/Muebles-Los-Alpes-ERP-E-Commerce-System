@@ -1,5 +1,4 @@
-Imports System.Collections.Generic
-Imports System.Data
+﻿Imports System.Data
 Imports Oracle.ManagedDataAccess.Client
 
 Public Class LoginEmpleadoService
@@ -7,40 +6,56 @@ Public Class LoginEmpleadoService
 
     Public Shared Function Login(usuario As String, password As String) As LoginEmpleadoResult
         Dim result As New LoginEmpleadoResult()
+        Dim pResultado As New OracleParameter("p_resultado", OracleDbType.Decimal, ParameterDirection.Output)
+        Dim pEmpleado As New OracleParameter("p_em_empleado", OracleDbType.Decimal, ParameterDirection.Output)
         Dim ps As New List(Of OracleParameter) From {
             New OracleParameter("p_usuario", OracleDbType.Varchar2, usuario, ParameterDirection.Input),
             New OracleParameter("p_password", OracleDbType.Varchar2, password, ParameterDirection.Input),
-            New OracleParameter("p_em_empleado", OracleDbType.Decimal, 500, ParameterDirection.Output),
-            New OracleParameter("p_nombre", OracleDbType.Varchar2, 500, ParameterDirection.Output),
-            New OracleParameter("p_grupo", OracleDbType.Varchar2, 255, ParameterDirection.Output),
-            New OracleParameter("p_per_admin", OracleDbType.Decimal, ParameterDirection.Output),
-            New OracleParameter("p_per_rh", OracleDbType.Decimal, ParameterDirection.Output),
-            New OracleParameter("p_per_fac", OracleDbType.Decimal, ParameterDirection.Output),
-            New OracleParameter("p_per_cli", OracleDbType.Decimal, ParameterDirection.Output),
-            New OracleParameter("p_per_bod", OracleDbType.Decimal, ParameterDirection.Output),
-            New OracleParameter("p_per_promo", OracleDbType.Decimal, ParameterDirection.Output),
-            New OracleParameter("p_resultado", OracleDbType.Decimal, ParameterDirection.Output)
+            pResultado,
+            pEmpleado
         }
-        OracleDb.ExecNonQuery(PKG & ".log_em_login", ps)
+        OracleDb.ExecNonQuery(PKG & ".log_em_validar", ps)
+        result.Resultado = Convert.ToInt32(pResultado.Value.ToString())
 
-        result.Resultado = Convert.ToInt32(ps(11).Value.ToString())
         If result.Resultado = 1 Then
-            result.EmpleadoId = Convert.ToInt32(ps(2).Value.ToString())
-            result.Nombre = ps(3).Value.ToString()
-            result.Grupo = ps(4).Value.ToString()
-            result.PerAdmin = Convert.ToInt32(ps(5).Value.ToString())
-            result.PerRH = Convert.ToInt32(ps(6).Value.ToString())
-            result.PerFac = Convert.ToInt32(ps(7).Value.ToString())
-            result.PerCli = Convert.ToInt32(ps(8).Value.ToString())
-            result.PerBod = Convert.ToInt32(ps(9).Value.ToString())
-            result.PerPromo = Convert.ToInt32(ps(10).Value.ToString())
+            result.EmpleadoId = Convert.ToInt32(pEmpleado.Value.ToString())
+            Dim dtEmp As DataTable = EmpleadoService.Buscar(result.EmpleadoId)
+            If dtEmp.Rows.Count > 0 Then
+                Dim rowEmp = dtEmp.Rows(0)
+                result.Nombre = rowEmp("em_primer_nombre").ToString() & " " &
+                                rowEmp("em_primer_apellido").ToString()
+                Dim rolId As Integer = Convert.ToInt32(rowEmp("rolus_rol_usuario").ToString())
+                Dim dtGru As DataTable = GrupoUsuarioService.Buscar(rolId)
+                If dtGru.Rows.Count > 0 Then
+                    Dim rowGru = dtGru.Rows(0)
+                    result.Grupo = rowGru("grupus_descripcion").ToString()
+                    Dim permisoId As Integer = Convert.ToInt32(rowGru("per_permisos").ToString())
+                    Dim dtPer As DataTable = PermisoService.Listar()
+                    For Each rowPer As DataRow In dtPer.Rows
+                        If Convert.ToInt32(rowPer("per_permisos")) = permisoId Then
+                            result.PerAdmin = Convert.ToInt32(rowPer("per_admin").ToString())
+                            result.PerRH = Convert.ToInt32(rowPer("per_rh").ToString())
+                            result.PerFac = Convert.ToInt32(rowPer("per_fac").ToString())
+                            result.PerCli = Convert.ToInt32(rowPer("per_cli").ToString())
+                            result.PerBod = Convert.ToInt32(rowPer("per_bod").ToString())
+                            result.PerPromo = Convert.ToInt32(rowPer("per_promo").ToString())
+                            Exit For
+                        End If
+                    Next
+                End If
+            End If
         End If
         Return result
     End Function
 
-    Public Shared Function Listar() As DataTable
-        Return OracleDb.ExecRefCursor(PKG & ".log_em_listar", Nothing, "p_cursor")
-    End Function
+    Public Shared Sub Crear(emId As Integer, usuario As String, password As String)
+        Dim ps As New List(Of OracleParameter) From {
+            New OracleParameter("p_em_empleado", OracleDbType.Decimal, emId, ParameterDirection.Input),
+            New OracleParameter("p_usuario", OracleDbType.Varchar2, usuario, ParameterDirection.Input),
+            New OracleParameter("p_password", OracleDbType.Varchar2, password, ParameterDirection.Input)
+        }
+        OracleDb.ExecNonQuery(PKG & ".log_em_crear", ps)
+    End Sub
 
     Public Shared Sub ActualizarPassword(emId As Integer, password As String)
         Dim ps As New List(Of OracleParameter) From {
