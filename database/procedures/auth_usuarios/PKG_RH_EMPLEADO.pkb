@@ -82,8 +82,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_RH_EMPLEADO AS
 
     PROCEDURE emp_eliminar(p_id IN NUMBER) IS
     BEGIN
-        DELETE FROM ADMIN_LOGIN_EMPLEADO WHERE em_empleado = p_id;
-        DELETE FROM RH_EMPLEADO WHERE em_empleado = p_id;
+        DELETE FROM RH_ASCENSO           WHERE em_empleado = p_id;
+        DELETE FROM ADMIN_LOGIN_EMPLEADO  WHERE em_empleado = p_id;
+        DELETE FROM RH_EMPLEADO           WHERE em_empleado = p_id;
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN

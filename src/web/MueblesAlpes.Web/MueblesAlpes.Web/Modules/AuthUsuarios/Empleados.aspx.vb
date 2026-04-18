@@ -181,31 +181,32 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
                     End If
                     lblMensaje.Text = "✏️ Editando empleado ID: " & id
                     lblMensaje.Visible = True
+                    lblError.Visible = False
                 Catch ex As Exception
                     lblError.Text = "Error al cargar: " & ex.Message
                     lblError.Visible = True
                 End Try
+                CargarEmpleados()
 
             ElseIf e.CommandName = "Eliminar" Then
-                Try
-                    ' Evitar que el empleado se borre a sí mismo
-                    Dim miId As Integer = Convert.ToInt32(Session("UsuarioId"))
-                    If id = miId Then
-                        lblError.Text = "⚠️ No puedes eliminar tu propio usuario estando activo."
-                        lblError.Visible = True
-                        Return
-                    End If
-                    EmpleadoService.Eliminar(id)
-                    lblMensaje.Text = "🗑️ Empleado ID " & id & " eliminado."
-                    lblMensaje.Visible = True
+                Dim miId As Integer = Convert.ToInt32(Session("UsuarioId"))
+                If id = miId Then
+                    lblError.Text = "⚠️ No puedes eliminar tu propio usuario estando activo."
+                    lblError.Visible = True
                     CargarEmpleados()
+                    Return
+                End If
+                Try
+                    EmpleadoService.Eliminar(id)
+                    lblMensaje.Text = "🗑️ Empleado ID " & id & " eliminado correctamente."
+                    lblMensaje.Visible = True
+                    lblError.Visible = False
                 Catch ex As Exception
                     lblError.Text = "Error al eliminar: " & ex.Message
                     lblError.Visible = True
                 End Try
+                CargarEmpleados()
             End If
-
-            CargarEmpleados()
         End Sub
 
         Private Sub LimpiarFormulario()
