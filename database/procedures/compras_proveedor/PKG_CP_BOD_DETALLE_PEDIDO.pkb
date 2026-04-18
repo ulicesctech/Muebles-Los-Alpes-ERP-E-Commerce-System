@@ -7,14 +7,26 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_DETALLE_PEDIDO AS
     PROCEDURE DET_PED_INSERTAR(
         p_ped_pedido      IN NUMBER,
         p_hip_historial   IN NUMBER,
-        p_pro_referencia  IN VARCHAR2,   -- se mantiene en la firma para no romper el .vb
+        p_pro_referencia  IN VARCHAR2,
         p_cant_solicitada IN NUMBER,
         p_cant_recibida   IN NUMBER DEFAULT 0
     ) IS
+        v_existe NUMBER;
     BEGIN
-        -- *** CAMBIE AHORITA: ya no se inserta pro_referencia en la tabla
-        -- porque la columna fue eliminada. p_pro_referencia se recibe pero se ignora.
-        -- La conexion con BOD_PRODUCTO se hace via hip_historial_precio (semilla).
+        -- Verificar que el producto no este ya en el pedido
+        -- comparando pro_referencia via BOD_HISTORIAL_PRECIO de los items existentes
+        SELECT COUNT(*)
+          INTO v_existe
+          FROM BOD_DETALLE_PEDIDO d
+          JOIN BOD_HISTORIAL_PRECIO h ON h.hip_historial_precio = d.hip_historial_precio
+         WHERE d.ped_pedido    = p_ped_pedido
+           AND h.pro_referencia = TRIM(p_pro_referencia);
+
+        IF v_existe > 0 THEN
+            RAISE_APPLICATION_ERROR(-20060,
+                'Este producto ya fue agregado al pedido. No se puede repetir.');
+        END IF;
+
         INSERT INTO BOD_DETALLE_PEDIDO
             (ped_pedido, hip_historial_precio,
              detpe_cantidad_solicitada, detpe_cantidad_recibida)
@@ -44,9 +56,57 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_DETALLE_PEDIDO AS
     END DET_PED_ACTUALIZAR;
 
     PROCEDURE DET_PED_ELIMINAR(p_detpe_id IN NUMBER) IS
+        v_hip_id   NUMBER;
+        v_ped_id   NUMBER;
+        v_precio   NUMBER;
+        v_nicho    NUMBER;
+        v_tiene_oc NUMBER;
+        v_otros    NUMBER;
     BEGIN
+        -- Leer ped_pedido e hip_historial_precio antes de borrar
+        SELECT ped_pedido, hip_historial_precio
+          INTO v_ped_id, v_hip_id
+          FROM BOD_DETALLE_PEDIDO
+         WHERE detpe_detalle_pedido = p_detpe_id;
+
+        -- Bloquear si el pedido ya tiene Orden de Compra
+        SELECT COUNT(*)
+          INTO v_tiene_oc
+          FROM BOD_ORDEN_DETALLE_PEDIDO
+         WHERE ped_pedido = v_ped_id;
+
+        IF v_tiene_oc > 0 THEN
+            RAISE_APPLICATION_ERROR(-20060,
+                'No se puede eliminar: el pedido ya tiene una Orden de Compra asociada.');
+        END IF;
+
+        -- Borrar el detalle
         DELETE FROM BOD_DETALLE_PEDIDO
          WHERE detpe_detalle_pedido = p_detpe_id;
+
+        -- Si tenia semilla vinculada, verificar si es huerfana y borrarla
+        IF v_hip_id IS NOT NULL THEN
+            SELECT NVL(hip_precio, -1), NVL(nic_nicho, -1)
+              INTO v_precio, v_nicho
+              FROM BOD_HISTORIAL_PRECIO
+             WHERE hip_historial_precio = v_hip_id;
+
+            -- Es semilla si precio o nicho son NULL (representados como -1 por NVL)
+            IF v_precio = -1 OR v_nicho = -1 THEN
+                -- Contar cuantos detalles quedan apuntando a esta semilla
+                SELECT COUNT(*)
+                  INTO v_otros
+                  FROM BOD_DETALLE_PEDIDO
+                 WHERE hip_historial_precio = v_hip_id;
+
+                -- Si nadie mas la referencia, eliminarla
+                IF v_otros = 0 THEN
+                    DELETE FROM BOD_HISTORIAL_PRECIO
+                     WHERE hip_historial_precio = v_hip_id;
+                END IF;
+            END IF;
+        END IF;
+
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN ROLLBACK; RAISE;
