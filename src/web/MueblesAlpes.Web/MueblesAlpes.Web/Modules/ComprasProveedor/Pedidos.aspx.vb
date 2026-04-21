@@ -338,27 +338,27 @@ Namespace Modules.ComprasProveedor
                         MostrarMensaje("No se encontro precio especifico. Se uso el primer precio disponible.", False)
                     End If
 
-                    ' 6. Actualizar la cantidad recibida en el detalle del pedido
-                    Dim cantSolActual As Integer = If(filaDetalle.Length > 0,
-                                             Convert.ToInt32(filaDetalle(0)("DETPE_CANTIDAD_SOLICITADA")),
-                                             cantSol)
-                    DetallePedidoService.Actualizar(detalleId, cantSolActual, cantRecibida)
+                    ' 6. NO guardar cantidad recibida aqui.
+                    '    Se guardara cuando el usuario confirme el stock desde Stock.aspx.
+                    '    Si el usuario se sale de Stock sin confirmar, no queda nada guardado.
 
-                    ' 7. Redirigir a Precios con los parametros necesarios
-                    ' *** CAMBIE AHORITA: se agregan &detpe= y &hip= al redirect.
-                    ' detpe = ID del BOD_DETALLE_PEDIDO (por si se necesita en Precios).
-                    ' hip   = ID del historial semilla a actualizar en Precios.
+                    ' 7. Redirigir a Stock con todos los parametros necesarios.
+                    '    Stock.aspx se encargara de:
+                    '      a) Activar la semilla como historial definitivo (precio + nicho)
+                    '      b) Crear/registrar la entrada de stock con cantRecibida
+                    '      c) Actualizar la cantidad recibida en BOD_DETALLE_PEDIDO
+                    '      d) Regresar a Pedidos.aspx?pedido=...
                     Dim precioODPStr As String = precioODP.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)
                     hfDetalleRecibir.Value = "0"
 
-                    Response.Redirect(ResolveUrl("~/Modules/CatalogoInventario/Precios.aspx") &
+                    Response.Redirect(ResolveUrl("~/Modules/CatalogoInventario/Stock.aspx") &
                               "?ref=" & proRef &
                               "&pedido=" & pedidoId &
                               "&detpe=" & detalleId &
                               "&hip=" & hipSemillaId &
                               "&precio=" & precioODPStr &
-                              "&readonly=1")
-                    ' *** FIN CAMBIE AHORITA
+                              "&cantrecibida=" & cantRecibida &
+                              "&fromped=1")
                 Catch ex As Exception
                     MostrarMensaje("Error: " & ex.Message, True)
                 End Try

@@ -106,6 +106,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_STOCK AS
              s.hip_historial_precio,
              p.pro_referencia,
              p.pro_nombre,
+             n.nic_nicho,
              n.nic_numero,
              n.nic_caracteristica,
              a.alm_nombre,
@@ -127,6 +128,53 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_STOCK AS
         JOIN BOD_ALMACEN          a  ON a.alm_almacen          = na.alm_almacen
        WHERE h.pro_referencia = v_ref
        ORDER BY a.alm_nombre, n.nic_numero;
+  END;
+
+  -- Devuelve el stock de un producto en un nicho especifico,
+  -- independientemente del hip vigente actual.
+  -- Util al recibir mercancia cuando el hip anterior ya fue cerrado.
+  PROCEDURE OBTENER_POR_NICHO(
+    p_pro_referencia IN VARCHAR2,
+    p_nic_nicho      IN NUMBER,
+    p_data           OUT SYS_REFCURSOR
+  ) IS
+    v_ref VARCHAR2(40);
+  BEGIN
+    v_ref := TRIM(p_pro_referencia);
+    IF v_ref IS NULL THEN
+      RAISE_APPLICATION_ERROR(-20014, 'BOD_STOCK: pro_referencia obligatorio.');
+    END IF;
+    IF p_nic_nicho IS NULL THEN
+      RAISE_APPLICATION_ERROR(-20015, 'BOD_STOCK: nic_nicho obligatorio.');
+    END IF;
+    OPEN p_data FOR
+      SELECT s.sto_stock,
+             s.hip_historial_precio,
+             p.pro_referencia,
+             p.pro_nombre,
+             n.nic_nicho,
+             n.nic_numero,
+             n.nic_caracteristica,
+             a.alm_nombre,
+             h.hip_precio,
+             h.hip_fecha_inicio,
+             s.sto_minimo,
+             s.sto_maximo,
+             s.sto_disponible,
+             CASE
+               WHEN s.sto_disponible <= s.sto_minimo THEN 'BAJO'
+               WHEN s.sto_disponible >= s.sto_maximo THEN 'ALTO'
+               ELSE 'NORMAL'
+             END AS estado_stock
+        FROM BOD_STOCK            s
+        JOIN BOD_HISTORIAL_PRECIO h  ON h.hip_historial_precio = s.hip_historial_precio
+        JOIN BOD_PRODUCTO         p  ON p.pro_referencia       = h.pro_referencia
+        JOIN BOD_NICHO            n  ON n.nic_nicho            = h.nic_nicho
+        JOIN BOD_NIC_ALM          na ON na.nic_nicho           = n.nic_nicho
+        JOIN BOD_ALMACEN          a  ON a.alm_almacen          = na.alm_almacen
+       WHERE h.pro_referencia = v_ref
+         AND n.nic_nicho      = p_nic_nicho
+       FETCH FIRST 1 ROWS ONLY;
   END;
  
   -- Suma cantidad al disponible — llamado desde Compras al recibir mercancia

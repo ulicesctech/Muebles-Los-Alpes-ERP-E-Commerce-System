@@ -75,6 +75,24 @@
     <asp:Label ID="lblMsg" runat="server" />
 </asp:Panel>
 
+<%-- Hidden fields para modo desde Pedidos --%>
+<asp:HiddenField ID="hfFromPed"      runat="server" Value="0" />
+<asp:HiddenField ID="hfPedParam"     runat="server" Value="0" />
+<asp:HiddenField ID="hfHipSemilla"   runat="server" Value="0" />
+<asp:HiddenField ID="hfDetpeParam"   runat="server" Value="0" />
+<asp:HiddenField ID="hfPrecioODP"    runat="server" Value="0" />
+<asp:HiddenField ID="hfCantRecibida" runat="server" Value="0" />
+<asp:HiddenField ID="hfHipAnterior"  runat="server" Value="0" />
+
+<%-- Aviso visible solo cuando viene de Pedidos --%>
+<asp:Panel ID="pnlAvisoPedido" runat="server" Visible="false">
+    <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:14px 18px;margin-bottom:18px;font-size:13px;font-family:Arial,sans-serif;color:#7a5818;">
+        <strong>&#9888; Recepcion de pedido</strong> — Selecciona el almacen y nicho donde entra la mercancia.
+        Al guardar el stock se confirmara la cantidad recibida y regresaras al pedido.<br/>
+        <em>Si sales sin guardar, la cantidad recibida NO quedara registrada en el pedido.</em>
+    </div>
+</asp:Panel>
+
 <%-- PASO 1 --%>
 <div class="step-card">
     <h4><span class="step-num">1</span> Selecciona el Producto</h4>
@@ -159,12 +177,20 @@
                 </div>
             </div>
 
+            <%-- Resumen de suma (solo visible en modo fromped con stock > 0) --%>
+            <asp:Panel ID="pnlSumaInfo" runat="server" Visible="false">
+                <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:10px 16px;margin-bottom:14px;font-size:13px;font-family:Arial,sans-serif;color:#1b5e20;">
+                    &#10133; Al confirmar, el disponible quedara en:
+                    <asp:Label ID="lblSumaInfo" runat="server" style="margin-left:6px;" />
+                </div>
+            </asp:Panel>
+
             <%-- Entrada de mercancia --%>
             <div class="entrada-card">
                 <h5>Registrar Entrada de Mercancia</h5>
                 <div class="f-row">
                     <div class="f-group" style="max-width:200px;">
-                        <label>Cantidad que ingresa *</label>
+                        <asp:Label ID="lblCantEntradaLabel" runat="server" Text="Cantidad que ingresa *" style="font-size:11px;font-weight:bold;color:#5C3A1E;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:0.5px;" />
                         <asp:TextBox ID="txtCantidadEntrada" runat="server" placeholder="0" />
                     </div>
                     <div style="display:flex; align-items:flex-end;">
@@ -192,7 +218,15 @@
                 </div>
             </div>
             <asp:Button ID="btnGuardar"  runat="server" Text="Guardar Limites" CssClass="btn-gold"    OnClick="btnGuardar_Click" />
-            <asp:Button ID="btnCancelar" runat="server" Text="Cancelar"        CssClass="btn-outline" OnClick="btnCancelar_Click" CausesValidation="false" />
+            <%-- Boton para habilitar edicion de limites en modo fromped --%>
+            <asp:Panel ID="pnlEditarLimites" runat="server" Visible="false" style="display:inline;">
+                <asp:Button ID="btnEditarLimites" runat="server" Text="&#9998; Editar Limites" CssClass="btn-outline" OnClick="btnEditarLimites_Click" CausesValidation="false" />
+            </asp:Panel>
+            <%-- Boton para cancelar edicion de limites (vuelve a readonly sin limpiar) --%>
+            <asp:Panel ID="pnlCancelarLimites" runat="server" Visible="false" style="display:inline;">
+                <asp:Button ID="btnCancelarLimites" runat="server" Text="Cancelar edicion" CssClass="btn-outline" OnClick="btnCancelarLimites_Click" CausesValidation="false" />
+            </asp:Panel>
+            <asp:Button ID="btnCancelar" runat="server" Text="Cancelar" CssClass="btn-outline" OnClick="btnCancelar_Click" CausesValidation="false" />
         </asp:Panel>
 
         <%-- Sin stock aun --%>
@@ -202,7 +236,7 @@
             </div>
             <div class="f-row" style="margin-bottom:16px;">
                 <div class="f-group" style="max-width:200px;">
-                    <label>Disponible inicial *</label>
+                    <asp:Label ID="lblDisponibleNuevoLabel" runat="server" Text="Disponible inicial *" style="font-size:11px;font-weight:bold;color:#5C3A1E;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:0.5px;" />
                     <asp:TextBox ID="txtDisponibleNuevo" runat="server" placeholder="0" />
                 </div>
                 <div class="f-group" style="max-width:200px;">
@@ -225,16 +259,50 @@
 <div class="section-label">Stock General</div>
 <div class="table-card">
     <asp:GridView ID="gvStock" runat="server" AutoGenerateColumns="false"
+        DataKeyNames="HIP_HISTORIAL_PRECIO"
+        OnRowEditing="gvStock_RowEditing"
+        OnRowCancelingEdit="gvStock_RowCancelingEdit"
+        OnRowUpdating="gvStock_RowUpdating"
         EmptyDataText="No hay stock registrado." style="width:100%;">
         <Columns>
-            <asp:BoundField DataField="PRO_NOMBRE"         HeaderText="Producto" />
-            <asp:BoundField DataField="ALM_NOMBRE"         HeaderText="Almacen"        ItemStyle-Width="130px" />
-            <asp:BoundField DataField="NIC_NUMERO"         HeaderText="Nicho"          ItemStyle-Width="70px" />
-            <asp:BoundField DataField="NIC_CARACTERISTICA" HeaderText="Caracteristica" />
-            <asp:BoundField DataField="HIP_PRECIO"         HeaderText="Precio Venta"   DataFormatString="{0:C2}" ItemStyle-Width="100px" />
-            <asp:BoundField DataField="STO_DISPONIBLE"     HeaderText="Disponible"     ItemStyle-Width="85px" />
-            <asp:BoundField DataField="STO_MINIMO"         HeaderText="Minimo"         ItemStyle-Width="75px" />
-            <asp:BoundField DataField="STO_MAXIMO"         HeaderText="Maximo"         ItemStyle-Width="75px" />
+            <%-- Columnas de solo lectura: ItemTemplate unico, sin EditItemTemplate --%>
+            <asp:TemplateField HeaderText="Producto">
+                <ItemTemplate><%# Eval("PRO_NOMBRE") %></ItemTemplate>
+            </asp:TemplateField>
+            <asp:TemplateField HeaderText="Almacen" ItemStyle-Width="130px">
+                <ItemTemplate><%# Eval("ALM_NOMBRE") %></ItemTemplate>
+            </asp:TemplateField>
+            <asp:TemplateField HeaderText="Nicho" ItemStyle-Width="70px">
+                <ItemTemplate><%# Eval("NIC_NUMERO") %></ItemTemplate>
+            </asp:TemplateField>
+            <asp:TemplateField HeaderText="Caracteristica">
+                <ItemTemplate><%# Eval("NIC_CARACTERISTICA") %></ItemTemplate>
+            </asp:TemplateField>
+            <asp:TemplateField HeaderText="Precio" ItemStyle-Width="100px">
+                <ItemTemplate><%# String.Format("{0:C2}", Eval("HIP_PRECIO")) %></ItemTemplate>
+            </asp:TemplateField>
+            <asp:TemplateField HeaderText="Disponible" ItemStyle-Width="85px">
+                <ItemTemplate>
+                    <asp:Label ID="lblGvDisponible" runat="server" Text='<%# Eval("STO_DISPONIBLE") %>' />
+                </ItemTemplate>
+            </asp:TemplateField>
+            <%-- Minimo: texto en vista normal, TextBox en edicion --%>
+            <asp:TemplateField HeaderText="Minimo" ItemStyle-Width="90px">
+                <ItemTemplate><%# Eval("STO_MINIMO") %></ItemTemplate>
+                <EditItemTemplate>
+                    <asp:TextBox ID="txtGvMinimo" runat="server" Text='<%# Eval("STO_MINIMO") %>'
+                        style="width:65px;padding:4px 6px;border:1.5px solid #C9973A;border-radius:6px;font-size:13px;" />
+                </EditItemTemplate>
+            </asp:TemplateField>
+            <%-- Maximo: texto en vista normal, TextBox en edicion --%>
+            <asp:TemplateField HeaderText="Maximo" ItemStyle-Width="90px">
+                <ItemTemplate><%# Eval("STO_MAXIMO") %></ItemTemplate>
+                <EditItemTemplate>
+                    <asp:TextBox ID="txtGvMaximo" runat="server" Text='<%# Eval("STO_MAXIMO") %>'
+                        style="width:65px;padding:4px 6px;border:1.5px solid #C9973A;border-radius:6px;font-size:13px;" />
+                </EditItemTemplate>
+            </asp:TemplateField>
+            <%-- Estado --%>
             <asp:TemplateField HeaderText="Estado" ItemStyle-Width="80px">
                 <ItemTemplate>
                     <%# If(Eval("ESTADO_STOCK").ToString() = "BAJO",
@@ -243,6 +311,19 @@
                             "<span class='badge-alto'>Alto</span>",
                             "<span class='badge-normal'>Normal</span>")) %>
                 </ItemTemplate>
+            </asp:TemplateField>
+            <%-- Acciones --%>
+            <asp:TemplateField HeaderText="" ItemStyle-Width="150px">
+                <ItemTemplate>
+                    <asp:Button CommandName="Edit" runat="server" Text="&#9998; Editar" CssClass="btn-outline"
+                        style="padding:5px 12px;font-size:12px;" />
+                </ItemTemplate>
+                <EditItemTemplate>
+                    <asp:Button CommandName="Update" runat="server" Text="&#10003; Guardar" CssClass="btn-gold"
+                        style="padding:5px 10px;font-size:12px;" />
+                    <asp:Button CommandName="Cancel" runat="server" Text="&#10005;" CssClass="btn-outline"
+                        style="padding:5px 8px;font-size:12px;margin-left:4px;" CausesValidation="false" />
+                </EditItemTemplate>
             </asp:TemplateField>
         </Columns>
     </asp:GridView>

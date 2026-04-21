@@ -522,7 +522,7 @@
     </Compile>
     <Compile Include="Modules\CatalogoInventario\Stock.aspx.vb">
       <DependentUpon>Stock.aspx</DependentUpon>
-      <SubType>ASPXCodebehind</SubType>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Modules\Cliente\Login.aspx.designer.vb">
       <DependentUpon>Login.aspx</DependentUpon>

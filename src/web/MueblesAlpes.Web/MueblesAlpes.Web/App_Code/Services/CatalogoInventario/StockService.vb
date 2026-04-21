@@ -29,6 +29,19 @@ Public Class StockService
         Return OracleDb.ExecRefCursor(PKG & ".OBTENER", ps, "p_data")
     End Function
 
+    ''' <summary>
+    ''' Busca el stock de un producto en un nicho especifico.
+    ''' Funciona aunque el hip ya no sea el vigente actual
+    ''' (el stock sigue vinculado al hip en que fue creado/actualizado).
+    ''' </summary>
+    Public Shared Function ObtenerPorNicho(proReferencia As String, nicNicho As Decimal) As DataTable
+        Dim ps As New List(Of OracleParameter) From {
+            New OracleParameter("p_pro_referencia", OracleDbType.Varchar2, proReferencia, ParameterDirection.Input),
+            New OracleParameter("p_nic_nicho", OracleDbType.Decimal, nicNicho, ParameterDirection.Input)
+        }
+        Return OracleDb.ExecRefCursor(PKG & ".OBTENER_POR_NICHO", ps, "p_data")
+    End Function
+
     ''' <summary>Lista todo el stock con producto, nicho, almacen y estado.</summary>
     Public Shared Function Listar() As DataTable
         Return OracleDb.ExecRefCursor(PKG & ".LISTAR", Nothing, "p_data")
