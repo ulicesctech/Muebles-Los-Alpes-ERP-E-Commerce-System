@@ -14,8 +14,7 @@ Namespace Modules.CatalogoInventario
                 CargarProductos()
                 CargarTablaStock()
 
-                ' MODO DESDE PEDIDOS (fromped=1):
-                ' Pre-carga producto, bloquea dropdown y guarda parametros en hidden fields.
+                ' MODO DESDE PEDIDOS (fromped=1)
                 Dim fromPed As String = Request.QueryString("fromped")
                 If fromPed = "1" Then
                     Dim refParam As String = Request.QueryString("ref")
@@ -144,8 +143,6 @@ Namespace Modules.CatalogoInventario
                     pnlPrecioVigente.Visible = True
                 End If
 
-                ' En modo fromped: buscar stock directamente por producto+nicho
-                ' sin depender del hip vigente, que pudo haber cambiado en recepciones anteriores.
                 Dim dtStock As DataTable = Nothing
                 If esDesdePedido Then
                     hfHipAnterior.Value = "0"
@@ -275,10 +272,7 @@ Namespace Modules.CatalogoInventario
                     Response.Redirect(ResolveUrl("~/Modules/ComprasProveedor/Pedidos.aspx") &
                                       "?pedido=" & pedidoId)
                 Else
-                    StockService.Guardar(
-                        Convert.ToDecimal(hfHipId.Value),
-                        minimo, maximo, disponible
-                    )
+                    StockService.Guardar(Convert.ToDecimal(hfHipId.Value), minimo, maximo, disponible)
                     MostrarExito("Stock creado correctamente.")
                     ddlNicho_SelectedIndexChanged(Nothing, EventArgs.Empty)
                     CargarTablaStock()
@@ -293,7 +287,6 @@ Namespace Modules.CatalogoInventario
         ' =============================================
         Protected Sub btnEntrada_Click(sender As Object, e As EventArgs)
             Dim esDesdePedido As Boolean = (hfFromPed.Value = "1")
-
             If Not esDesdePedido AndAlso txtCantidadEntrada.Text.Trim() = "" Then
                 MostrarError("Ingresa la cantidad que entro.")
                 Return
@@ -423,7 +416,6 @@ Namespace Modules.CatalogoInventario
             Try
                 Dim row As GridViewRow = gvStock.Rows(e.RowIndex)
                 Dim hipId As Decimal = Convert.ToDecimal(gvStock.DataKeys(e.RowIndex).Value)
-
                 Dim txtMin As TextBox = CType(row.FindControl("txtGvMinimo"), TextBox)
                 Dim txtMax As TextBox = CType(row.FindControl("txtGvMaximo"), TextBox)
                 Dim lblDis As Label = CType(row.FindControl("lblGvDisponible"), Label)
@@ -445,9 +437,7 @@ Namespace Modules.CatalogoInventario
                 End If
 
                 Dim disponibleActual As Decimal = 0
-                If lblDis IsNot Nothing Then
-                    Decimal.TryParse(lblDis.Text, disponibleActual)
-                End If
+                If lblDis IsNot Nothing Then Decimal.TryParse(lblDis.Text, disponibleActual)
 
                 StockService.Guardar(hipId, nuevoMin, nuevoMax, disponibleActual)
                 gvStock.EditIndex = -1
@@ -456,6 +446,200 @@ Namespace Modules.CatalogoInventario
             Catch ex As Exception
                 MostrarError("Error al actualizar: " & ex.Message)
             End Try
+        End Sub
+
+        ' =============================================
+        ' TRASLADO DE STOCK — iniciado desde el gridview
+        ' =============================================
+        Protected Sub gvStock_RowCommand(sender As Object, e As GridViewCommandEventArgs)
+            If e.CommandName = "Trasladar" Then
+                Dim hipOrigen As Decimal = Convert.ToDecimal(e.CommandArgument)
+                Try
+                    Dim dtOrigen As DataTable = StockService.Obtener(hipOrigen)
+                    If dtOrigen Is Nothing OrElse dtOrigen.Rows.Count = 0 Then
+                        MostrarError("No se pudo obtener el stock de este registro.")
+                        Return
+                    End If
+
+                    Dim dispOrigen As Decimal = Convert.ToDecimal(dtOrigen.Rows(0)("STO_DISPONIBLE"))
+                    If dispOrigen <= 0 Then
+                        MostrarError("No hay stock disponible en este nicho para trasladar.")
+                        Return
+                    End If
+
+                    hfHipOrigen.Value = hipOrigen.ToString()
+                    hfMinOrigen.Value = dtOrigen.Rows(0)("STO_MINIMO").ToString()
+                    hfMaxOrigen.Value = dtOrigen.Rows(0)("STO_MAXIMO").ToString()
+                    hfDispOrigen.Value = dispOrigen.ToString()
+
+                    lblOrigenInfo.Text = " " & dtOrigen.Rows(0)("PRO_NOMBRE").ToString() &
+                                         " — " & dtOrigen.Rows(0)("ALM_NOMBRE").ToString() &
+                                         " / " & dtOrigen.Rows(0)("NIC_NUMERO").ToString() &
+                                         " | Disponible: " & dispOrigen.ToString() &
+                                         " | Min: " & dtOrigen.Rows(0)("STO_MINIMO").ToString() &
+                                         " | Max: " & dtOrigen.Rows(0)("STO_MAXIMO").ToString()
+
+                    hfProductoTraslado.Value = dtOrigen.Rows(0)("PRO_REFERENCIA").ToString()
+
+                    ddlAlmacenDestino.DataSource = AlmacenService.Listar()
+                    ddlAlmacenDestino.DataTextField = "ALM_NOMBRE"
+                    ddlAlmacenDestino.DataValueField = "ALM_ALMACEN"
+                    ddlAlmacenDestino.DataBind()
+                    ddlAlmacenDestino.Items.Insert(0, New ListItem("-- Seleccione almacen destino --", ""))
+                    ddlNichoDestino.Items.Clear()
+                    ddlNichoDestino.Items.Add(New ListItem("-- Primero seleccione almacen --", ""))
+                    txtCantidadTraslado.Text = ""
+                    pnlResumenDestino.Visible = False
+                    pnlDestinoSinStock.Visible = False
+                    pnlTraslado.Visible = True
+                    pnlMsg.Visible = False
+                Catch ex As Exception
+                    MostrarError("Error al iniciar traslado: " & ex.Message)
+                End Try
+            End If
+        End Sub
+
+        Protected Sub ddlAlmacenDestino_SelectedIndexChanged(sender As Object, e As EventArgs)
+            ddlNichoDestino.Items.Clear()
+            pnlResumenDestino.Visible = False
+            pnlDestinoSinStock.Visible = False
+            If ddlAlmacenDestino.SelectedValue = "" Then
+                ddlNichoDestino.Items.Add(New ListItem("-- Primero seleccione almacen --", ""))
+                Return
+            End If
+            Try
+                ' Verificar que el almacen destino tenga stock del producto en al menos un nicho.
+                ' Se reutiliza LISTAR_POR_PRODUCTO y se filtra por ALM_NOMBRE no es ideal,
+                ' pero StockService.ListarPorProducto devuelve alm_nombre en cada fila,
+                ' asi que filtramos en memoria comparando el almacen seleccionado.
+                Dim almDestinoId As Decimal = Convert.ToDecimal(ddlAlmacenDestino.SelectedValue)
+                Dim dtStockProducto As DataTable = StockService.ListarPorProducto(hfProductoTraslado.Value)
+                Dim tieneStockEnAlmacen As Boolean = False
+                If dtStockProducto IsNot Nothing Then
+                    For Each fila As DataRow In dtStockProducto.Rows
+                        ' Excluir el nicho origen del conteo para no contar solo ese
+                        If fila("HIP_HISTORIAL_PRECIO").ToString() <> hfHipOrigen.Value Then
+                            ' Necesitamos comparar por almacen. El SP devuelve alm_nombre,
+                            ' pero necesitamos el ID. Agregamos alm_almacen al SP o
+                            ' comparamos cargando los nichos del almacen destino.
+                            ' Como NIC_NICHO si esta disponible, verificamos via nichos del almacen.
+                            Dim nichosFila As DataTable = NicAlmService.ListarPorAlmacen(almDestinoId)
+                            For Each nicFila As DataRow In nichosFila.Rows
+                                If fila("NIC_NICHO").ToString() = nicFila("NIC_NICHO").ToString() Then
+                                    tieneStockEnAlmacen = True
+                                    Exit For
+                                End If
+                            Next
+                        End If
+                        If tieneStockEnAlmacen Then Exit For
+                    Next
+                End If
+
+                If Not tieneStockEnAlmacen Then
+                    MostrarError("El almacen seleccionado no tiene stock registrado para este producto. Selecciona otro almacen.")
+                    ddlAlmacenDestino.SelectedIndex = 0
+                    ddlNichoDestino.Items.Clear()
+                    ddlNichoDestino.Items.Add(New ListItem("-- Primero seleccione almacen --", ""))
+                    Return
+                End If
+
+                ddlNichoDestino.DataSource = NicAlmService.ListarPorAlmacen(almDestinoId)
+                ddlNichoDestino.DataTextField = "NIC_DISPLAY"
+                ddlNichoDestino.DataValueField = "NIC_NICHO"
+                ddlNichoDestino.DataBind()
+                ddlNichoDestino.Items.Insert(0, New ListItem("-- Seleccione nicho destino --", ""))
+            Catch ex As Exception
+                MostrarError("Error al cargar nichos destino: " & ex.Message)
+            End Try
+        End Sub
+
+        Protected Sub ddlNichoDestino_SelectedIndexChanged(sender As Object, e As EventArgs)
+            pnlResumenDestino.Visible = False
+            pnlDestinoSinStock.Visible = False
+            If ddlNichoDestino.SelectedValue = "" Then Return
+
+            Dim nicDestinoId As Decimal = Convert.ToDecimal(ddlNichoDestino.SelectedValue)
+            Dim referencia As String = hfProductoTraslado.Value
+
+            Try
+                Dim dtDest As DataTable = StockService.ObtenerPorNicho(referencia, nicDestinoId)
+                If dtDest IsNot Nothing AndAlso dtDest.Rows.Count > 0 Then
+                    ' Validar que no sea el mismo registro origen
+                    If dtDest.Rows(0)("HIP_HISTORIAL_PRECIO").ToString() = hfHipOrigen.Value Then
+                        MostrarError("El nicho destino no puede ser el mismo que el origen.")
+                        ddlNichoDestino.SelectedIndex = 0
+                        Return
+                    End If
+                    hfHipDestino.Value = dtDest.Rows(0)("HIP_HISTORIAL_PRECIO").ToString()
+                    hfMinDestino.Value = dtDest.Rows(0)("STO_MINIMO").ToString()
+                    hfMaxDestino.Value = dtDest.Rows(0)("STO_MAXIMO").ToString()
+                    hfDispDestino.Value = dtDest.Rows(0)("STO_DISPONIBLE").ToString()
+
+                    lblResumenDispDestino.Text = dtDest.Rows(0)("STO_DISPONIBLE").ToString()
+                    lblResumenMinDestino.Text = dtDest.Rows(0)("STO_MINIMO").ToString()
+                    lblResumenMaxDestino.Text = dtDest.Rows(0)("STO_MAXIMO").ToString()
+                    pnlResumenDestino.Visible = True
+                Else
+                    ' Nicho sin stock dentro de un almacen que si tiene stock en otros nichos.
+                    ' No permitido — el usuario debe elegir un nicho con stock.
+                    MostrarError("Este nicho no tiene stock registrado para este producto. Elige otro nicho del mismo almacen.")
+                    ddlNichoDestino.SelectedIndex = 0
+                End If
+            Catch ex As Exception
+                MostrarError("Error al verificar destino: " & ex.Message)
+            End Try
+        End Sub
+
+        Protected Sub btnConfirmarTraslado_Click(sender As Object, e As EventArgs)
+            Try
+                Dim hipOrigen As Decimal = Convert.ToDecimal(hfHipOrigen.Value)
+                Dim dispOrigen As Decimal = Convert.ToDecimal(hfDispOrigen.Value)
+                Dim minOrigen As Decimal = Convert.ToDecimal(hfMinOrigen.Value)
+                Dim maxOrigen As Decimal = Convert.ToDecimal(hfMaxOrigen.Value)
+
+                Dim cantidad As Decimal
+                If Not Decimal.TryParse(txtCantidadTraslado.Text.Trim(), cantidad) OrElse cantidad <= 0 Then
+                    MostrarError("Ingresa una cantidad valida mayor a 0.") : Return
+                End If
+
+                If cantidad > dispOrigen Then
+                    MostrarError("La cantidad supera el disponible del origen (" & dispOrigen.ToString() & ").") : Return
+                End If
+                If (dispOrigen - cantidad) < minOrigen Then
+                    MostrarError("El traslado dejaria el origen por debajo de su minimo (" & minOrigen.ToString() & "). " &
+                                 "Maximo trasladable: " & (dispOrigen - minOrigen).ToString() & " unidades.") : Return
+                End If
+
+                ' El destino siempre tiene stock previo — validar que el HIP este cargado
+                If hfHipDestino.Value = "" OrElse hfHipDestino.Value = "0" Then
+                    MostrarError("Selecciona un nicho destino valido con stock registrado.") : Return
+                End If
+
+                Dim hipDestino As Decimal = Convert.ToDecimal(hfHipDestino.Value)
+                Dim minDestino As Decimal = Convert.ToDecimal(hfMinDestino.Value)
+                Dim maxDestino As Decimal = Convert.ToDecimal(hfMaxDestino.Value)
+                Dim dispDestino As Decimal = Convert.ToDecimal(hfDispDestino.Value)
+
+                If maxDestino > 0 AndAlso (dispDestino + cantidad) > maxDestino Then
+                    MostrarError("La cantidad superaria el maximo del destino (" & maxDestino.ToString() & "). " &
+                                 "Maximo que puede recibir: " & (maxDestino - dispDestino).ToString() & " unidades.") : Return
+                End If
+
+                StockService.Guardar(hipOrigen, minOrigen, maxOrigen, dispOrigen - cantidad)
+                StockService.Guardar(hipDestino, minDestino, maxDestino, dispDestino + cantidad)
+
+                MostrarExito("Traslado exitoso. Se movieron " & cantidad.ToString() & " unidades.")
+                pnlTraslado.Visible = False
+                ddlNicho_SelectedIndexChanged(Nothing, EventArgs.Empty)
+                CargarTablaStock()
+            Catch ex As Exception
+                MostrarError("Error al confirmar traslado: " & ex.Message)
+            End Try
+        End Sub
+
+        Protected Sub btnCancelarTraslado_Click(sender As Object, e As EventArgs)
+            pnlTraslado.Visible = False
+            pnlMsg.Visible = False
         End Sub
 
         ' =============================================
@@ -491,6 +675,7 @@ Namespace Modules.CatalogoInventario
                 pnlSumaInfo.Visible = False
                 pnlEditarLimites.Visible = False
                 pnlCancelarLimites.Visible = False
+                pnlTraslado.Visible = False
                 hfHipId.Value = ""
                 hfHipAnterior.Value = ""
                 txtDisponible.Text = ""

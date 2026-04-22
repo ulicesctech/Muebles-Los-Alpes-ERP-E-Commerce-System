@@ -508,7 +508,7 @@
     </Compile>
     <Compile Include="Modules\CatalogoInventario\Precios.aspx.vb">
       <DependentUpon>Precios.aspx</DependentUpon>
-      <SubType>ASPXCodebehind</SubType>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Modules\CatalogoInventario\Promociones.aspx.designer.vb">
       <DependentUpon>Promociones.aspx</DependentUpon>
