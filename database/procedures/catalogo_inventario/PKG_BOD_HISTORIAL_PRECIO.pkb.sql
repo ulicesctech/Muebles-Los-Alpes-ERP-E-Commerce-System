@@ -218,12 +218,16 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_HISTORIAL_PRECIO AS
              h.nic_nicho,
              n.nic_numero,
              n.nic_caracteristica,
+             a.alm_nombre,
              h.hip_precio,
              h.hip_fecha_inicio,
              h.hip_fecha_final
         FROM BOD_HISTORIAL_PRECIO h
-        JOIN BOD_PRODUCTO         p ON p.pro_referencia = h.pro_referencia
-        LEFT JOIN BOD_NICHO       n ON n.nic_nicho      = h.nic_nicho
+        JOIN BOD_PRODUCTO         p  ON p.pro_referencia = h.pro_referencia
+        JOIN BOD_NICHO            n  ON n.nic_nicho      = h.nic_nicho
+        JOIN BOD_NIC_ALM          na ON na.nic_nicho     = n.nic_nicho
+        JOIN BOD_ALMACEN          a  ON a.alm_almacen    = na.alm_almacen
+       WHERE h.hip_precio IS NOT NULL
        ORDER BY h.hip_fecha_inicio DESC, h.hip_historial_precio DESC;
   END;
 
@@ -242,13 +246,17 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_HISTORIAL_PRECIO AS
              h.nic_nicho,
              n.nic_numero,
              n.nic_caracteristica,
+             a.alm_nombre,
              h.hip_precio,
              h.hip_fecha_inicio,
              h.hip_fecha_final
         FROM BOD_HISTORIAL_PRECIO h
-        JOIN BOD_PRODUCTO         p ON p.pro_referencia = h.pro_referencia
-        LEFT JOIN BOD_NICHO       n ON n.nic_nicho      = h.nic_nicho
+        JOIN BOD_PRODUCTO         p  ON p.pro_referencia = h.pro_referencia
+        JOIN BOD_NICHO            n  ON n.nic_nicho      = h.nic_nicho
+        JOIN BOD_NIC_ALM          na ON na.nic_nicho     = n.nic_nicho
+        JOIN BOD_ALMACEN          a  ON a.alm_almacen    = na.alm_almacen
        WHERE h.pro_referencia = v_ref
+         AND h.hip_precio     IS NOT NULL
        ORDER BY h.hip_fecha_inicio DESC;
   END;
 
@@ -292,12 +300,15 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_HISTORIAL_PRECIO AS
              h.nic_nicho,
              n.nic_numero,
              n.nic_caracteristica,
+             a.alm_nombre,
              h.hip_precio,
              h.hip_fecha_inicio,
              h.hip_fecha_final
         FROM BOD_HISTORIAL_PRECIO h
-        JOIN BOD_PRODUCTO         p ON p.pro_referencia = h.pro_referencia
-        JOIN BOD_NICHO            n ON n.nic_nicho      = h.nic_nicho
+        JOIN BOD_PRODUCTO         p  ON p.pro_referencia = h.pro_referencia
+        JOIN BOD_NICHO            n  ON n.nic_nicho      = h.nic_nicho
+        JOIN BOD_NIC_ALM          na ON na.nic_nicho     = n.nic_nicho
+        JOIN BOD_ALMACEN          a  ON a.alm_almacen    = na.alm_almacen
        WHERE h.hip_fecha_final IS NOT NULL
          AND h.hip_precio      IS NOT NULL
          AND h.hip_fecha_inicio <= v_fin

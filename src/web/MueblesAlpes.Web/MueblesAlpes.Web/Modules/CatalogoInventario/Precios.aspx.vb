@@ -3,25 +3,7 @@ Imports System.Data
 
 ' ============================================================
 ' RUTA: Modules/CatalogoInventario/Precios.aspx.vb
-'
-' CAMBIOS en btnRegistrar_Click:
-'
-'   FLUJO NORMAL (readonlyParam <> "1"):
-'     ANTES : CerrarVigente(nicho) + Registrar(nicho)
-'             → solo cerraba el nicho seleccionado
-'     AHORA : RegistrarGlobal(proRef, nicho, precio, fecha)
-'             → en Oracle cierra TODOS los vigentes del producto
-'               (cualquier nicho/almacen) y crea uno nuevo unico.
-'
-'   FLUJO READONLY (viene de Pedidos → Recibido):
-'     ANTES : CerrarVigente(nicho) + ActualizarSemilla
-'             → solo cerraba el nicho especifico
-'     AHORA : CerrarTodos(proRef, fecha) + ActualizarSemilla
-'             → cierra TODOS los vigentes del producto antes
-'               de activar la semilla como precio definitivo.
-'             CerrarTodos solo se llama si habia un vigente real
-'             (hip_precio NOT NULL) previo. Si no habia ninguno,
-'             se actualiza la semilla directamente.
+' Solo listado — el registro de precios se hace desde Pedidos.
 ' ============================================================
 Namespace Modules.CatalogoInventario
 
@@ -30,90 +12,9 @@ Namespace Modules.CatalogoInventario
 
         Protected Sub Page_Load(sender As Object, e As EventArgs) Handles Me.Load
             If Not IsPostBack Then
-                CargarProductos()
-                CargarAlmacenes()
                 CargarFiltroMes()
-                LimpiarNichos()
-                txtFechaInicio.Text = DateTime.Now.ToString("yyyy-MM-dd")
                 CargarHistorialTodos()
-
-                Dim refParam As String = Request.QueryString("ref")
-                Dim precioParam As String = Request.QueryString("precio")
-                Dim readonlyParam As String = Request.QueryString("readonly")
-                Dim hipParam As String = Request.QueryString("hip")
-                Dim detpeParam As String = Request.QueryString("detpe")
-
-                If Not String.IsNullOrEmpty(refParam) Then
-                    Dim item = ddlProducto.Items.FindByValue(refParam)
-                    If item IsNot Nothing Then
-                        ddlProducto.SelectedValue = refParam
-                        ddlProducto_SelectedIndexChanged(Nothing, EventArgs.Empty)
-                    End If
-                End If
-
-                If readonlyParam = "1" Then
-                    ddlProducto.Enabled = False
-                    txtFechaInicio.ReadOnly = True
-
-                    hfHipSemilla.Value = If(String.IsNullOrEmpty(hipParam), "0", hipParam)
-                    hfDetpeId.Value = If(String.IsNullOrEmpty(detpeParam), "0", detpeParam)
-
-                    If Not String.IsNullOrEmpty(precioParam) Then
-                        txtPrecio.Text = precioParam
-                        txtPrecio.ReadOnly = True
-                    End If
-
-                    If Not String.IsNullOrEmpty(refParam) Then
-                        Try
-                            Dim dtProd As DataTable = ProductoService.Listar()
-                            Dim filaProd As DataRow() = dtProd.Select("PRO_REFERENCIA = '" & refParam & "'")
-                            If filaProd.Length > 0 Then
-                                lblROProducto.Text = filaProd(0)("PRO_NOMBRE").ToString()
-                                lblROMaterial.Text = If(dtProd.Columns.Contains("MAT_DESCRIPCION"),
-                                                        filaProd(0)("MAT_DESCRIPCION").ToString(), "")
-                                pnlReadonlyProducto.Visible = True
-                            End If
-                        Catch
-                        End Try
-                    End If
-
-                    Dim pedidoParam As String = Request.QueryString("pedido")
-                    MostrarInfo("Registrando precio de recepcion desde el Pedido #" & pedidoParam &
-                        ". Producto y precio pre-cargados desde la Orden de Compra. Selecciona el almacen y nicho.")
-                End If
             End If
-        End Sub
-
-        ' =============================================
-        ' DROPDOWNS PRINCIPALES
-        ' =============================================
-        Private Sub CargarProductos()
-            Try
-                ddlProducto.DataSource = ProductoService.Listar()
-                ddlProducto.DataTextField = "PRO_NOMBRE"
-                ddlProducto.DataValueField = "PRO_REFERENCIA"
-                ddlProducto.DataBind()
-                ddlProducto.Items.Insert(0, New ListItem("-- Seleccione un producto --", ""))
-            Catch ex As Exception
-                MostrarError("Error al cargar productos: " & ex.Message)
-            End Try
-        End Sub
-
-        Private Sub CargarAlmacenes()
-            Try
-                ddlAlmacen.DataSource = AlmacenService.Listar()
-                ddlAlmacen.DataTextField = "ALM_NOMBRE"
-                ddlAlmacen.DataValueField = "ALM_ALMACEN"
-                ddlAlmacen.DataBind()
-                ddlAlmacen.Items.Insert(0, New ListItem("-- Seleccione un almacen --", ""))
-            Catch ex As Exception
-                MostrarError("Error al cargar almacenes: " & ex.Message)
-            End Try
-        End Sub
-
-        Private Sub LimpiarNichos()
-            ddlNicho.Items.Clear()
-            ddlNicho.Items.Add(New ListItem("-- Primero seleccione un almacen --", ""))
         End Sub
 
         ' =============================================
@@ -158,83 +59,6 @@ Namespace Modules.CatalogoInventario
         End Sub
 
         ' =============================================
-        ' CASCADA PRODUCTO → ALMACEN → NICHO
-        ' =============================================
-        Protected Sub ddlProducto_SelectedIndexChanged(sender As Object, e As EventArgs)
-            pnlInfoProducto.Visible = False
-            pnlPrecioNicho.Visible = False
-            LimpiarNichos()
-            If ddlProducto.SelectedValue = "" Then
-                CargarHistorialTodos()
-                Return
-            End If
-            Try
-                Dim dt As DataTable = ProductoService.Listar()
-                Dim fila As DataRow() = dt.Select("PRO_REFERENCIA = '" & ddlProducto.SelectedValue & "'")
-                If fila.Length > 0 Then
-                    lblNombreProducto.Text = fila(0)("PRO_NOMBRE").ToString()
-                    If dt.Columns.Contains("TIP_DESCRIPCION") Then
-                        lblTipo.Text = fila(0)("TIP_DESCRIPCION").ToString()
-                    ElseIf dt.Columns.Contains("TIP_TIPO") Then
-                        lblTipo.Text = fila(0)("TIP_TIPO").ToString()
-                    Else
-                        lblTipo.Text = ""
-                    End If
-                    If dt.Columns.Contains("MAT_DESCRIPCION") Then
-                        lblMaterial.Text = fila(0)("MAT_DESCRIPCION").ToString()
-                    ElseIf dt.Columns.Contains("MAT_MATERIAL") Then
-                        lblMaterial.Text = fila(0)("MAT_MATERIAL").ToString()
-                    Else
-                        lblMaterial.Text = ""
-                    End If
-                    pnlInfoProducto.Visible = True
-                End If
-                CargarHistorial(ddlProducto.SelectedValue)
-            Catch ex As Exception
-                MostrarError("Error: " & ex.Message)
-            End Try
-        End Sub
-
-        Protected Sub ddlAlmacen_SelectedIndexChanged(sender As Object, e As EventArgs)
-            pnlPrecioNicho.Visible = False
-            LimpiarNichos()
-            If ddlAlmacen.SelectedValue = "" Then Return
-            Try
-                ddlNicho.DataSource = NicAlmService.ListarPorAlmacen(Convert.ToDecimal(ddlAlmacen.SelectedValue))
-                ddlNicho.DataTextField = "NIC_DISPLAY"
-                ddlNicho.DataValueField = "NIC_NICHO"
-                ddlNicho.DataBind()
-                ddlNicho.Items.Insert(0, New ListItem("-- Seleccione un nicho --", ""))
-            Catch ex As Exception
-                MostrarError("Error al cargar nichos: " & ex.Message)
-            End Try
-        End Sub
-
-        Protected Sub ddlNicho_SelectedIndexChanged(sender As Object, e As EventArgs)
-            pnlPrecioNicho.Visible = False
-            If ddlNicho.SelectedValue = "" OrElse ddlProducto.SelectedValue = "" Then Return
-            Try
-                Dim dtVigente As DataTable = HistorialPrecioService.Vigente(
-                    ddlProducto.SelectedValue,
-                    Convert.ToDecimal(ddlNicho.SelectedValue)
-                )
-                ' VIGENTE en Oracle ya excluye semillas (hip_precio IS NOT NULL),
-                ' por lo que si retorna filas siempre tiene precio real > 0.
-                If dtVigente IsNot Nothing AndAlso dtVigente.Rows.Count > 0 Then
-                    If Not IsDBNull(dtVigente.Rows(0)("HIP_PRECIO")) Then
-                        Dim precioActual As Decimal = Convert.ToDecimal(dtVigente.Rows(0)("HIP_PRECIO"))
-                        If precioActual > 0 Then
-                            lblPrecioNicho.Text = String.Format("{0:C2}", precioActual)
-                            pnlPrecioNicho.Visible = True
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                ' Sin precio vigente aun: no mostrar badge
-            End Try
-        End Sub
-
-        ' =============================================
         ' HISTORIAL
         ' =============================================
         Private Sub CargarHistorialTodos()
@@ -246,96 +70,12 @@ Namespace Modules.CatalogoInventario
             End Try
         End Sub
 
-        Private Sub CargarHistorial(referencia As String)
-            Try
-                gvHistorial.DataSource = HistorialPrecioService.ListarPorProducto(referencia)
-                gvHistorial.DataBind()
-            Catch ex As Exception
-                MostrarError("Error al cargar historial: " & ex.Message)
-            End Try
-        End Sub
-
         ' =============================================
-        ' REGISTRAR PRECIO  ← AQUI ESTAN LOS CAMBIOS
+        ' HELPERS
         ' =============================================
-        Protected Sub btnRegistrar_Click(sender As Object, e As EventArgs)
-            If ddlProducto.SelectedValue = "" Then MostrarError("Debe seleccionar un producto.") : Return
-            If ddlAlmacen.SelectedValue = "" Then MostrarError("Debe seleccionar un almacen.") : Return
-            If ddlNicho.SelectedValue = "" Then MostrarError("Debe seleccionar un nicho.") : Return
-            If txtPrecio.Text.Trim() = "" Then MostrarError("El precio es obligatorio.") : Return
-            Dim precioValidar As Decimal
-            If Not Decimal.TryParse(txtPrecio.Text.Trim(), precioValidar) OrElse precioValidar <= 0 Then
-                MostrarError("El precio debe ser un numero mayor a 0.") : Return
-            End If
-            If txtFechaInicio.Text.Trim() = "" Then MostrarError("La fecha de inicio es obligatoria.") : Return
-
-            Try
-                Dim proRef As String = ddlProducto.SelectedValue
-                Dim nichoId As Decimal = Convert.ToDecimal(ddlNicho.SelectedValue)
-                Dim precio As Decimal = Convert.ToDecimal(txtPrecio.Text.Trim())
-                Dim fechaInicio As Date = Convert.ToDateTime(txtFechaInicio.Text.Trim())
-                Dim readonlyParam As String = Request.QueryString("readonly")
-
-                If readonlyParam = "1" Then
-                    Dim hipSemilla As Decimal = Convert.ToDecimal(hfHipSemilla.Value)
-
-                    ' Paso 1: cerrar TODOS los vigentes del producto (todos los nichos/almacenes)
-                    HistorialPrecioService.CerrarTodos(proRef, fechaInicio)
-
-                    ' Paso 2: activar la semilla como el nuevo precio definitivo y unico vigente
-                    HistorialPrecioService.ActualizarSemilla(hipSemilla, nichoId, precio, fechaInicio)
-
-                    Dim pedidoParam As String = Request.QueryString("pedido")
-                    If Not String.IsNullOrEmpty(pedidoParam) Then
-                        Response.Redirect(ResolveUrl("~/Modules/ComprasProveedor/Pedidos.aspx") &
-                                  "?pedido=" & pedidoParam)
-                        Return
-                    End If
-                Else
-                    HistorialPrecioService.RegistrarGlobal(proRef, nichoId, precio, fechaInicio)
-                End If
-
-                MostrarExito("Precio registrado correctamente.")
-                txtPrecio.Text = ""
-                txtFechaInicio.Text = DateTime.Now.ToString("yyyy-MM-dd")
-                ddlNicho_SelectedIndexChanged(Nothing, EventArgs.Empty)
-                CargarHistorial(proRef)
-            Catch ex As Exception
-                MostrarError("Error al registrar: " & ex.Message)
-            End Try
-        End Sub
-
-        Protected Sub btnCancelar_Click(sender As Object, e As EventArgs)
-            LimpiarFormulario()
-        End Sub
-
-        Private Sub LimpiarFormulario()
-            ddlProducto.SelectedIndex = 0
-            ddlAlmacen.SelectedIndex = 0
-            txtPrecio.Text = ""
-            txtFechaInicio.Text = DateTime.Now.ToString("yyyy-MM-dd")
-            pnlInfoProducto.Visible = False
-            pnlPrecioNicho.Visible = False
-            pnlMsg.Visible = False
-            LimpiarNichos()
-            CargarHistorialTodos()
-        End Sub
-
         Private Sub MostrarError(msg As String)
             lblMsg.Text = msg
             pnlMsg.CssClass = "alert-err"
-            pnlMsg.Visible = True
-        End Sub
-
-        Private Sub MostrarExito(msg As String)
-            lblMsg.Text = msg
-            pnlMsg.CssClass = "alert-ok"
-            pnlMsg.Visible = True
-        End Sub
-
-        Private Sub MostrarInfo(msg As String)
-            lblMsg.Text = msg
-            pnlMsg.CssClass = "alert-ok"
             pnlMsg.Visible = True
         End Sub
 
