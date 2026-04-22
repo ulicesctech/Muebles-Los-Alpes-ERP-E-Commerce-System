@@ -1,5 +1,9 @@
 -- ============================================================
 -- PKG_BOD_HISTORIAL_PRECIO.pkb
+--
+-- CAMBIOS vs version anterior:
+--   + CERRAR_SEMILLA: cierra unicamente la semilla indicada por
+--     su hip_id sin afectar ningun otro registro del producto.
 -- ============================================================
 CREATE OR REPLACE PACKAGE BODY PKG_BOD_HISTORIAL_PRECIO AS
 
@@ -128,6 +132,37 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_HISTORIAL_PRECIO AS
   END CERRAR_TODOS;
 
   -- ------------------------------------------------------------
+  -- CERRAR_SEMILLA: cierra unicamente la semilla indicada por
+  -- su hip_id sin afectar ningun otro registro del producto.
+  -- Solo actua sobre registros con hip_precio IS NULL (semillas).
+  -- Se usa cuando el precio del pedido coincide con el vigente real,
+  -- evitando generar un nuevo historial innecesario.
+  -- GREATEST evita violar CK_HIP_FECHAS.
+  -- ------------------------------------------------------------
+  PROCEDURE CERRAR_SEMILLA(
+    p_hip_id       IN NUMBER,
+    p_fecha_cierre IN DATE
+  ) IS
+  BEGIN
+    IF p_hip_id IS NULL THEN
+      RAISE_APPLICATION_ERROR(-20060, 'BOD_HISTORIAL_PRECIO: hip_id obligatorio.');
+    END IF;
+    IF p_fecha_cierre IS NULL THEN
+      RAISE_APPLICATION_ERROR(-20061, 'BOD_HISTORIAL_PRECIO: fecha_cierre obligatoria.');
+    END IF;
+
+    UPDATE BOD_HISTORIAL_PRECIO
+       SET hip_fecha_final = GREATEST(p_fecha_cierre, hip_fecha_inicio)
+     WHERE hip_historial_precio = p_hip_id
+       AND hip_precio           IS NULL
+       AND hip_fecha_final       IS NULL;
+
+    COMMIT;
+  EXCEPTION
+    WHEN OTHERS THEN ROLLBACK; RAISE;
+  END CERRAR_SEMILLA;
+
+  -- ------------------------------------------------------------
   -- REGISTRAR_GLOBAL: atomico: cierra todos los vigentes REALES
   -- del producto e inserta el nuevo registro vigente unico.
   -- Solo cierra registros con hip_precio IS NOT NULL para no
@@ -158,14 +193,12 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_HISTORIAL_PRECIO AS
       RAISE_APPLICATION_ERROR(-20053, 'BOD_HISTORIAL_PRECIO: fecha_inicio obligatoria.');
     END IF;
 
-    -- Paso 1: cerrar solo los registros reales vigentes (no semillas)
     UPDATE BOD_HISTORIAL_PRECIO
        SET hip_fecha_final = GREATEST(p_fecha_inicio, hip_fecha_inicio)
      WHERE pro_referencia = v_ref
        AND hip_fecha_final IS NULL
        AND hip_precio      IS NOT NULL;
 
-    -- Paso 2: insertar el nuevo registro vigente unico
     INSERT INTO BOD_HISTORIAL_PRECIO(
         pro_referencia, nic_nicho, hip_precio, hip_fecha_inicio, hip_fecha_final)
     VALUES(v_ref, p_nic_nicho, p_precio, p_fecha_inicio, NULL)

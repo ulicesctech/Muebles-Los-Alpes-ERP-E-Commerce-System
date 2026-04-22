@@ -186,6 +186,15 @@ Namespace Modules.CatalogoInventario
         Protected WithEvents pnlAvisoPedido As Global.System.Web.UI.WebControls.Panel
 
         '''<summary>
+        '''Control pnlPaso1.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents pnlPaso1 As Global.System.Web.UI.WebControls.Panel
+
+        '''<summary>
         '''Control ddlProducto.
         '''</summary>
         '''<remarks>
@@ -364,6 +373,15 @@ Namespace Modules.CatalogoInventario
         '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         '''</remarks>
         Protected WithEvents lblSumaInfo As Global.System.Web.UI.WebControls.Label
+
+        '''<summary>
+        '''Control pnlEntradaMercancia.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents pnlEntradaMercancia As Global.System.Web.UI.WebControls.Panel
 
         '''<summary>
         '''Control lblCantEntradaLabel.
@@ -670,24 +688,6 @@ Namespace Modules.CatalogoInventario
         '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         '''</remarks>
         Protected WithEvents pnlDestinoSinStock As Global.System.Web.UI.WebControls.Panel
-
-        '''<summary>
-        '''Control txtMinimoDestino.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents txtMinimoDestino As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
-        '''Control txtMaximoDestino.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents txtMaximoDestino As Global.System.Web.UI.WebControls.TextBox
 
         '''<summary>
         '''Control btnConfirmarTraslado.

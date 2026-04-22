@@ -95,14 +95,14 @@
 <asp:HiddenField ID="hfHipAnterior"  runat="server" Value="0" />
 
 <%-- Hidden fields para traslado --%>
-<asp:HiddenField ID="hfHipDestino"      runat="server" Value="0" />
-<asp:HiddenField ID="hfMinDestino"      runat="server" Value="0" />
-<asp:HiddenField ID="hfMaxDestino"      runat="server" Value="0" />
-<asp:HiddenField ID="hfDispDestino"     runat="server" Value="0" />
-<asp:HiddenField ID="hfHipOrigen"       runat="server" Value="0" />
-<asp:HiddenField ID="hfMinOrigen"       runat="server" Value="0" />
-<asp:HiddenField ID="hfMaxOrigen"       runat="server" Value="0" />
-<asp:HiddenField ID="hfDispOrigen"      runat="server" Value="0" />
+<asp:HiddenField ID="hfHipDestino"       runat="server" Value="0" />
+<asp:HiddenField ID="hfMinDestino"       runat="server" Value="0" />
+<asp:HiddenField ID="hfMaxDestino"       runat="server" Value="0" />
+<asp:HiddenField ID="hfDispDestino"      runat="server" Value="0" />
+<asp:HiddenField ID="hfHipOrigen"        runat="server" Value="0" />
+<asp:HiddenField ID="hfMinOrigen"        runat="server" Value="0" />
+<asp:HiddenField ID="hfMaxOrigen"        runat="server" Value="0" />
+<asp:HiddenField ID="hfDispOrigen"       runat="server" Value="0" />
 <asp:HiddenField ID="hfProductoTraslado" runat="server" Value="" />
 
 <%-- Aviso visible solo cuando viene de Pedidos --%>
@@ -114,23 +114,25 @@
     </div>
 </asp:Panel>
 
-<%-- PASO 1 --%>
-<div class="step-card">
-    <h4><span class="step-num">1</span> Selecciona el Producto</h4>
-    <div class="f-row">
-        <div class="f-group">
-            <label>Producto</label>
-            <asp:DropDownList ID="ddlProducto" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlProducto_SelectedIndexChanged" />
+<%-- PASO 1 — solo visible desde Pedidos --%>
+<asp:Panel ID="pnlPaso1" runat="server" Visible="false">
+    <div class="step-card">
+        <h4><span class="step-num">1</span> Selecciona el Producto</h4>
+        <div class="f-row">
+            <div class="f-group">
+                <label>Producto</label>
+                <asp:DropDownList ID="ddlProducto" runat="server" AutoPostBack="true" OnSelectedIndexChanged="ddlProducto_SelectedIndexChanged" />
+            </div>
         </div>
+        <asp:Panel ID="pnlInfoProducto" runat="server" Visible="false">
+            <div class="info-badge" style="margin-top:10px;">
+                Tipo: <strong><asp:Label ID="lblTipo" runat="server" /></strong>
+                &nbsp;|&nbsp;
+                Material: <strong><asp:Label ID="lblMaterial" runat="server" /></strong>
+            </div>
+        </asp:Panel>
     </div>
-    <asp:Panel ID="pnlInfoProducto" runat="server" Visible="false">
-        <div class="info-badge" style="margin-top:10px;">
-            Tipo: <strong><asp:Label ID="lblTipo" runat="server" /></strong>
-            &nbsp;|&nbsp;
-            Material: <strong><asp:Label ID="lblMaterial" runat="server" /></strong>
-        </div>
-    </asp:Panel>
-</div>
+</asp:Panel>
 
 <%-- PASO 2 --%>
 <asp:Panel ID="pnlPaso2" runat="server" Visible="false">
@@ -164,21 +166,18 @@
         <h4><span class="step-num">4</span> Gestionar Stock</h4>
         <asp:HiddenField ID="hfHipId" runat="server" Value="" />
 
-        <%-- Precio vigente --%>
         <asp:Panel ID="pnlPrecioVigente" runat="server" Visible="false">
             <div class="precio-actual">
                 Precio vigente: <strong><asp:Label ID="lblPrecioVigente" runat="server" /></strong>
             </div>
         </asp:Panel>
 
-        <%-- Aviso sin precio --%>
         <asp:Panel ID="pnlAvisoPrecio" runat="server" Visible="false">
             <div class="aviso-precio">
                 No hay precio registrado en este nicho. Ve a Historial de Precios y registra el precio primero.
             </div>
         </asp:Panel>
 
-        <%-- Stock actual --%>
         <asp:Panel ID="pnlStockActual" runat="server" Visible="false">
             <div class="stock-actual">
                 <h5>Stock Actual</h5>
@@ -198,7 +197,6 @@
                 </div>
             </div>
 
-            <%-- Resumen de suma (modo fromped) --%>
             <asp:Panel ID="pnlSumaInfo" runat="server" Visible="false">
                 <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:10px 16px;margin-bottom:14px;font-size:13px;font-family:Arial,sans-serif;color:#1b5e20;">
                     &#10133; Al confirmar, el disponible quedara en:
@@ -206,21 +204,22 @@
                 </div>
             </asp:Panel>
 
-            <%-- Entrada de mercancia --%>
-            <div class="entrada-card">
-                <h5>Registrar Entrada de Mercancia</h5>
-                <div class="f-row">
-                    <div class="f-group" style="max-width:200px;">
-                        <asp:Label ID="lblCantEntradaLabel" runat="server" Text="Cantidad que ingresa *" style="font-size:11px;font-weight:bold;color:#5C3A1E;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:0.5px;" />
-                        <asp:TextBox ID="txtCantidadEntrada" runat="server" placeholder="0" />
-                    </div>
-                    <div style="display:flex; align-items:flex-end;">
-                        <asp:Button ID="btnEntrada" runat="server" Text="Registrar Entrada" CssClass="btn-green" OnClick="btnEntrada_Click" />
+            <%-- Entrada de mercancia — solo visible desde Pedidos --%>
+            <asp:Panel ID="pnlEntradaMercancia" runat="server">
+                <div class="entrada-card">
+                    <h5>Registrar Entrada de Mercancia</h5>
+                    <div class="f-row">
+                        <div class="f-group" style="max-width:200px;">
+                            <asp:Label ID="lblCantEntradaLabel" runat="server" Text="Cantidad que ingresa *" style="font-size:11px;font-weight:bold;color:#5C3A1E;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:0.5px;" />
+                            <asp:TextBox ID="txtCantidadEntrada" runat="server" placeholder="0" />
+                        </div>
+                        <div style="display:flex; align-items:flex-end;">
+                            <asp:Button ID="btnEntrada" runat="server" Text="Registrar Entrada" CssClass="btn-green" OnClick="btnEntrada_Click" />
+                        </div>
                     </div>
                 </div>
-            </div>
+            </asp:Panel>
 
-            <%-- Ajustar limites --%>
             <div style="margin-bottom:14px; font-size:12px; font-weight:bold; color:#5C3A1E; font-family:Arial,sans-serif; text-transform:uppercase; letter-spacing:0.5px;">
                 Ajustar Limites
             </div>
@@ -246,10 +245,9 @@
                 <asp:Button ID="btnCancelarLimites" runat="server" Text="Cancelar edicion" CssClass="btn-outline" OnClick="btnCancelarLimites_Click" CausesValidation="false" />
             </asp:Panel>
             <asp:Button ID="btnCancelar" runat="server" Text="Cancelar" CssClass="btn-outline" OnClick="btnCancelar_Click" CausesValidation="false" />
-
         </asp:Panel>
 
-        <%-- Sin stock aun --%>
+        <%-- Sin stock aun — solo desde Pedidos --%>
         <asp:Panel ID="pnlSinStock" runat="server" Visible="false">
             <div class="aviso-precio" style="margin-bottom:14px;">
                 Este producto no tiene stock registrado en este nicho aun.
@@ -349,28 +347,24 @@
     </asp:GridView>
 </div>
 
-<%-- PANEL TRASLADO — se activa desde el boton de cada fila del listado --%>
+<%-- PANEL TRASLADO --%>
 <asp:Panel ID="pnlTraslado" runat="server" Visible="false">
-    <asp:HiddenField ID="HiddenField1"   runat="server" Value="0" />
-    <asp:HiddenField ID="HiddenField2"   runat="server" Value="0" />
-    <asp:HiddenField ID="HiddenField3"   runat="server" Value="0" />
-    <asp:HiddenField ID="HiddenField4"  runat="server" Value="0" />
+    <asp:HiddenField ID="HiddenField1" runat="server" Value="0" />
+    <asp:HiddenField ID="HiddenField2" runat="server" Value="0" />
+    <asp:HiddenField ID="HiddenField3" runat="server" Value="0" />
+    <asp:HiddenField ID="HiddenField4" runat="server" Value="0" />
     <div class="traslado-card" style="margin-bottom:20px;">
         <h5>&#8652; Traslado de Stock</h5>
-
-        <%-- Info del origen --%>
         <div style="background:#f0f7ff;border:1px solid #b0c8f0;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;font-family:Arial,sans-serif;color:#2040a0;">
             <strong>Origen:</strong>
             <asp:Label ID="lblOrigenInfo" runat="server" />
         </div>
-
         <div class="f-row" style="margin-bottom:14px;">
             <div class="f-group" style="max-width:200px;">
                 <label>Cantidad a trasladar *</label>
                 <asp:TextBox ID="txtCantidadTraslado" runat="server" placeholder="0" />
             </div>
         </div>
-
         <div class="traslado-destino">
             <h6>Destino</h6>
             <div class="f-row" style="margin-bottom:10px;">
@@ -385,7 +379,6 @@
                         OnSelectedIndexChanged="ddlNichoDestino_SelectedIndexChanged" />
                 </div>
             </div>
-
             <asp:Panel ID="pnlResumenDestino" runat="server" Visible="false">
                 <div style="font-size:12px;color:#2040a0;font-family:Arial,sans-serif;font-weight:bold;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.3px;">
                     Stock actual del destino
@@ -405,24 +398,12 @@
                     </div>
                 </div>
             </asp:Panel>
-
             <asp:Panel ID="pnlDestinoSinStock" runat="server" Visible="false">
                 <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;font-family:Arial,sans-serif;color:#7a5818;">
-                    Este nicho no tiene stock registrado aun. Define los limites antes de confirmar.
-                </div>
-                <div class="f-row">
-                    <div class="f-group" style="max-width:160px;">
-                        <label>Minimo destino *</label>
-                        <asp:TextBox ID="txtMinimoDestino" runat="server" placeholder="0" />
-                    </div>
-                    <div class="f-group" style="max-width:160px;">
-                        <label>Maximo destino *</label>
-                        <asp:TextBox ID="txtMaximoDestino" runat="server" placeholder="0" />
-                    </div>
+                    Este nicho no tiene stock registrado aun.
                 </div>
             </asp:Panel>
         </div>
-
         <div style="margin-top:16px;">
             <asp:Button ID="btnConfirmarTraslado" runat="server" Text="&#10003; Confirmar Traslado" CssClass="btn-gold" OnClick="btnConfirmarTraslado_Click" />
             <asp:Button ID="btnCancelarTraslado"  runat="server" Text="Cancelar" CssClass="btn-outline" OnClick="btnCancelarTraslado_Click" CausesValidation="false" />
