@@ -7,7 +7,7 @@ Imports Oracle.ManagedDataAccess.Client
 Public Class StockService
     Private Const PKG As String = "PKG_BOD_STOCK"
 
-    ''' <summary>Guarda o actualiza el stock. STO_RESERVADO fue eliminado.</summary>
+    ''' <summary>Guarda o actualiza el stock.</summary>
     Public Shared Sub Guardar(hipHistorialPrecio As Decimal,
                                minimo As Decimal,
                                maximo As Decimal,
@@ -30,9 +30,8 @@ Public Class StockService
     End Function
 
     ''' <summary>
-    ''' Busca el stock de un producto en un nicho especifico.
-    ''' Funciona aunque el hip ya no sea el vigente actual
-    ''' (el stock sigue vinculado al hip en que fue creado/actualizado).
+    ''' Busca el stock de un producto en un nicho especifico,
+    ''' independientemente del hip vigente actual.
     ''' </summary>
     Public Shared Function ObtenerPorNicho(proReferencia As String, nicNicho As Decimal) As DataTable
         Dim ps As New List(Of OracleParameter) From {
@@ -55,10 +54,7 @@ Public Class StockService
         Return OracleDb.ExecRefCursor(PKG & ".LISTAR_POR_PRODUCTO", ps, "p_data")
     End Function
 
-    ''' <summary>
-    ''' Suma cantidad al disponible.
-    ''' Llamado desde Compras al recibir mercancia.
-    ''' </summary>
+    ''' <summary>Suma cantidad al disponible. Llamado desde Compras al recibir mercancia.</summary>
     Public Shared Sub Entrada(hipHistorialPrecio As Decimal, cantidad As Decimal)
         Dim ps As New List(Of OracleParameter) From {
             New OracleParameter("p_hip_historial_precio", OracleDbType.Decimal, hipHistorialPrecio, ParameterDirection.Input),
@@ -67,16 +63,25 @@ Public Class StockService
         OracleDb.ExecNonQuery(PKG & ".ENTRADA", ps)
     End Sub
 
-    ''' <summary>
-    ''' Resta cantidad del disponible.
-    ''' Llamado desde Ventas al facturar.
-    ''' </summary>
+    ''' <summary>Resta cantidad del disponible. Llamado desde Ventas al facturar.</summary>
     Public Shared Sub Salida(hipHistorialPrecio As Decimal, cantidad As Decimal)
         Dim ps As New List(Of OracleParameter) From {
             New OracleParameter("p_hip_historial_precio", OracleDbType.Decimal, hipHistorialPrecio, ParameterDirection.Input),
             New OracleParameter("p_cantidad", OracleDbType.Decimal, cantidad, ParameterDirection.Input)
         }
         OracleDb.ExecNonQuery(PKG & ".SALIDA", ps)
+    End Sub
+
+    ''' <summary>
+    ''' Elimina el registro de stock de un HIP.
+    ''' Se usa cuando el precio cambia y el stock se migra al nuevo HIP:
+    ''' el registro viejo queda huerfano y debe borrarse para no duplicar stock.
+    ''' </summary>
+    Public Shared Sub Eliminar(hipHistorialPrecio As Decimal)
+        Dim ps As New List(Of OracleParameter) From {
+            New OracleParameter("p_hip_historial_precio", OracleDbType.Decimal, hipHistorialPrecio, ParameterDirection.Input)
+        }
+        OracleDb.ExecNonQuery(PKG & ".ELIMINAR", ps)
     End Sub
 
 End Class

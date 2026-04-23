@@ -21,14 +21,23 @@ Namespace Modules.CatalogoInventario
                     Dim hipParam As String = Request.QueryString("hip")
                     Dim detpeParam As String = Request.QueryString("detpe")
                     Dim pedidoParam As String = Request.QueryString("pedido")
-                    Dim cantRecibParam As String = Request.QueryString("cantrecibida")
+                    Dim cantRecibParam As String = Request.QueryString("cantrecibida")   ' incremento nuevo
+                    Dim cantTotalParam As String = Request.QueryString("canttotalrecib") ' acumulado total
 
                     hfFromPed.Value = "1"
                     hfPedParam.Value = If(String.IsNullOrEmpty(pedidoParam), "0", pedidoParam)
                     hfHipSemilla.Value = If(String.IsNullOrEmpty(hipParam), "0", hipParam)
                     hfDetpeParam.Value = If(String.IsNullOrEmpty(detpeParam), "0", detpeParam)
                     hfPrecioODP.Value = If(String.IsNullOrEmpty(precioParam), "0", precioParam)
+
+                    ' hfCantRecibida = solo el incremento nuevo → se suma al stock
                     hfCantRecibida.Value = If(String.IsNullOrEmpty(cantRecibParam), "0", cantRecibParam)
+
+                    ' hfCantTotalRecib = total acumulado (ya recibido + nuevo) → se guarda en DETPE
+                    ' Si no viene el param (flujo anterior), se usa cantRecibida como fallback
+                    hfCantTotalRecib.Value = If(String.IsNullOrEmpty(cantTotalParam),
+                                               hfCantRecibida.Value,
+                                               cantTotalParam)
 
                     If Not String.IsNullOrEmpty(refParam) Then
                         Dim item = ddlProducto.Items.FindByValue(refParam)
@@ -50,24 +59,12 @@ Namespace Modules.CatalogoInventario
 
         ' =============================================
         ' HELPER — Resolver HIP para recepcion de pedido
-        '
-        ' Logica:
-        '   1. Busca si ya existe un HIP vigente REAL para el producto
-        '      (precio NOT NULL, fecha_final IS NULL) en cualquier nicho.
-        '   2. Si existe y el precio coincide con el del pedido:
-        '      -> reutiliza ese HIP. Solo actualiza la semilla para apuntar
-        '         al mismo nicho/precio sin crear un nuevo registro.
-        '         Devuelve el HIP vigente existente.
-        '   3. Si no existe vigente o el precio es diferente:
-        '      -> ejecuta flujo normal: CerrarTodos + ActualizarSemilla.
-        '         Devuelve el HIP de la semilla actualizada.
         ' =============================================
         Private Function ResolverHipParaRecepcion(proRef As String,
                                                    hipSemilla As Decimal,
                                                    nichoId As Decimal,
                                                    precioNuevo As Decimal,
                                                    fechaHoy As Date) As Decimal
-            ' Buscar vigente real del producto en el nicho destino
             Dim dtVigenteNicho As DataTable = HistorialPrecioService.Vigente(proRef, nichoId)
 
             If dtVigenteNicho IsNot Nothing AndAlso dtVigenteNicho.Rows.Count > 0 Then
@@ -75,22 +72,46 @@ Namespace Modules.CatalogoInventario
                 Dim hipVigente As Decimal = Convert.ToDecimal(dtVigenteNicho.Rows(0)("HIP_HISTORIAL_PRECIO"))
 
                 If precioVigente = precioNuevo Then
-                    ' Precio igual al vigente: cerrar solo la semilla (sin tocar el vigente real)
-                    ' y devolver el HIP vigente existente para asociar el stock.
-                    ' La semilla se cierra para no dejarla huerfana.
                     HistorialPrecioService.CerrarSemilla(hipSemilla, fechaHoy)
                     Return hipVigente
                 End If
             End If
 
-            ' Precio diferente o no hay vigente: flujo normal
             HistorialPrecioService.CerrarTodos(proRef, fechaHoy)
             HistorialPrecioService.ActualizarSemilla(hipSemilla, nichoId, precioNuevo, fechaHoy)
             Return hipSemilla
         End Function
 
         ' =============================================
-        ' PASO 1 — PRODUCTO (solo fromped)
+        ' HELPER — Guardar stock sumando SOLO el incremento nuevo al existente en el nicho.
+        ' dtExistente debe leerse ANTES de llamar ResolverHipParaRecepcion.
+        ' cantIncremento = solo lo nuevo que entra esta vez (NO el total acumulado).
+        ' =============================================
+        Private Sub GuardarStockSumando(dtExistente As DataTable,
+                                         hipFinal As Decimal,
+                                         cantIncremento As Decimal,
+                                         minimoDefault As Decimal,
+                                         maximoDefault As Decimal)
+            If dtExistente IsNot Nothing AndAlso dtExistente.Rows.Count > 0 Then
+                Dim hipExistente As Decimal = Convert.ToDecimal(dtExistente.Rows(0)("HIP_HISTORIAL_PRECIO"))
+                Dim dispActual As Decimal = Convert.ToDecimal(dtExistente.Rows(0)("STO_DISPONIBLE"))
+                Dim minActual As Decimal = Convert.ToDecimal(dtExistente.Rows(0)("STO_MINIMO"))
+                Dim maxActual As Decimal = Convert.ToDecimal(dtExistente.Rows(0)("STO_MAXIMO"))
+                Dim nuevoDisponible As Decimal = dispActual + cantIncremento
+
+                If hipExistente <> hipFinal Then
+                    StockService.Eliminar(hipExistente)
+                    StockService.Guardar(hipFinal, minActual, maxActual, nuevoDisponible)
+                Else
+                    StockService.Guardar(hipFinal, minActual, maxActual, nuevoDisponible)
+                End If
+            Else
+                StockService.Guardar(hipFinal, minimoDefault, maximoDefault, cantIncremento)
+            End If
+        End Sub
+
+        ' =============================================
+        ' PASO 1 — PRODUCTO
         ' =============================================
         Private Sub CargarProductos()
             Try
@@ -185,21 +206,23 @@ Namespace Modules.CatalogoInventario
 
                 Dim tieneStock As Boolean = (dtStock IsNot Nothing AndAlso dtStock.Rows.Count > 0)
 
+                ' cantIncremento = solo lo nuevo que entra (hfCantRecibida)
+                Dim cantIncremento As Decimal = Convert.ToDecimal(hfCantRecibida.Value)
+
                 If tieneStock Then
                     CargarDatosStock(dtStock.Rows(0))
 
-                    Dim cantRecib As Decimal = Convert.ToDecimal(hfCantRecibida.Value)
                     Dim disponibleActual As Decimal = Convert.ToDecimal(dtStock.Rows(0)("STO_DISPONIBLE"))
-                    Dim nuevoDisponible As Decimal = disponibleActual + cantRecib
+                    Dim nuevoDisponible As Decimal = disponibleActual + cantIncremento
 
                     lblSumaInfo.Text = disponibleActual.ToString() & " + " &
-                                       cantRecib.ToString() & " = <strong>" &
+                                       cantIncremento.ToString() & " = <strong>" &
                                        nuevoDisponible.ToString() & "</strong>"
                     pnlSumaInfo.Visible = True
 
-                    txtCantidadEntrada.Text = cantRecib.ToString()
+                    txtCantidadEntrada.Text = cantIncremento.ToString()
                     txtCantidadEntrada.ReadOnly = True
-                    lblCantEntradaLabel.Text = "Cantidad recibida (desde pedido)"
+                    lblCantEntradaLabel.Text = "Cantidad a ingresar esta vez"
                     btnEntrada.Text = "Confirmar Recepcion y Volver a Pedidos"
 
                     txtMinimo.ReadOnly = True
@@ -211,9 +234,9 @@ Namespace Modules.CatalogoInventario
                     pnlStockActual.Visible = True
                     pnlSinStock.Visible = False
                 Else
-                    txtDisponibleNuevo.Text = hfCantRecibida.Value
+                    txtDisponibleNuevo.Text = cantIncremento.ToString()
                     txtDisponibleNuevo.ReadOnly = True
-                    lblDisponibleNuevoLabel.Text = "Disponible inicial (cantidad recibida)"
+                    lblDisponibleNuevoLabel.Text = "Disponible inicial (cantidad recibida esta vez)"
                     btnCrearStock.Text = "Confirmar Recepcion y Volver a Pedidos"
                     pnlStockActual.Visible = False
                     pnlSinStock.Visible = True
@@ -248,7 +271,9 @@ Namespace Modules.CatalogoInventario
         End Sub
 
         ' =============================================
-        ' CREAR STOCK (primera vez — solo desde Pedidos)
+        ' CREAR STOCK (primera vez en el nicho)
+        ' Stock suma solo el incremento (hfCantRecibida).
+        ' DETPE se actualiza con el total acumulado (hfCantTotalRecib).
         ' =============================================
         Protected Sub btnCrearStock_Click(sender As Object, e As EventArgs)
             If hfFromPed.Value <> "1" Then
@@ -267,21 +292,27 @@ Namespace Modules.CatalogoInventario
                 Dim precio As Decimal = Convert.ToDecimal(hfPrecioODP.Value, System.Globalization.CultureInfo.InvariantCulture)
                 Dim fechaHoy As Date = Date.Today
                 Dim proRef As String = ddlProducto.SelectedValue
-                Dim cantRecibida As Decimal = Convert.ToDecimal(hfCantRecibida.Value)
+                Dim cantIncremento As Decimal = Convert.ToDecimal(hfCantRecibida.Value)   ' solo lo nuevo → stock
+                Dim cantTotal As Integer = Convert.ToInt32(hfCantTotalRecib.Value)   ' acumulado → DETPE
 
-                ' Resolver HIP: reusar vigente si precio igual, o crear nuevo si diferente
+                ' PASO 1: leer stock existente ANTES de tocar HIPs
+                Dim dtExistente As DataTable = StockService.ObtenerPorNicho(proRef, nichoId)
+
+                ' PASO 2: resolver HIP
                 Dim hipFinal As Decimal = ResolverHipParaRecepcion(proRef, hipSemilla, nichoId, precio, fechaHoy)
 
-                StockService.Guardar(hipFinal, minimo, maximo, cantRecibida)
+                ' PASO 3: sumar solo el incremento al stock
+                GuardarStockSumando(dtExistente, hipFinal, cantIncremento, minimo, maximo)
 
+                ' PASO 4: actualizar DETPE con el total acumulado
                 Dim detpeId As Integer = Convert.ToInt32(hfDetpeParam.Value)
                 Dim pedidoId As Integer = Convert.ToInt32(hfPedParam.Value)
                 Dim dtDetalle As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
                 Dim filaDetalle = dtDetalle.Select("DETPE_DETALLE_PEDIDO = " & detpeId)
                 Dim cantSol As Integer = If(filaDetalle.Length > 0,
-                                           Convert.ToInt32(filaDetalle(0)("DETPE_CANTIDAD_SOLICITADA")),
-                                           CInt(cantRecibida))
-                DetallePedidoService.Actualizar(detpeId, cantSol, CInt(cantRecibida))
+                                               Convert.ToInt32(filaDetalle(0)("DETPE_CANTIDAD_SOLICITADA")),
+                                               cantTotal)
+                DetallePedidoService.Actualizar(detpeId, cantSol, cantTotal)
 
                 Response.Redirect(ResolveUrl("~/Modules/ComprasProveedor/Pedidos.aspx") &
                                   "?pedido=" & pedidoId)
@@ -291,7 +322,9 @@ Namespace Modules.CatalogoInventario
         End Sub
 
         ' =============================================
-        ' REGISTRAR ENTRADA DE MERCANCIA — solo desde Pedidos
+        ' REGISTRAR ENTRADA (nicho ya tiene stock)
+        ' Stock suma solo el incremento (hfCantRecibida).
+        ' DETPE se actualiza con el total acumulado (hfCantTotalRecib).
         ' =============================================
         Protected Sub btnEntrada_Click(sender As Object, e As EventArgs)
             If hfFromPed.Value <> "1" Then
@@ -299,43 +332,48 @@ Namespace Modules.CatalogoInventario
                 Return
             End If
             Try
-                Dim cantidad As Decimal = Convert.ToDecimal(hfCantRecibida.Value)
+                Dim cantIncremento As Decimal = Convert.ToDecimal(hfCantRecibida.Value)   ' solo lo nuevo → stock
+                Dim cantTotal As Integer = Convert.ToInt32(hfCantTotalRecib.Value)   ' acumulado → DETPE
                 Dim hipSemilla As Decimal = Convert.ToDecimal(hfHipSemilla.Value)
                 Dim nichoId As Decimal = Convert.ToDecimal(ddlNicho.SelectedValue)
                 Dim precio As Decimal = Convert.ToDecimal(hfPrecioODP.Value, System.Globalization.CultureInfo.InvariantCulture)
                 Dim fechaHoy As Date = Date.Today
                 Dim proRef As String = ddlProducto.SelectedValue
 
-                ' Resolver HIP: reusar vigente si precio igual, o crear nuevo si diferente
-                Dim hipFinal As Decimal = ResolverHipParaRecepcion(proRef, hipSemilla, nichoId, precio, fechaHoy)
+                ' PASO 1: leer stock existente ANTES de tocar HIPs
+                Dim dtExistente As DataTable = StockService.ObtenerPorNicho(proRef, nichoId)
 
-                ' Obtener minimo/maximo/disponible actuales del stock asociado al HIP resuelto
-                Dim minimoActual As Decimal = 0
-                Dim maximoActual As Decimal = 0
-                Dim disponibleActual As Decimal = 0
-
-                Dim hipAnterior As Decimal = If(hfHipAnterior.Value <> "" AndAlso hfHipAnterior.Value <> "0",
-                                                 Convert.ToDecimal(hfHipAnterior.Value), 0D)
-                Dim hipParaStock As Decimal = If(hipAnterior > 0, hipAnterior, hipFinal)
-
-                Dim dtStockPrev As DataTable = StockService.Obtener(hipParaStock)
-                If dtStockPrev IsNot Nothing AndAlso dtStockPrev.Rows.Count > 0 Then
-                    minimoActual = Convert.ToDecimal(dtStockPrev.Rows(0)("STO_MINIMO"))
-                    maximoActual = Convert.ToDecimal(dtStockPrev.Rows(0)("STO_MAXIMO"))
-                    disponibleActual = Convert.ToDecimal(dtStockPrev.Rows(0)("STO_DISPONIBLE"))
+                ' Obtener min/max fallback desde hfHipAnterior si dtExistente vacio
+                Dim minimoFallback As Decimal = 0
+                Dim maximoFallback As Decimal = 0
+                If dtExistente Is Nothing OrElse dtExistente.Rows.Count = 0 Then
+                    Dim hipAnterior As Decimal = If(hfHipAnterior.Value <> "" AndAlso hfHipAnterior.Value <> "0",
+                                                    Convert.ToDecimal(hfHipAnterior.Value), 0D)
+                    If hipAnterior > 0 Then
+                        Dim dtPrev As DataTable = StockService.Obtener(hipAnterior)
+                        If dtPrev IsNot Nothing AndAlso dtPrev.Rows.Count > 0 Then
+                            minimoFallback = Convert.ToDecimal(dtPrev.Rows(0)("STO_MINIMO"))
+                            maximoFallback = Convert.ToDecimal(dtPrev.Rows(0)("STO_MAXIMO"))
+                            dtExistente = dtPrev
+                        End If
+                    End If
                 End If
 
-                Dim nuevoDisponible As Decimal = disponibleActual + cantidad
-                StockService.Guardar(hipFinal, minimoActual, maximoActual, nuevoDisponible)
+                ' PASO 2: resolver HIP
+                Dim hipFinal As Decimal = ResolverHipParaRecepcion(proRef, hipSemilla, nichoId, precio, fechaHoy)
 
+                ' PASO 3: sumar solo el incremento al stock
+                GuardarStockSumando(dtExistente, hipFinal, cantIncremento, minimoFallback, maximoFallback)
+
+                ' PASO 4: actualizar DETPE con el total acumulado
                 Dim detpeId As Integer = Convert.ToInt32(hfDetpeParam.Value)
                 Dim pedidoId As Integer = Convert.ToInt32(hfPedParam.Value)
                 Dim dtDetalle As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
                 Dim filaDetalle = dtDetalle.Select("DETPE_DETALLE_PEDIDO = " & detpeId)
                 Dim cantSol As Integer = If(filaDetalle.Length > 0,
-                                           Convert.ToInt32(filaDetalle(0)("DETPE_CANTIDAD_SOLICITADA")),
-                                           CInt(cantidad))
-                DetallePedidoService.Actualizar(detpeId, cantSol, CInt(cantidad))
+                                               Convert.ToInt32(filaDetalle(0)("DETPE_CANTIDAD_SOLICITADA")),
+                                               cantTotal)
+                DetallePedidoService.Actualizar(detpeId, cantSol, cantTotal)
 
                 Response.Redirect(ResolveUrl("~/Modules/ComprasProveedor/Pedidos.aspx") &
                                   "?pedido=" & pedidoId)
@@ -357,8 +395,7 @@ Namespace Modules.CatalogoInventario
                     Convert.ToDecimal(hfHipId.Value),
                     Convert.ToDecimal(txtMinimo.Text.Trim()),
                     Convert.ToDecimal(txtMaximo.Text.Trim()),
-                    Convert.ToDecimal(txtDisponible.Text.Trim())
-                )
+                    Convert.ToDecimal(txtDisponible.Text.Trim()))
                 MostrarExito("Limites actualizados correctamente.")
                 CargarTablaStock()
             Catch ex As Exception
@@ -373,7 +410,7 @@ Namespace Modules.CatalogoInventario
         End Sub
 
         ' =============================================
-        ' HABILITAR / CANCELAR EDICION DE LIMITES (modo fromped)
+        ' HABILITAR / CANCELAR EDICION DE LIMITES
         ' =============================================
         Protected Sub btnEditarLimites_Click(sender As Object, e As EventArgs)
             txtMinimo.ReadOnly = False
@@ -443,7 +480,7 @@ Namespace Modules.CatalogoInventario
         End Sub
 
         ' =============================================
-        ' TRASLADO DE STOCK — iniciado desde el gridview
+        ' TRASLADO DE STOCK
         ' =============================================
         Protected Sub gvStock_RowCommand(sender As Object, e As GridViewCommandEventArgs)
             If e.CommandName = "Trasladar" Then
@@ -583,7 +620,6 @@ Namespace Modules.CatalogoInventario
                 If Not Decimal.TryParse(txtCantidadTraslado.Text.Trim(), cantidad) OrElse cantidad <= 0 Then
                     MostrarError("Ingresa una cantidad valida mayor a 0.") : Return
                 End If
-
                 If cantidad > dispOrigen Then
                     MostrarError("La cantidad supera el disponible del origen (" & dispOrigen.ToString() & ").") : Return
                 End If
@@ -591,7 +627,6 @@ Namespace Modules.CatalogoInventario
                     MostrarError("El traslado dejaria el origen por debajo de su minimo (" & minOrigen.ToString() & "). " &
                                  "Maximo trasladable: " & (dispOrigen - minOrigen).ToString() & " unidades.") : Return
                 End If
-
                 If hfHipDestino.Value = "" OrElse hfHipDestino.Value = "0" Then
                     MostrarError("Selecciona un nicho destino valido con stock registrado.") : Return
                 End If

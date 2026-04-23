@@ -71,11 +71,10 @@ Namespace Modules.ComprasProveedor
             Dim dtPed As DataTable = PedidoService.ObtenerPorId(pedidoId)
             If dtPed IsNot Nothing AndAlso dtPed.Rows.Count > 0 Then
                 PedidoService.Actualizar(
-                        Convert.ToDecimal(pedidoId),
-                        dtPed.Rows(0)("PED_CODIGO").ToString(),
-                        dtPed.Rows(0)("PED_FORMA_PAGO").ToString(),
-                        total
-                    )
+                    Convert.ToDecimal(pedidoId),
+                    dtPed.Rows(0)("PED_CODIGO").ToString(),
+                    dtPed.Rows(0)("PED_FORMA_PAGO").ToString(),
+                    total)
             End If
         End Sub
 
@@ -107,11 +106,10 @@ Namespace Modules.ComprasProveedor
                 Dim dt As DataTable = PedidoService.ObtenerPorId(pedidoId)
                 If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
                     PedidoService.Actualizar(
-                    Convert.ToDecimal(pedidoId),
-                    dt.Rows(0)("PED_CODIGO").ToString(),
-                    ddlCabeceraFormaPago.SelectedValue,
-                    Convert.ToDecimal(dt.Rows(0)("PED_TOTAL"))
-                )
+                        Convert.ToDecimal(pedidoId),
+                        dt.Rows(0)("PED_CODIGO").ToString(),
+                        ddlCabeceraFormaPago.SelectedValue,
+                        Convert.ToDecimal(dt.Rows(0)("PED_TOTAL")))
                     CargarPedidos()
                     MostrarMensaje("Forma de pago actualizada correctamente.", False)
                 End If
@@ -126,7 +124,7 @@ Namespace Modules.ComprasProveedor
                     MostrarMensaje("Ingresa el codigo del pedido.", True) : Exit Sub
                 End If
                 Dim nuevoId As Decimal = PedidoService.Crear(txtCodigo.Text.Trim(),
-                                                                  ddlFormaPago.SelectedValue, 0)
+                                                             ddlFormaPago.SelectedValue, 0)
                 hfPedidoActivo.Value = nuevoId.ToString()
                 lblIdSeleccionado.Text = nuevoId.ToString()
                 CargarProductosDropDown()
@@ -154,7 +152,7 @@ Namespace Modules.ComprasProveedor
         End Sub
 
         '========================
-        ' GRID PEDIDOS  carga sub-grid de items en cada fila
+        ' GRID PEDIDOS
         '========================
         Protected Sub gvPedidos_RowDataBound(sender As Object, e As GridViewRowEventArgs)
             If e.Row.RowType = DataControlRowType.DataRow Then
@@ -198,7 +196,7 @@ Namespace Modules.ComprasProveedor
         ' DROPDOWN PRODUCTO
         '========================
         Protected Sub ddlProducto_SelectedIndexChanged(sender As Object, e As EventArgs)
-            ' Solo refresca  precio se asigna desde Orden de Compra
+            ' Solo refresca — precio se asigna desde Orden de Compra
         End Sub
 
         '========================
@@ -217,14 +215,12 @@ Namespace Modules.ComprasProveedor
                     MostrarMensaje("Ingresa una cantidad valida.", True) : Exit Sub
                 End If
 
-                ' Validar que el pedido no tenga ya una Orden de Compra asociada
                 Dim dtOC As DataTable = OrdenDetallePedidoService.BuscarPorPedido(pedidoId)
                 If dtOC IsNot Nothing AndAlso dtOC.Rows.Count > 0 Then
                     MostrarMensaje("No se pueden agregar productos porque este pedido ya tiene una Orden de Compra asociada.", True)
                     Exit Sub
                 End If
 
-                ' Validar que el producto no este ya en el pedido
                 Dim dtActual As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
                 For Each fila As DataRow In dtActual.Rows
                     If Not IsDBNull(fila("PRO_REFERENCIA")) AndAlso
@@ -275,37 +271,49 @@ Namespace Modules.ComprasProveedor
 
             ElseIf e.CommandName = "ConfirmarRecibido" Then
                 Try
-                    ' 1. Extraer argumentos del comando
+                    ' 1. Extraer argumentos
                     Dim partes As String() = e.CommandArgument.ToString().Split("|")
                     Dim detalleId As Integer = Convert.ToInt32(partes(0))
                     Dim proRef As String = If(partes.Length > 1, partes(1), "")
                     Dim cantSol As Integer = Convert.ToInt32(If(partes.Length > 2, partes(2), "0"))
 
-                    ' 2. Capturar cantidad recibida desde el TextBox del GridView
-                    Dim cantRecibida As Integer = 0
+                    ' 2. Capturar cantidad nueva que el usuario escribio esta vez
+                    Dim cantNuevaEntrada As Integer = 0
                     For Each row As GridViewRow In gvDetalles.Rows
                         Dim pnl As Panel = CType(row.FindControl("pnlRecibir"), Panel)
                         If pnl IsNot Nothing AndAlso pnl.Visible Then
                             Dim txt As TextBox = CType(row.FindControl("txtCantRecibir"), TextBox)
-                            If txt IsNot Nothing Then Integer.TryParse(txt.Text.Trim(), cantRecibida)
+                            If txt IsNot Nothing Then Integer.TryParse(txt.Text.Trim(), cantNuevaEntrada)
                             Exit For
                         End If
                     Next
 
-                    ' 3. Validaciones de negocio
-                    ' *** CAMBIE AHORITA: se agrego validacion de cantidad > 0 obligatoria.
-                    ' Si cantRecibida = 0 o negativa no se permite continuar a Precios.
-                    If cantRecibida <= 0 Then
-                        MostrarMensaje("La cantidad recibida debe ser mayor a 0 para continuar.", True)
-                        Exit Sub
-                    End If
-                    ' *** FIN CAMBIE AHORITA
-                    If cantRecibida > cantSol Then
-                        MostrarMensaje("La cantidad recibida no puede superar la solicitada (" & cantSol & ").", True)
+                    ' 3. Validar cantidad nueva
+                    If cantNuevaEntrada <= 0 Then
+                        MostrarMensaje("La cantidad a recibir debe ser mayor a 0.", True)
                         Exit Sub
                     End If
 
-                    ' 4. Buscar detalles de la Orden de Compra asociada al pedido
+                    ' 4. Leer cuanto ya habia sido recibido antes
+                    Dim dtDetalle As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
+                    Dim filaDetalle = dtDetalle.Select("DETPE_DETALLE_PEDIDO = " & detalleId)
+
+                    Dim cantYaRecibida As Integer = 0
+                    If filaDetalle.Length > 0 AndAlso Not IsDBNull(filaDetalle(0)("DETPE_CANTIDAD_RECIBIDA")) Then
+                        cantYaRecibida = Convert.ToInt32(filaDetalle(0)("DETPE_CANTIDAD_RECIBIDA"))
+                    End If
+
+                    ' 5. Calcular total acumulado y validar que no supere lo solicitado
+                    Dim cantTotalNueva As Integer = cantYaRecibida + cantNuevaEntrada
+                    If cantTotalNueva > cantSol Then
+                        MostrarMensaje("La cantidad total recibida (" & cantTotalNueva &
+                                       ") superaria la solicitada (" & cantSol & "). " &
+                                       "Maximo que puedes recibir ahora: " &
+                                       (cantSol - cantYaRecibida) & ".", True)
+                        Exit Sub
+                    End If
+
+                    ' 6. Verificar Orden de Compra asociada
                     Dim dtOrdenes As DataTable = OrdenDetallePedidoService.BuscarPorPedido(pedidoId)
                     If dtOrdenes Is Nothing OrElse dtOrdenes.Rows.Count = 0 Then
                         MostrarMensaje("Este pedido no tiene una Orden de Compra asociada. Vinculala primero.", True)
@@ -314,21 +322,19 @@ Namespace Modules.ComprasProveedor
                         Exit Sub
                     End If
 
-                    ' 5. Obtener el material y hip_historial_precio del item actual
-                    Dim dtDetalle As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
-                    Dim filaDetalle = dtDetalle.Select("DETPE_DETALLE_PEDIDO = " & detalleId)
+                    ' 7. Obtener material, producto y hip del item
                     Dim materialItem As String = If(filaDetalle.Length > 0, filaDetalle(0)("MATERIAL").ToString().Trim(), "")
+                    Dim productoItem As String = If(filaDetalle.Length > 0, filaDetalle(0)("PRO_NOMBRE").ToString().Trim(), "")
 
-                    ' *** CAMBIE AHORITA: se lee el HIP_HISTORIAL_PRECIO de la fila del detalle
-                    ' para enviarlo a Precios como parametro "hip" y poder actualizar la semilla.
                     Dim hipSemillaId As String = "0"
                     If filaDetalle.Length > 0 AndAlso Not IsDBNull(filaDetalle(0)("HIP_HISTORIAL_PRECIO")) Then
                         hipSemillaId = filaDetalle(0)("HIP_HISTORIAL_PRECIO").ToString()
                     End If
-                    ' *** FIN CAMBIE AHORITA
 
-                    ' Buscar precio en la Orden de Compra por material
-                    Dim filasODP = dtOrdenes.Select("TRIM(ODP_MATERIAL) = '" & materialItem.Replace("'", "''") & "'")
+                    ' 8. Buscar precio en ODP comparando MATERIAL + PRODUCTO
+                    Dim filtro As String = "TRIM(ODP_MATERIAL) = '" & materialItem.Replace("'", "''") & "'" &
+                                          " AND TRIM(ODP_PRODUCTO) = '" & productoItem.Replace("'", "''") & "'"
+                    Dim filasODP = dtOrdenes.Select(filtro)
                     Dim precioODP As Decimal = 0
 
                     If filasODP.Length > 0 Then
@@ -338,16 +344,9 @@ Namespace Modules.ComprasProveedor
                         MostrarMensaje("No se encontro precio especifico. Se uso el primer precio disponible.", False)
                     End If
 
-                    ' 6. NO guardar cantidad recibida aqui.
-                    '    Se guardara cuando el usuario confirme el stock desde Stock.aspx.
-                    '    Si el usuario se sale de Stock sin confirmar, no queda nada guardado.
-
-                    ' 7. Redirigir a Stock con todos los parametros necesarios.
-                    '    Stock.aspx se encargara de:
-                    '      a) Activar la semilla como historial definitivo (precio + nicho)
-                    '      b) Crear/registrar la entrada de stock con cantRecibida
-                    '      c) Actualizar la cantidad recibida en BOD_DETALLE_PEDIDO
-                    '      d) Regresar a Pedidos.aspx?pedido=...
+                    ' 9. Redirigir a Stock pasando:
+                    '    cantrecibida   = cantNuevaEntrada  -solo lo nuevo, para sumar al stock
+                    '    canttotalrecib = cantTotalNueva    -acumulado total, para actualizar DETPE
                     Dim precioODPStr As String = precioODP.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)
                     hfDetalleRecibir.Value = "0"
 
@@ -357,7 +356,8 @@ Namespace Modules.ComprasProveedor
                               "&detpe=" & detalleId &
                               "&hip=" & hipSemillaId &
                               "&precio=" & precioODPStr &
-                              "&cantrecibida=" & cantRecibida &
+                              "&cantrecibida=" & cantNuevaEntrada &
+                              "&canttotalrecib=" & cantTotalNueva &
                               "&fromped=1")
                 Catch ex As Exception
                     MostrarMensaje("Error: " & ex.Message, True)
@@ -381,14 +381,11 @@ Namespace Modules.ComprasProveedor
 
         Protected Sub gvDetalles_RowEditing(sender As Object, e As GridViewEditEventArgs)
             Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
-
-            ' Verificar si este pedido ya tiene una Orden de Compra asociada
             Dim dtOrdenes As DataTable = OrdenDetallePedidoService.BuscarPorPedido(pedidoId)
             If dtOrdenes IsNot Nothing AndAlso dtOrdenes.Rows.Count > 0 Then
                 MostrarMensaje("No se puede editar la cantidad porque este pedido ya tiene una Orden de Compra asociada.", True)
                 Exit Sub
             End If
-
             hfDetalleRecibir.Value = "0"
             gvDetalles.EditIndex = e.NewEditIndex
             CargarDetallesPedido(pedidoId)

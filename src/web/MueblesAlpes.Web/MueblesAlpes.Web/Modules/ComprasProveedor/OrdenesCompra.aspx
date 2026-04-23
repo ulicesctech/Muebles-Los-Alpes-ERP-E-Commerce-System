@@ -122,6 +122,7 @@
                                             <ItemTemplate><span class="badge-pago"><%# Eval("PED_FORMA_PAGO") %></span></ItemTemplate>
                                         </asp:TemplateField>
                                         <asp:BoundField DataField="ODP_MATERIAL" HeaderText="Material" />
+                                        <asp:BoundField DataField="ODP_PRODUCTO" HeaderText="Producto ODP" />
                                         <asp:TemplateField HeaderText="Precio" ItemStyle-Width="80px">
                                             <ItemTemplate>Q <%# String.Format("{0:N2}", Eval("ODP_PRECIO")) %></ItemTemplate>
                                         </asp:TemplateField>
@@ -279,6 +280,7 @@
                                         CssClass="precio-input" placeholder="0.00" Text="" />
                                     <asp:HiddenField ID="hfDetpeId"  runat="server" Value='<%# Eval("DETPE_DETALLE_PEDIDO") %>' />
                                     <asp:HiddenField ID="hfMaterial" runat="server" Value='<%# Eval("MATERIAL") %>' />
+                                    <asp:HiddenField ID="hfProducto" runat="server" Value='<%# Eval("PRODUCTO_NOMBRE") %>' />
                                     <asp:HiddenField ID="hfCantidad" runat="server" Value='<%# Eval("CANTIDAD") %>' />
                                 </ItemTemplate>
                             </asp:TemplateField>

@@ -92,6 +92,7 @@
 <asp:HiddenField ID="hfDetpeParam"   runat="server" Value="0" />
 <asp:HiddenField ID="hfPrecioODP"    runat="server" Value="0" />
 <asp:HiddenField ID="hfCantRecibida" runat="server" Value="0" />
+    <asp:HiddenField ID="hfCantTotalRecib" runat="server" Value="0" />
 <asp:HiddenField ID="hfHipAnterior"  runat="server" Value="0" />
 
 <%-- Hidden fields para traslado --%>

@@ -108,6 +108,8 @@ Namespace Modules.ComprasProveedor
 
         '========================
         ' GUARDAR NUEVA ORDEN
+        ' hfMaterial  - columna MATERIAL   del grid ORC_DETALLES_PEDIDO
+        ' hfProducto  - columna PRO_NOMBRE del grid ORC_DETALLES_PEDIDO  --NUEVO
         '========================
         Protected Sub btnGuardar_Click(sender As Object, e As EventArgs)
             Try
@@ -125,11 +127,9 @@ Namespace Modules.ComprasProveedor
                     MostrarMsg("Selecciona un proveedor.", True) : Exit Sub
                 End If
 
-                ' Crear la orden
                 OrdenCompraService.Crear(orcKey, codigo, provId, 0)
                 hfKey.Value = orcKey
 
-                ' Si hay pedido vinculado, insertar un ODP por cada item del grid con precio manual
                 Dim pedId As Integer = Convert.ToInt32(hfPedidoVinculado.Value)
                 If pedId > 0 Then
                     Dim itemsInsertados As Integer = 0
@@ -138,15 +138,18 @@ Namespace Modules.ComprasProveedor
                     For Each row As GridViewRow In gvItemsPedido.Rows
                         Dim txtPrecio As TextBox = CType(row.FindControl("txtPrecioItem"), TextBox)
                         Dim hfMat As HiddenField = CType(row.FindControl("hfMaterial"), HiddenField)
+                        Dim hfProd As HiddenField = CType(row.FindControl("hfProducto"), HiddenField)
                         Dim hfCant As HiddenField = CType(row.FindControl("hfCantidad"), HiddenField)
 
-                        If txtPrecio Is Nothing OrElse hfMat Is Nothing OrElse hfCant Is Nothing Then
+                        If txtPrecio Is Nothing OrElse hfMat Is Nothing OrElse
+                           hfProd Is Nothing OrElse hfCant Is Nothing Then
                             Continue For
                         End If
 
                         Dim precio As Decimal = 0
                         Dim cantidad As Integer = 0
                         Dim material As String = hfMat.Value
+                        Dim producto As String = hfProd.Value
 
                         If Not Decimal.TryParse(txtPrecio.Text.Trim().Replace(",", "."),
                                                 System.Globalization.NumberStyles.Any,
@@ -158,13 +161,12 @@ Namespace Modules.ComprasProveedor
                         Integer.TryParse(hfCant.Value, cantidad)
                         If cantidad <= 0 Then cantidad = 1
 
-                        OrdenDetallePedidoService.Insertar(orcKey, pedId, material, precio, cantidad)
+                        OrdenDetallePedidoService.Insertar(orcKey, pedId, material, producto, precio, cantidad)
                         itemsInsertados += 1
                     Next
 
                     If itemsSinPrecio > 0 AndAlso itemsInsertados = 0 Then
                         MostrarMsg("Debes ingresar el precio para al menos un item antes de confirmar.", True)
-                        ' Revertir la creacion de la orden
                         OrdenCompraService.Eliminar(orcKey)
                         Exit Sub
                     ElseIf itemsSinPrecio > 0 Then
@@ -172,10 +174,8 @@ Namespace Modules.ComprasProveedor
                     End If
                 End If
 
-                ' Calcular total
                 ActualizarTotalOrden(orcKey)
 
-                ' Abrir panel de edicion
                 hfOrdenActiva.Value = orcKey
                 lblOrdenSeleccionada.Text = orcKey
                 pnlFormCabecera.Visible = False
@@ -195,7 +195,7 @@ Namespace Modules.ComprasProveedor
         End Sub
 
         '========================
-        ' BUSCAR PEDIDOS (1 fila por pedido con items visibles)
+        ' BUSCAR PEDIDOS
         '========================
         Protected Sub btnBuscarPedido_Click(sender As Object, e As EventArgs)
             Dim texto As String = txtBuscarPedido.Text.Trim()
@@ -206,7 +206,6 @@ Namespace Modules.ComprasProveedor
             pnlItemsPedido.Visible = False
         End Sub
 
-        ' Carga el sub-grid de items dentro de cada fila del buscador de pedidos
         Protected Sub gvBuscarPedidos_RowDataBound(sender As Object, e As GridViewRowEventArgs)
             If e.Row.RowType = DataControlRowType.DataRow Then
                 Dim pedId As Integer = Convert.ToInt32(gvBuscarPedidos.DataKeys(e.Row.RowIndex).Value)
@@ -225,7 +224,6 @@ Namespace Modules.ComprasProveedor
                 Dim pedId As Integer = Convert.ToInt32(partes(0))
                 Dim pedCod As String = If(partes.Length > 1, partes(1), "")
 
-                ' Cargar items del pedido * precio SIEMPRE en blanco
                 Dim dt As DataTable = OrdenCompraService.DetallesPedido(pedId)
 
                 hfPedidoVinculado.Value = pedId.ToString()
@@ -288,7 +286,6 @@ Namespace Modules.ComprasProveedor
             CargarOrdenes()
         End Sub
 
-        ' Carga el sub-grid de items dentro del listado principal de ordenes
         Protected Sub gvOrdenes_RowDataBound(sender As Object, e As GridViewRowEventArgs)
             If e.Row.RowType = DataControlRowType.DataRow Then
                 Dim orcKey As String = gvOrdenes.DataKeys(e.Row.RowIndex).Value.ToString()
@@ -319,12 +316,13 @@ Namespace Modules.ComprasProveedor
             Try
                 Dim row As GridViewRow = gvItemsOrden.Rows(e.RowIndex)
                 Dim id As Integer = Convert.ToInt32(gvItemsOrden.DataKeys(e.RowIndex).Value)
-                ' Material ya no es editable: se lee del HiddenField hfEMat
                 Dim hfMat As HiddenField = CType(row.FindControl("hfEMat"), HiddenField)
-                Dim material As String = If(hfMat IsNot Nothing, hfMat.Value.Trim(), "")
-                Dim precio As Decimal
+                Dim hfProd As HiddenField = CType(row.FindControl("hfEProd"), HiddenField)
                 Dim hfCan As HiddenField = CType(row.FindControl("hfECan"), HiddenField)
+                Dim material As String = If(hfMat IsNot Nothing, hfMat.Value.Trim(), "")
+                Dim producto As String = If(hfProd IsNot Nothing, hfProd.Value.Trim(), "")
                 Dim cantidad As Integer = Convert.ToInt32(hfCan.Value)
+                Dim precio As Decimal
 
                 If Not Decimal.TryParse(CType(row.FindControl("txtEPre"), TextBox).Text.Trim().Replace(",", "."),
                                         System.Globalization.NumberStyles.Any,
@@ -332,7 +330,7 @@ Namespace Modules.ComprasProveedor
                     MostrarMsg("Precio invalido.", True) : Exit Sub
                 End If
 
-                OrdenDetallePedidoService.Actualizar(id, material, precio, cantidad)
+                OrdenDetallePedidoService.Actualizar(id, material, producto, precio, cantidad)
                 gvItemsOrden.EditIndex = -1
                 CargarDetalle(hfOrdenActiva.Value)
                 ActualizarTotalOrden(hfOrdenActiva.Value)
@@ -354,12 +352,6 @@ Namespace Modules.ComprasProveedor
                 End Try
             End If
         End Sub
-
-        '========================
-        ' AGREGAR ITEM MANUAL
-        '========================
-        ' btnAddMat_Click deshabilitado: controles txtMat/txtPre/txtCan
-        ' comentados en el ASPX (seccion Agregar Item Manual oculta).
 
         '========================
         ' BUSCAR / LIMPIAR ORDENES

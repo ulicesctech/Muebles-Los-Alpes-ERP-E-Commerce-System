@@ -4,14 +4,15 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_ORDEN_DETALLE_PEDIDO AS
         p_orc_key  IN VARCHAR2,
         p_ped_id   IN NUMBER,
         p_material IN VARCHAR2,
+        p_producto IN VARCHAR2,
         p_precio   IN NUMBER,
         p_cantidad IN NUMBER
     ) IS
     BEGIN
         INSERT INTO BOD_ORDEN_DETALLE_PEDIDO
-            (orc_orden_compra, ped_pedido, odp_material, odp_precio, odp_cantidad)
+            (orc_orden_compra, ped_pedido, odp_material, odp_producto, odp_precio, odp_cantidad)
         VALUES
-            (p_orc_key, p_ped_id, p_material, p_precio, p_cantidad);
+            (p_orc_key, p_ped_id, p_material, p_producto, p_precio, p_cantidad);
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
@@ -22,12 +23,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_ORDEN_DETALLE_PEDIDO AS
     PROCEDURE ODP_ACTUALIZAR(
         p_odp_id   IN NUMBER,
         p_material IN VARCHAR2,
+        p_producto IN VARCHAR2,
         p_precio   IN NUMBER,
         p_cantidad IN NUMBER
     ) IS
     BEGIN
         UPDATE BOD_ORDEN_DETALLE_PEDIDO
            SET odp_material = p_material,
+               odp_producto = p_producto,
                odp_precio   = p_precio,
                odp_cantidad = p_cantidad
          WHERE odp_orden_detalle_pedido = p_odp_id;
@@ -49,12 +52,6 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_ORDEN_DETALLE_PEDIDO AS
             RAISE;
     END ODP_ELIMINAR;
 
-    -- PRO_NOMBRE: subquery que busca en BOD_DETALLE_PEDIDO del mismo pedido
-    -- el item cuyo material (via BOD_MATERIAL → BOD_PRODUCTO) coincide con odp_material.
-    -- Si no encuentra coincidencia muestra odp_material como fallback.
-    -- PED_FORMA_PAGO: join directo con BOD_PEDIDO.
-    -- No se hace JOIN directo con BOD_MATERIAL/BOD_PRODUCTO para evitar
-    -- multiplicacion o perdida de filas cuando hay materiales repetidos.
     PROCEDURE ODP_LISTAR_POR_ORDEN(
         p_orc_key IN VARCHAR2,
         p_data    OUT SYS_REFCURSOR
@@ -67,6 +64,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_ORDEN_DETALLE_PEDIDO AS
                    pe.ped_codigo,
                    pe.ped_forma_pago,
                    d.odp_material,
+                   d.odp_producto,
                    NVL(
                        (SELECT pr.pro_nombre
                           FROM BOD_DETALLE_PEDIDO  dp
@@ -75,8 +73,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_ORDEN_DETALLE_PEDIDO AS
                           JOIN BOD_MATERIAL         m  ON m.mat_material         = pr.mat_material
                          WHERE dp.ped_pedido = d.ped_pedido
                            AND UPPER(TRIM(m.mat_descripcion)) = UPPER(TRIM(d.odp_material))
+                           AND UPPER(TRIM(pr.pro_nombre))     = UPPER(TRIM(d.odp_producto))
                            AND ROWNUM = 1),
-                       d.odp_material
+                       d.odp_producto
                    ) AS pro_nombre,
                    d.odp_precio,
                    d.odp_cantidad
@@ -96,6 +95,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_ORDEN_DETALLE_PEDIDO AS
                    orc_orden_compra,
                    ped_pedido,
                    odp_material,
+                   odp_producto,
                    odp_precio,
                    odp_cantidad
               FROM BOD_ORDEN_DETALLE_PEDIDO
