@@ -240,15 +240,6 @@ Namespace Modules.ComprasProveedor
         Protected WithEvents gvDetalles As Global.System.Web.UI.WebControls.GridView
 
         '''<summary>
-        '''Control lblTotalDetalle.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents lblTotalDetalle As Global.System.Web.UI.WebControls.Label
-
-        '''<summary>
         '''Control btnFinalizarPedido.
         '''</summary>
         '''<remarks>

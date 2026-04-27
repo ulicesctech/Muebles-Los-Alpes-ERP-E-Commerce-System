@@ -67,7 +67,7 @@ Namespace Modules.ComprasProveedor
                     total += (precio * cantidad)
                 Next
             End If
-            lblTotalDetalle.Text = total.ToString("N2")
+
             Dim dtPed As DataTable = PedidoService.ObtenerPorId(pedidoId)
             If dtPed IsNot Nothing AndAlso dtPed.Rows.Count > 0 Then
                 PedidoService.Actualizar(
@@ -196,7 +196,7 @@ Namespace Modules.ComprasProveedor
         ' DROPDOWN PRODUCTO
         '========================
         Protected Sub ddlProducto_SelectedIndexChanged(sender As Object, e As EventArgs)
-            ' Solo refresca — precio se asigna desde Orden de Compra
+            ' Solo refresca
         End Sub
 
         '========================
@@ -271,49 +271,44 @@ Namespace Modules.ComprasProveedor
 
             ElseIf e.CommandName = "ConfirmarRecibido" Then
                 Try
-                    ' 1. Extraer argumentos
+                    ' 1. Extraer argumentos del CommandArgument
+                    '    formato: detalleId|proRef|cantSol|cantYaRecibida
                     Dim partes As String() = e.CommandArgument.ToString().Split("|")
                     Dim detalleId As Integer = Convert.ToInt32(partes(0))
                     Dim proRef As String = If(partes.Length > 1, partes(1), "")
                     Dim cantSol As Integer = Convert.ToInt32(If(partes.Length > 2, partes(2), "0"))
+                    Dim cantYaRecibida As Integer = Convert.ToInt32(If(partes.Length > 3, partes(3), "0"))
 
-                    ' 2. Capturar cantidad nueva que el usuario escribio esta vez
-                    Dim cantNuevaEntrada As Integer = 0
+                    ' 2. Leer el complemento que el usuario escribio en txtCantComplemento
+                    Dim cantComplemento As Integer = 0
                     For Each row As GridViewRow In gvDetalles.Rows
                         Dim pnl As Panel = CType(row.FindControl("pnlRecibir"), Panel)
                         If pnl IsNot Nothing AndAlso pnl.Visible Then
-                            Dim txt As TextBox = CType(row.FindControl("txtCantRecibir"), TextBox)
-                            If txt IsNot Nothing Then Integer.TryParse(txt.Text.Trim(), cantNuevaEntrada)
+                            Dim txtComp As TextBox = CType(row.FindControl("txtCantComplemento"), TextBox)
+                            If txtComp IsNot Nothing Then
+                                Integer.TryParse(txtComp.Text.Trim(), cantComplemento)
+                            End If
                             Exit For
                         End If
                     Next
 
-                    ' 3. Validar cantidad nueva
-                    If cantNuevaEntrada <= 0 Then
-                        MostrarMensaje("La cantidad a recibir debe ser mayor a 0.", True)
+                    ' 3. Validar complemento
+                    If cantComplemento <= 0 Then
+                        MostrarMensaje("Ingresa una cantidad a agregar mayor a 0.", True)
                         Exit Sub
                     End If
 
-                    ' 4. Leer cuanto ya habia sido recibido antes
-                    Dim dtDetalle As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
-                    Dim filaDetalle = dtDetalle.Select("DETPE_DETALLE_PEDIDO = " & detalleId)
-
-                    Dim cantYaRecibida As Integer = 0
-                    If filaDetalle.Length > 0 AndAlso Not IsDBNull(filaDetalle(0)("DETPE_CANTIDAD_RECIBIDA")) Then
-                        cantYaRecibida = Convert.ToInt32(filaDetalle(0)("DETPE_CANTIDAD_RECIBIDA"))
-                    End If
-
-                    ' 5. Calcular total acumulado y validar que no supere lo solicitado
-                    Dim cantTotalNueva As Integer = cantYaRecibida + cantNuevaEntrada
+                    ' 4. Calcular total acumulado y validar que no supere lo solicitado
+                    Dim cantTotalNueva As Integer = cantYaRecibida + cantComplemento
                     If cantTotalNueva > cantSol Then
                         MostrarMensaje("La cantidad total recibida (" & cantTotalNueva &
                                        ") superaria la solicitada (" & cantSol & "). " &
-                                       "Maximo que puedes recibir ahora: " &
+                                       "Maximo que puedes agregar ahora: " &
                                        (cantSol - cantYaRecibida) & ".", True)
                         Exit Sub
                     End If
 
-                    ' 6. Verificar Orden de Compra asociada
+                    ' 5. Verificar Orden de Compra asociada
                     Dim dtOrdenes As DataTable = OrdenDetallePedidoService.BuscarPorPedido(pedidoId)
                     If dtOrdenes Is Nothing OrElse dtOrdenes.Rows.Count = 0 Then
                         MostrarMensaje("Este pedido no tiene una Orden de Compra asociada. Vinculala primero.", True)
@@ -322,7 +317,10 @@ Namespace Modules.ComprasProveedor
                         Exit Sub
                     End If
 
-                    ' 7. Obtener material, producto y hip del item
+                    ' 6. Obtener material, producto y hip del item
+                    Dim dtDetalle As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
+                    Dim filaDetalle = dtDetalle.Select("DETPE_DETALLE_PEDIDO = " & detalleId)
+
                     Dim materialItem As String = If(filaDetalle.Length > 0, filaDetalle(0)("MATERIAL").ToString().Trim(), "")
                     Dim productoItem As String = If(filaDetalle.Length > 0, filaDetalle(0)("PRO_NOMBRE").ToString().Trim(), "")
 
@@ -331,9 +329,9 @@ Namespace Modules.ComprasProveedor
                         hipSemillaId = filaDetalle(0)("HIP_HISTORIAL_PRECIO").ToString()
                     End If
 
-                    ' 8. Buscar precio en ODP comparando MATERIAL + PRODUCTO
+                    ' 7. Buscar precio en ODP por MATERIAL + PRODUCTO
                     Dim filtro As String = "TRIM(ODP_MATERIAL) = '" & materialItem.Replace("'", "''") & "'" &
-                                          " AND TRIM(ODP_PRODUCTO) = '" & productoItem.Replace("'", "''") & "'"
+                                            " AND TRIM(ODP_PRODUCTO) = '" & productoItem.Replace("'", "''") & "'"
                     Dim filasODP = dtOrdenes.Select(filtro)
                     Dim precioODP As Decimal = 0
 
@@ -344,9 +342,9 @@ Namespace Modules.ComprasProveedor
                         MostrarMensaje("No se encontro precio especifico. Se uso el primer precio disponible.", False)
                     End If
 
-                    ' 9. Redirigir a Stock pasando:
-                    '    cantrecibida   = cantNuevaEntrada  -solo lo nuevo, para sumar al stock
-                    '    canttotalrecib = cantTotalNueva    -acumulado total, para actualizar DETPE
+                    ' 8. Redirigir a Stock pasando:
+                    '    cantrecibida   = cantComplemento - solo lo nuevo, para sumar al stock
+                    '    canttotalrecib = cantTotalNueva   - acumulado, para actualizar DETPE
                     Dim precioODPStr As String = precioODP.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)
                     hfDetalleRecibir.Value = "0"
 
@@ -356,7 +354,7 @@ Namespace Modules.ComprasProveedor
                               "&detpe=" & detalleId &
                               "&hip=" & hipSemillaId &
                               "&precio=" & precioODPStr &
-                              "&cantrecibida=" & cantNuevaEntrada &
+                              "&cantrecibida=" & cantComplemento &
                               "&canttotalrecib=" & cantTotalNueva &
                               "&fromped=1")
                 Catch ex As Exception

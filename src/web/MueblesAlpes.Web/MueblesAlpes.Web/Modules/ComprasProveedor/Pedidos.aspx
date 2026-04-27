@@ -52,8 +52,18 @@
     .cabecera-info strong { font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:#8B5E3C; display:block; margin-bottom:4px; }
     .section-label { font-size:12px; font-weight:bold; color:#5C3A1E; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; }
     .empty-state { text-align:center; padding:40px 20px; color:#aaa; font-family:Arial,sans-serif; }
-    .recibir-box { margin-top:8px; padding:10px 12px; background:#f0fff4; border:1px solid #9ae6b4; border-radius:8px; }
-    .recibir-box label { font-size:11px; font-weight:bold; color:#276749; text-transform:uppercase; display:block; margin-bottom:6px; }
+    .recibir-box { margin-top:8px; padding:12px 14px; background:#f0fff4; border:1px solid #9ae6b4; border-radius:8px; font-family:Arial,sans-serif; }
+    .recibir-box label { font-size:11px; font-weight:bold; color:#276749; text-transform:uppercase; display:block; margin-bottom:4px; }
+    .recibir-fila { display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; margin-bottom:10px; }
+    .recibir-campo { display:flex; flex-direction:column; gap:4px; }
+    .recibir-campo label { font-size:10px; font-weight:bold; color:#276749; text-transform:uppercase; letter-spacing:0.4px; }
+    .recibir-readonly { padding:7px 10px; border:2px solid #c6f6d5; border-radius:6px; font-size:13px; font-family:Arial,sans-serif; background:#e6ffed; color:#276749; font-weight:bold; width:80px; box-sizing:border-box; text-align:center; }
+    .recibir-suma { padding:7px 8px; font-size:18px; color:#276749; font-weight:bold; align-self:flex-end; margin-bottom:2px; }
+    .recibir-input { padding:7px 10px; border:2px solid #9ae6b4; border-radius:6px; font-size:13px; font-family:Arial,sans-serif; background:white; width:80px; box-sizing:border-box; outline:none; }
+    .recibir-input:focus { border-color:#276749; }
+    .recibir-igual { padding:7px 8px; font-size:18px; color:#276749; font-weight:bold; align-self:flex-end; margin-bottom:2px; }
+    .recibir-total { padding:7px 10px; border:2px solid #276749; border-radius:6px; font-size:13px; font-family:Arial,sans-serif; background:#f0fff4; color:#276749; font-weight:bold; width:80px; box-sizing:border-box; text-align:center; }
+    .recibir-nota { font-size:11px; color:#276749; font-style:italic; margin-bottom:10px; }
     .info-nota { font-size:11px; color:#8B5E3C; font-style:italic; margin-top:4px; font-family:Arial,sans-serif; }
     .edit-input { padding:7px 10px; border:2px solid #C9973A; border-radius:6px; font-size:13px; font-family:Arial,sans-serif; background:white; width:100%; box-sizing:border-box; outline:none; }
     .sub-ped-table { width:100%; border-collapse:collapse; font-family:Arial,sans-serif; font-size:12px; margin-top:6px; }
@@ -124,7 +134,7 @@
                                     <asp:TemplateField HeaderText="Material">
                                         <ItemTemplate>
                                             <%# If(IsDBNull(Eval("MATERIAL")) OrElse String.IsNullOrEmpty(Eval("MATERIAL").ToString()),
-                                                "<span class='badge-pendiente'>�</span>",
+                                                "<span class='badge-pendiente'>—</span>",
                                                 Eval("MATERIAL").ToString()) %>
                                         </ItemTemplate>
                                     </asp:TemplateField>
@@ -134,21 +144,11 @@
                                     <asp:TemplateField HeaderText="Rec." ItemStyle-Width="55px">
                                         <ItemTemplate><%# Eval("DETPE_CANTIDAD_RECIBIDA") %></ItemTemplate>
                                     </asp:TemplateField>
-                                    <%--<asp:TemplateField HeaderText="Precio" ItemStyle-Width="90px">
-                                        <ItemTemplate>
-                                            <%# If(Not IsDBNull(Eval("HIP_PRECIO")) AndAlso Convert.ToDecimal(Eval("HIP_PRECIO")) > 0,
-                                                "Q " & String.Format("{0:N2}", Eval("HIP_PRECIO")),
-                                                "<span class='badge-pendiente'>Pend. OC</span>") %>
-                                        </ItemTemplate>
-                                    </asp:TemplateField>--%>
                                 </Columns>
                                 <EmptyDataTemplate>
                                     <span style="color:#aaa;font-size:11px;font-style:italic;">Sin productos</span>
                                 </EmptyDataTemplate>
                             </asp:GridView>
-                           <%-- <div style="margin-top:6px; padding:4px 10px; background:#fdf6ec; border-radius:6px; border:1px solid #e8d8c0; font-size:12px; font-weight:bold; color:#5C3A1E; font-family:Arial,sans-serif; display:inline-block;">
-                                Total: Q <%# String.Format("{0:N2}", Eval("PED_TOTAL")) %>
-                            </div>--%>
                         </ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="170px" ItemStyle-VerticalAlign="Top">
@@ -268,33 +268,17 @@
                         <EditItemTemplate><%# Eval("PRO_NOMBRE") %></EditItemTemplate>
                     </asp:TemplateField>
 
-                    <%-- NUEVO: Material desde mat_descripcion via paquete --%>
                     <asp:TemplateField HeaderText="Material">
                         <ItemTemplate>
                             <%# If(IsDBNull(Eval("MATERIAL")) OrElse String.IsNullOrEmpty(Eval("MATERIAL").ToString()),
-                                "<span class='badge-pendiente'>�</span>",
+                                "<span class='badge-pendiente'>—</span>",
                                 Eval("MATERIAL").ToString()) %>
                         </ItemTemplate>
                         <EditItemTemplate>
                             <%# If(IsDBNull(Eval("MATERIAL")) OrElse String.IsNullOrEmpty(Eval("MATERIAL").ToString()),
-                                "�", Eval("MATERIAL").ToString()) %>
+                                "—", Eval("MATERIAL").ToString()) %>
                         </EditItemTemplate>
                     </asp:TemplateField>
-
-                    <%--
-                    <asp:TemplateField HeaderText="Precio Asignado" ItemStyle-Width="140px">
-                        <ItemTemplate>
-                            <%# If(Not IsDBNull(Eval("HIP_PRECIO")) AndAlso Convert.ToDecimal(Eval("HIP_PRECIO")) > 0,
-                                "Q " & String.Format("{0:N2}", Eval("HIP_PRECIO")),
-                                "<span style='color:#aaa;font-size:11px;'>Pendiente OC</span>") %>
-                        </ItemTemplate>
-                        <EditItemTemplate>
-                            <%# If(Not IsDBNull(Eval("HIP_PRECIO")) AndAlso Convert.ToDecimal(Eval("HIP_PRECIO")) > 0,
-                                "Q " & String.Format("{0:N2}", Eval("HIP_PRECIO")),
-                                "Pendiente OC") %>
-                        </EditItemTemplate>
-                    </asp:TemplateField>
-                    --%>
 
                     <asp:TemplateField HeaderText="Solicitado" ItemStyle-Width="100px">
                         <ItemTemplate><%# Eval("DETPE_CANTIDAD_SOLICITADA") %></ItemTemplate>
@@ -306,18 +290,45 @@
                         </EditItemTemplate>
                     </asp:TemplateField>
 
-                    <asp:TemplateField HeaderText="Recibido" ItemStyle-Width="160px">
+                    <%-- COLUMNA RECIBIDO: muestra cantidad ya recibida
+                         y cuando se activa muestra el panel con ya recibido + input complemento --%>
+                    <asp:TemplateField HeaderText="Recibido" ItemStyle-Width="320px">
                         <ItemTemplate>
                             <%# Eval("DETPE_CANTIDAD_RECIBIDA") %>
+
                             <asp:Panel ID="pnlRecibir" runat="server" Visible="false">
                                 <div class="recibir-box">
-                                    <label>Cantidad recibida:</label>
-                                    <asp:TextBox ID="txtCantRecibir" runat="server"
-                                        Text='<%# Eval("DETPE_CANTIDAD_RECIBIDA") %>'
-                                        CssClass="edit-input" style="width:75px; margin-bottom:8px;" />
+
+                                    <%-- Fila: ya recibido + input complemento = total --%>
+                                    <div class="recibir-fila">
+                                        <div class="recibir-campo">
+                                            <label>Ya recibido</label>
+                                            <asp:TextBox ID="txtYaRecibido" runat="server"
+                                                CssClass="recibir-readonly"
+                                                ReadOnly="true"
+                                                Text='<%# Eval("DETPE_CANTIDAD_RECIBIDA") %>' />
+                                        </div>
+                                        <div class="recibir-suma">+</div>
+                                        <div class="recibir-campo">
+                                            <label>Cantidad a agregar *</label>
+                                            <asp:TextBox ID="txtCantComplemento" runat="server"
+                                                CssClass="recibir-input"
+                                                placeholder="0" Text="" />
+                                        </div>
+                                        <div class="recibir-igual">=</div>
+                                        <div class="recibir-campo">
+                                            <label>Total recibido</label>
+                                            <div class="recibir-total" id="divTotalRecibido">—</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="recibir-nota">
+                                        Solo ingresa la cantidad que llega ahora. El total se acumula automaticamente.
+                                    </div>
+
                                     <div class="actions-cell">
                                         <asp:LinkButton CommandName="ConfirmarRecibido"
-                                            CommandArgument='<%# Eval("DETPE_DETALLE_PEDIDO") & "|" & Eval("PRO_REFERENCIA") & "|" & Eval("DETPE_CANTIDAD_SOLICITADA") %>'
+                                            CommandArgument='<%# Eval("DETPE_DETALLE_PEDIDO") & "|" & Eval("PRO_REFERENCIA") & "|" & Eval("DETPE_CANTIDAD_SOLICITADA") & "|" & Eval("DETPE_CANTIDAD_RECIBIDA") %>'
                                             runat="server" CssClass="btn-save-t"
                                             CausesValidation="false">&#10003; Confirmar</asp:LinkButton>
                                         <asp:LinkButton CommandName="CancelarRecibido"
@@ -330,17 +341,6 @@
                         </ItemTemplate>
                         <EditItemTemplate><%# Eval("DETPE_CANTIDAD_RECIBIDA") %></EditItemTemplate>
                     </asp:TemplateField>
-
-                    <%--
-                    <asp:TemplateField HeaderText="Subtotal" ItemStyle-Width="120px">
-                        <ItemTemplate>
-                            <%# If(Not IsDBNull(Eval("HIP_PRECIO")) AndAlso Convert.ToDecimal(Eval("HIP_PRECIO")) > 0,
-                                "Q " & String.Format("{0:N2}", Convert.ToDecimal(Eval("HIP_PRECIO")) * Convert.ToDecimal(Eval("DETPE_CANTIDAD_SOLICITADA"))),
-                                "--") %>
-                        </ItemTemplate>
-                        <EditItemTemplate></EditItemTemplate>
-                    </asp:TemplateField>
-                    --%>
 
                     <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="220px">
                         <ItemTemplate>
@@ -370,9 +370,6 @@
             </asp:GridView>
         </div>
 
-        <!--<div class="total-box">
-            Total: Q <asp:Label ID="lblTotalDetalle" runat="server" Text="0.00" />
-        </div>-->
         <div class="f-row" style="margin-top:16px;">
             <asp:Button ID="btnFinalizarPedido" runat="server" Text="&#10003; Finalizar Pedido"
                 CssClass="btn-green" OnClick="btnFinalizarPedido_Click" />
@@ -380,5 +377,30 @@
     </div>
 </div>
 </asp:Panel>
+
+<%-- JS: calcula el total en tiempo real mientras el usuario escribe en txtCantComplemento --%>
+<script type="text/javascript">
+    document.addEventListener('input', function (e) {
+        if (!e.target.classList.contains('recibir-input')) return;
+
+        var box      = e.target.closest('.recibir-box');
+        if (!box) return;
+
+        var yaInput  = box.querySelector('.recibir-readonly');
+        var totalDiv = box.querySelector('.recibir-total');
+        if (!yaInput || !totalDiv) return;
+
+        var ya          = parseInt(yaInput.value, 10) || 0;
+        var complemento = parseInt(e.target.value,  10) || 0;
+
+        if (complemento > 0) {
+            totalDiv.textContent = ya + complemento;
+            totalDiv.style.color = '#276749';
+        } else {
+            totalDiv.textContent = '—';
+            totalDiv.style.color = '#276749';
+        }
+    });
+</script>
 
 </asp:Content>
