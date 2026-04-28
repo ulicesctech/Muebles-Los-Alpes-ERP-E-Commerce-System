@@ -96,24 +96,6 @@ Namespace Modules.ComprasProveedor
         Protected WithEvents hfKey As Global.System.Web.UI.WebControls.HiddenField
 
         '''<summary>
-        '''Control txtIDOrden.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents txtIDOrden As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
-        '''Control txtCodigo.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents txtCodigo As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
         '''Control ddlProveedor.
         '''</summary>
         '''<remarks>

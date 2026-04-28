@@ -127,10 +127,6 @@ CREATE OR REPLACE PACKAGE BODY PKG_CP_BOD_ORDEN_COMPRA AS
              ORDER BY pe.ped_fecha DESC;
     END ORC_BUSCAR_PEDIDOS;
 
-    -- *** CAMBIE AHORITA: se elimino toda referencia a d.pro_referencia porque
-    -- la columna fue dropeada de BOD_DETALLE_PEDIDO.
-    -- Ahora producto y material se obtienen via hip_historial_precio → BOD_HISTORIAL_PRECIO
-    -- → BOD_PRODUCTO → BOD_MATERIAL, igual que en PKG_BOD_DETALLE_PEDIDO.
     PROCEDURE ORC_DETALLES_PEDIDO(
         p_ped_id IN NUMBER,
         p_data   OUT SYS_REFCURSOR
@@ -153,7 +149,20 @@ CREATE OR REPLACE PACKAGE BODY PKG_CP_BOD_ORDEN_COMPRA AS
              WHERE d.ped_pedido = p_ped_id
              ORDER BY d.detpe_detalle_pedido;
     END ORC_DETALLES_PEDIDO;
-    -- *** FIN CAMBIE AHORITA
+
+    -- Devuelve el siguiente numero disponible para el codigo OC-N.
+    -- Extrae el numero de orc_orden_compra con formato OC-N y retorna MAX(N)+1.
+    -- Si no hay registros retorna 1.
+    PROCEDURE ORC_SIGUIENTE_NUMERO(p_numero OUT NUMBER) AS
+    BEGIN
+        SELECT NVL(MAX(TO_NUMBER(REGEXP_SUBSTR(orc_orden_compra, '\d+', 1, 1))), 0) + 1
+          INTO p_numero
+          FROM BOD_ORDEN_COMPRA
+         WHERE REGEXP_LIKE(orc_orden_compra, '^OC-\d+$');
+    EXCEPTION
+        WHEN OTHERS THEN
+            p_numero := 1;
+    END ORC_SIGUIENTE_NUMERO;
 
 END PKG_CP_BOD_ORDEN_COMPRA;
 /

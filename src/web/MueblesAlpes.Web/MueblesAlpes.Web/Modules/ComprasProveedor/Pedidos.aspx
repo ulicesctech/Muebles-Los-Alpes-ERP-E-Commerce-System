@@ -19,6 +19,7 @@
     .f-group label { font-size:11px; font-weight:bold; color:#5C3A1E; font-family:Arial,sans-serif; text-transform:uppercase; letter-spacing:0.5px; }
     .form-control { padding:10px 14px; border:2px solid #e8d8c0; border-radius:8px; font-size:14px; font-family:Arial,sans-serif; background:#fdf8f3; width:100%; outline:none; box-sizing:border-box; }
     .form-control:focus { border-color:#C9973A; background:white; }
+    .form-control-readonly { padding:10px 14px; border:2px solid #e8d8c0; border-radius:8px; font-size:14px; font-family:Arial,sans-serif; background:#f0f0f0; color:#888; width:100%; box-sizing:border-box; cursor:not-allowed; }
     .btn-gold { background:linear-gradient(135deg,#C9973A,#a87a2e); color:white; border:none; padding:10px 20px; border-radius:8px; font-size:13px; font-weight:bold; font-family:Arial,sans-serif; cursor:pointer; white-space:nowrap; }
     .btn-gold:hover { background:linear-gradient(135deg,#a87a2e,#7a5818); }
     .btn-green { background:linear-gradient(135deg,#276749,#1a4d35); color:white; border:none; padding:10px 20px; border-radius:8px; font-size:13px; font-weight:bold; font-family:Arial,sans-serif; cursor:pointer; white-space:nowrap; }
@@ -73,6 +74,7 @@
     .sub-ped-table tbody tr:last-child { border-bottom:none; }
     .sub-ped-table tbody td { padding:5px 10px; color:#555; }
     .badge-pendiente { color:#aaa; font-size:11px; font-style:italic; }
+
 </style>
 
 <div class="breadcrumb-mod">
@@ -180,8 +182,8 @@
     <div class="form-card-body">
         <div class="f-row">
             <div class="f-group">
-                <label>Codigo *</label>
-                <asp:TextBox ID="txtCodigo" runat="server" CssClass="form-control" placeholder="Ej: PED-001" />
+                <label>Codigo</label>
+                <div class="form-control-readonly">Se generara automaticamente (ej: PED-12)</div>
             </div>
             <div class="f-group">
                 <label>Forma de Pago *</label>
@@ -290,16 +292,12 @@
                         </EditItemTemplate>
                     </asp:TemplateField>
 
-                    <%-- COLUMNA RECIBIDO: muestra cantidad ya recibida
-                         y cuando se activa muestra el panel con ya recibido + input complemento --%>
                     <asp:TemplateField HeaderText="Recibido" ItemStyle-Width="320px">
                         <ItemTemplate>
                             <%# Eval("DETPE_CANTIDAD_RECIBIDA") %>
 
                             <asp:Panel ID="pnlRecibir" runat="server" Visible="false">
                                 <div class="recibir-box">
-
-                                    <%-- Fila: ya recibido + input complemento = total --%>
                                     <div class="recibir-fila">
                                         <div class="recibir-campo">
                                             <label>Ya recibido</label>
@@ -378,21 +376,16 @@
 </div>
 </asp:Panel>
 
-<%-- JS: calcula el total en tiempo real mientras el usuario escribe en txtCantComplemento --%>
 <script type="text/javascript">
     document.addEventListener('input', function (e) {
         if (!e.target.classList.contains('recibir-input')) return;
-
-        var box      = e.target.closest('.recibir-box');
+        var box = e.target.closest('.recibir-box');
         if (!box) return;
-
-        var yaInput  = box.querySelector('.recibir-readonly');
+        var yaInput = box.querySelector('.recibir-readonly');
         var totalDiv = box.querySelector('.recibir-total');
         if (!yaInput || !totalDiv) return;
-
-        var ya          = parseInt(yaInput.value, 10) || 0;
-        var complemento = parseInt(e.target.value,  10) || 0;
-
+        var ya = parseInt(yaInput.value, 10) || 0;
+        var complemento = parseInt(e.target.value, 10) || 0;
         if (complemento > 0) {
             totalDiv.textContent = ya + complemento;
             totalDiv.style.color = '#276749';

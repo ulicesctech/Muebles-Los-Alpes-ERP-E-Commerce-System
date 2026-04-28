@@ -91,7 +91,6 @@ Namespace Modules.ComprasProveedor
             pnlFormCabecera.Visible = True
             pnlDetalleContenedor.Visible = False
             pnlMsg.Visible = False
-            txtCodigo.Text = ""
             ddlFormaPago.SelectedIndex = 0
         End Sub
 
@@ -118,13 +117,21 @@ Namespace Modules.ComprasProveedor
             End Try
         End Sub
 
+        ''' <summary>
+        ''' Crea el pedido con codigo temporal, obtiene el ID generado por Oracle
+        ''' y actualiza de inmediato el codigo definitivo con formato PED-{ID}.
+        ''' El usuario nunca ingresa ni edita el codigo.
+        ''' </summary>
         Protected Sub btnGuardar_Click(sender As Object, e As EventArgs)
             Try
-                If String.IsNullOrEmpty(txtCodigo.Text.Trim()) Then
-                    MostrarMensaje("Ingresa el codigo del pedido.", True) : Exit Sub
-                End If
-                Dim nuevoId As Decimal = PedidoService.Crear(txtCodigo.Text.Trim(),
-                                                             ddlFormaPago.SelectedValue, 0)
+                ' 1. Insertar con codigo temporal para obtener el ID de Oracle
+                Dim nuevoId As Decimal = PedidoService.Crear("TEMP", ddlFormaPago.SelectedValue, 0)
+
+                ' 2. Construir el codigo definitivo y actualizar de inmediato
+                Dim codigoAuto As String = "PED-" & nuevoId.ToString()
+                PedidoService.Actualizar(nuevoId, codigoAuto, ddlFormaPago.SelectedValue, 0)
+
+                ' 3. Abrir el panel de detalle para agregar productos
                 hfPedidoActivo.Value = nuevoId.ToString()
                 lblIdSeleccionado.Text = nuevoId.ToString()
                 CargarProductosDropDown()
@@ -133,22 +140,58 @@ Namespace Modules.ComprasProveedor
                 pnlFormCabecera.Visible = False
                 pnlDetalleContenedor.Visible = True
                 CargarPedidos()
-                MostrarMensaje("Pedido #" & nuevoId & " creado. Agrega los productos.", False)
+                MostrarMensaje("Pedido " & codigoAuto & " creado correctamente. Agrega al menos un producto antes de finalizar.", False)
             Catch ex As Exception
                 MostrarMensaje("Error: " & ex.Message, True)
             End Try
         End Sub
 
+        ''' <summary>
+        ''' Finaliza el pedido solo si tiene al menos un producto agregado.
+        ''' Si no tiene productos, elimina el pedido vacio y avisa al usuario.
+        ''' </summary>
         Protected Sub btnFinalizarPedido_Click(sender As Object, e As EventArgs)
-            pnlDetalleContenedor.Visible = False
-            pnlMsg.Visible = False
-            CargarPedidos()
+            Try
+                Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
+                Dim dtItems As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
+
+                ' Validar que tenga al menos un producto
+                If dtItems Is Nothing OrElse dtItems.Rows.Count = 0 Then
+                    ' Eliminar el pedido vacio para no dejar basura en la BD
+                    PedidoService.Eliminar(pedidoId)
+                    pnlDetalleContenedor.Visible = False
+                    CargarPedidos()
+                    MostrarMensaje("No puedes finalizar un pedido sin productos. El pedido fue eliminado automaticamente.", True)
+                    Exit Sub
+                End If
+
+                ' Tiene productos: cerrar normalmente
+                pnlDetalleContenedor.Visible = False
+                pnlMsg.Visible = False
+                CargarPedidos()
+            Catch ex As Exception
+                MostrarMensaje("Error al finalizar: " & ex.Message, True)
+            End Try
         End Sub
 
         Protected Sub btnCerrarDetalle_Click(sender As Object, e As EventArgs)
-            pnlDetalleContenedor.Visible = False
-            pnlFormCabecera.Visible = False
-            pnlMsg.Visible = False
+            Try
+                Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
+                Dim dtItems As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
+
+                ' Si cerraron sin agregar productos, eliminar el pedido vacio
+                If dtItems Is Nothing OrElse dtItems.Rows.Count = 0 Then
+                    PedidoService.Eliminar(pedidoId)
+                    CargarPedidos()
+                    MostrarMensaje("El pedido no tenia productos y fue eliminado automaticamente.", True)
+                End If
+            Catch ex As Exception
+                ' Si falla la limpieza, simplemente cerrar sin avisar
+            Finally
+                pnlDetalleContenedor.Visible = False
+                pnlFormCabecera.Visible = False
+                pnlMsg.Visible = False
+            End Try
         End Sub
 
         '========================
@@ -185,7 +228,7 @@ Namespace Modules.ComprasProveedor
                         pnlDetalleContenedor.Visible = False
                     End If
                     CargarPedidos()
-                    MostrarMensaje("Pedido eliminado.", False)
+                    MostrarMensaje("Pedido eliminado correctamente.", False)
                 Catch ex As Exception
                     MostrarMensaje("Error: " & ex.Message, True)
                 End Try
@@ -237,7 +280,7 @@ Namespace Modules.ComprasProveedor
                 ddlProducto.SelectedIndex = 0
                 CargarDetallesPedido(pedidoId)
                 CargarPedidos()
-                MostrarMensaje("Producto agregado. Vincula este pedido a una Orden de Compra para asignar precio.", False)
+                MostrarMensaje("Producto agregado correctamente. Vincula este pedido a una Orden de Compra para asignar precio.", False)
             Catch ex As Exception
                 MostrarMensaje("Error al agregar item: " & ex.Message, True)
             End Try
@@ -255,7 +298,7 @@ Namespace Modules.ComprasProveedor
                     hfDetalleRecibir.Value = "0"
                     CargarDetallesPedido(pedidoId)
                     CargarPedidos()
-                    MostrarMensaje("Producto eliminado.", False)
+                    MostrarMensaje("Producto eliminado correctamente.", False)
                 Catch ex As Exception
                     MostrarMensaje("Error: " & ex.Message, True)
                 End Try
@@ -271,15 +314,12 @@ Namespace Modules.ComprasProveedor
 
             ElseIf e.CommandName = "ConfirmarRecibido" Then
                 Try
-                    ' 1. Extraer argumentos del CommandArgument
-                    '    formato: detalleId|proRef|cantSol|cantYaRecibida
                     Dim partes As String() = e.CommandArgument.ToString().Split("|")
                     Dim detalleId As Integer = Convert.ToInt32(partes(0))
                     Dim proRef As String = If(partes.Length > 1, partes(1), "")
                     Dim cantSol As Integer = Convert.ToInt32(If(partes.Length > 2, partes(2), "0"))
                     Dim cantYaRecibida As Integer = Convert.ToInt32(If(partes.Length > 3, partes(3), "0"))
 
-                    ' 2. Leer el complemento que el usuario escribio en txtCantComplemento
                     Dim cantComplemento As Integer = 0
                     For Each row As GridViewRow In gvDetalles.Rows
                         Dim pnl As Panel = CType(row.FindControl("pnlRecibir"), Panel)
@@ -292,13 +332,11 @@ Namespace Modules.ComprasProveedor
                         End If
                     Next
 
-                    ' 3. Validar complemento
                     If cantComplemento <= 0 Then
                         MostrarMensaje("Ingresa una cantidad a agregar mayor a 0.", True)
                         Exit Sub
                     End If
 
-                    ' 4. Calcular total acumulado y validar que no supere lo solicitado
                     Dim cantTotalNueva As Integer = cantYaRecibida + cantComplemento
                     If cantTotalNueva > cantSol Then
                         MostrarMensaje("La cantidad total recibida (" & cantTotalNueva &
@@ -308,7 +346,6 @@ Namespace Modules.ComprasProveedor
                         Exit Sub
                     End If
 
-                    ' 5. Verificar Orden de Compra asociada
                     Dim dtOrdenes As DataTable = OrdenDetallePedidoService.BuscarPorPedido(pedidoId)
                     If dtOrdenes Is Nothing OrElse dtOrdenes.Rows.Count = 0 Then
                         MostrarMensaje("Este pedido no tiene una Orden de Compra asociada. Vinculala primero.", True)
@@ -317,7 +354,6 @@ Namespace Modules.ComprasProveedor
                         Exit Sub
                     End If
 
-                    ' 6. Obtener material, producto y hip del item
                     Dim dtDetalle As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
                     Dim filaDetalle = dtDetalle.Select("DETPE_DETALLE_PEDIDO = " & detalleId)
 
@@ -329,7 +365,6 @@ Namespace Modules.ComprasProveedor
                         hipSemillaId = filaDetalle(0)("HIP_HISTORIAL_PRECIO").ToString()
                     End If
 
-                    ' 7. Buscar precio en ODP por MATERIAL + PRODUCTO
                     Dim filtro As String = "TRIM(ODP_MATERIAL) = '" & materialItem.Replace("'", "''") & "'" &
                                             " AND TRIM(ODP_PRODUCTO) = '" & productoItem.Replace("'", "''") & "'"
                     Dim filasODP = dtOrdenes.Select(filtro)
@@ -342,9 +377,6 @@ Namespace Modules.ComprasProveedor
                         MostrarMensaje("No se encontro precio especifico. Se uso el primer precio disponible.", False)
                     End If
 
-                    ' 8. Redirigir a Stock pasando:
-                    '    cantrecibida   = cantComplemento - solo lo nuevo, para sumar al stock
-                    '    canttotalrecib = cantTotalNueva   - acumulado, para actualizar DETPE
                     Dim precioODPStr As String = precioODP.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)
                     hfDetalleRecibir.Value = "0"
 
@@ -417,7 +449,7 @@ Namespace Modules.ComprasProveedor
                 gvDetalles.EditIndex = -1
                 CargarDetallesPedido(pedidoId)
                 CargarPedidos()
-                MostrarMensaje("Item actualizado.", False)
+                MostrarMensaje("Item actualizado correctamente.", False)
             Catch ex As Exception
                 MostrarMensaje("Error: " & ex.Message, True)
             End Try

@@ -21,6 +21,7 @@
     .f-group label { font-size:11px; font-weight:bold; color:#5C3A1E; font-family:Arial,sans-serif; text-transform:uppercase; letter-spacing:0.5px; }
     .form-control { padding:10px 14px; border:2px solid #e8d8c0; border-radius:8px; font-size:14px; font-family:Arial,sans-serif; background:#fdf8f3; width:100%; outline:none; box-sizing:border-box; }
     .form-control:focus { border-color:#C9973A; background:white; }
+    .form-control-readonly { padding:10px 14px; border:2px solid #e8d8c0; border-radius:8px; font-size:14px; font-family:Arial,sans-serif; background:#f0f0f0; color:#888; width:100%; box-sizing:border-box; cursor:not-allowed; }
     .btn-gold    { background:linear-gradient(135deg,#C9973A,#a87a2e); color:white; border:none; padding:10px 20px; border-radius:8px; font-size:13px; font-weight:bold; font-family:Arial,sans-serif; cursor:pointer; white-space:nowrap; }
     .btn-gold:hover { background:linear-gradient(135deg,#a87a2e,#7a5818); }
     .btn-green   { background:linear-gradient(135deg,#276749,#1a4d35); color:white; border:none; padding:10px 22px; border-radius:8px; font-size:13px; font-weight:bold; font-family:Arial,sans-serif; cursor:pointer; white-space:nowrap; }
@@ -61,6 +62,22 @@
     .items-precio-table tbody td { padding:9px 12px; color:#333; vertical-align:middle; }
     .precio-input { padding:7px 10px; border:2px solid #9ae6b4; border-radius:6px; font-size:13px; font-family:Arial,sans-serif; background:white; width:110px; box-sizing:border-box; outline:none; }
     .precio-input:focus { border-color:#276749; }
+    .auto-gen-badge { display:inline-block; padding:4px 12px; background:#fdf6ec; border:1px solid #e8d8c0; border-radius:6px; font-size:13px; color:#888; font-family:Arial,sans-serif; cursor:not-allowed; }
+.btn-disabled-t {
+    background:#f7f7f7;
+    color:#bbb;
+    border:1px solid #e0e0e0;
+    padding:5px 12px;
+    border-radius:6px;
+    font-size:12px;
+    font-weight:bold;
+    font-family:Arial,sans-serif;
+    cursor:not-allowed;
+    text-decoration:none;
+    display:inline-block;
+    white-space:nowrap;
+}
+ 
 </style>
 
 <div class="breadcrumb-mod">
@@ -101,7 +118,7 @@
                 OnRowUpdating="gvOrdenes_RowUpdating"
                 OnRowDataBound="gvOrdenes_RowDataBound">
                 <Columns>
-                    <asp:TemplateField HeaderText="ID" ItemStyle-Width="110px">
+                    <asp:TemplateField HeaderText="ID Orden" ItemStyle-Width="120px">
                         <ItemTemplate><span class="badge-id"><%# Eval("ORC_KEY") %></span></ItemTemplate>
                     </asp:TemplateField>
                     <asp:BoundField DataField="CODIGO"    HeaderText="Codigo" />
@@ -117,12 +134,13 @@
                                     Visible="false">
                                     <Columns>
                                         <asp:BoundField DataField="PED_CODIGO"   HeaderText="Pedido"     ItemStyle-Width="65px" />
-                                        <asp:BoundField DataField="PRO_NOMBRE"   HeaderText="Producto" />
+                                        <asp:BoundField DataField="ODP_PRODUCTO" HeaderText="Producto" />
+                                        <asp:BoundField DataField="ODP_MATERIAL" HeaderText="Material" />
                                         <asp:TemplateField HeaderText="Forma Pago" ItemStyle-Width="90px">
                                             <ItemTemplate><span class="badge-pago"><%# Eval("PED_FORMA_PAGO") %></span></ItemTemplate>
                                         </asp:TemplateField>
-                                        <asp:BoundField DataField="ODP_MATERIAL" HeaderText="Material" />
-                                        <asp:BoundField DataField="ODP_PRODUCTO" HeaderText="Producto ODP" />
+                                        
+                                       
                                         <asp:TemplateField HeaderText="Precio" ItemStyle-Width="80px">
                                             <ItemTemplate>Q <%# String.Format("{0:N2}", Eval("ODP_PRECIO")) %></ItemTemplate>
                                         </asp:TemplateField>
@@ -166,14 +184,16 @@
     <div class="form-card-head"><span>&#9999; Nueva Orden de Compra</span></div>
     <div class="form-card-body">
         <asp:HiddenField ID="hfKey" runat="server" />
+
         <div class="f-row">
+            <%-- ID y Codigo se generan automaticamente: solo se muestran --%>
             <div class="f-group">
-                <label>ID / Clave *</label>
-                <asp:TextBox ID="txtIDOrden" runat="server" CssClass="form-control" placeholder="Ej: OC-2026-001" />
+                <label>ID / Clave</label>
+                <div class="form-control-readonly">Se generara automaticamente (ej: OC-5)</div>
             </div>
             <div class="f-group">
-                <label>Codigo *</label>
-                <asp:TextBox ID="txtCodigo" runat="server" CssClass="form-control" placeholder="COD-001" />
+                <label>Codigo</label>
+                <div class="form-control-readonly">Se generara automaticamente (ej: COD-5)</div>
             </div>
             <div class="f-group">
                 <label>Proveedor *</label>
@@ -231,10 +251,10 @@
                             </asp:TemplateField>
                             <asp:TemplateField HeaderText="" ItemStyle-Width="130px" ItemStyle-VerticalAlign="Top">
                                 <ItemTemplate>
-                                    <asp:LinkButton CommandName="VerItemsPedido"
-                                        CommandArgument='<%# Eval("PED_PEDIDO") & "|" & Eval("PED_CODIGO") %>'
-                                        runat="server" CssClass="btn-edit-t"
-                                        CausesValidation="false">&#10003; Seleccionar</asp:LinkButton>
+                                   <asp:LinkButton ID="lnkSeleccionar" CommandName="VerItemsPedido"
+    CommandArgument='<%# Eval("PED_PEDIDO") & "|" & Eval("PED_CODIGO") %>'
+    runat="server" CssClass="btn-edit-t"
+    CausesValidation="false">&#10003; Seleccionar</asp:LinkButton>
                                 </ItemTemplate>
                             </asp:TemplateField>
                         </Columns>
@@ -323,16 +343,16 @@
                 OnRowCommand="gvItemsOrden_RowCommand">
                 <Columns>
                     <asp:TemplateField HeaderText="Pedido" ItemStyle-Width="80px">
-                        <ItemTemplate><span class="badge-id"><%# Eval("PED_PEDIDO") %></span></ItemTemplate>
+                        <ItemTemplate><span class="badge-id"><%# Eval("PED_CODIGO") %></span></ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Producto">
                         <ItemTemplate><%# Eval("PRO_NOMBRE") %></ItemTemplate>
                     </asp:TemplateField>
-                    <asp:TemplateField HeaderText="Forma Pago" ItemStyle-Width="110px">
-                        <ItemTemplate><span class="badge-pago"><%# Eval("PED_FORMA_PAGO") %></span></ItemTemplate>
-                    </asp:TemplateField>
                     <asp:TemplateField HeaderText="Material">
                         <ItemTemplate><%# Eval("ODP_MATERIAL") %></ItemTemplate>
+                    </asp:TemplateField>
+                     <asp:TemplateField HeaderText="Forma Pago" ItemStyle-Width="110px">
+                    <ItemTemplate><span class="badge-pago"><%# Eval("PED_FORMA_PAGO") %></span></ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Precio" ItemStyle-Width="110px">
                         <ItemTemplate>Q <%# String.Format("{0:N2}", Eval("ODP_PRECIO")) %></ItemTemplate>
