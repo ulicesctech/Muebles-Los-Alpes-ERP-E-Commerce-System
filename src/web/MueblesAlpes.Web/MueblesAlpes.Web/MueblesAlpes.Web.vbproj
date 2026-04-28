@@ -191,6 +191,10 @@
     <Content Include="Modules\CatalogoInventario\Stock.aspx" />
     <Content Include="Modules\Cliente\Login.aspx" />
     <Content Include="Modules\Cliente\Registro.aspx" />
+    <Content Include="Site.Mobile.Master.cs" />
+    <Content Include="Site.Mobile.Master.designer.cs" />
+    <Content Include="ViewSwitcher.ascx.cs" />
+    <Content Include="ViewSwitcher.ascx.designer.cs" />
     <Content Include="Web.config" />
     <Content Include="Bundle.config" />
     <Content Include="Site.Master" />
@@ -213,6 +217,7 @@
     <Content Include="Modules\VentasFacturacion\Carrito.aspx" />
     <Content Include="Modules\VentasFacturacion\DetalleCarrito.aspx" />
     <Content Include="Modules\VentasFacturacion\Factura.aspx" />
+    <Content Include="Modules\VentasFacturacion\HistorialPrecioVenta.aspx" />
     <Content Include="Modules\VentasFacturacion\Index.aspx" />
     <Content Include="Modules\AuthUsuarios\.gitkeep" />
     <Content Include="Modules\CatalogoInventario\.gitkeep" />
@@ -419,6 +424,9 @@
     <Compile Include="App_Code\Services\ComprasProveedor\PedidoService.vb" />
     <Compile Include="App_Code\Services\ComprasProveedor\ProveedorService.vb" />
     <Compile Include="App_Code\Services\ComprasProveedor\ReclamoProveedorService.vb" />
+    <Compile Include="App_Code\Services\VentasFacturacion\CarritoService.vb" />
+    <Compile Include="App_Code\Services\VentasFacturacion\FacturaService.vb" />
+    <Compile Include="App_Code\Services\VentasFacturacion\HistorialPrecioVentaService.vb" />
     <!-- APP START -->
     <Compile Include="App_Start\BundleConfig.vb" />
     <Compile Include="App_Start\RouteConfig.vb" />
@@ -678,6 +686,13 @@
       <DependentUpon>Factura.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="Modules\VentasFacturacion\HistorialPrecioVenta.aspx.designer.vb">
+      <DependentUpon>HistorialPrecioVenta.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\VentasFacturacion\HistorialPrecioVenta.aspx.vb">
+      <DependentUpon>HistorialPrecioVenta.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="Modules\VentasFacturacion\Index.aspx.designer.vb">
       <DependentUpon>Index.aspx</DependentUpon>
     </Compile>
@@ -744,8 +759,15 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+    <None Include="Oracle.DataAccess.Common.Configuration.Section.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Oracle.ManagedDataAccess.Client.Configuration.Section.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="bin\MueblesAlpes.Web.dll.config" />
+    <Content Include="Web.config.example" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

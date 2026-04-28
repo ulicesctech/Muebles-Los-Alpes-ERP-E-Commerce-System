@@ -30,7 +30,7 @@ Namespace Modules.VentasFacturacion
                 Dim dt As DataTable = CarritoService.ListarProductosConPrecio()
                 ddlProducto.DataSource = dt
                 ddlProducto.DataTextField = "PRO_NOMBRE"
-                ddlProducto.DataValueField = "HIP_HISTORIAL_PRECIO"
+                ddlProducto.DataValueField = "HV_HISTORIAL_PRECIO_VENTA"
                 ddlProducto.DataBind()
                 ddlProducto.Items.Insert(0, New ListItem("-- Seleccione --", ""))
             Catch ex As Exception
@@ -100,7 +100,9 @@ Namespace Modules.VentasFacturacion
         End Sub
 
         Protected Sub gvCarritos_RowCommand(ByVal sender As Object, ByVal e As GridViewCommandEventArgs)
-            If e.CommandName = "VerDetalle" Then
+            If e.CommandName = "VerResumen" Then
+                Response.Redirect("DetalleCarrito.aspx?carrito=" & e.CommandArgument.ToString())
+            ElseIf e.CommandName = "VerDetalle" Then
                 hfCarritoDetalle.Value = e.CommandArgument.ToString()
                 lblCarritoSeleccionado.Text = e.CommandArgument.ToString()
                 pnlDetalle.Visible = True

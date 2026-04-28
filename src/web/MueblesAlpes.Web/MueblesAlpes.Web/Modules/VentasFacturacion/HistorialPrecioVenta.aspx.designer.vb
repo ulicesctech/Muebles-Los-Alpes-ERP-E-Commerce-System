@@ -1,9 +1,9 @@
-﻿'------------------------------------------------------------------------------
+'------------------------------------------------------------------------------
 ' <generado automáticamente>
 '     Este código fue generado por una herramienta.
 '
 '     Los cambios en este archivo podrían causar un comportamiento incorrecto y se perderán si
-'     se vuelve a generar el código. 
+'     se vuelve a generar el código.
 ' </generado automáticamente>
 '------------------------------------------------------------------------------
 
@@ -12,16 +12,7 @@ Option Explicit On
 
 Namespace Modules.VentasFacturacion
 
-    Partial Public Class DetalleCarrito
-
-        '''<summary>
-        '''Control hfCarrito.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents hfCarrito As Global.System.Web.UI.WebControls.HiddenField
+    Partial Public Class HistorialPrecioVenta
 
         '''<summary>
         '''Control pnlMsg.
@@ -42,49 +33,58 @@ Namespace Modules.VentasFacturacion
         Protected WithEvents lblMsg As Global.System.Web.UI.WebControls.Label
 
         '''<summary>
-        '''Control gvDetalles.
+        '''Control hfPrecios.
         '''</summary>
         '''<remarks>
         '''Campo generado automáticamente.
         '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         '''</remarks>
-        Protected WithEvents gvDetalles As Global.System.Web.UI.WebControls.GridView
+        Protected WithEvents hfPrecios As Global.System.Web.UI.WebControls.HiddenField
 
         '''<summary>
-        '''Control lblTotal.
+        '''Control ddlProducto.
         '''</summary>
         '''<remarks>
         '''Campo generado automáticamente.
         '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         '''</remarks>
-        Protected WithEvents lblTotal As Global.System.Web.UI.WebControls.Label
+        Protected WithEvents ddlProducto As Global.System.Web.UI.WebControls.DropDownList
 
         '''<summary>
-        '''Control pnlListado.
+        '''Control txtPorcetaje.
         '''</summary>
         '''<remarks>
         '''Campo generado automáticamente.
         '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         '''</remarks>
-        Protected WithEvents pnlListado As Global.System.Web.UI.WebControls.Panel
+        Protected WithEvents txtPorcetaje As Global.System.Web.UI.WebControls.TextBox
 
         '''<summary>
-        '''Control gvListado.
+        '''Control txtPrecioFinal.
         '''</summary>
         '''<remarks>
         '''Campo generado automáticamente.
         '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         '''</remarks>
-        Protected WithEvents gvListado As Global.System.Web.UI.WebControls.GridView
+        Protected WithEvents txtPrecioFinal As Global.System.Web.UI.WebControls.TextBox
 
         '''<summary>
-        '''Control pnlDetalle.
+        '''Control btnRegistrar.
         '''</summary>
         '''<remarks>
         '''Campo generado automáticamente.
         '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         '''</remarks>
-        Protected WithEvents pnlDetalle As Global.System.Web.UI.WebControls.Panel
+        Protected WithEvents btnRegistrar As Global.System.Web.UI.WebControls.Button
+
+        '''<summary>
+        '''Control gvPrecios.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents gvPrecios As Global.System.Web.UI.WebControls.GridView
 
     End Class
 End Namespace

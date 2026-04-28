@@ -34,7 +34,7 @@ Public Class CarritoService
     Public Shared Function AgregarDetalle(carrito As Decimal, histPrecio As Decimal, cantidad As Decimal) As Decimal
         Dim ps As New List(Of OracleParameter) From {
             New OracleParameter("p_carrito", OracleDbType.Decimal, carrito, ParameterDirection.Input),
-            New OracleParameter("p_hist_precio", OracleDbType.Decimal, histPrecio, ParameterDirection.Input),
+            New OracleParameter("p_hv_precio", OracleDbType.Decimal, histPrecio, ParameterDirection.Input),
             New OracleParameter("p_cantidad", OracleDbType.Decimal, cantidad, ParameterDirection.Input)
         }
         Return OracleDb.ExecOutNumber(PKG & ".CARRITO_AGREGAR_DETALLE", ps, "p_id")
@@ -58,8 +58,22 @@ Public Class CarritoService
         Return OracleDb.ExecRefCursor(PKG & ".CARRITO_PRODUCTOS_DISPONIBLES", Nothing, "p_data")
     End Function
 
-    Public Shared Function Resumen() As DataTable
-        Return OracleDb.ExecRefCursor(PKG & ".CARRITO_RESUMEN", Nothing, "p_data")
+    Public Shared Function Resumen(carrito As Decimal) As DataTable
+        Dim ps As New List(Of OracleParameter) From {
+            New OracleParameter("p_carrito", OracleDbType.Decimal, carrito, ParameterDirection.Input)
+        }
+        Return OracleDb.ExecRefCursor(PKG & ".CARRITO_RESUMEN", ps, "p_data")
     End Function
+
+    Public Shared Function ResumenTodos() As DataTable
+        Return OracleDb.ExecRefCursor(PKG & ".CARRITO_RESUMEN_TODOS", Nothing, "p_data")
+    End Function
+
+    Public Shared Sub Facturar(carrito As Decimal)
+        Dim ps As New List(Of OracleParameter) From {
+            New OracleParameter("p_carrito", OracleDbType.Decimal, carrito, ParameterDirection.Input)
+        }
+        OracleDb.ExecNonQuery(PKG & ".CARRITO_FACTURAR", ps)
+    End Sub
 
 End Class

@@ -270,6 +270,7 @@
                         <a runat="server" href="~/Modules/VentasFacturacion/Carrito.aspx">Carrito</a>
                         <a runat="server" href="~/Modules/VentasFacturacion/DetalleCarrito.aspx">Detalle Carrito</a>
                         <a runat="server" href="~/Modules/VentasFacturacion/Factura.aspx">Factura</a>
+                        <a runat="server" href="~/Modules/VentasFacturacion/HistorialPrecioVenta.aspx">Precios de Venta</a>
                     </div>
                 </li>
             </ul>

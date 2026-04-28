@@ -165,6 +165,11 @@
                                 runat="server" CssClass="btn-ui btn-dorado">
                                 ➕ Agregar
                             </asp:LinkButton>
+                            <asp:LinkButton CommandName="VerResumen"
+                                CommandArgument='<%# Eval("PRE_CARRITO") %>'
+                                runat="server" CssClass="btn-ui btn-principal">
+                                📋 Resumen
+                            </asp:LinkButton>
                             <asp:LinkButton CommandName="Vaciar"
                                 CommandArgument='<%# Eval("PRE_CARRITO") %>'
                                 runat="server" CssClass="btn-ui btn-secundario"
