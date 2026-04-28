@@ -58,7 +58,7 @@
         <div class="f-row">
             <div class="f-group">
                 <label>NIT <span style="color:#e53e3e;">*</span></label>
-                <asp:TextBox ID="txtNit" runat="server" CssClass="form-control" placeholder="Ej: 12345678-9"></asp:TextBox>
+                <asp:TextBox ID="txtNit" runat="server" CssClass="form-control" placeholder="Ej: 123456789"></asp:TextBox>
             </div>
             <div class="f-group">
                 <label>Nombre <span style="color:#e53e3e;">*</span></label>
@@ -66,7 +66,7 @@
             </div>
             <div class="f-group">
                 <label>Teléfono <span style="color:#e53e3e;">*</span></label>
-                <asp:TextBox ID="txtTelefono" runat="server" CssClass="form-control" placeholder="Ej: 2222-3333"></asp:TextBox>
+                <asp:TextBox ID="txtTelefono" runat="server" CssClass="form-control" placeholder="Ej: 22223333"></asp:TextBox>
             </div>
         </div>
         <div class="f-row" style="margin-top:12px;">

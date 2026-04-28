@@ -274,7 +274,7 @@
                             <asp:TemplateField HeaderText="Cantidad" ItemStyle-Width="80px">
                                 <ItemTemplate><%# Eval("CANTIDAD") %></ItemTemplate>
                             </asp:TemplateField>
-                            <asp:TemplateField HeaderText="Precio ODP (Q) *" ItemStyle-Width="160px">
+                            <asp:TemplateField HeaderText="Precio unitario (Q) *" ItemStyle-Width="160px">
                                 <ItemTemplate>
                                     <asp:TextBox ID="txtPrecioItem" runat="server"
                                         CssClass="precio-input" placeholder="0.00" Text="" />

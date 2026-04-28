@@ -43,6 +43,8 @@
     .entrada-card { background:#f0fff4; border:1px solid #9ae6b4; border-radius:10px; padding:16px 20px; margin-bottom:16px; }
     .entrada-card h5 { color:#276749; font-family:Arial,sans-serif; font-size:13px; font-weight:bold; margin:0 0 12px; text-transform:uppercase; letter-spacing:0.5px; }
     .section-label { font-size:12px; font-weight:bold; color:#5C3A1E; margin:0 0 14px; padding:8px 14px; background:linear-gradient(135deg,#fdf6ec,#f5e8d0); border-radius:8px; border-left:4px solid #C9973A; font-family:Arial,sans-serif; text-transform:uppercase; letter-spacing:0.5px; }
+    .filtros-card { background:white; border-radius:12px; border:1px solid #e8d8c0; padding:16px 20px; margin-bottom:16px; box-shadow:0 2px 8px rgba(92,58,30,0.06); }
+    .filtros-card h5 { color:#5C3A1E; font-family:Arial,sans-serif; font-size:12px; font-weight:bold; text-transform:uppercase; letter-spacing:0.5px; margin:0 0 12px; }
     .table-card { background:white; border-radius:12px; border:1px solid #e8d8c0; overflow:hidden; box-shadow:0 2px 8px rgba(92,58,30,0.06); margin-bottom:20px; }
     .table-card table { width:100%; border-collapse:collapse; font-family:Arial,sans-serif; font-size:13px; }
     .table-card thead tr { background:linear-gradient(135deg,#5C3A1E,#7a4f2a); }
@@ -55,6 +57,8 @@
     .badge-alto   { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:bold; background:#fdf6ec; color:#C9973A; border:1px solid #e8d0a0; }
     .back-link { display:inline-flex; align-items:center; gap:6px; color:#C9973A; font-size:13px; font-family:Arial,sans-serif; text-decoration:none; margin-top:20px; padding:8px 14px; border-radius:6px; border:1px solid #e8d8c0; background:white; transition:all 0.2s; }
     .back-link:hover { border-color:#C9973A; background:#fdf6ec; text-decoration:none; color:#C9973A; }
+    .contador-resultados { font-size:12px; color:#888; font-family:Arial,sans-serif; margin-bottom:10px; }
+    .contador-resultados strong { color:#5C3A1E; }
 </style>
 
 <div class="breadcrumb-mod">
@@ -75,7 +79,6 @@
     <asp:Label ID="lblMsg" runat="server" />
 </asp:Panel>
 
-<%-- Hidden fields para modo desde Pedidos --%>
 <asp:HiddenField ID="hfFromPed"        runat="server" Value="0" />
 <asp:HiddenField ID="hfPedParam"       runat="server" Value="0" />
 <asp:HiddenField ID="hfHipSemilla"     runat="server" Value="0" />
@@ -85,7 +88,6 @@
 <asp:HiddenField ID="hfCantTotalRecib" runat="server" Value="0" />
 <asp:HiddenField ID="hfHipAnterior"    runat="server" Value="0" />
 
-<%-- Aviso visible solo cuando viene de Pedidos --%>
 <asp:Panel ID="pnlAvisoPedido" runat="server" Visible="false">
     <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:14px 18px;margin-bottom:18px;font-size:13px;font-family:Arial,sans-serif;color:#7a5818;">
         <strong>&#9888; Recepcion de pedido</strong> — Selecciona el almacen y nicho donde entra la mercancia.
@@ -94,7 +96,6 @@
     </div>
 </asp:Panel>
 
-<%-- PASO 1 --%>
 <asp:Panel ID="pnlPaso1" runat="server" Visible="false">
     <div class="step-card">
         <h4><span class="step-num">1</span> Selecciona el Producto</h4>
@@ -114,7 +115,6 @@
     </div>
 </asp:Panel>
 
-<%-- PASO 2 --%>
 <asp:Panel ID="pnlPaso2" runat="server" Visible="false">
     <div class="step-card">
         <h4><span class="step-num">2</span> Selecciona el Almacen</h4>
@@ -127,7 +127,6 @@
     </div>
 </asp:Panel>
 
-<%-- PASO 3 --%>
 <asp:Panel ID="pnlPaso3" runat="server" Visible="false">
     <div class="step-card">
         <h4><span class="step-num">3</span> Selecciona el Nicho</h4>
@@ -140,7 +139,6 @@
     </div>
 </asp:Panel>
 
-<%-- PASO 4 --%>
 <asp:Panel ID="pnlPaso4" runat="server" Visible="false">
     <div class="step-card">
         <h4><span class="step-num">4</span> Gestionar Stock</h4>
@@ -151,7 +149,6 @@
                 Precio vigente: <strong><asp:Label ID="lblPrecioVigente" runat="server" /></strong>
             </div>
         </asp:Panel>
-
         <asp:Panel ID="pnlAvisoPrecio" runat="server" Visible="false">
             <div class="aviso-precio">
                 No hay precio registrado en este nicho. Ve a Historial de Precios y registra el precio primero.
@@ -247,12 +244,48 @@
             <asp:Button ID="btnCrearStock" runat="server" Text="Crear Stock" CssClass="btn-gold"    OnClick="btnCrearStock_Click" />
             <asp:Button ID="btnCancelar2"  runat="server" Text="Cancelar"    CssClass="btn-outline" OnClick="btnCancelar_Click" CausesValidation="false" />
         </asp:Panel>
-
     </div>
 </asp:Panel>
 
-<%-- TABLA --%>
-<div class="section-label">Stock General</div>
+<%-- FILTROS — usan ALM_NOMBRE y NIC_NUMERO como value (lo que devuelve LISTAR) --%>
+<div class="section-label">&#128230; Stock General</div>
+<div class="filtros-card">
+    <h5>&#128269; Filtrar Stock</h5>
+    <div class="f-row">
+        <div class="f-group">
+            <label>Producto</label>
+            <asp:TextBox ID="txtFiltroProducto" runat="server" placeholder="Buscar por nombre de producto..." />
+        </div>
+        <div class="f-group" style="max-width:200px;">
+            <label>Almacen</label>
+            <%-- Value = ALM_NOMBRE porque LISTAR no devuelve ALM_ALMACEN --%>
+            <asp:DropDownList ID="ddlFiltroAlmacen" runat="server" />
+        </div>
+        <div class="f-group" style="max-width:180px;">
+            <label>Nicho</label>
+            <%-- Value = NIC_NUMERO porque LISTAR no devuelve NIC_NICHO --%>
+            <asp:DropDownList ID="ddlFiltroNicho" runat="server" />
+        </div>
+        <div class="f-group" style="max-width:160px;">
+            <label>Estado</label>
+            <asp:DropDownList ID="ddlFiltroEstado" runat="server">
+                <asp:ListItem Text="-- Todos --" Value="" />
+                <asp:ListItem Text="Normal"       Value="NORMAL" />
+                <asp:ListItem Text="Bajo"         Value="BAJO" />
+                <asp:ListItem Text="Alto"         Value="ALTO" />
+            </asp:DropDownList>
+        </div>
+        <div style="display:flex; align-items:flex-end; gap:8px;">
+            <asp:Button ID="btnFiltrar" runat="server" Text="&#128269; Filtrar" CssClass="btn-gold"   OnClick="btnFiltrar_Click"  CausesValidation="false" style="margin-left:0;" />
+            <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar"           CssClass="btn-outline" OnClick="btnLimpiar_Click"  CausesValidation="false" style="margin-left:0;" />
+        </div>
+    </div>
+</div>
+
+<div class="contador-resultados">
+    Mostrando <strong><asp:Label ID="lblContador" runat="server" Text="0" /></strong> registro(s)
+</div>
+
 <div class="table-card">
     <asp:GridView ID="gvStock" runat="server" AutoGenerateColumns="false"
         DataKeyNames="HIP_HISTORIAL_PRECIO"
@@ -260,7 +293,7 @@
         OnRowCancelingEdit="gvStock_RowCancelingEdit"
         OnRowUpdating="gvStock_RowUpdating"
         OnRowCommand="gvStock_RowCommand"
-        EmptyDataText="No hay stock registrado." style="width:100%;">
+        EmptyDataText="No hay stock que coincida con los filtros." style="width:100%;">
         <Columns>
             <asp:TemplateField HeaderText="Producto">
                 <ItemTemplate><%# Eval("PRO_NOMBRE") %></ItemTemplate>

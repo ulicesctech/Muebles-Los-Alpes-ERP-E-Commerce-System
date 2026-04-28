@@ -11,9 +11,14 @@
     .filter-bar { background:white; border-radius:12px; border:1px solid #e8d8c0; padding:16px 20px; margin-bottom:16px; display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; box-shadow:0 2px 8px rgba(92,58,30,0.06); }
     .filter-bar .fg { display:flex; flex-direction:column; gap:5px; }
     .filter-bar .fg label { font-size:11px; font-weight:bold; color:#5C3A1E; font-family:Arial,sans-serif; text-transform:uppercase; letter-spacing:0.5px; }
-    .filter-bar .fg select { padding:9px 14px; border:1.5px solid #e0d0b8; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; outline:none; }
+    .filter-bar .fg select,
+    .filter-bar .fg input { padding:9px 14px; border:1.5px solid #e0d0b8; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; outline:none; }
+    .filter-bar .fg input:focus,
+    .filter-bar .fg select:focus { border-color:#C9973A; }
     .btn-gold { background:#C9973A; color:#1a0e05; border:none; padding:10px 22px; border-radius:8px; font-size:13px; font-weight:bold; font-family:Arial,sans-serif; cursor:pointer; transition:all 0.2s; }
     .btn-gold:hover { background:#a87a2e; color:white; }
+    .btn-outline { background:white; color:#5C3A1E; border:1.5px solid #e0d0b8; padding:10px 18px; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; cursor:pointer; transition:all 0.2s; margin-left:4px; }
+    .btn-outline:hover { border-color:#C9973A; color:#C9973A; }
     .section-label { font-size:12px; font-weight:bold; color:#5C3A1E; margin:0 0 14px; padding:8px 14px; background:linear-gradient(135deg,#fdf6ec,#f5e8d0); border-radius:8px; border-left:4px solid #C9973A; font-family:Arial,sans-serif; text-transform:uppercase; letter-spacing:0.5px; }
     .table-card { background:white; border-radius:12px; border:1px solid #e8d8c0; overflow:hidden; box-shadow:0 2px 8px rgba(92,58,30,0.06); margin-bottom:20px; }
     .table-card table { width:100%; border-collapse:collapse; font-family:Arial,sans-serif; font-size:13px; }
@@ -26,6 +31,8 @@
     .badge-historico { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:bold; background:#fdf6ec; color:#C9973A; border:1px solid #e8d0a0; }
     .alert-ok  { background:#f0fff4; border:1px solid #9ae6b4; color:#276749; padding:10px 16px; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; margin-bottom:16px; }
     .alert-err { background:#fff5f5; border:1px solid #fed7d7; color:#c53030; padding:10px 16px; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; margin-bottom:16px; }
+    .contador-resultados { font-size:12px; color:#888; font-family:Arial,sans-serif; margin-bottom:10px; }
+    .contador-resultados strong { color:#5C3A1E; }
     .back-link { display:inline-flex; align-items:center; gap:6px; color:#C9973A; font-size:13px; font-family:Arial,sans-serif; text-decoration:none; margin-top:20px; padding:8px 14px; border-radius:6px; border:1px solid #e8d8c0; background:white; transition:all 0.2s; }
     .back-link:hover { border-color:#C9973A; background:#fdf6ec; text-decoration:none; color:#C9973A; }
 </style>
@@ -48,49 +55,74 @@
     <asp:Label ID="lblMsg" runat="server" />
 </asp:Panel>
 
-<%-- FILTRO --%>
 <div class="section-label">Historial de Precios</div>
+
+<%-- FILTROS --%>
 <div class="filter-bar">
+    <%-- Filtro por mes/año (original) --%>
     <div class="fg">
         <label>Mes</label>
-        <asp:DropDownList ID="ddlMes" runat="server"
-            style="padding:9px 14px; border:1.5px solid #e0d0b8; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; outline:none;" />
+        <asp:DropDownList ID="ddlMes" runat="server" />
     </div>
     <div class="fg">
-        <label>Anio</label>
-        <asp:DropDownList ID="ddlAnio" runat="server"
-            style="padding:9px 14px; border:1.5px solid #e0d0b8; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; outline:none;" />
+        <label>Año</label>
+        <asp:DropDownList ID="ddlAnio" runat="server" />
     </div>
-    <asp:Button ID="btnFiltrar" runat="server" Text="Filtrar" CssClass="btn-gold" OnClick="btnFiltrar_Click" CausesValidation="false" />
+
+    <%-- Filtro por producto (nuevo) --%>
+    <div class="fg">
+        <label>Producto</label>
+        <asp:TextBox ID="txtFiltroProducto" runat="server"
+            placeholder="Buscar por nombre..."
+            style="padding:9px 14px; border:1.5px solid #e0d0b8; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; outline:none; min-width:220px;" />
+    </div>
+
+    <%-- Filtro por estado (nuevo) --%>
+    <div class="fg">
+        <label>Estado</label>
+        <asp:DropDownList ID="ddlFiltroEstado" runat="server"
+            style="padding:9px 14px; border:1.5px solid #e0d0b8; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; outline:none;">
+            <asp:ListItem Text="-- Todos --"  Value=""         />
+            <asp:ListItem Text="Vigente"      Value="VIGENTE"  />
+            <asp:ListItem Text="Historico"    Value="HISTORICO"/>
+        </asp:DropDownList>
+    </div>
+
+    <asp:Button ID="btnFiltrar"  runat="server" Text="&#128269; Filtrar" CssClass="btn-gold"    OnClick="btnFiltrar_Click"  CausesValidation="false" />
+    <asp:Button ID="btnLimpiar"  runat="server" Text="Limpiar"           CssClass="btn-outline"  OnClick="btnLimpiar_Click"  CausesValidation="false" />
+</div>
+
+<div class="contador-resultados">
+    Mostrando <strong><asp:Label ID="lblContador" runat="server" Text="0" /></strong> registro(s)
 </div>
 
 <div class="table-card">
-<asp:GridView ID="gvHistorial" runat="server"
-    AutoGenerateColumns="false"
-    EmptyDataText="No hay registros de precios."
-    style="width:100%;">
-    <Columns>
-        <asp:BoundField DataField="HIP_HISTORIAL_PRECIO" HeaderText="ID"             ItemStyle-Width="50px" />
-        <asp:BoundField DataField="PRO_NOMBRE"           HeaderText="Producto" />
-        <asp:BoundField DataField="ALM_NOMBRE"           HeaderText="Almacen"        ItemStyle-Width="120px" />
-        <asp:BoundField DataField="NIC_NUMERO"           HeaderText="Nicho"          ItemStyle-Width="70px" />
-        <asp:BoundField DataField="NIC_CARACTERISTICA"   HeaderText="Caracteristica" />
-        <asp:TemplateField HeaderText="Precio" ItemStyle-Width="110px">
-            <ItemTemplate>
-                Q <%# String.Format("{0:N2}", Eval("HIP_PRECIO")) %>
-            </ItemTemplate>
-        </asp:TemplateField>
-        <asp:BoundField DataField="HIP_FECHA_INICIO" HeaderText="Desde" DataFormatString="{0:dd/MM/yyyy}" ItemStyle-Width="100px" />
-        <asp:BoundField DataField="HIP_FECHA_FINAL"  HeaderText="Hasta" DataFormatString="{0:dd/MM/yyyy}" ItemStyle-Width="100px" />
-        <asp:TemplateField HeaderText="Estado" ItemStyle-Width="90px">
-            <ItemTemplate>
-                <%# If(Eval("HIP_FECHA_FINAL") Is DBNull.Value OrElse Eval("HIP_FECHA_FINAL").ToString() = "",
-                    "<span class='badge-vigente'>Vigente</span>",
-                    "<span class='badge-historico'>Historico</span>") %>
-            </ItemTemplate>
-        </asp:TemplateField>
-    </Columns>
-</asp:GridView>
+    <asp:GridView ID="gvHistorial" runat="server"
+        AutoGenerateColumns="false"
+        EmptyDataText="No hay registros que coincidan con los filtros."
+        style="width:100%;">
+        <Columns>
+            <asp:BoundField DataField="HIP_HISTORIAL_PRECIO" HeaderText="ID"             ItemStyle-Width="50px" />
+            <asp:BoundField DataField="PRO_NOMBRE"           HeaderText="Producto" />
+            <asp:BoundField DataField="ALM_NOMBRE"           HeaderText="Almacen"        ItemStyle-Width="120px" />
+            <asp:BoundField DataField="NIC_NUMERO"           HeaderText="Nicho"          ItemStyle-Width="70px" />
+            <asp:BoundField DataField="NIC_CARACTERISTICA"   HeaderText="Caracteristica" />
+            <asp:TemplateField HeaderText="Precio" ItemStyle-Width="110px">
+                <ItemTemplate>
+                    Q <%# String.Format("{0:N2}", Eval("HIP_PRECIO")) %>
+                </ItemTemplate>
+            </asp:TemplateField>
+            <asp:BoundField DataField="HIP_FECHA_INICIO" HeaderText="Desde" DataFormatString="{0:dd/MM/yyyy}" ItemStyle-Width="100px" />
+            <asp:BoundField DataField="HIP_FECHA_FINAL"  HeaderText="Hasta" DataFormatString="{0:dd/MM/yyyy}" ItemStyle-Width="100px" />
+            <asp:TemplateField HeaderText="Estado" ItemStyle-Width="90px">
+                <ItemTemplate>
+                    <%# If(Eval("HIP_FECHA_FINAL") Is DBNull.Value OrElse Eval("HIP_FECHA_FINAL").ToString() = "",
+                        "<span class='badge-vigente'>Vigente</span>",
+                        "<span class='badge-historico'>Historico</span>") %>
+                </ItemTemplate>
+            </asp:TemplateField>
+        </Columns>
+    </asp:GridView>
 </div>
 
 <a class="back-link" href='<%: ResolveUrl("~/Modules/CatalogoInventario/Index.aspx") %>'>&#8592; Volver a Catalogo &amp; Inventario</a>

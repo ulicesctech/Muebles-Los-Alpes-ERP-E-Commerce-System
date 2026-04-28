@@ -1,9 +1,8 @@
 -- ============================================================
 -- PKG_BOD_HISTORIAL_PRECIO.pkb
 --
--- CAMBIOS vs version anterior:
---   + CERRAR_SEMILLA: cierra unicamente la semilla indicada por
---     su hip_id sin afectar ningun otro registro del producto.
+-- CAMBIO: LISTAR_POR_MES ahora devuelve tanto vigentes como
+-- historicos que estuvieron activos durante el mes seleccionado.
 -- ============================================================
 CREATE OR REPLACE PACKAGE BODY PKG_BOD_HISTORIAL_PRECIO AS
 
@@ -98,14 +97,6 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_HISTORIAL_PRECIO AS
   END CERRAR_VIGENTE;
 
   -- ------------------------------------------------------------
-  -- CERRAR_TODOS: cierra todos los registros REALES vigentes del
-  -- producto sin filtrar por nicho.
-  -- Solo afecta registros con hip_precio IS NOT NULL (reales).
-  -- Las semillas (hip_precio IS NULL) NO se cierran aqui porque
-  -- aun no tienen precio asignado y se activaran con ACTUALIZAR_SEMILLA.
-  -- GREATEST evita violar CK_HIP_FECHAS si p_fecha_cierre es anterior
-  -- a hip_fecha_inicio de algun registro.
-  -- ------------------------------------------------------------
   PROCEDURE CERRAR_TODOS(
     p_pro_referencia IN VARCHAR2,
     p_fecha_cierre   IN DATE
@@ -132,13 +123,6 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_HISTORIAL_PRECIO AS
   END CERRAR_TODOS;
 
   -- ------------------------------------------------------------
-  -- CERRAR_SEMILLA: cierra unicamente la semilla indicada por
-  -- su hip_id sin afectar ningun otro registro del producto.
-  -- Solo actua sobre registros con hip_precio IS NULL (semillas).
-  -- Se usa cuando el precio del pedido coincide con el vigente real,
-  -- evitando generar un nuevo historial innecesario.
-  -- GREATEST evita violar CK_HIP_FECHAS.
-  -- ------------------------------------------------------------
   PROCEDURE CERRAR_SEMILLA(
     p_hip_id       IN NUMBER,
     p_fecha_cierre IN DATE
@@ -162,12 +146,6 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_HISTORIAL_PRECIO AS
     WHEN OTHERS THEN ROLLBACK; RAISE;
   END CERRAR_SEMILLA;
 
-  -- ------------------------------------------------------------
-  -- REGISTRAR_GLOBAL: atomico: cierra todos los vigentes REALES
-  -- del producto e inserta el nuevo registro vigente unico.
-  -- Solo cierra registros con hip_precio IS NOT NULL para no
-  -- afectar semillas pendientes de otros items del mismo pedido.
-  -- GREATEST evita violar CK_HIP_FECHAS.
   -- ------------------------------------------------------------
   PROCEDURE REGISTRAR_GLOBAL(
     p_pro_referencia IN  VARCHAR2,
@@ -314,6 +292,17 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_HISTORIAL_PRECIO AS
   END;
 
   -- ------------------------------------------------------------
+  -- LISTAR_POR_MES: devuelve todos los registros (vigentes e
+  -- historicos) que estuvieron activos durante el mes/año indicado.
+  --
+  -- Un registro estaba activo en el mes si:
+  --   - Historico: se solapó con el mes
+  --     (hip_fecha_inicio <= fin_mes AND hip_fecha_final >= inicio_mes)
+  --   - Vigente: inicio antes o durante el mes y aún sin cerrar
+  --     (hip_fecha_inicio <= fin_mes AND hip_fecha_final IS NULL)
+  --
+  -- Ambas condiciones se combinan con OR para traer los dos tipos.
+  -- ------------------------------------------------------------
   PROCEDURE LISTAR_POR_MES(p_mes IN NUMBER, p_anio IN NUMBER, p_data OUT SYS_REFCURSOR) IS
     v_inicio DATE;
     v_fin    DATE;
@@ -324,8 +313,10 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_HISTORIAL_PRECIO AS
     IF p_anio IS NULL OR p_anio < 2000 THEN
       RAISE_APPLICATION_ERROR(-20009, 'BOD_HISTORIAL_PRECIO: anio invalido.');
     END IF;
+
     v_inicio := TRUNC(TO_DATE(p_mes || '/' || p_anio, 'MM/YYYY'), 'MM');
     v_fin    := LAST_DAY(v_inicio);
+
     OPEN p_data FOR
       SELECT h.hip_historial_precio,
              h.pro_referencia,
@@ -342,10 +333,15 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_HISTORIAL_PRECIO AS
         JOIN BOD_NICHO            n  ON n.nic_nicho      = h.nic_nicho
         JOIN BOD_NIC_ALM          na ON na.nic_nicho     = n.nic_nicho
         JOIN BOD_ALMACEN          a  ON a.alm_almacen    = na.alm_almacen
-       WHERE h.hip_fecha_final IS NOT NULL
-         AND h.hip_precio      IS NOT NULL
+       WHERE h.hip_precio IS NOT NULL
          AND h.hip_fecha_inicio <= v_fin
-         AND h.hip_fecha_final  >= v_inicio
+         AND (
+               -- Historico: se solapo con el mes
+               (h.hip_fecha_final IS NOT NULL AND h.hip_fecha_final >= v_inicio)
+               OR
+               -- Vigente: inicio antes/durante el mes y aun abierto
+               h.hip_fecha_final IS NULL
+             )
        ORDER BY p.pro_nombre, h.hip_fecha_inicio DESC;
   END;
 

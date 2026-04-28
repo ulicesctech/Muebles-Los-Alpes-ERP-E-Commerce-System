@@ -3,8 +3,10 @@
 ' ============================================================
 Imports System
 Imports System.Data
+Imports System.Text.RegularExpressions
 
 Namespace Modules.ComprasProveedor
+
     Partial Public Class Proveedores
         Inherits System.Web.UI.Page
 
@@ -12,6 +14,9 @@ Namespace Modules.ComprasProveedor
             If Not IsPostBack Then CargarGrilla()
         End Sub
 
+        ' =============================================
+        ' CARGAR GRILLA
+        ' =============================================
         Private Sub CargarGrilla()
             Try
                 If String.IsNullOrEmpty(txtBuscar.Text.Trim()) Then
@@ -25,30 +30,42 @@ Namespace Modules.ComprasProveedor
             End Try
         End Sub
 
+        ' =============================================
+        ' GUARDAR (crear o actualizar)
+        ' =============================================
         Protected Sub btnGuardar_Click(sender As Object, e As EventArgs)
             If Not ValidarCampos() Then Return
-
             Try
                 Dim id As Decimal = Convert.ToDecimal(hfId.Value)
-
                 If id = 0 Then
-                    ProveedorService.Crear(txtNit.Text, txtNombre.Text, txtAvenida.Text, txtZona.Text, txtDireccion.Text, txtTelefono.Text)
+                    ProveedorService.Crear(txtNit.Text.Trim(), txtNombre.Text.Trim(),
+                                           txtAvenida.Text.Trim(), txtZona.Text.Trim(),
+                                           txtDireccion.Text.Trim(), txtTelefono.Text.Trim())
+                    LimpiarFormulario()
                     MostrarExito("Proveedor creado correctamente.")
                 Else
-                    ProveedorService.Actualizar(id, txtNit.Text, txtNombre.Text, txtAvenida.Text, txtZona.Text, txtDireccion.Text, txtTelefono.Text)
+                    ProveedorService.Actualizar(id, txtNit.Text.Trim(), txtNombre.Text.Trim(),
+                                                txtAvenida.Text.Trim(), txtZona.Text.Trim(),
+                                                txtDireccion.Text.Trim(), txtTelefono.Text.Trim())
+                    LimpiarFormulario()
                     MostrarExito("Proveedor actualizado correctamente.")
                 End If
-
-                LimpiarFormulario()
                 CargarGrilla()
             Catch ex As Exception
-                MostrarError(ex.Message)
+                If ex.Message.Contains("ya existe un proveedor con ese NIT") Then
+                    MostrarError("Ya existe un proveedor registrado con ese NIT.")
+                Else
+                    MostrarError(ex.Message)
+                End If
             End Try
         End Sub
 
+        ' =============================================
+        ' GRID COMMANDS — Editar y Eliminar
+        ' =============================================
         Protected Sub gvProveedores_RowCommand(sender As Object, e As GridViewCommandEventArgs)
-            ' Validación de argumento para evitar errores de conversión
-            If e.CommandArgument Is Nothing OrElse String.IsNullOrEmpty(e.CommandArgument.ToString()) Then Return
+            If e.CommandArgument Is Nothing OrElse
+               String.IsNullOrEmpty(e.CommandArgument.ToString()) Then Return
 
             Dim id As Decimal = Convert.ToDecimal(e.CommandArgument)
 
@@ -76,19 +93,21 @@ Namespace Modules.ComprasProveedor
             ElseIf e.CommandName = "Eliminar" Then
                 Try
                     ProveedorService.Eliminar(id)
-                    MostrarExito("¡Hecho! El proveedor ha sido eliminado del sistema de forma segura.")
+                    MostrarExito("Proveedor eliminado correctamente.")
                     CargarGrilla()
                 Catch ex As Exception
-                    ' Manejo específico de error de integridad referencial de Oracle (ORA-02292)
                     If ex.Message.Contains("ORA-02292") Then
-                        MostrarError("No se puede eliminar: Este proveedor ya tiene registros vinculados (órdenes, facturas o reclamos).")
+                        MostrarError("No se puede eliminar: este proveedor tiene ordenes, facturas o reclamos vinculados.")
                     Else
-                        MostrarError("Hubo un inconveniente al intentar eliminar el registro: " & ex.Message)
+                        MostrarError("Error al eliminar: " & ex.Message)
                     End If
                 End Try
             End If
         End Sub
 
+        ' =============================================
+        ' BUSCAR Y LIMPIAR
+        ' =============================================
         Protected Sub btnBuscar_Click(sender As Object, e As EventArgs)
             CargarGrilla()
         End Sub
@@ -101,24 +120,85 @@ Namespace Modules.ComprasProveedor
 
         Protected Sub btnCancelar_Click(sender As Object, e As EventArgs)
             LimpiarFormulario()
-            pnlMsg.Visible = False
         End Sub
 
-        ' --- Métodos Auxiliares ---
-
+        ' =============================================
+        ' VALIDACIONES
+        ' =============================================
         Private Function ValidarCampos() As Boolean
+
+            ' NIT obligatorio
             If String.IsNullOrWhiteSpace(txtNit.Text) Then
-                MostrarError("Por favor, ingresa el NIT del proveedor. Es un dato obligatorio.") : Return False
+                MostrarError("Ingresa el NIT o CUI del proveedor.") : Return False
             End If
+
+            ' NIT / CUI formato Guatemala
+            If Not EsNitOCuiGuatemalteco(txtNit.Text.Trim()) Then
+                MostrarError("El NIT o CUI no tiene un formato valido. " &
+                             "Formatos aceptados:" & vbCrLf &
+                             "• NIT: digitos sin guion, puede terminar en K (ej: 123456789 o 12345678K)" & vbCrLf &
+                             "• CUI: 13 digitos (ej: 1234567890101)") : Return False
+            End If
+
+            ' Nombre obligatorio
             If String.IsNullOrWhiteSpace(txtNombre.Text) Then
-                MostrarError("Necesitamos el nombre comercial o razón social del proveedor.") : Return False
+                MostrarError("Ingresa el nombre o razon social del proveedor.") : Return False
             End If
-            If txtTelefono.Text.Length > 0 AndAlso Not IsNumeric(txtTelefono.Text) Then
-                MostrarError("El número de teléfono debe contener solo dígitos.") : Return False
+
+            ' Avenida obligatoria
+            If String.IsNullOrWhiteSpace(txtAvenida.Text) Then
+                MostrarError("Ingresa la avenida del proveedor.") : Return False
             End If
+
+            ' Zona obligatoria
+            If String.IsNullOrWhiteSpace(txtZona.Text) Then
+                MostrarError("Ingresa la zona del proveedor.") : Return False
+            End If
+
+            ' Direccion obligatoria
+            If String.IsNullOrWhiteSpace(txtDireccion.Text) Then
+                MostrarError("Ingresa la direccion del proveedor.") : Return False
+            End If
+
+            ' Telefono: obligatorio, exactamente 8 digitos numericos
+            Dim tel As String = txtTelefono.Text.Trim()
+            If String.IsNullOrWhiteSpace(tel) Then
+                MostrarError("Ingresa el telefono del proveedor.") : Return False
+            End If
+            If Not Regex.IsMatch(tel, "^\d{8}$") Then
+                MostrarError("El telefono debe tener exactamente 8 digitos numericos sin espacios ni guiones (ej: 22223333).") : Return False
+            End If
+
             Return True
         End Function
 
+        ' =============================================
+        ' VALIDACION NIT / CUI GUATEMALTECO
+        '
+        ' Formatos validos para PROVEEDORES (guion NO aceptado):
+        '
+        '   NIT sin guion:  2-9 digitos + digito verificador (0-9 o K)
+        '                   Ej: 123456789, 12345678K
+        '
+        '   CUI:            Exactamente 13 digitos numericos
+        '                   Ej: 1234567890101
+        ' =============================================
+        Private Function EsNitOCuiGuatemalteco(nit As String) As Boolean
+            Dim nitUp As String = nit.ToUpper().Trim()
+
+            ' CUI: exactamente 13 digitos
+            If Regex.IsMatch(nitUp, "^\d{13}$") Then Return True
+
+            ' NIT sin guion: 2-9 digitos + digito verificador (0-9 o K)
+            ' Cubre: 123456789  /  12345678K
+            If Regex.IsMatch(nitUp, "^\d{2,9}[\dK]$") Then Return True
+
+            Return False
+        End Function
+
+        ' =============================================
+        ' HELPERS
+        ' =============================================
         Private Sub LimpiarFormulario()
             hfId.Value = "0"
             txtNit.Text = "" : txtNombre.Text = "" : txtTelefono.Text = ""
@@ -140,5 +220,7 @@ Namespace Modules.ComprasProveedor
             pnlMsg.CssClass = "alert-ok"
             pnlMsg.Visible = True
         End Sub
+
     End Class
+
 End Namespace

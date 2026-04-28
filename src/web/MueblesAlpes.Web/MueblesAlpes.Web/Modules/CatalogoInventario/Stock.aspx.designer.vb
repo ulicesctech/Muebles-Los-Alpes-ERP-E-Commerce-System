@@ -483,6 +483,69 @@ Namespace Modules.CatalogoInventario
         Protected WithEvents btnCancelar2 As Global.System.Web.UI.WebControls.Button
 
         '''<summary>
+        '''Control txtFiltroProducto.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents txtFiltroProducto As Global.System.Web.UI.WebControls.TextBox
+
+        '''<summary>
+        '''Control ddlFiltroAlmacen.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents ddlFiltroAlmacen As Global.System.Web.UI.WebControls.DropDownList
+
+        '''<summary>
+        '''Control ddlFiltroNicho.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents ddlFiltroNicho As Global.System.Web.UI.WebControls.DropDownList
+
+        '''<summary>
+        '''Control ddlFiltroEstado.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents ddlFiltroEstado As Global.System.Web.UI.WebControls.DropDownList
+
+        '''<summary>
+        '''Control btnFiltrar.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents btnFiltrar As Global.System.Web.UI.WebControls.Button
+
+        '''<summary>
+        '''Control btnLimpiar.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents btnLimpiar As Global.System.Web.UI.WebControls.Button
+
+        '''<summary>
+        '''Control lblContador.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents lblContador As Global.System.Web.UI.WebControls.Label
+
+        '''<summary>
         '''Control gvStock.
         '''</summary>
         '''<remarks>
