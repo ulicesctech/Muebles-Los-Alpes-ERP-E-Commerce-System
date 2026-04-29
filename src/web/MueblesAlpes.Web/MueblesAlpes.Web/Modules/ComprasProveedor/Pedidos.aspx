@@ -232,7 +232,9 @@
                 <div class="f-group" style="flex:3;">
                     <label>Producto *</label>
                     <%-- ddlProducto se deshabilita en CargarDetallesPedido si el pedido tiene OC --%>
-                    <asp:DropDownList ID="ddlProducto" runat="server" CssClass="form-control"
+                    <asp:DropDownList ID="ddlProducto" runat="server" style="padding:10px 14px; border:2px solid #e8d8c0; border-radius:8px;
+           font-size:14px; font-family:Arial,sans-serif; background:#fdf8f3;
+           width:100%; outline:none; box-sizing:border-box;" 
                         AutoPostBack="true" OnSelectedIndexChanged="ddlProducto_SelectedIndexChanged" />
                     <div class="info-nota">El precio se asignara al recibir la mercancia desde la Orden de Compra.</div>
                 </div>

@@ -93,7 +93,7 @@
 <div class="search-bar">
     <div class="search-wrap">
         <span class="search-icon-abs">🔍</span>
-        <asp:TextBox ID="txtBuscar" runat="server" placeholder="Buscar por nombre o NIT..."></asp:TextBox>
+        <asp:TextBox ID="txtBuscar" runat="server" placeholder="Buscar por proveedor,NIT o telefono"></asp:TextBox>
     </div>
     <asp:Button ID="btnBuscar" runat="server" Text="Buscar" CssClass="btn-gold" OnClick="btnBuscar_Click" CausesValidation="false" />
     <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" CssClass="btn-outline" OnClick="btnLimpiar_Click" CausesValidation="false" />
