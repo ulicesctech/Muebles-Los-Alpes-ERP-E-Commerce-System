@@ -308,7 +308,8 @@
                 <ItemTemplate><%# Eval("NIC_CARACTERISTICA") %></ItemTemplate>
             </asp:TemplateField>
             <asp:TemplateField HeaderText="Precio" ItemStyle-Width="100px">
-                <ItemTemplate><%# String.Format("{0:C2}", Eval("HIP_PRECIO")) %></ItemTemplate>
+                <ItemTemplate>Q <%# String.Format("{0:N2}", Eval("HIP_PRECIO")) %></ItemTemplate>
+
             </asp:TemplateField>
             <asp:TemplateField HeaderText="Disponible" ItemStyle-Width="85px">
                 <ItemTemplate>

@@ -7,6 +7,7 @@ Namespace Modules.ComprasProveedor
 
         Protected Sub Page_Load(sender As Object, e As EventArgs) Handles Me.Load
             If Not IsPostBack Then
+                CargarFormasPago()
                 CargarPedidos()
                 Dim pedidoParam As String = Request.QueryString("pedido")
                 If Not String.IsNullOrEmpty(pedidoParam) Then
@@ -22,9 +23,45 @@ Namespace Modules.ComprasProveedor
             End If
         End Sub
 
-        '========================
+        ' =============================================
         ' HELPERS
-        '========================
+        ' =============================================
+
+        ''' <summary>
+        ''' Devuelve True si el pedido ya tiene al menos un item en BOD_ORDEN_DETALLE_PEDIDO,
+        ''' lo que indica que fue vinculado a una Orden de Compra.
+        ''' Cuando esto es True, solo se permite registrar cantidades recibidas.
+        ''' </summary>
+        Private Function PedidoTieneOrdenCompra(pedidoId As Integer) As Boolean
+            Try
+                Dim dt As DataTable = OrdenDetallePedidoService.BuscarPorPedido(pedidoId)
+                Return (dt IsNot Nothing AndAlso dt.Rows.Count > 0)
+            Catch
+                Return False
+            End Try
+        End Function
+
+        ''' <summary>
+        ''' Carga las formas de pago desde Oracle (PKG_CP_BOD_PEDIDO.PED_LISTAR_FORMAS_PAGO).
+        ''' Alimenta tanto ddlFormaPago (nuevo pedido) como ddlCabeceraFormaPago (edicion).
+        ''' Nunca se hardcodea CONTADO/CREDITO en el VB.
+        ''' </summary>
+        Private Sub CargarFormasPago()
+            Try
+                Dim dt As DataTable = PedidoService.ListarFormasPago()
+                ddlFormaPago.DataSource = dt
+                ddlFormaPago.DataTextField = "DESCRIPCION"
+                ddlFormaPago.DataValueField = "FORMA_PAGO"
+                ddlFormaPago.DataBind()
+                ddlCabeceraFormaPago.DataSource = dt
+                ddlCabeceraFormaPago.DataTextField = "DESCRIPCION"
+                ddlCabeceraFormaPago.DataValueField = "FORMA_PAGO"
+                ddlCabeceraFormaPago.DataBind()
+            Catch ex As Exception
+                MostrarMensaje("Error al cargar formas de pago: " & ex.Message, True)
+            End Try
+        End Sub
+
         Private Sub CargarPedidos()
             gvPedidos.DataSource = PedidoService.Listar()
             gvPedidos.DataBind()
@@ -45,6 +82,14 @@ Namespace Modules.ComprasProveedor
             gvDetalles.DataSource = dt
             gvDetalles.DataBind()
             RecalcularTotal(dt, pedidoId)
+
+            ' Si el pedido ya tiene OC: bloquear controles de edicion de cabecera
+            Dim tieneOC As Boolean = PedidoTieneOrdenCompra(pedidoId)
+            ddlCabeceraFormaPago.Enabled = Not tieneOC
+            btnGuardarCabecera.Enabled = Not tieneOC
+            btnAgregarItem.Enabled = Not tieneOC
+            ddlProducto.Enabled = Not tieneOC
+            txtCantSolicitada.Enabled = Not tieneOC
         End Sub
 
         Private Sub CargarInfoCabecera(pedidoId As Integer)
@@ -67,14 +112,12 @@ Namespace Modules.ComprasProveedor
                     total += (precio * cantidad)
                 Next
             End If
-
             Dim dtPed As DataTable = PedidoService.ObtenerPorId(pedidoId)
             If dtPed IsNot Nothing AndAlso dtPed.Rows.Count > 0 Then
-                PedidoService.Actualizar(
-                    Convert.ToDecimal(pedidoId),
-                    dtPed.Rows(0)("PED_CODIGO").ToString(),
-                    dtPed.Rows(0)("PED_FORMA_PAGO").ToString(),
-                    total)
+                PedidoService.Actualizar(Convert.ToDecimal(pedidoId),
+                                         dtPed.Rows(0)("PED_CODIGO").ToString(),
+                                         dtPed.Rows(0)("PED_FORMA_PAGO").ToString(),
+                                         total)
             End If
         End Sub
 
@@ -84,14 +127,15 @@ Namespace Modules.ComprasProveedor
             pnlMsg.Visible = True
         End Sub
 
-        '========================
+        ' =============================================
         ' NUEVO PEDIDO
-        '========================
+        ' =============================================
         Protected Sub btnNuevoPedido_Click(sender As Object, e As EventArgs)
+            CargarFormasPago()
             pnlFormCabecera.Visible = True
             pnlDetalleContenedor.Visible = False
             pnlMsg.Visible = False
-            ddlFormaPago.SelectedIndex = 0
+            If ddlFormaPago.Items.Count > 0 Then ddlFormaPago.SelectedIndex = 0
         End Sub
 
         Protected Sub btnCancelarForm_Click(sender As Object, e As EventArgs)
@@ -99,9 +143,19 @@ Namespace Modules.ComprasProveedor
             pnlMsg.Visible = False
         End Sub
 
+        ''' <summary>
+        ''' Guarda cambios en la cabecera del pedido (forma de pago).
+        ''' BLOQUEADO si el pedido ya tiene una Orden de Compra asociada.
+        ''' </summary>
         Protected Sub btnGuardarCabecera_Click(sender As Object, e As EventArgs)
             Try
                 Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
+
+                If PedidoTieneOrdenCompra(pedidoId) Then
+                    MostrarMensaje("No se puede modificar la forma de pago porque este pedido ya tiene una Orden de Compra asociada.", True)
+                    Exit Sub
+                End If
+
                 Dim dt As DataTable = PedidoService.ObtenerPorId(pedidoId)
                 If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
                     PedidoService.Actualizar(
@@ -117,21 +171,17 @@ Namespace Modules.ComprasProveedor
             End Try
         End Sub
 
-        ''' <summary>
-        ''' Crea el pedido con codigo temporal, obtiene el ID generado por Oracle
-        ''' y actualiza de inmediato el codigo definitivo con formato PED-{ID}.
-        ''' El usuario nunca ingresa ni edita el codigo.
-        ''' </summary>
         Protected Sub btnGuardar_Click(sender As Object, e As EventArgs)
             Try
-                ' 1. Insertar con codigo temporal para obtener el ID de Oracle
-                Dim nuevoId As Decimal = PedidoService.Crear("TEMP", ddlFormaPago.SelectedValue, 0)
+                Dim formaPago As String = ddlFormaPago.SelectedValue
+                If String.IsNullOrEmpty(formaPago) Then
+                    MostrarMensaje("Selecciona una forma de pago.", True) : Exit Sub
+                End If
 
-                ' 2. Construir el codigo definitivo y actualizar de inmediato
+                Dim nuevoId As Decimal = PedidoService.Crear("TEMP", formaPago, 0)
                 Dim codigoAuto As String = "PED-" & nuevoId.ToString()
-                PedidoService.Actualizar(nuevoId, codigoAuto, ddlFormaPago.SelectedValue, 0)
+                PedidoService.Actualizar(nuevoId, codigoAuto, formaPago, 0)
 
-                ' 3. Abrir el panel de detalle para agregar productos
                 hfPedidoActivo.Value = nuevoId.ToString()
                 lblIdSeleccionado.Text = nuevoId.ToString()
                 CargarProductosDropDown()
@@ -146,26 +196,17 @@ Namespace Modules.ComprasProveedor
             End Try
         End Sub
 
-        ''' <summary>
-        ''' Finaliza el pedido solo si tiene al menos un producto agregado.
-        ''' Si no tiene productos, elimina el pedido vacio y avisa al usuario.
-        ''' </summary>
         Protected Sub btnFinalizarPedido_Click(sender As Object, e As EventArgs)
             Try
                 Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
                 Dim dtItems As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
-
-                ' Validar que tenga al menos un producto
                 If dtItems Is Nothing OrElse dtItems.Rows.Count = 0 Then
-                    ' Eliminar el pedido vacio para no dejar basura en la BD
                     PedidoService.Eliminar(pedidoId)
                     pnlDetalleContenedor.Visible = False
                     CargarPedidos()
                     MostrarMensaje("No puedes finalizar un pedido sin productos. El pedido fue eliminado automaticamente.", True)
                     Exit Sub
                 End If
-
-                ' Tiene productos: cerrar normalmente
                 pnlDetalleContenedor.Visible = False
                 pnlMsg.Visible = False
                 CargarPedidos()
@@ -178,15 +219,12 @@ Namespace Modules.ComprasProveedor
             Try
                 Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
                 Dim dtItems As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
-
-                ' Si cerraron sin agregar productos, eliminar el pedido vacio
                 If dtItems Is Nothing OrElse dtItems.Rows.Count = 0 Then
                     PedidoService.Eliminar(pedidoId)
                     CargarPedidos()
                     MostrarMensaje("El pedido no tenia productos y fue eliminado automaticamente.", True)
                 End If
-            Catch ex As Exception
-                ' Si falla la limpieza, simplemente cerrar sin avisar
+            Catch
             Finally
                 pnlDetalleContenedor.Visible = False
                 pnlFormCabecera.Visible = False
@@ -194,9 +232,9 @@ Namespace Modules.ComprasProveedor
             End Try
         End Sub
 
-        '========================
+        ' =============================================
         ' GRID PEDIDOS
-        '========================
+        ' =============================================
         Protected Sub gvPedidos_RowDataBound(sender As Object, e As GridViewRowEventArgs)
             If e.Row.RowType = DataControlRowType.DataRow Then
                 Dim pedId As Integer = Convert.ToInt32(gvPedidos.DataKeys(e.Row.RowIndex).Value)
@@ -217,10 +255,16 @@ Namespace Modules.ComprasProveedor
                 hfDetalleRecibir.Value = "0"
                 lblIdSeleccionado.Text = pedidoId.ToString()
                 CargarProductosDropDown()
-                CargarDetallesPedido(pedidoId)
+                CargarDetallesPedido(pedidoId)   ' <-- ya bloquea controles si tiene OC
                 CargarInfoCabecera(pedidoId)
                 pnlDetalleContenedor.Visible = True
                 pnlFormCabecera.Visible = False
+
+                ' Informar al usuario si el pedido esta bloqueado por OC
+                If PedidoTieneOrdenCompra(pedidoId) Then
+                    MostrarMensaje("Este pedido tiene una Orden de Compra asociada. Solo puedes registrar cantidades recibidas.", False)
+                End If
+
             ElseIf e.CommandName = "Eliminar" Then
                 Try
                     PedidoService.Eliminar(Convert.ToInt32(e.CommandArgument))
@@ -235,19 +279,26 @@ Namespace Modules.ComprasProveedor
             End If
         End Sub
 
-        '========================
+        ' =============================================
         ' DROPDOWN PRODUCTO
-        '========================
+        ' =============================================
         Protected Sub ddlProducto_SelectedIndexChanged(sender As Object, e As EventArgs)
             ' Solo refresca
         End Sub
 
-        '========================
+        ' =============================================
         ' AGREGAR PRODUCTO
-        '========================
+        ' BLOQUEADO si el pedido tiene OC asociada
+        ' =============================================
         Protected Sub btnAgregarItem_Click(sender As Object, e As EventArgs)
             Try
                 Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
+
+                If PedidoTieneOrdenCompra(pedidoId) Then
+                    MostrarMensaje("No se pueden agregar productos porque este pedido ya tiene una Orden de Compra asociada.", True)
+                    Exit Sub
+                End If
+
                 Dim proRef As String = ddlProducto.SelectedValue
                 Dim cantidad As Integer
 
@@ -256,12 +307,6 @@ Namespace Modules.ComprasProveedor
                 End If
                 If Not Integer.TryParse(txtCantSolicitada.Text.Trim(), cantidad) OrElse cantidad <= 0 Then
                     MostrarMensaje("Ingresa una cantidad valida.", True) : Exit Sub
-                End If
-
-                Dim dtOC As DataTable = OrdenDetallePedidoService.BuscarPorPedido(pedidoId)
-                If dtOC IsNot Nothing AndAlso dtOC.Rows.Count > 0 Then
-                    MostrarMensaje("No se pueden agregar productos porque este pedido ya tiene una Orden de Compra asociada.", True)
-                    Exit Sub
                 End If
 
                 Dim dtActual As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
@@ -280,19 +325,24 @@ Namespace Modules.ComprasProveedor
                 ddlProducto.SelectedIndex = 0
                 CargarDetallesPedido(pedidoId)
                 CargarPedidos()
-                MostrarMensaje("Producto agregado correctamente. Vincula este pedido a una Orden de Compra para asignar precio.", False)
+                MostrarMensaje("Producto agregado correctamente.", False)
             Catch ex As Exception
                 MostrarMensaje("Error al agregar item: " & ex.Message, True)
             End Try
         End Sub
 
-        '========================
+        ' =============================================
         ' GRID DETALLES
-        '========================
+        ' =============================================
         Protected Sub gvDetalles_RowCommand(sender As Object, e As GridViewCommandEventArgs)
             Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
 
             If e.CommandName = "BorrarItem" Then
+                ' BLOQUEADO si el pedido tiene OC asociada
+                If PedidoTieneOrdenCompra(pedidoId) Then
+                    MostrarMensaje("No se puede eliminar productos porque este pedido ya tiene una Orden de Compra asociada.", True)
+                    Exit Sub
+                End If
                 Try
                     DetallePedidoService.Eliminar(Convert.ToInt32(e.CommandArgument))
                     hfDetalleRecibir.Value = "0"
@@ -325,24 +375,19 @@ Namespace Modules.ComprasProveedor
                         Dim pnl As Panel = CType(row.FindControl("pnlRecibir"), Panel)
                         If pnl IsNot Nothing AndAlso pnl.Visible Then
                             Dim txtComp As TextBox = CType(row.FindControl("txtCantComplemento"), TextBox)
-                            If txtComp IsNot Nothing Then
-                                Integer.TryParse(txtComp.Text.Trim(), cantComplemento)
-                            End If
+                            If txtComp IsNot Nothing Then Integer.TryParse(txtComp.Text.Trim(), cantComplemento)
                             Exit For
                         End If
                     Next
 
                     If cantComplemento <= 0 Then
-                        MostrarMensaje("Ingresa una cantidad a agregar mayor a 0.", True)
-                        Exit Sub
+                        MostrarMensaje("Ingresa una cantidad a agregar mayor a 0.", True) : Exit Sub
                     End If
 
                     Dim cantTotalNueva As Integer = cantYaRecibida + cantComplemento
                     If cantTotalNueva > cantSol Then
-                        MostrarMensaje("La cantidad total recibida (" & cantTotalNueva &
-                                       ") superaria la solicitada (" & cantSol & "). " &
-                                       "Maximo que puedes agregar ahora: " &
-                                       (cantSol - cantYaRecibida) & ".", True)
+                        MostrarMensaje("La cantidad total (" & cantTotalNueva & ") superaria la solicitada (" & cantSol & "). " &
+                                       "Maximo que puedes agregar ahora: " & (cantSol - cantYaRecibida) & ".", True)
                         Exit Sub
                     End If
 
@@ -366,10 +411,9 @@ Namespace Modules.ComprasProveedor
                     End If
 
                     Dim filtro As String = "TRIM(ODP_MATERIAL) = '" & materialItem.Replace("'", "''") & "'" &
-                                            " AND TRIM(ODP_PRODUCTO) = '" & productoItem.Replace("'", "''") & "'"
+                                             " AND TRIM(ODP_PRODUCTO) = '" & productoItem.Replace("'", "''") & "'"
                     Dim filasODP = dtOrdenes.Select(filtro)
                     Dim precioODP As Decimal = 0
-
                     If filasODP.Length > 0 Then
                         precioODP = Convert.ToDecimal(filasODP(0)("ODP_PRECIO"))
                     Else
@@ -397,22 +441,33 @@ Namespace Modules.ComprasProveedor
 
         Protected Sub gvDetalles_RowDataBound(sender As Object, e As GridViewRowEventArgs)
             If e.Row.RowType = DataControlRowType.DataRow Then
+                Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
+
+                ' Mostrar/ocultar panel Recibir segun el item activo
                 Dim detalleActivo As Integer = 0
                 Integer.TryParse(hfDetalleRecibir.Value, detalleActivo)
                 If detalleActivo > 0 Then
                     Dim detalleId As Integer = Convert.ToInt32(gvDetalles.DataKeys(e.Row.RowIndex).Value)
                     Dim pnl As Panel = CType(e.Row.FindControl("pnlRecibir"), Panel)
-                    If pnl IsNot Nothing Then
-                        pnl.Visible = (detalleId = detalleActivo)
-                    End If
+                    If pnl IsNot Nothing Then pnl.Visible = (detalleId = detalleActivo)
+                End If
+
+                ' Si el pedido tiene OC: ocultar botones Editar y Eliminar,
+                ' dejar solo el boton Recibido
+                If PedidoTieneOrdenCompra(pedidoId) Then
+                    Dim lnkEditar As System.Web.UI.WebControls.LinkButton =
+                        CType(e.Row.FindControl("btnEditarItem"), System.Web.UI.WebControls.LinkButton)
+                    Dim lnkBorrar As System.Web.UI.WebControls.LinkButton =
+                        CType(e.Row.FindControl("btnBorrarItem"), System.Web.UI.WebControls.LinkButton)
+                    If lnkEditar IsNot Nothing Then lnkEditar.Visible = False
+                    If lnkBorrar IsNot Nothing Then lnkBorrar.Visible = False
                 End If
             End If
         End Sub
 
         Protected Sub gvDetalles_RowEditing(sender As Object, e As GridViewEditEventArgs)
             Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
-            Dim dtOrdenes As DataTable = OrdenDetallePedidoService.BuscarPorPedido(pedidoId)
-            If dtOrdenes IsNot Nothing AndAlso dtOrdenes.Rows.Count > 0 Then
+            If PedidoTieneOrdenCompra(pedidoId) Then
                 MostrarMensaje("No se puede editar la cantidad porque este pedido ya tiene una Orden de Compra asociada.", True)
                 Exit Sub
             End If
@@ -431,6 +486,15 @@ Namespace Modules.ComprasProveedor
                 Dim row As GridViewRow = gvDetalles.Rows(e.RowIndex)
                 Dim detalleId As Integer = Convert.ToInt32(gvDetalles.DataKeys(e.RowIndex).Value)
                 Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
+
+                ' Doble verificacion por si el boton llega por postback directo
+                If PedidoTieneOrdenCompra(pedidoId) Then
+                    MostrarMensaje("No se puede editar la cantidad porque este pedido ya tiene una Orden de Compra asociada.", True)
+                    gvDetalles.EditIndex = -1
+                    CargarDetallesPedido(pedidoId)
+                    Exit Sub
+                End If
+
                 Dim txtSol As TextBox = CType(row.FindControl("txtESolicitada"), TextBox)
                 Dim solicitada As Integer
 
@@ -455,9 +519,9 @@ Namespace Modules.ComprasProveedor
             End Try
         End Sub
 
-        '========================
+        ' =============================================
         ' BUSCAR / LIMPIAR
-        '========================
+        ' =============================================
         Protected Sub btnBuscar_Click(sender As Object, e As EventArgs)
             Dim filtro As String = txtBuscar.Text.Trim()
             If String.IsNullOrEmpty(filtro) Then

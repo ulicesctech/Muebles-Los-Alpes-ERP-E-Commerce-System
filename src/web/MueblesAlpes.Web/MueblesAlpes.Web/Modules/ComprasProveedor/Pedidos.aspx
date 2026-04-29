@@ -33,40 +33,37 @@
     .table-card tbody tr { border-bottom:1px solid #f5ece0; }
     .table-card tbody tr:last-child { border-bottom:none; }
     .table-card tbody td { padding:12px 16px; font-size:13px; color:#444; vertical-align:top; }
-    .badge-id { background:#fdf6ec; color:#C9973A; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:bold; border:1px solid #e8d8c0; display:inline-block; }
-    .badge-pago { background:#e6f4ea; color:#276749; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:bold; border:1px solid #b7dfc2; display:inline-block; }
-    .badge-pago-credito { background:#fff3e0; color:#7d4a00; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:bold; border:1px solid #f6d198; display:inline-block; }
+    .badge-id   { background:#fdf6ec; color:#C9973A; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:bold; border:1px solid #e8d8c0; display:inline-block; }
+    .badge-pago { background:#eef6ff; color:#2b6cb0; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:bold; border:1px solid #bee3f8; display:inline-block; }
     .actions-cell { display:flex; gap:6px; align-items:center; }
-    .btn-edit-t { background:#fdf6ec; color:#C9973A; border:1px solid #e8d8c0; padding:5px 12px; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer; text-decoration:none; display:inline-block; white-space:nowrap; }
+    .btn-edit-t   { background:#fdf6ec; color:#C9973A; border:1px solid #e8d8c0; padding:5px 12px; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer; text-decoration:none; display:inline-block; white-space:nowrap; }
     .btn-edit-t:hover { background:#C9973A; color:white; border-color:#C9973A; }
-    .btn-del-t { background:#fff5f5; color:#e53e3e; border:1px solid #fed7d7; padding:5px 12px; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer; text-decoration:none; display:inline-block; white-space:nowrap; }
+    .btn-del-t    { background:#fff5f5; color:#e53e3e; border:1px solid #fed7d7; padding:5px 12px; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer; text-decoration:none; display:inline-block; white-space:nowrap; }
     .btn-del-t:hover { background:#e53e3e; color:white; border-color:#e53e3e; }
-    .btn-save-t { background:#f0fff4; color:#276749; border:1px solid #9ae6b4; padding:5px 12px; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer; white-space:nowrap; }
+    .btn-save-t   { background:#f0fff4; color:#276749; border:1px solid #9ae6b4; padding:5px 12px; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer; white-space:nowrap; }
     .btn-save-t:hover { background:#276749; color:white; }
     .btn-cancel-t { background:#f7fafc; color:#4a5568; border:1px solid #cbd5e0; padding:5px 12px; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer; white-space:nowrap; }
     .btn-cancel-t:hover { background:#4a5568; color:white; }
     .btn-precio-t { background:#fdf6ec; color:#8B5E3C; border:1px solid #e8d8c0; padding:5px 12px; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer; text-decoration:none; display:inline-block; white-space:nowrap; }
     .btn-precio-t:hover { background:#8B5E3C; color:white; }
     .add-item-box { background:#fdf8f3; padding:15px; border-radius:10px; border:1px solid #e8d8c0; margin-bottom:15px; }
-    .total-box { padding:14px 16px; background:#fdf6ec; border-radius:8px; border:1px solid #e8d8c0; font-size:16px; font-weight:bold; color:#5C3A1E; font-family:Georgia,serif; margin-top:12px; }
     .cabecera-info { background:#fdf8f3; border:1px solid #e8d8c0; border-radius:8px; padding:12px 16px; margin-bottom:14px; display:flex; gap:24px; flex-wrap:wrap; align-items:flex-end; font-family:Arial,sans-serif; font-size:13px; color:#5C3A1E; }
     .cabecera-info strong { font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:#8B5E3C; display:block; margin-bottom:4px; }
     .section-label { font-size:12px; font-weight:bold; color:#5C3A1E; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; }
     .empty-state { text-align:center; padding:40px 20px; color:#aaa; font-family:Arial,sans-serif; }
     .recibir-box { margin-top:8px; padding:12px 14px; background:#f0fff4; border:1px solid #9ae6b4; border-radius:8px; font-family:Arial,sans-serif; }
-    .recibir-box label { font-size:11px; font-weight:bold; color:#276749; text-transform:uppercase; display:block; margin-bottom:4px; }
     .recibir-fila { display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; margin-bottom:10px; }
     .recibir-campo { display:flex; flex-direction:column; gap:4px; }
     .recibir-campo label { font-size:10px; font-weight:bold; color:#276749; text-transform:uppercase; letter-spacing:0.4px; }
     .recibir-readonly { padding:7px 10px; border:2px solid #c6f6d5; border-radius:6px; font-size:13px; font-family:Arial,sans-serif; background:#e6ffed; color:#276749; font-weight:bold; width:80px; box-sizing:border-box; text-align:center; }
-    .recibir-suma { padding:7px 8px; font-size:18px; color:#276749; font-weight:bold; align-self:flex-end; margin-bottom:2px; }
+    .recibir-suma  { padding:7px 8px; font-size:18px; color:#276749; font-weight:bold; align-self:flex-end; margin-bottom:2px; }
     .recibir-input { padding:7px 10px; border:2px solid #9ae6b4; border-radius:6px; font-size:13px; font-family:Arial,sans-serif; background:white; width:80px; box-sizing:border-box; outline:none; }
     .recibir-input:focus { border-color:#276749; }
     .recibir-igual { padding:7px 8px; font-size:18px; color:#276749; font-weight:bold; align-self:flex-end; margin-bottom:2px; }
     .recibir-total { padding:7px 10px; border:2px solid #276749; border-radius:6px; font-size:13px; font-family:Arial,sans-serif; background:#f0fff4; color:#276749; font-weight:bold; width:80px; box-sizing:border-box; text-align:center; }
-    .recibir-nota { font-size:11px; color:#276749; font-style:italic; margin-bottom:10px; }
-    .info-nota { font-size:11px; color:#8B5E3C; font-style:italic; margin-top:4px; font-family:Arial,sans-serif; }
-    .edit-input { padding:7px 10px; border:2px solid #C9973A; border-radius:6px; font-size:13px; font-family:Arial,sans-serif; background:white; width:100%; box-sizing:border-box; outline:none; }
+    .recibir-nota  { font-size:11px; color:#276749; font-style:italic; margin-bottom:10px; }
+    .info-nota     { font-size:11px; color:#8B5E3C; font-style:italic; margin-top:4px; font-family:Arial,sans-serif; }
+    .edit-input    { padding:7px 10px; border:2px solid #C9973A; border-radius:6px; font-size:13px; font-family:Arial,sans-serif; background:white; width:100%; box-sizing:border-box; outline:none; }
     .sub-ped-table { width:100%; border-collapse:collapse; font-family:Arial,sans-serif; font-size:12px; margin-top:6px; }
     .sub-ped-table thead tr { background:#f5ece0; }
     .sub-ped-table thead th { padding:5px 10px; color:#5C3A1E; font-size:10px; font-weight:bold; text-transform:uppercase; letter-spacing:0.4px; text-align:left; border-bottom:1px solid #e8d8c0; }
@@ -74,7 +71,6 @@
     .sub-ped-table tbody tr:last-child { border-bottom:none; }
     .sub-ped-table tbody td { padding:5px 10px; color:#555; }
     .badge-pendiente { color:#aaa; font-size:11px; font-style:italic; }
-
 </style>
 
 <div class="breadcrumb-mod">
@@ -88,7 +84,7 @@
     <asp:Label ID="lblMsg" runat="server" />
 </asp:Panel>
 
-<!-- ====== LISTADO ====== -->
+<!-- LISTADO -->
 <div class="form-card">
     <div class="form-card-head">
         <span>&#128230; LISTADO DE PEDIDOS</span>
@@ -118,11 +114,10 @@
                     <asp:TemplateField HeaderText="Fecha" ItemStyle-Width="110px">
                         <ItemTemplate><%# String.Format("{0:dd/MM/yyyy}", Eval("PED_FECHA")) %></ItemTemplate>
                     </asp:TemplateField>
+                    <%-- Forma de pago: valor directo de Oracle, sin comparar ni condicionar --%>
                     <asp:TemplateField HeaderText="Forma Pago" ItemStyle-Width="110px">
                         <ItemTemplate>
-                            <%# If(Eval("PED_FORMA_PAGO").ToString() = "CREDITO",
-                                "<span class='badge-pago-credito'>CREDITO</span>",
-                                "<span class='badge-pago'>CONTADO</span>") %>
+                            <span class="badge-pago"><%# Eval("PED_FORMA_PAGO") %></span>
                         </ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Productos / Items">
@@ -175,7 +170,7 @@
     </div>
 </div>
 
-<!-- ====== FORM NUEVO PEDIDO ====== -->
+<!-- FORM NUEVO PEDIDO -->
 <asp:Panel ID="pnlFormCabecera" runat="server" Visible="false">
 <div class="form-card">
     <div class="form-card-head"><span>&#9999; Nuevo Pedido</span></div>
@@ -187,10 +182,9 @@
             </div>
             <div class="f-group">
                 <label>Forma de Pago *</label>
-                <asp:DropDownList ID="ddlFormaPago" runat="server" CssClass="form-control">
-                    <asp:ListItem Text="Contado" Value="CONTADO" />
-                    <asp:ListItem Text="Credito" Value="CREDITO" />
-                </asp:DropDownList>
+                <asp:DropDownList ID="ddlFormaPago" runat="server"  style="padding:10px 14px; border:2px solid #e8d8c0; border-radius:8px;
+           font-size:14px; font-family:Arial,sans-serif; background:#fdf8f3;
+           width:100%; outline:none; box-sizing:border-box;" />
             </div>
         </div>
         <div class="f-row" style="margin-top:12px;">
@@ -203,7 +197,7 @@
 </div>
 </asp:Panel>
 
-<!-- ====== DETALLE PEDIDO ====== -->
+<!-- DETALLE PEDIDO -->
 <asp:Panel ID="pnlDetalleContenedor" runat="server" Visible="false">
 <div class="form-card">
     <div class="form-card-head">
@@ -217,19 +211,18 @@
         <asp:HiddenField ID="hfDetalleRecibir" runat="server" Value="0" />
 
         <div class="cabecera-info">
-            <div><strong>Codigo</strong><asp:Label ID="lblCabeceraCode" runat="server" /></div>
+            <div><strong>Codigo</strong><asp:Label ID="lblCabeceraCode"  runat="server" /></div>
             <div><strong>Fecha</strong><asp:Label  ID="lblCabeceraFecha" runat="server" /></div>
             <div>
                 <strong>Forma de Pago</strong>
-                <asp:DropDownList ID="ddlCabeceraFormaPago" runat="server" CssClass="form-control" style="width:140px; padding:5px 10px; font-size:13px;">
-                    <asp:ListItem Text="Contado" Value="CONTADO" />
-                    <asp:ListItem Text="Credito" Value="CREDITO" />
-                </asp:DropDownList>
+                <%-- ddlCabeceraFormaPago se deshabilita en CargarDetallesPedido si el pedido tiene OC --%>
+                <asp:DropDownList ID="ddlCabeceraFormaPago" runat="server" CssClass="form-control"
+                    style="width:160px; padding:5px 10px; font-size:13px;" />
             </div>
             <div style="display:flex;align-items:flex-end;">
+                <%-- btnGuardarCabecera se deshabilita en CargarDetallesPedido si el pedido tiene OC --%>
                 <asp:Button ID="btnGuardarCabecera" runat="server" Text="&#10003; Guardar"
-                    CssClass="btn-save-t" OnClick="btnGuardarCabecera_Click"
-                    CausesValidation="false" />
+                    CssClass="btn-save-t" OnClick="btnGuardarCabecera_Click" CausesValidation="false" />
             </div>
         </div>
 
@@ -238,15 +231,18 @@
             <div class="f-row">
                 <div class="f-group" style="flex:3;">
                     <label>Producto *</label>
+                    <%-- ddlProducto se deshabilita en CargarDetallesPedido si el pedido tiene OC --%>
                     <asp:DropDownList ID="ddlProducto" runat="server" CssClass="form-control"
                         AutoPostBack="true" OnSelectedIndexChanged="ddlProducto_SelectedIndexChanged" />
                     <div class="info-nota">El precio se asignara al recibir la mercancia desde la Orden de Compra.</div>
                 </div>
                 <div class="f-group" style="max-width:140px;">
                     <label>Cantidad *</label>
+                    <%-- txtCantSolicitada se deshabilita en CargarDetallesPedido si el pedido tiene OC --%>
                     <asp:TextBox ID="txtCantSolicitada" runat="server" CssClass="form-control" placeholder="0" />
                 </div>
                 <div style="display:flex;align-items:flex-end;">
+                    <%-- btnAgregarItem se deshabilita en CargarDetallesPedido si el pedido tiene OC --%>
                     <asp:Button ID="btnAgregarItem" runat="server" Text="+ Agregar"
                         CssClass="btn-gold" OnClick="btnAgregarItem_Click" />
                 </div>
@@ -269,86 +265,74 @@
                         <ItemTemplate><%# Eval("PRO_NOMBRE") %></ItemTemplate>
                         <EditItemTemplate><%# Eval("PRO_NOMBRE") %></EditItemTemplate>
                     </asp:TemplateField>
-
                     <asp:TemplateField HeaderText="Material">
                         <ItemTemplate>
                             <%# If(IsDBNull(Eval("MATERIAL")) OrElse String.IsNullOrEmpty(Eval("MATERIAL").ToString()),
-                                "<span class='badge-pendiente'>—</span>",
-                                Eval("MATERIAL").ToString()) %>
+                                "<span class='badge-pendiente'>—</span>", Eval("MATERIAL").ToString()) %>
                         </ItemTemplate>
                         <EditItemTemplate>
                             <%# If(IsDBNull(Eval("MATERIAL")) OrElse String.IsNullOrEmpty(Eval("MATERIAL").ToString()),
                                 "—", Eval("MATERIAL").ToString()) %>
                         </EditItemTemplate>
                     </asp:TemplateField>
-
                     <asp:TemplateField HeaderText="Solicitado" ItemStyle-Width="100px">
                         <ItemTemplate><%# Eval("DETPE_CANTIDAD_SOLICITADA") %></ItemTemplate>
                         <EditItemTemplate>
-                            <asp:TextBox ID="txtESolicitada" runat="server"
-                                Text=""
-                                placeholder="0"
+                            <asp:TextBox ID="txtESolicitada" runat="server" Text="" placeholder="0"
                                 CssClass="edit-input" style="width:70px;" />
                         </EditItemTemplate>
                     </asp:TemplateField>
-
                     <asp:TemplateField HeaderText="Recibido" ItemStyle-Width="320px">
                         <ItemTemplate>
                             <%# Eval("DETPE_CANTIDAD_RECIBIDA") %>
-
                             <asp:Panel ID="pnlRecibir" runat="server" Visible="false">
                                 <div class="recibir-box">
                                     <div class="recibir-fila">
                                         <div class="recibir-campo">
                                             <label>Ya recibido</label>
                                             <asp:TextBox ID="txtYaRecibido" runat="server"
-                                                CssClass="recibir-readonly"
-                                                ReadOnly="true"
+                                                CssClass="recibir-readonly" ReadOnly="true"
                                                 Text='<%# Eval("DETPE_CANTIDAD_RECIBIDA") %>' />
                                         </div>
                                         <div class="recibir-suma">+</div>
                                         <div class="recibir-campo">
                                             <label>Cantidad a agregar *</label>
                                             <asp:TextBox ID="txtCantComplemento" runat="server"
-                                                CssClass="recibir-input"
-                                                placeholder="0" Text="" />
+                                                CssClass="recibir-input" placeholder="0" Text="" />
                                         </div>
                                         <div class="recibir-igual">=</div>
                                         <div class="recibir-campo">
                                             <label>Total recibido</label>
-                                            <div class="recibir-total" id="divTotalRecibido">—</div>
+                                            <div class="recibir-total">—</div>
                                         </div>
                                     </div>
-
                                     <div class="recibir-nota">
                                         Solo ingresa la cantidad que llega ahora. El total se acumula automaticamente.
                                     </div>
-
                                     <div class="actions-cell">
                                         <asp:LinkButton CommandName="ConfirmarRecibido"
                                             CommandArgument='<%# Eval("DETPE_DETALLE_PEDIDO") & "|" & Eval("PRO_REFERENCIA") & "|" & Eval("DETPE_CANTIDAD_SOLICITADA") & "|" & Eval("DETPE_CANTIDAD_RECIBIDA") %>'
-                                            runat="server" CssClass="btn-save-t"
-                                            CausesValidation="false">&#10003; Confirmar</asp:LinkButton>
+                                            runat="server" CssClass="btn-save-t" CausesValidation="false">&#10003; Confirmar</asp:LinkButton>
                                         <asp:LinkButton CommandName="CancelarRecibido"
                                             CommandArgument='<%# Eval("DETPE_DETALLE_PEDIDO") %>'
-                                            runat="server" CssClass="btn-cancel-t"
-                                            CausesValidation="false">&#10005; Cancelar</asp:LinkButton>
+                                            runat="server" CssClass="btn-cancel-t" CausesValidation="false">&#10005; Cancelar</asp:LinkButton>
                                     </div>
                                 </div>
                             </asp:Panel>
                         </ItemTemplate>
                         <EditItemTemplate><%# Eval("DETPE_CANTIDAD_RECIBIDA") %></EditItemTemplate>
                     </asp:TemplateField>
-
                     <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="220px">
                         <ItemTemplate>
                             <div class="actions-cell">
-                                <asp:LinkButton CommandName="Edit"
+                                <%-- ID requerido para que gvDetalles_RowDataBound pueda ocultarlo cuando hay OC --%>
+                                <asp:LinkButton ID="btnEditarItem" CommandName="Edit"
                                     runat="server" CssClass="btn-edit-t" CausesValidation="false">&#9999; Editar</asp:LinkButton>
                                 <asp:LinkButton CommandName="MarcarRecibido"
                                     CommandArgument='<%# Eval("DETPE_DETALLE_PEDIDO") %>'
                                     runat="server" CssClass="btn-precio-t" CausesValidation="false">&#10003; Recibido</asp:LinkButton>
-                                <asp:LinkButton CommandName="BorrarItem"
+                                <%-- ID requerido para que gvDetalles_RowDataBound pueda ocultarlo cuando hay OC --%>
+                                <asp:LinkButton ID="btnBorrarItem" CommandName="BorrarItem"
                                     CommandArgument='<%# Eval("DETPE_DETALLE_PEDIDO") %>'
                                     runat="server" CssClass="btn-del-t"
                                     OnClientClick="return confirm('Eliminar este producto?');">&#128465;</asp:LinkButton>
@@ -386,13 +370,7 @@
         if (!yaInput || !totalDiv) return;
         var ya = parseInt(yaInput.value, 10) || 0;
         var complemento = parseInt(e.target.value, 10) || 0;
-        if (complemento > 0) {
-            totalDiv.textContent = ya + complemento;
-            totalDiv.style.color = '#276749';
-        } else {
-            totalDiv.textContent = '—';
-            totalDiv.style.color = '#276749';
-        }
+        totalDiv.textContent = complemento > 0 ? ya + complemento : '—';
     });
 </script>
 

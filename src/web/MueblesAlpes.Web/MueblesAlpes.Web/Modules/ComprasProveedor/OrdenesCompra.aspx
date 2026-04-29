@@ -63,21 +63,7 @@
     .precio-input { padding:7px 10px; border:2px solid #9ae6b4; border-radius:6px; font-size:13px; font-family:Arial,sans-serif; background:white; width:110px; box-sizing:border-box; outline:none; }
     .precio-input:focus { border-color:#276749; }
     .auto-gen-badge { display:inline-block; padding:4px 12px; background:#fdf6ec; border:1px solid #e8d8c0; border-radius:6px; font-size:13px; color:#888; font-family:Arial,sans-serif; cursor:not-allowed; }
-.btn-disabled-t {
-    background:#f7f7f7;
-    color:#bbb;
-    border:1px solid #e0e0e0;
-    padding:5px 12px;
-    border-radius:6px;
-    font-size:12px;
-    font-weight:bold;
-    font-family:Arial,sans-serif;
-    cursor:not-allowed;
-    text-decoration:none;
-    display:inline-block;
-    white-space:nowrap;
-}
- 
+    .btn-disabled-t { background:#f7f7f7; color:#bbb; border:1px solid #e0e0e0; padding:5px 12px; border-radius:6px; font-size:12px; font-weight:bold; font-family:Arial,sans-serif; cursor:not-allowed; text-decoration:none; display:inline-block; white-space:nowrap; }
 </style>
 
 <div class="breadcrumb-mod">
@@ -133,14 +119,13 @@
                                     GridLines="None"
                                     Visible="false">
                                     <Columns>
-                                        <asp:BoundField DataField="PED_CODIGO"   HeaderText="Pedido"     ItemStyle-Width="65px" />
+                                        <asp:BoundField DataField="PED_CODIGO"   HeaderText="Pedido"   ItemStyle-Width="65px" />
                                         <asp:BoundField DataField="ODP_PRODUCTO" HeaderText="Producto" />
                                         <asp:BoundField DataField="ODP_MATERIAL" HeaderText="Material" />
+                                        <%-- PED_FORMA_PAGO viene de Oracle via ODP_LISTAR_POR_ORDEN (JOIN a BOD_PEDIDO) --%>
                                         <asp:TemplateField HeaderText="Forma Pago" ItemStyle-Width="90px">
                                             <ItemTemplate><span class="badge-pago"><%# Eval("PED_FORMA_PAGO") %></span></ItemTemplate>
                                         </asp:TemplateField>
-                                        
-                                       
                                         <asp:TemplateField HeaderText="Precio" ItemStyle-Width="80px">
                                             <ItemTemplate>Q <%# String.Format("{0:N2}", Eval("ODP_PRECIO")) %></ItemTemplate>
                                         </asp:TemplateField>
@@ -186,7 +171,6 @@
         <asp:HiddenField ID="hfKey" runat="server" />
 
         <div class="f-row">
-            <%-- ID y Codigo se generan automaticamente: solo se muestran --%>
             <div class="f-group">
                 <label>ID / Clave</label>
                 <div class="form-control-readonly">Se generara automaticamente (ej: OC-5)</div>
@@ -197,7 +181,10 @@
             </div>
             <div class="f-group">
                 <label>Proveedor *</label>
-                <asp:DropDownList ID="ddlProveedor" runat="server" CssClass="form-control" />
+                <asp:DropDownList ID="ddlProveedor" runat="server"
+    style="padding:10px 14px; border:2px solid #e8d8c0; border-radius:8px;
+           font-size:14px; font-family:Arial,sans-serif; background:#fdf8f3;
+           width:100%; outline:none; box-sizing:border-box;" />
             </div>
         </div>
 
@@ -229,6 +216,7 @@
                             <asp:TemplateField HeaderText="Fecha" ItemStyle-Width="110px">
                                 <ItemTemplate><%# String.Format("{0:dd/MM/yyyy}", Eval("PED_FECHA")) %></ItemTemplate>
                             </asp:TemplateField>
+                            <%-- PED_FORMA_PAGO viene de Oracle via ORC_BUSCAR_PEDIDOS --%>
                             <asp:TemplateField HeaderText="Forma Pago" ItemStyle-Width="110px">
                                 <ItemTemplate><span class="badge-pago"><%# Eval("PED_FORMA_PAGO") %></span></ItemTemplate>
                             </asp:TemplateField>
@@ -251,10 +239,13 @@
                             </asp:TemplateField>
                             <asp:TemplateField HeaderText="" ItemStyle-Width="130px" ItemStyle-VerticalAlign="Top">
                                 <ItemTemplate>
-                                   <asp:LinkButton ID="lnkSeleccionar" CommandName="VerItemsPedido"
-    CommandArgument='<%# Eval("PED_PEDIDO") & "|" & Eval("PED_CODIGO") %>'
-    runat="server" CssClass="btn-edit-t"
-    CausesValidation="false">&#10003; Seleccionar</asp:LinkButton>
+                                    <%-- CommandArgument: PED_PEDIDO | PED_CODIGO | PED_FORMA_PAGO
+                                         Se agrega PED_FORMA_PAGO para que gvBuscarPedidos_RowCommand
+                                         pueda mostrarla en lblFormaPagoPedido sin una consulta extra. --%>
+                                    <asp:LinkButton ID="lnkSeleccionar" CommandName="VerItemsPedido"
+                                        CommandArgument='<%# Eval("PED_PEDIDO") & "|" & Eval("PED_CODIGO") & "|" & Eval("PED_FORMA_PAGO") %>'
+                                        runat="server" CssClass="btn-edit-t"
+                                        CausesValidation="false">&#10003; Seleccionar</asp:LinkButton>
                                 </ItemTemplate>
                             </asp:TemplateField>
                         </Columns>
@@ -267,11 +258,17 @@
 
             <asp:Panel ID="pnlItemsPedido" runat="server" Visible="false">
                 <asp:HiddenField ID="hfPedidoVinculado" runat="server" Value="0" />
+                <%-- Persiste la forma de pago entre postbacks para mostrarla en lblFormaPagoPedido --%>
+                <asp:HiddenField ID="hfFormaPago"       runat="server" Value="" />
                 <div class="pedido-sel-box">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                         <div style="font-size:13px; font-weight:bold; color:#276749; font-family:Arial,sans-serif;">
                             &#128203; Pedido #<asp:Label ID="lblPedidoId" runat="server" /> &mdash;
                             <asp:Label ID="lblPedidoCodigo" runat="server" />
+                            &nbsp;|&nbsp; Forma de pago:
+                            <%-- Poblado en gvBuscarPedidos_RowCommand con el valor que viene de Oracle --%>
+                            <asp:Label ID="lblFormaPagoPedido" runat="server"
+                                style="font-size:12px; background:#eef6ff; color:#2b6cb0; padding:2px 8px; border-radius:10px; border:1px solid #bee3f8;" />
                             <span style="font-size:11px; color:#555; font-weight:normal; margin-left:8px;">
                                 Ingresa el precio de compra para cada item
                             </span>
@@ -288,6 +285,7 @@
                         <Columns>
                             <asp:BoundField DataField="PRODUCTO_NOMBRE" HeaderText="Producto" />
                             <asp:BoundField DataField="MATERIAL"        HeaderText="Material" />
+                            <%-- PED_FORMA_PAGO viene de Oracle via ORC_DETALLES_PEDIDO (JOIN a BOD_PEDIDO) --%>
                             <asp:TemplateField HeaderText="Forma Pago" ItemStyle-Width="100px">
                                 <ItemTemplate><span class="badge-pago"><%# Eval("PED_FORMA_PAGO") %></span></ItemTemplate>
                             </asp:TemplateField>
@@ -323,7 +321,7 @@
 </div>
 </asp:Panel>
 
-<!-- ====== DETALLE DE ITEMS (solo lectura + eliminar) ====== -->
+<!-- ====== DETALLE DE ITEMS ====== -->
 <asp:Panel ID="pnlDetalleOrden" runat="server" Visible="false">
 <div class="form-card">
     <div class="form-card-head">
@@ -351,8 +349,9 @@
                     <asp:TemplateField HeaderText="Material">
                         <ItemTemplate><%# Eval("ODP_MATERIAL") %></ItemTemplate>
                     </asp:TemplateField>
-                     <asp:TemplateField HeaderText="Forma Pago" ItemStyle-Width="110px">
-                    <ItemTemplate><span class="badge-pago"><%# Eval("PED_FORMA_PAGO") %></span></ItemTemplate>
+                    <%-- PED_FORMA_PAGO viene de Oracle via ODP_LISTAR_POR_ORDEN (JOIN a BOD_PEDIDO) --%>
+                    <asp:TemplateField HeaderText="Forma Pago" ItemStyle-Width="110px">
+                        <ItemTemplate><span class="badge-pago"><%# Eval("PED_FORMA_PAGO") %></span></ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Precio" ItemStyle-Width="110px">
                         <ItemTemplate>Q <%# String.Format("{0:N2}", Eval("ODP_PRECIO")) %></ItemTemplate>

@@ -43,6 +43,7 @@ Namespace Modules.ComprasProveedor
             pnlMsg.Visible = False
             hfKey.Value = ""
             hfPedidoVinculado.Value = "0"
+            hfFormaPago.Value = ""
         End Sub
 
         Private Sub ActualizarTotalOrden(orcKey As String)
@@ -75,9 +76,6 @@ Namespace Modules.ComprasProveedor
 
         ' =============================================
         ' VALIDACION 1 — Pedido ya asignado a otra orden
-        ' Comprueba si el pedido tiene filas en BOD_ORDEN_DETALLE_PEDIDO.
-        ' BuscarPorPedido devuelve los ODP vinculados a ese pedido.
-        ' Si tiene registros significa que ya fue asignado a una orden.
         ' =============================================
         Private Function PedidoYaAsignado(pedidoId As Integer) As Boolean
             Try
@@ -90,19 +88,12 @@ Namespace Modules.ComprasProveedor
 
         ' =============================================
         ' VALIDACION 2 — Orden con recepcion registrada
-        ' Revisa los detalles del pedido vinculado a la orden.
-        ' Si algun item tiene DETPE_CANTIDAD_RECIBIDA > 0, no se puede eliminar.
         ' =============================================
         Private Function OrdenTieneRecepcionRegistrada(orcKey As String) As Boolean
             Try
-                ' Obtener los items ODP de esta orden
                 Dim dtOdp As DataTable = OrdenDetallePedidoService.ListarPorOrden(orcKey)
                 If dtOdp Is Nothing OrElse dtOdp.Rows.Count = 0 Then Return False
 
-                ' Para cada item ODP, verificar el detalle del pedido original
-                ' ODP_CANTIDAD_RECIBIDA no existe en ODP — se revisa en DETPE via BuscarPorPedido
-                ' Lo mas directo: buscar si el pedido vinculado tiene cant_recibida > 0
-                ' Tomamos el PED_ID del primer item ODP (todos pertenecen al mismo pedido)
                 If dtOdp.Columns.Contains("PED_PEDIDO") Then
                     Dim pedId As Integer = Convert.ToInt32(dtOdp.Rows(0)("PED_PEDIDO"))
                     Dim dtDetalle As DataTable = DetallePedidoService.ListarPorPedido(pedId)
@@ -118,7 +109,6 @@ Namespace Modules.ComprasProveedor
                 End If
                 Return False
             Catch
-                ' Si no se puede verificar, permitimos eliminar (Oracle lanzara el error si hay FK)
                 Return False
             End Try
         End Function
@@ -164,7 +154,6 @@ Namespace Modules.ComprasProveedor
                     MostrarMsg("Selecciona un proveedor.", True) : Exit Sub
                 End If
 
-                ' VALIDACION — pedido obligatorio
                 If Convert.ToInt32(hfPedidoVinculado.Value) = 0 Then
                     MostrarMsg("Debes seleccionar un pedido antes de confirmar la orden.", True) : Exit Sub
                 End If
@@ -177,10 +166,10 @@ Namespace Modules.ComprasProveedor
                 hfKey.Value = orcKey
 
                 Dim pedId As Integer = Convert.ToInt32(hfPedidoVinculado.Value)
-                If pedId > 0 Then
-                    Dim itemsInsertados As Integer = 0
-                    Dim itemsSinPrecio As Integer = 0
+                Dim itemsInsertados As Integer = 0
+                Dim itemsSinPrecio As Integer = 0
 
+                If pedId > 0 Then
                     For Each row As GridViewRow In gvItemsPedido.Rows
                         Dim txtPrecio As TextBox = CType(row.FindControl("txtPrecioItem"), TextBox)
                         Dim hfMat As HiddenField = CType(row.FindControl("hfMaterial"), HiddenField)
@@ -242,7 +231,6 @@ Namespace Modules.ComprasProveedor
 
         ' =============================================
         ' BUSCAR PEDIDOS
-        ' Al mostrar resultados, marca los pedidos ya asignados
         ' =============================================
         Protected Sub btnBuscarPedido_Click(sender As Object, e As EventArgs)
             Dim texto As String = txtBuscarPedido.Text.Trim()
@@ -257,7 +245,6 @@ Namespace Modules.ComprasProveedor
             If e.Row.RowType = DataControlRowType.DataRow Then
                 Dim pedId As Integer = Convert.ToInt32(gvBuscarPedidos.DataKeys(e.Row.RowIndex).Value)
 
-                ' Cargar sub-grid de items
                 Dim gvSub As GridView = CType(e.Row.FindControl("gvSubItemsBuscar"), GridView)
                 If gvSub IsNot Nothing Then
                     Dim dtSub As DataTable = OrdenCompraService.DetallesPedido(pedId)
@@ -265,7 +252,6 @@ Namespace Modules.ComprasProveedor
                     gvSub.DataBind()
                 End If
 
-                ' Deshabilitar boton Seleccionar si el pedido ya esta asignado a otra orden
                 Dim lnkSeleccionar As System.Web.UI.WebControls.LinkButton =
                     CType(e.Row.FindControl("lnkSeleccionar"), System.Web.UI.WebControls.LinkButton)
 
@@ -278,13 +264,20 @@ Namespace Modules.ComprasProveedor
             End If
         End Sub
 
+        ''' <summary>
+        ''' Al seleccionar un pedido el CommandArgument trae tres partes:
+        '''   PED_PEDIDO | PED_CODIGO | PED_FORMA_PAGO
+        ''' La forma de pago viene directamente de Oracle (ORC_BUSCAR_PEDIDOS
+        ''' incluye ped_forma_pago). Se guarda en hfFormaPago y se muestra en
+        ''' lblFormaPagoPedido sin ningun valor hardcodeado.
+        ''' </summary>
         Protected Sub gvBuscarPedidos_RowCommand(sender As Object, e As GridViewCommandEventArgs)
             If e.CommandName = "VerItemsPedido" Then
                 Dim partes As String() = e.CommandArgument.ToString().Split("|")
                 Dim pedId As Integer = Convert.ToInt32(partes(0))
                 Dim pedCod As String = If(partes.Length > 1, partes(1), "")
+                Dim pedFP As String = If(partes.Length > 2, partes(2), "")
 
-                ' Doble verificacion en el servidor
                 If PedidoYaAsignado(pedId) Then
                     MostrarMsg("Este pedido ya esta asignado a una Orden de Compra y no puede seleccionarse.", True)
                     Exit Sub
@@ -293,12 +286,13 @@ Namespace Modules.ComprasProveedor
                 Dim dt As DataTable = OrdenCompraService.DetallesPedido(pedId)
 
                 hfPedidoVinculado.Value = pedId.ToString()
+                hfFormaPago.Value = pedFP          ' persiste entre postbacks
                 lblPedidoId.Text = pedId.ToString()
                 lblPedidoCodigo.Text = pedCod
+                lblFormaPagoPedido.Text = If(pedFP <> "", pedFP, "—")
 
                 gvItemsPedido.DataSource = dt
                 gvItemsPedido.DataBind()
-
                 pnlItemsPedido.Visible = True
                 pnlResultadosPedidos.Visible = False
                 txtBuscarPedido.Text = ""
@@ -306,7 +300,6 @@ Namespace Modules.ComprasProveedor
         End Sub
 
         Protected Sub lnkQuitarPedido_Click(sender As Object, e As EventArgs)
-            ' Si ya se creo la orden, eliminarla tambien
             If Not String.IsNullOrEmpty(hfKey.Value) Then
                 Try
                     OrdenCompraService.Eliminar(hfKey.Value)
@@ -318,6 +311,8 @@ Namespace Modules.ComprasProveedor
             End If
 
             hfPedidoVinculado.Value = "0"
+            hfFormaPago.Value = ""
+            lblFormaPagoPedido.Text = ""
             pnlItemsPedido.Visible = False
         End Sub
 
@@ -340,7 +335,6 @@ Namespace Modules.ComprasProveedor
             Try
                 Dim orcKey As String = gvOrdenes.DataKeys(e.RowIndex).Value.ToString()
 
-                ' VALIDACION 2 — no eliminar si ya hay recepcion registrada
                 If OrdenTieneRecepcionRegistrada(orcKey) Then
                     MostrarMsg("No se puede eliminar esta Orden de Compra porque ya se ha registrado " &
                                "recepcion de mercancia (parcial o completa) para uno o mas items del pedido vinculado.", True)
@@ -431,11 +425,9 @@ Namespace Modules.ComprasProveedor
                 Try
                     OrdenDetallePedidoService.Eliminar(Convert.ToInt32(e.CommandArgument))
 
-                    ' Verificar si quedan items en la orden
                     Dim dtRestantes As DataTable = OrdenDetallePedidoService.ListarPorOrden(hfOrdenActiva.Value)
 
                     If dtRestantes Is Nothing OrElse dtRestantes.Rows.Count = 0 Then
-                        ' No quedan items — eliminar la orden completa
                         Dim orcKeyEliminada As String = hfOrdenActiva.Value
                         Try
                             OrdenCompraService.Eliminar(orcKeyEliminada)
@@ -451,7 +443,6 @@ Namespace Modules.ComprasProveedor
                         MostrarMsg("Se elimino el ultimo item. La Orden de Compra " &
                                    orcKeyEliminada & " fue eliminada automaticamente.", False)
                     Else
-                        ' Quedan items — actualizar total y recargar
                         ActualizarTotalOrden(hfOrdenActiva.Value)
                         CargarDetalle(hfOrdenActiva.Value)
                         CargarOrdenes()
