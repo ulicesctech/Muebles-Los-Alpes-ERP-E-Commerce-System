@@ -1,16 +1,65 @@
 CREATE OR REPLACE PACKAGE BODY PKG_CP_BOD_ORDEN_COMPRA AS
 
-    PROCEDURE ORC_CREAR(
-        p_orc_key  IN VARCHAR2,
-        p_codigo   IN VARCHAR2,
-        p_prov_id  IN NUMBER,
-        p_total    IN NUMBER
-    ) IS
+    -- ============================================================
+    -- CONFIGURACION CENTRAL
+    -- ============================================================
+
+    -- Prefijo para orc_orden_compra (campo PK / key visible).
+    -- Cambia solo este valor; el numero correlativo se extrae
+    -- del MAX actual y se incrementa automaticamente.
+    -- Ejemplos: 'OC', 'ORD', 'COMP'
+    C_PREFIJO_ORC CONSTANT VARCHAR2(20) := 'OC';
+
+    -- Prefijo para orc_codigo (campo de codigo alternativo).
+    -- Cambia solo este valor de forma independiente a C_PREFIJO_ORC.
+    -- Ejemplos: 'COD', 'ORC', 'PO'
+    C_PREFIJO_COD CONSTANT VARCHAR2(20) := 'COD';
+
+    -- ============================================================
+    -- FUNCION INTERNA: genera el siguiente numero correlativo.
+    -- Lee el MAX del numero embebido en orc_orden_compra usando
+    -- REGEXP_SUBSTR para extraer solo digitos, sin importar cual
+    -- sea el prefijo actual (no hardcodea 'OC-' en el patron).
+    -- ============================================================
+    FUNCTION F_SIGUIENTE_NUM RETURN NUMBER IS
+        v_num NUMBER;
     BEGIN
+        SELECT NVL(MAX(TO_NUMBER(REGEXP_SUBSTR(orc_orden_compra, '\d+$'))), 0) + 1
+          INTO v_num
+          FROM BOD_ORDEN_COMPRA
+         WHERE REGEXP_LIKE(orc_orden_compra, '\d+$');
+        RETURN v_num;
+    EXCEPTION
+        WHEN OTHERS THEN RETURN 1;
+    END F_SIGUIENTE_NUM;
+
+    -- ============================================================
+    -- PROCEDIMIENTOS
+    -- ============================================================
+
+    -- ORC_CREAR
+    -- Genera el key y el codigo internamente con los prefijos configurados.
+    -- El VB recibe el key resultante via p_orc_key_out para usarlo
+    -- en los inserts de detalle sin necesidad de calcularlo en capa VB.
+    PROCEDURE ORC_CREAR(
+        p_prov_id     IN  NUMBER,
+        p_total       IN  NUMBER,
+        p_orc_key_out OUT VARCHAR2
+    ) IS
+        v_num    NUMBER;
+        v_key    VARCHAR2(50);
+        v_codigo VARCHAR2(50);
+    BEGIN
+        v_num    := F_SIGUIENTE_NUM();
+        v_key    := C_PREFIJO_ORC || '-' || TO_CHAR(v_num);
+        v_codigo := C_PREFIJO_COD || '-' || TO_CHAR(v_num);
+
         INSERT INTO BOD_ORDEN_COMPRA(
             orc_orden_compra, orc_codigo, prov_proveedor, orc_fecha, orc_total_precio)
-        VALUES (p_orc_key, p_codigo, p_prov_id, SYSDATE, p_total);
+        VALUES (v_key, v_codigo, p_prov_id, SYSDATE, NVL(p_total, 0));
         COMMIT;
+
+        p_orc_key_out := v_key;
     EXCEPTION
         WHEN OTHERS THEN ROLLBACK; RAISE;
     END ORC_CREAR;
@@ -68,7 +117,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_CP_BOD_ORDEN_COMPRA AS
     END ORC_LISTAR;
 
     PROCEDURE ORC_LISTAR_ID(
-        p_orc_key IN VARCHAR2,
+        p_orc_key IN  VARCHAR2,
         p_data    OUT SYS_REFCURSOR
     ) IS
     BEGIN
@@ -89,7 +138,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_CP_BOD_ORDEN_COMPRA AS
     END ORC_LISTAR_ID;
 
     PROCEDURE ORC_BUSCAR(
-        p_codigo IN VARCHAR2,
+        p_codigo IN  VARCHAR2,
         p_data   OUT SYS_REFCURSOR
     ) IS
     BEGIN
@@ -108,7 +157,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_CP_BOD_ORDEN_COMPRA AS
     END ORC_BUSCAR;
 
     PROCEDURE ORC_BUSCAR_PEDIDOS(
-        p_texto IN VARCHAR2,
+        p_texto IN  VARCHAR2,
         p_data  OUT SYS_REFCURSOR
     ) IS
     BEGIN
@@ -128,7 +177,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_CP_BOD_ORDEN_COMPRA AS
     END ORC_BUSCAR_PEDIDOS;
 
     PROCEDURE ORC_DETALLES_PEDIDO(
-        p_ped_id IN NUMBER,
+        p_ped_id IN  NUMBER,
         p_data   OUT SYS_REFCURSOR
     ) IS
     BEGIN
@@ -149,20 +198,6 @@ CREATE OR REPLACE PACKAGE BODY PKG_CP_BOD_ORDEN_COMPRA AS
              WHERE d.ped_pedido = p_ped_id
              ORDER BY d.detpe_detalle_pedido;
     END ORC_DETALLES_PEDIDO;
-
-    -- Devuelve el siguiente numero disponible para el codigo OC-N.
-    -- Extrae el numero de orc_orden_compra con formato OC-N y retorna MAX(N)+1.
-    -- Si no hay registros retorna 1.
-    PROCEDURE ORC_SIGUIENTE_NUMERO(p_numero OUT NUMBER) AS
-    BEGIN
-        SELECT NVL(MAX(TO_NUMBER(REGEXP_SUBSTR(orc_orden_compra, '\d+', 1, 1))), 0) + 1
-          INTO p_numero
-          FROM BOD_ORDEN_COMPRA
-         WHERE REGEXP_LIKE(orc_orden_compra, '^OC-\d+$');
-    EXCEPTION
-        WHEN OTHERS THEN
-            p_numero := 1;
-    END ORC_SIGUIENTE_NUMERO;
 
 END PKG_CP_BOD_ORDEN_COMPRA;
 /

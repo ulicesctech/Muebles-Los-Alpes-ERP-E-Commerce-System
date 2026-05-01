@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Control de Stock" Language="VB" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Stock.aspx.vb" Inherits="MueblesAlpes.Web.Modules.CatalogoInventario.Stock" %>
+﻿<%@ Page Title="Control de Stock" Language="VB" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Stock.aspx.vb" Inherits="MueblesAlpes.Web.Modules.CatalogoInventario.Stock"  MaintainScrollPositionOnPostback="true" %>
 
 <asp:Content ID="cBody" ContentPlaceHolderID="MainContent" runat="server">
 <style>
@@ -266,15 +266,7 @@
             <%-- Value = NIC_NUMERO porque LISTAR no devuelve NIC_NICHO --%>
             <asp:DropDownList ID="ddlFiltroNicho" runat="server" />
         </div>
-        <div class="f-group" style="max-width:160px;">
-            <label>Estado</label>
-            <asp:DropDownList ID="ddlFiltroEstado" runat="server">
-                <asp:ListItem Text="-- Todos --" Value="" />
-                <asp:ListItem Text="Normal"       Value="NORMAL" />
-                <asp:ListItem Text="Bajo"         Value="BAJO" />
-                <asp:ListItem Text="Alto"         Value="ALTO" />
-            </asp:DropDownList>
-        </div>
+      
         <div style="display:flex; align-items:flex-end; gap:8px;">
             <asp:Button ID="btnFiltrar" runat="server" Text="&#128269; Filtrar" CssClass="btn-gold"   OnClick="btnFiltrar_Click"  CausesValidation="false" style="margin-left:0;" />
             <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar"           CssClass="btn-outline" OnClick="btnLimpiar_Click"  CausesValidation="false" style="margin-left:0;" />
@@ -330,15 +322,7 @@
                         style="width:65px;padding:4px 6px;border:1.5px solid #C9973A;border-radius:6px;font-size:13px;" />
                 </EditItemTemplate>
             </asp:TemplateField>
-            <asp:TemplateField HeaderText="Estado" ItemStyle-Width="80px">
-                <ItemTemplate>
-                    <%# If(Eval("ESTADO_STOCK").ToString() = "BAJO",
-                        "<span class='badge-bajo'>Bajo</span>",
-                        If(Eval("ESTADO_STOCK").ToString() = "ALTO",
-                            "<span class='badge-alto'>Alto</span>",
-                            "<span class='badge-normal'>Normal</span>")) %>
-                </ItemTemplate>
-            </asp:TemplateField>
+           
             <asp:TemplateField HeaderText="" ItemStyle-Width="120px">
                 <ItemTemplate>
                     <asp:Button CommandName="Edit" runat="server" Text="&#9998; Editar" CssClass="btn-outline"

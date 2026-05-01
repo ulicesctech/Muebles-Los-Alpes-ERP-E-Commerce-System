@@ -1,15 +1,69 @@
 CREATE OR REPLACE PACKAGE BODY PKG_CP_BOD_PEDIDO AS
 
+    -- ============================================================
+    -- CONFIGURACION CENTRAL
+    -- ============================================================
+
+    -- Prefijo del codigo de pedido.
+    -- Cambia solo este valor para que todos los pedidos nuevos usen
+    -- la nueva abreviatura.  El numero correlativo es siempre el ID
+    -- del registro (ped_pedido), por lo que no hay huecos ni saltos.
+    -- Ejemplos: 'PED', 'OC', 'COMP', 'REQ'
+    C_PREFIJO_PEDIDO CONSTANT VARCHAR2(20) := 'PED';
+
+    -- Formas de pago disponibles.
+    -- Para agregar una forma de pago: agrega un registro mas al array.
+    -- Para quitarla: elimina o comenta la linea correspondiente.
+    -- El primer campo (fp) es el valor que se guarda en BD;
+    -- debe coincidir con los valores permitidos por el CHECK constraint
+    -- de BOD_PEDIDO.ped_forma_pago.
+    -- El segundo campo (desc_) es el texto que se muestra en la UI.
+    TYPE t_forma_pago_rec IS RECORD (
+        fp    VARCHAR2(30),
+        desc_ VARCHAR2(60)
+    );
+    TYPE t_formas_pago IS TABLE OF t_forma_pago_rec INDEX BY PLS_INTEGER;
+
+    FUNCTION C_FORMAS_PAGO RETURN t_formas_pago IS
+        v_lista t_formas_pago;
+    BEGIN
+        -- ► AQUI se configuran las formas de pago ◄
+        -- Orden: aparecen en este mismo orden en el combo de la UI.
+        v_lista(1).fp := 'CONTADO';  v_lista(1).desc_ := 'Contado';
+        v_lista(2).fp := 'CREDITO';  v_lista(2).desc_ := 'Credito';
+        -- Ejemplo para agregar mas opciones:
+        -- v_lista(3).fp := 'CHEQUE';   v_lista(3).desc_ := 'Cheque';
+        -- v_lista(4).fp := 'TRANSFERENCIA'; v_lista(4).desc_ := 'Transferencia Bancaria';
+        RETURN v_lista;
+    END C_FORMAS_PAGO;
+
+    -- ============================================================
+    -- PROCEDIMIENTOS
+    -- ============================================================
+
+    -- PED_CREAR
+    -- Inserta el pedido con codigo TEMP, obtiene el ID con RETURNING,
+    -- luego actualiza el codigo con el patron "PREFIJO-ID" en un solo
+    -- bloque atomico.  El VB ya no arma el codigo ni hace un segundo
+    -- UPDATE de cabecera para sobreescribirlo.
     PROCEDURE PED_CREAR(
-        p_codigo     IN  VARCHAR2,
         p_forma_pago IN  VARCHAR2,
         p_total      IN  NUMBER,
         p_id         OUT NUMBER
     ) AS
+        v_codigo VARCHAR2(50);
     BEGIN
         INSERT INTO BOD_PEDIDO(ped_codigo, ped_forma_pago, ped_total, ped_fecha)
-        VALUES(TRIM(p_codigo), NVL(p_forma_pago, 'SIMULADO'), NVL(p_total, 0), SYSDATE)
+        VALUES ('TEMP', p_forma_pago, NVL(p_total, 0), SYSDATE)
         RETURNING ped_pedido INTO p_id;
+
+        -- Armar el codigo definitivo con el prefijo configurado arriba
+        v_codigo := C_PREFIJO_PEDIDO || '-' || TO_CHAR(p_id);
+
+        UPDATE BOD_PEDIDO
+           SET ped_codigo = v_codigo
+         WHERE ped_pedido = p_id;
+
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN ROLLBACK; RAISE;
@@ -31,19 +85,6 @@ CREATE OR REPLACE PACKAGE BODY PKG_CP_BOD_PEDIDO AS
     EXCEPTION
         WHEN OTHERS THEN ROLLBACK; RAISE;
     END PED_ACTUALIZAR;
-
-    PROCEDURE PED_AGREGAR_DETALLE(
-        p_ped_id   IN NUMBER,
-        p_hip_id   IN NUMBER,
-        p_cant_sol IN NUMBER
-    ) IS
-    BEGIN
-        INSERT INTO BOD_DETALLE_PEDIDO(ped_pedido, hip_historial_precio, detpe_cantidad_solicitada)
-        VALUES(p_ped_id, p_hip_id, p_cant_sol);
-        COMMIT;
-    EXCEPTION
-        WHEN OTHERS THEN ROLLBACK; RAISE;
-    END PED_AGREGAR_DETALLE;
 
     PROCEDURE PED_ELIMINAR(p_id IN NUMBER) AS
     BEGIN
@@ -173,17 +214,31 @@ CREATE OR REPLACE PACKAGE BODY PKG_CP_BOD_PEDIDO AS
 
     -- --------------------------------------------------------
     -- PED_LISTAR_FORMAS_PAGO
-    -- Devuelve las formas de pago validas definidas en el
-    -- CHECK constraint de BOD_PEDIDO (ped_forma_pago).
-    -- Columnas: FORMA_PAGO (valor a guardar), DESCRIPCION (texto UI)
+    -- Lee el array C_FORMAS_PAGO y lo convierte en un cursor
+    -- usando una tabla temporal en memoria (coleccion PL/SQL).
+    -- No usa SQL dinamico: es estable en todas las versiones Oracle.
+    -- Para agregar/quitar formas de pago solo edita C_FORMAS_PAGO.
     -- --------------------------------------------------------
     PROCEDURE PED_LISTAR_FORMAS_PAGO(p_data OUT SYS_REFCURSOR) IS
+        v_lista t_formas_pago;
+        v_idx   PLS_INTEGER;
+        v_fps   SYS.ODCIVARCHAR2LIST := SYS.ODCIVARCHAR2LIST();
+        v_descs SYS.ODCIVARCHAR2LIST := SYS.ODCIVARCHAR2LIST();
     BEGIN
+        v_lista := C_FORMAS_PAGO();
+        v_idx   := v_lista.FIRST;
+        WHILE v_idx IS NOT NULL LOOP
+            v_fps.EXTEND;   v_fps(v_fps.LAST)     := v_lista(v_idx).fp;
+            v_descs.EXTEND; v_descs(v_descs.LAST) := v_lista(v_idx).desc_;
+            v_idx := v_lista.NEXT(v_idx);
+        END LOOP;
         OPEN p_data FOR
-            SELECT 'CONTADO' AS forma_pago, 'Contado' AS descripcion FROM DUAL
-            UNION ALL
-            SELECT 'CREDITO' AS forma_pago, 'Credito' AS descripcion FROM DUAL
-            ORDER BY forma_pago;
+            SELECT f.column_value AS forma_pago,
+                   d.column_value AS descripcion
+              FROM (SELECT ROWNUM rn, column_value FROM TABLE(v_fps))  f
+              JOIN (SELECT ROWNUM rn, column_value FROM TABLE(v_descs)) d
+                ON f.rn = d.rn
+             ORDER BY f.rn;
     END PED_LISTAR_FORMAS_PAGO;
 
 END PKG_CP_BOD_PEDIDO;

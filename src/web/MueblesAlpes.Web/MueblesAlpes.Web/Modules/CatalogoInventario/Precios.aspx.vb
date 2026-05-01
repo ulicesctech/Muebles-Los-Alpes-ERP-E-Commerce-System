@@ -18,7 +18,7 @@ Namespace Modules.CatalogoInventario
         End Sub
 
         ' =============================================
-        ' FILTRO MES/AÑO (original)
+        ' FILTRO MES/AÑO
         ' =============================================
         Private Sub CargarFiltroMes()
             ddlMes.Items.Clear()
@@ -45,14 +45,14 @@ Namespace Modules.CatalogoInventario
 
         ' =============================================
         ' BOTON FILTRAR
-        ' Aplica: mes/año (via Oracle) + producto y estado (en memoria)
+        ' 1. Obtiene datos base desde Oracle (por mes o todos)
+        ' 2. Aplica filtros en memoria: producto y estado vigente
         ' =============================================
         Protected Sub btnFiltrar_Click(sender As Object, e As EventArgs)
             Try
                 Dim mes As Integer = Convert.ToInt32(ddlMes.SelectedValue)
                 Dim dt As DataTable
 
-                ' 1. Obtener datos base (mes/año o todos)
                 If mes = 0 Then
                     dt = HistorialPrecioService.ListarTodos()
                 Else
@@ -60,7 +60,6 @@ Namespace Modules.CatalogoInventario
                     dt = HistorialPrecioService.ListarPorMes(mes, anio)
                 End If
 
-                ' 2. Aplicar filtros en memoria
                 dt = AplicarFiltrosEnMemoria(dt)
 
                 gvHistorial.DataSource = dt
@@ -78,47 +77,54 @@ Namespace Modules.CatalogoInventario
             ddlMes.SelectedIndex = 0
             ddlAnio.SelectedIndex = 0
             txtFiltroProducto.Text = ""
-            ddlFiltroEstado.SelectedIndex = 0
+            chkSoloVigentes.Checked = False
+            pnlMsg.Visible = False
             CargarHistorialTodos()
         End Sub
 
         ' =============================================
         ' FILTROS EN MEMORIA
-        ' Columnas disponibles: PRO_NOMBRE, HIP_FECHA_FINAL
-        ' Estado: VIGENTE  = HIP_FECHA_FINAL IS NULL
-        '         HISTORICO = HIP_FECHA_FINAL IS NOT NULL
+        ' - Producto: contiene el texto en PRO_NOMBRE (insensible a mayúsculas)
+        ' - Solo vigentes: HIP_FECHA_FINAL IS NULL
+        '
+        ' Ambos filtros son independientes y se acumulan (AND).
         ' =============================================
         Private Function AplicarFiltrosEnMemoria(dt As DataTable) As DataTable
             If dt Is Nothing OrElse dt.Rows.Count = 0 Then Return dt
 
-            Dim filtroProd As String = txtFiltroProducto.Text.Trim().ToUpper()
-            Dim filtroEstado As String = ddlFiltroEstado.SelectedValue
+            Dim filtroProd As String = txtFiltroProducto.Text.Trim()
+            Dim soloVigentes As Boolean = chkSoloVigentes.Checked
+            Dim hayFiltro As Boolean = Not String.IsNullOrEmpty(filtroProd) OrElse soloVigentes
 
+            ' Si no hay ningún filtro activo devolvemos el DataTable tal cual
+            If Not hayFiltro Then Return dt
+
+            Dim filtroUp As String = filtroProd.ToUpper()
             Dim filas As IEnumerable(Of DataRow) = dt.AsEnumerable()
 
-            ' Filtro producto
+            ' Filtro por nombre de producto (contiene, insensible a mayúsculas)
             If Not String.IsNullOrEmpty(filtroProd) Then
                 filas = filas.Where(Function(r)
-                                        Return r("PRO_NOMBRE").ToString().ToUpper().Contains(filtroProd)
+                                        If IsDBNull(r("PRO_NOMBRE")) Then Return False
+                                        Return r("PRO_NOMBRE").ToString().ToUpper().Contains(filtroUp)
                                     End Function)
             End If
 
-            ' Filtro estado
-            If filtroEstado = "VIGENTE" Then
-                filas = filas.Where(Function(r) IsDBNull(r("HIP_FECHA_FINAL")) OrElse r("HIP_FECHA_FINAL").ToString() = "")
-            ElseIf filtroEstado = "HISTORICO" Then
-                filas = filas.Where(Function(r) Not IsDBNull(r("HIP_FECHA_FINAL")) AndAlso r("HIP_FECHA_FINAL").ToString() <> "")
+            ' Filtro solo vigentes: fecha final nula
+            If soloVigentes Then
+                filas = filas.Where(Function(r) IsDBNull(r("HIP_FECHA_FINAL")))
             End If
 
             Dim dtResultado As DataTable = dt.Clone()
             For Each fila As DataRow In filas
                 dtResultado.ImportRow(fila)
             Next
+
             Return dtResultado
         End Function
 
         ' =============================================
-        ' CARGAR HISTORIAL COMPLETO
+        ' CARGAR HISTORIAL COMPLETO (sin filtros)
         ' =============================================
         Private Sub CargarHistorialTodos()
             Try

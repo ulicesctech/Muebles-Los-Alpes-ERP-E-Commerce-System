@@ -2,7 +2,8 @@
     Inherits="MueblesAlpes.Web.Modules.ComprasProveedor.OrdenesCompra"
     MasterPageFile="~/Site.Master"
     ContentType="text/html"
-    ResponseEncoding="utf-8" %>
+    ResponseEncoding="utf-8" 
+    MaintainScrollPositionOnPostback="true" %>
 
 <asp:Content ID="cBody" ContentPlaceHolderID="MainContent" runat="server">
 <meta charset="utf-8" />
@@ -24,8 +25,6 @@
     .form-control-readonly { padding:10px 14px; border:2px solid #e8d8c0; border-radius:8px; font-size:14px; font-family:Arial,sans-serif; background:#f0f0f0; color:#888; width:100%; box-sizing:border-box; cursor:not-allowed; }
     .btn-gold    { background:linear-gradient(135deg,#C9973A,#a87a2e); color:white; border:none; padding:10px 20px; border-radius:8px; font-size:13px; font-weight:bold; font-family:Arial,sans-serif; cursor:pointer; white-space:nowrap; }
     .btn-gold:hover { background:linear-gradient(135deg,#a87a2e,#7a5818); }
-    .btn-green   { background:linear-gradient(135deg,#276749,#1a4d35); color:white; border:none; padding:10px 22px; border-radius:8px; font-size:13px; font-weight:bold; font-family:Arial,sans-serif; cursor:pointer; white-space:nowrap; }
-    .btn-green:hover { background:linear-gradient(135deg,#1a4d35,#0f3020); }
     .btn-outline { background:white; color:#5C3A1E; border:2px solid #e8d8c0; padding:10px 18px; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; cursor:pointer; white-space:nowrap; }
     .btn-outline:hover { border-color:#C9973A; color:#C9973A; }
     .table-card { background:white; border-radius:12px; border:1px solid #e8d8c0; overflow:hidden; box-shadow:0 2px 8px rgba(92,58,30,0.06); margin-top:10px; }
@@ -122,7 +121,6 @@
                                         <asp:BoundField DataField="PED_CODIGO"   HeaderText="Pedido"   ItemStyle-Width="65px" />
                                         <asp:BoundField DataField="ODP_PRODUCTO" HeaderText="Producto" />
                                         <asp:BoundField DataField="ODP_MATERIAL" HeaderText="Material" />
-                                        <%-- PED_FORMA_PAGO viene de Oracle via ODP_LISTAR_POR_ORDEN (JOIN a BOD_PEDIDO) --%>
                                         <asp:TemplateField HeaderText="Forma Pago" ItemStyle-Width="90px">
                                             <ItemTemplate><span class="badge-pago"><%# Eval("PED_FORMA_PAGO") %></span></ItemTemplate>
                                         </asp:TemplateField>
@@ -216,7 +214,6 @@
                             <asp:TemplateField HeaderText="Fecha" ItemStyle-Width="110px">
                                 <ItemTemplate><%# String.Format("{0:dd/MM/yyyy}", Eval("PED_FECHA")) %></ItemTemplate>
                             </asp:TemplateField>
-                            <%-- PED_FORMA_PAGO viene de Oracle via ORC_BUSCAR_PEDIDOS --%>
                             <asp:TemplateField HeaderText="Forma Pago" ItemStyle-Width="110px">
                                 <ItemTemplate><span class="badge-pago"><%# Eval("PED_FORMA_PAGO") %></span></ItemTemplate>
                             </asp:TemplateField>
@@ -239,9 +236,6 @@
                             </asp:TemplateField>
                             <asp:TemplateField HeaderText="" ItemStyle-Width="130px" ItemStyle-VerticalAlign="Top">
                                 <ItemTemplate>
-                                    <%-- CommandArgument: PED_PEDIDO | PED_CODIGO | PED_FORMA_PAGO
-                                         Se agrega PED_FORMA_PAGO para que gvBuscarPedidos_RowCommand
-                                         pueda mostrarla en lblFormaPagoPedido sin una consulta extra. --%>
                                     <asp:LinkButton ID="lnkSeleccionar" CommandName="VerItemsPedido"
                                         CommandArgument='<%# Eval("PED_PEDIDO") & "|" & Eval("PED_CODIGO") & "|" & Eval("PED_FORMA_PAGO") %>'
                                         runat="server" CssClass="btn-edit-t"
@@ -258,7 +252,6 @@
 
             <asp:Panel ID="pnlItemsPedido" runat="server" Visible="false">
                 <asp:HiddenField ID="hfPedidoVinculado" runat="server" Value="0" />
-                <%-- Persiste la forma de pago entre postbacks para mostrarla en lblFormaPagoPedido --%>
                 <asp:HiddenField ID="hfFormaPago"       runat="server" Value="" />
                 <div class="pedido-sel-box">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
@@ -266,7 +259,6 @@
                             &#128203; Pedido #<asp:Label ID="lblPedidoId" runat="server" /> &mdash;
                             <asp:Label ID="lblPedidoCodigo" runat="server" />
                             &nbsp;|&nbsp; Forma de pago:
-                            <%-- Poblado en gvBuscarPedidos_RowCommand con el valor que viene de Oracle --%>
                             <asp:Label ID="lblFormaPagoPedido" runat="server"
                                 style="font-size:12px; background:#eef6ff; color:#2b6cb0; padding:2px 8px; border-radius:10px; border:1px solid #bee3f8;" />
                             <span style="font-size:11px; color:#555; font-weight:normal; margin-left:8px;">
@@ -285,7 +277,6 @@
                         <Columns>
                             <asp:BoundField DataField="PRODUCTO_NOMBRE" HeaderText="Producto" />
                             <asp:BoundField DataField="MATERIAL"        HeaderText="Material" />
-                            <%-- PED_FORMA_PAGO viene de Oracle via ORC_DETALLES_PEDIDO (JOIN a BOD_PEDIDO) --%>
                             <asp:TemplateField HeaderText="Forma Pago" ItemStyle-Width="100px">
                                 <ItemTemplate><span class="badge-pago"><%# Eval("PED_FORMA_PAGO") %></span></ItemTemplate>
                             </asp:TemplateField>
@@ -337,8 +328,7 @@
                 AutoGenerateColumns="false"
                 DataKeyNames="ODP_ORDEN_DETALLE_PEDIDO"
                 CssClass="table"
-                GridLines="None"
-                OnRowCommand="gvItemsOrden_RowCommand">
+                GridLines="None">
                 <Columns>
                     <asp:TemplateField HeaderText="Pedido" ItemStyle-Width="80px">
                         <ItemTemplate><span class="badge-id"><%# Eval("PED_CODIGO") %></span></ItemTemplate>
@@ -349,7 +339,6 @@
                     <asp:TemplateField HeaderText="Material">
                         <ItemTemplate><%# Eval("ODP_MATERIAL") %></ItemTemplate>
                     </asp:TemplateField>
-                    <%-- PED_FORMA_PAGO viene de Oracle via ODP_LISTAR_POR_ORDEN (JOIN a BOD_PEDIDO) --%>
                     <asp:TemplateField HeaderText="Forma Pago" ItemStyle-Width="110px">
                         <ItemTemplate><span class="badge-pago"><%# Eval("PED_FORMA_PAGO") %></span></ItemTemplate>
                     </asp:TemplateField>
@@ -361,16 +350,6 @@
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Subtotal" ItemStyle-Width="110px">
                         <ItemTemplate>Q <%# String.Format("{0:N2}", Convert.ToDecimal(Eval("ODP_PRECIO")) * Convert.ToDecimal(Eval("ODP_CANTIDAD"))) %></ItemTemplate>
-                    </asp:TemplateField>
-                    <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="120px">
-                        <ItemTemplate>
-                            <div class="actions-cell">
-                                <asp:LinkButton CommandName="BorrarItem"
-                                    CommandArgument='<%# Eval("ODP_ORDEN_DETALLE_PEDIDO") %>'
-                                    runat="server" CssClass="btn-del-t"
-                                    OnClientClick="return confirm('Eliminar este item?');">&#128465; Eliminar</asp:LinkButton>
-                            </div>
-                        </ItemTemplate>
                     </asp:TemplateField>
                 </Columns>
                 <EmptyDataTemplate>

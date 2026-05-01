@@ -7,14 +7,20 @@ Imports Oracle.ManagedDataAccess.Client
 ' Package: PKG_CP_BOD_PEDIDO
 ' ============================================================
 Public Class PedidoService
+
     Private Const PKG As String = "PKG_CP_BOD_PEDIDO"
 
-    ''' <summary>Crea un pedido y devuelve el ID generado por Oracle.</summary>
-    Public Shared Function Crear(codigo As String, formaPago As String, total As Decimal) As Decimal
+    ''' <summary>
+    ''' Crea un pedido y devuelve el ID generado por Oracle.
+    ''' El codigo (ej: PED-12) lo genera el propio paquete Oracle usando
+    ''' la constante C_PREFIJO_PEDIDO definida en PKG_CP_BOD_PEDIDO body.
+    ''' Para cambiar el prefijo edita esa constante en Oracle; no hay nada
+    ''' que modificar en este servicio ni en el code-behind.
+    ''' </summary>
+    Public Shared Function Crear(formaPago As String, total As Decimal) As Decimal
         Dim pId As New OracleParameter("p_id", OracleDbType.Decimal)
         pId.Direction = ParameterDirection.Output
         Dim ps As New List(Of OracleParameter) From {
-            New OracleParameter("p_codigo", OracleDbType.Varchar2, codigo, ParameterDirection.Input),
             New OracleParameter("p_forma_pago", OracleDbType.Varchar2, formaPago, ParameterDirection.Input),
             New OracleParameter("p_total", OracleDbType.Decimal, total, ParameterDirection.Input),
             pId
@@ -67,9 +73,9 @@ Public Class PedidoService
     End Sub
 
     ''' <summary>
-    ''' Devuelve las formas de pago validas desde Oracle.
+    ''' Devuelve las formas de pago configuradas en PKG_CP_BOD_PEDIDO (funcion C_FORMAS_PAGO).
     ''' Columnas: FORMA_PAGO (valor), DESCRIPCION (texto para UI).
-    ''' Nunca hardcodear CONTADO/CREDITO en el VB — siempre usar este metodo.
+    ''' Para agregar o quitar formas de pago edita el array C_FORMAS_PAGO en el package body.
     ''' </summary>
     Public Shared Function ListarFormasPago() As DataTable
         Return OracleDb.ExecRefCursor(PKG & ".PED_LISTAR_FORMAS_PAGO", Nothing, "p_data")

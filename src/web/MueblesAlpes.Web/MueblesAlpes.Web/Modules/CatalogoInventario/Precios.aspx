@@ -12,9 +12,13 @@
     .filter-bar .fg { display:flex; flex-direction:column; gap:5px; }
     .filter-bar .fg label { font-size:11px; font-weight:bold; color:#5C3A1E; font-family:Arial,sans-serif; text-transform:uppercase; letter-spacing:0.5px; }
     .filter-bar .fg select,
-    .filter-bar .fg input { padding:9px 14px; border:1.5px solid #e0d0b8; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; outline:none; }
-    .filter-bar .fg input:focus,
+    .filter-bar .fg input[type=text] { padding:9px 14px; border:1.5px solid #e0d0b8; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; outline:none; }
+    .filter-bar .fg input[type=text]:focus,
     .filter-bar .fg select:focus { border-color:#C9973A; }
+    .chk-vigente-wrap { display:flex; align-items:center; gap:8px; padding:10px 14px; border:1.5px solid #e0d0b8; border-radius:8px; background:#fdf8f3; cursor:pointer; transition:border-color .2s; }
+    .chk-vigente-wrap:hover { border-color:#C9973A; }
+    .chk-vigente-wrap input[type=checkbox] { width:16px; height:16px; accent-color:#276749; cursor:pointer; }
+    .chk-vigente-wrap span { font-size:13px; font-family:Arial,sans-serif; color:#276749; font-weight:bold; white-space:nowrap; }
     .btn-gold { background:#C9973A; color:#1a0e05; border:none; padding:10px 22px; border-radius:8px; font-size:13px; font-weight:bold; font-family:Arial,sans-serif; cursor:pointer; transition:all 0.2s; }
     .btn-gold:hover { background:#a87a2e; color:white; }
     .btn-outline { background:white; color:#5C3A1E; border:1.5px solid #e0d0b8; padding:10px 18px; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; cursor:pointer; transition:all 0.2s; margin-left:4px; }
@@ -27,8 +31,6 @@
     .table-card tbody tr { border-bottom:1px solid #f5ece0; transition:background 0.15s; }
     .table-card tbody tr:hover { background:#fdf6ec; }
     .table-card tbody td { padding:11px 16px; color:#333; vertical-align:middle; }
-    .badge-vigente   { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:bold; background:#f0fff4; color:#2d7a2d; border:1px solid #9ae6b4; }
-    .badge-historico { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:bold; background:#fdf6ec; color:#C9973A; border:1px solid #e8d0a0; }
     .alert-ok  { background:#f0fff4; border:1px solid #9ae6b4; color:#276749; padding:10px 16px; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; margin-bottom:16px; }
     .alert-err { background:#fff5f5; border:1px solid #fed7d7; color:#c53030; padding:10px 16px; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; margin-bottom:16px; }
     .contador-resultados { font-size:12px; color:#888; font-family:Arial,sans-serif; margin-bottom:10px; }
@@ -57,9 +59,7 @@
 
 <div class="section-label">Historial de Precios</div>
 
-<%-- FILTROS --%>
 <div class="filter-bar">
-    <%-- Filtro por mes/año (original) --%>
     <div class="fg">
         <label>Mes</label>
         <asp:DropDownList ID="ddlMes" runat="server" />
@@ -69,27 +69,24 @@
         <asp:DropDownList ID="ddlAnio" runat="server" />
     </div>
 
-    <%-- Filtro por producto (nuevo) --%>
     <div class="fg">
         <label>Producto</label>
         <asp:TextBox ID="txtFiltroProducto" runat="server"
             placeholder="Buscar por nombre..."
-            style="padding:9px 14px; border:1.5px solid #e0d0b8; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; outline:none; min-width:220px;" />
+            style="padding:9px 14px; border:1.5px solid #e0d0b8; border-radius:8px;
+                   font-size:13px; font-family:Arial,sans-serif; outline:none; min-width:220px;" />
     </div>
 
-    <%-- Filtro por estado (nuevo) --%>
     <div class="fg">
         <label>Estado</label>
-        <asp:DropDownList ID="ddlFiltroEstado" runat="server"
-            style="padding:9px 14px; border:1.5px solid #e0d0b8; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; outline:none;">
-            <asp:ListItem Text="-- Todos --"  Value=""         />
-            <asp:ListItem Text="Vigente"      Value="VIGENTE"  />
-            <asp:ListItem Text="Historico"    Value="HISTORICO"/>
-        </asp:DropDownList>
+        <label class="chk-vigente-wrap">
+            <asp:CheckBox ID="chkSoloVigentes" runat="server" />
+            <span>&#128994; Solo vigentes</span>
+        </label>
     </div>
 
-    <asp:Button ID="btnFiltrar"  runat="server" Text="&#128269; Filtrar" CssClass="btn-gold"    OnClick="btnFiltrar_Click"  CausesValidation="false" />
-    <asp:Button ID="btnLimpiar"  runat="server" Text="Limpiar"           CssClass="btn-outline"  OnClick="btnLimpiar_Click"  CausesValidation="false" />
+    <asp:Button ID="btnFiltrar" runat="server" Text="&#128269; Filtrar" CssClass="btn-gold"   OnClick="btnFiltrar_Click"  CausesValidation="false" />
+    <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar"           CssClass="btn-outline" OnClick="btnLimpiar_Click"  CausesValidation="false" />
 </div>
 
 <div class="contador-resultados">
@@ -114,13 +111,6 @@
             </asp:TemplateField>
             <asp:BoundField DataField="HIP_FECHA_INICIO" HeaderText="Desde" DataFormatString="{0:dd/MM/yyyy}" ItemStyle-Width="100px" />
             <asp:BoundField DataField="HIP_FECHA_FINAL"  HeaderText="Hasta" DataFormatString="{0:dd/MM/yyyy}" ItemStyle-Width="100px" />
-            <asp:TemplateField HeaderText="Estado" ItemStyle-Width="90px">
-                <ItemTemplate>
-                    <%# If(Eval("HIP_FECHA_FINAL") Is DBNull.Value OrElse Eval("HIP_FECHA_FINAL").ToString() = "",
-                        "<span class='badge-vigente'>Vigente</span>",
-                        "<span class='badge-historico'>Historico</span>") %>
-                </ItemTemplate>
-            </asp:TemplateField>
         </Columns>
     </asp:GridView>
 </div>

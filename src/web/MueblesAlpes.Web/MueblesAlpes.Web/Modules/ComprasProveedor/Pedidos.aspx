@@ -1,7 +1,7 @@
 ﻿<%@ Page Language="VB" AutoEventWireup="true" CodeBehind="Pedidos.aspx.vb"
         Inherits="MueblesAlpes.Web.Modules.ComprasProveedor.Pedidos"
         MasterPageFile="~/Site.Master"
-        ContentType="text/html" ResponseEncoding="utf-8" %>
+        ContentType="text/html" ResponseEncoding="utf-8" MaintainScrollPositionOnPostback="true" %>
 <asp:Content ID="cBody" ContentPlaceHolderID="MainContent" runat="server">
 <meta charset="utf-8" />
 <style>
@@ -277,13 +277,20 @@
                                 "—", Eval("MATERIAL").ToString()) %>
                         </EditItemTemplate>
                     </asp:TemplateField>
+
+                    <%-- *** UNICO CAMBIO: Text='<%# Eval("DETPE_CANTIDAD_SOLICITADA") %>'      ***
+                         Antes era Text="" lo que vaciaba el campo al entrar en modo edicion.
+                         Con Eval() el TextBox pre-carga el valor guardado en Oracle y el usuario
+                         lo ve de inmediato sin necesidad de un segundo clic.                    --%>
                     <asp:TemplateField HeaderText="Solicitado" ItemStyle-Width="100px">
                         <ItemTemplate><%# Eval("DETPE_CANTIDAD_SOLICITADA") %></ItemTemplate>
                         <EditItemTemplate>
-                            <asp:TextBox ID="txtESolicitada" runat="server" Text="" placeholder="0"
+                            <asp:TextBox ID="txtESolicitada" runat="server"
+                                Text='<%# Eval("DETPE_CANTIDAD_SOLICITADA") %>'
                                 CssClass="edit-input" style="width:70px;" />
                         </EditItemTemplate>
                     </asp:TemplateField>
+
                     <asp:TemplateField HeaderText="Recibido" ItemStyle-Width="320px">
                         <ItemTemplate>
                             <%# Eval("DETPE_CANTIDAD_RECIBIDA") %>

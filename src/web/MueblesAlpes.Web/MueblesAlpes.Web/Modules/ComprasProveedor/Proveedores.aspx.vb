@@ -1,9 +1,11 @@
 ' ============================================================
 ' RUTA: Modules/ComprasProveedor/Proveedores.aspx.vb
+' Las reglas de NIT y telefono viven en PKG_CP_BOD_PROVEEDOR.
+' El code-behind solo valida que los campos no esten vacios
+' antes de ir a la base de datos.
 ' ============================================================
 Imports System
 Imports System.Data
-Imports System.Text.RegularExpressions
 
 Namespace Modules.ComprasProveedor
 
@@ -34,7 +36,8 @@ Namespace Modules.ComprasProveedor
         ' GUARDAR (crear o actualizar)
         ' =============================================
         Protected Sub btnGuardar_Click(sender As Object, e As EventArgs)
-            If Not ValidarCampos() Then Return
+            ' Validacion minima del lado del cliente: campos vacios
+            If Not ValidarCamposRequeridos() Then Return
             Try
                 Dim id As Decimal = Convert.ToDecimal(hfId.Value)
                 If id = 0 Then
@@ -52,11 +55,9 @@ Namespace Modules.ComprasProveedor
                 End If
                 CargarGrilla()
             Catch ex As Exception
-                If ex.Message.Contains("ya existe un proveedor con ese NIT") Then
-                    MostrarError("Ya existe un proveedor registrado con ese NIT.")
-                Else
-                    MostrarError(ex.Message)
-                End If
+                ' El paquete Oracle lanza mensajes descriptivos con RAISE_APPLICATION_ERROR.
+                ' Se muestra directamente sin necesidad de parsear el texto aqui.
+                MostrarError(LimpiarMensajeOracle(ex.Message))
             End Try
         End Sub
 
@@ -99,7 +100,7 @@ Namespace Modules.ComprasProveedor
                     If ex.Message.Contains("ORA-02292") Then
                         MostrarError("No se puede eliminar: este proveedor tiene ordenes, facturas o reclamos vinculados.")
                     Else
-                        MostrarError("Error al eliminar: " & ex.Message)
+                        MostrarError(LimpiarMensajeOracle(ex.Message))
                     End If
                 End Try
             End If
@@ -123,77 +124,47 @@ Namespace Modules.ComprasProveedor
         End Sub
 
         ' =============================================
-        ' VALIDACIONES
+        ' VALIDACION MINIMA EN .NET
+        ' Solo verifica que ningun campo este vacio.
+        ' Las reglas de formato (NIT, telefono) las aplica
+        ' el paquete Oracle y se muestran via ex.Message.
         ' =============================================
-        Private Function ValidarCampos() As Boolean
-
-            ' NIT obligatorio
+        Private Function ValidarCamposRequeridos() As Boolean
             If String.IsNullOrWhiteSpace(txtNit.Text) Then
                 MostrarError("Ingresa el NIT o CUI del proveedor.") : Return False
             End If
-
-            ' NIT / CUI formato Guatemala
-            If Not EsNitOCuiGuatemalteco(txtNit.Text.Trim()) Then
-                MostrarError("El NIT o CUI no tiene un formato valido. " &
-                             "Formatos aceptados:" & vbCrLf &
-                             "• NIT: digitos sin guion, puede terminar en K (ej: 123456789 o 12345678K)" & vbCrLf &
-                             "• CUI: 13 digitos (ej: 1234567890101)") : Return False
-            End If
-
-            ' Nombre obligatorio
             If String.IsNullOrWhiteSpace(txtNombre.Text) Then
                 MostrarError("Ingresa el nombre o razon social del proveedor.") : Return False
             End If
-
-            ' Avenida obligatoria
             If String.IsNullOrWhiteSpace(txtAvenida.Text) Then
                 MostrarError("Ingresa la avenida del proveedor.") : Return False
             End If
-
-            ' Zona obligatoria
             If String.IsNullOrWhiteSpace(txtZona.Text) Then
                 MostrarError("Ingresa la zona del proveedor.") : Return False
             End If
-
-            ' Direccion obligatoria
             If String.IsNullOrWhiteSpace(txtDireccion.Text) Then
                 MostrarError("Ingresa la direccion del proveedor.") : Return False
             End If
-
-            ' Telefono: obligatorio, exactamente 8 digitos numericos
-            Dim tel As String = txtTelefono.Text.Trim()
-            If String.IsNullOrWhiteSpace(tel) Then
+            If String.IsNullOrWhiteSpace(txtTelefono.Text) Then
                 MostrarError("Ingresa el telefono del proveedor.") : Return False
             End If
-            If Not Regex.IsMatch(tel, "^\d{8}$") Then
-                MostrarError("El telefono debe tener exactamente 8 digitos numericos sin espacios ni guiones (ej: 22223333).") : Return False
-            End If
-
             Return True
         End Function
 
         ' =============================================
-        ' VALIDACION NIT / CUI GUATEMALTECO
-        '
-        ' Formatos validos para PROVEEDORES (guion NO aceptado):
-        '
-        '   NIT sin guion:  2-9 digitos + digito verificador (0-9 o K)
-        '                   Ej: 123456789, 12345678K
-        '
-        '   CUI:            Exactamente 13 digitos numericos
-        '                   Ej: 1234567890101
+        ' Quita el prefijo tecnico que Oracle agrega al
+        ' mensaje antes de la descripcion del paquete.
+        ' Ej: "ORA-20008: PKG_CP_BOD_PROVEEDOR: telefono invalido..."
+        '  -> "telefono invalido..."
         ' =============================================
-        Private Function EsNitOCuiGuatemalteco(nit As String) As Boolean
-            Dim nitUp As String = nit.ToUpper().Trim()
-
-            ' CUI: exactamente 13 digitos
-            If Regex.IsMatch(nitUp, "^\d{13}$") Then Return True
-
-            ' NIT sin guion: 2-9 digitos + digito verificador (0-9 o K)
-            ' Cubre: 123456789  /  12345678K
-            If Regex.IsMatch(nitUp, "^\d{2,9}[\dK]$") Then Return True
-
-            Return False
+        Private Function LimpiarMensajeOracle(msg As String) As String
+            ' Busca el patron "PKG_CP_BOD_PROVEEDOR: " y devuelve lo que sigue
+            Dim marca As String = "PKG_CP_BOD_PROVEEDOR: "
+            Dim pos As Integer = msg.IndexOf(marca)
+            If pos >= 0 Then
+                Return msg.Substring(pos + marca.Length)
+            End If
+            Return msg
         End Function
 
         ' =============================================

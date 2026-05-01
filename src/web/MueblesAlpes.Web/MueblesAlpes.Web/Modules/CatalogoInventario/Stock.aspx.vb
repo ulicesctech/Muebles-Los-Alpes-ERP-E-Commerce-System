@@ -53,17 +53,32 @@ Namespace Modules.CatalogoInventario
         End Sub
 
         ' =============================================
+        ' HELPER — SCROLL
+        ' =============================================
+        ' block: 'start' | 'center' | 'end' | 'nearest'
+        Private Sub ScrollAPanel(control As System.Web.UI.Control,
+                                  Optional block As String = "start")
+            Dim clientId As String = control.ClientID
+            Dim script As String =
+                "setTimeout(function(){" &
+                "  var el = document.getElementById('" & clientId & "');" &
+                "  if(el){" &
+                "    el.setAttribute('tabindex','-1');" &
+                "    el.focus({preventScroll:true});" &
+                "    el.scrollIntoView({behavior:'smooth',block:'" & block & "'});" &
+                "  }" &
+                "}, 200);"
+            Page.ClientScript.RegisterStartupScript(Me.GetType(), "scrollTo_" & clientId, script, True)
+        End Sub
+
+        ' =============================================
         ' FILTROS
-        ' Carga dropdowns usando los valores de texto que devuelve
-        ' StockService.Listar(): ALM_NOMBRE y NIC_NUMERO.
-        ' No usamos IDs porque LISTAR no los incluye en el SELECT.
         ' =============================================
         Private Sub CargarFiltros()
             Try
                 Dim dt As DataTable = StockService.Listar()
                 If dt Is Nothing OrElse dt.Rows.Count = 0 Then Return
 
-                ' Almacen: valores únicos de ALM_NOMBRE
                 Dim almacenes As DataTable = dt.DefaultView.ToTable(True, "ALM_NOMBRE")
                 ddlFiltroAlmacen.Items.Clear()
                 ddlFiltroAlmacen.Items.Add(New ListItem("-- Todos --", ""))
@@ -72,7 +87,6 @@ Namespace Modules.CatalogoInventario
                     ddlFiltroAlmacen.Items.Add(New ListItem(nombre, nombre))
                 Next
 
-                ' Nicho: valores únicos de NIC_NUMERO
                 Dim nichos As DataTable = dt.DefaultView.ToTable(True, "NIC_NUMERO")
                 ddlFiltroNicho.Items.Clear()
                 ddlFiltroNicho.Items.Add(New ListItem("-- Todos --", ""))
@@ -85,13 +99,6 @@ Namespace Modules.CatalogoInventario
             End Try
         End Sub
 
-        ' =============================================
-        ' FILTRAR — todo en memoria con Contains
-        ' Columnas disponibles en LISTAR:
-        '   PRO_NOMBRE, ALM_NOMBRE, NIC_NUMERO,
-        '   NIC_CARACTERISTICA, HIP_PRECIO,
-        '   STO_MINIMO, STO_MAXIMO, STO_DISPONIBLE, ESTADO_STOCK
-        ' =============================================
         Protected Sub btnFiltrar_Click(sender As Object, e As EventArgs)
             AplicarFiltros()
         End Sub
@@ -100,26 +107,17 @@ Namespace Modules.CatalogoInventario
             txtFiltroProducto.Text = ""
             ddlFiltroAlmacen.SelectedIndex = 0
             ddlFiltroNicho.SelectedIndex = 0
-            ddlFiltroEstado.SelectedIndex = 0
             CargarTablaStock()
         End Sub
 
         Private Sub AplicarFiltros()
             Try
                 Dim dtTodo As DataTable = StockService.Listar()
-                If dtTodo Is Nothing OrElse dtTodo.Rows.Count = 0 Then
-                    gvStock.DataSource = dtTodo
-                    gvStock.DataBind()
-                    lblContador.Text = "0"
-                    Return
-                End If
 
                 Dim filtroProd As String = txtFiltroProducto.Text.Trim().ToUpper()
                 Dim filtroAlmacen As String = ddlFiltroAlmacen.SelectedValue
                 Dim filtroNicho As String = ddlFiltroNicho.SelectedValue
-                Dim filtroEstado As String = ddlFiltroEstado.SelectedValue
 
-                ' Filtrar en memoria: todos los campos usan Contains/comparacion directa
                 Dim filas As IEnumerable(Of DataRow) = dtTodo.AsEnumerable()
 
                 If Not String.IsNullOrEmpty(filtroProd) Then
@@ -130,9 +128,6 @@ Namespace Modules.CatalogoInventario
                 End If
                 If Not String.IsNullOrEmpty(filtroNicho) Then
                     filas = filas.Where(Function(r) r("NIC_NUMERO").ToString() = filtroNicho)
-                End If
-                If Not String.IsNullOrEmpty(filtroEstado) Then
-                    filas = filas.Where(Function(r) r("ESTADO_STOCK").ToString() = filtroEstado)
                 End If
 
                 Dim dtResultado As DataTable = dtTodo.Clone()
@@ -149,7 +144,7 @@ Namespace Modules.CatalogoInventario
         End Sub
 
         ' =============================================
-        ' HELPER — Resolver HIP para recepcion de pedido
+        ' HELPERS — HIP y STOCK
         ' =============================================
         Private Function ResolverHipParaRecepcion(proRef As String,
                                                    hipSemilla As Decimal,
@@ -172,9 +167,6 @@ Namespace Modules.CatalogoInventario
             Return hipSemilla
         End Function
 
-        ' =============================================
-        ' HELPER — Guardar stock sumando SOLO el incremento
-        ' =============================================
         Private Sub GuardarStockSumando(dtExistente As DataTable,
                                          hipFinal As Decimal,
                                          cantIncremento As Decimal,
@@ -189,10 +181,8 @@ Namespace Modules.CatalogoInventario
 
                 If hipExistente <> hipFinal Then
                     StockService.Eliminar(hipExistente)
-                    StockService.Guardar(hipFinal, minActual, maxActual, nuevoDisponible)
-                Else
-                    StockService.Guardar(hipFinal, minActual, maxActual, nuevoDisponible)
                 End If
+                StockService.Guardar(hipFinal, minActual, maxActual, nuevoDisponible)
             Else
                 StockService.Guardar(hipFinal, minimoDefault, maximoDefault, cantIncremento)
             End If
@@ -227,6 +217,7 @@ Namespace Modules.CatalogoInventario
                 End If
                 CargarAlmacenes()
                 pnlPaso2.Visible = True
+                ScrollAPanel(pnlPaso1, "end")   ' end: baja solo lo necesario, paso 1 sigue visible
             Catch ex As Exception
                 MostrarError("Error: " & ex.Message)
             End Try
@@ -253,6 +244,7 @@ Namespace Modules.CatalogoInventario
             Try
                 CargarNichos(Convert.ToDecimal(ddlAlmacen.SelectedValue))
                 pnlPaso3.Visible = True
+                ScrollAPanel(pnlPaso3)
             Catch ex As Exception
                 MostrarError("Error: " & ex.Message)
             End Try
@@ -279,6 +271,7 @@ Namespace Modules.CatalogoInventario
             Try
                 Dim referencia As String = ddlProducto.SelectedValue
                 Dim nicId As Decimal = Convert.ToDecimal(ddlNicho.SelectedValue)
+                Dim cantIncremento As Decimal = Convert.ToDecimal(hfCantRecibida.Value)
 
                 hfHipAnterior.Value = "0"
                 Dim dtStock As DataTable = Nothing
@@ -293,7 +286,6 @@ Namespace Modules.CatalogoInventario
                 End Try
 
                 Dim tieneStock As Boolean = (dtStock IsNot Nothing AndAlso dtStock.Rows.Count > 0)
-                Dim cantIncremento As Decimal = Convert.ToDecimal(hfCantRecibida.Value)
 
                 If tieneStock Then
                     CargarDatosStock(dtStock.Rows(0))
@@ -315,10 +307,12 @@ Namespace Modules.CatalogoInventario
                     txtMaximo.ReadOnly = True
                     pnlEditarLimites.Visible = True
                     btnGuardar.Visible = False
-
                     pnlEntradaMercancia.Visible = True
                     pnlStockActual.Visible = True
                     pnlSinStock.Visible = False
+
+                    pnlPaso4.Visible = True
+                    ScrollAPanel(pnlStockActual)   ' ← lleva directo al stock actual + botón confirmar
                 Else
                     txtDisponibleNuevo.Text = cantIncremento.ToString()
                     txtDisponibleNuevo.ReadOnly = True
@@ -326,9 +320,11 @@ Namespace Modules.CatalogoInventario
                     btnCrearStock.Text = "Confirmar Recepcion y Volver a Pedidos"
                     pnlStockActual.Visible = False
                     pnlSinStock.Visible = True
+
+                    pnlPaso4.Visible = True
+                    ScrollAPanel(pnlSinStock)      ' ← lleva directo al formulario de crear stock
                 End If
 
-                pnlPaso4.Visible = True
             Catch ex As Exception
                 MostrarError("Error al cargar datos: " & ex.Message)
             End Try

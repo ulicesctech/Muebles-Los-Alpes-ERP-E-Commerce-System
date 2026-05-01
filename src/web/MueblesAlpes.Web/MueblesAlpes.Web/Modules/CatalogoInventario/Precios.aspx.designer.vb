@@ -60,13 +60,13 @@ Namespace Modules.CatalogoInventario
         Protected WithEvents txtFiltroProducto As Global.System.Web.UI.WebControls.TextBox
 
         '''<summary>
-        '''Control ddlFiltroEstado.
+        '''Control chkSoloVigentes.
         '''</summary>
         '''<remarks>
         '''Campo generado automáticamente.
         '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         '''</remarks>
-        Protected WithEvents ddlFiltroEstado As Global.System.Web.UI.WebControls.DropDownList
+        Protected WithEvents chkSoloVigentes As Global.System.Web.UI.WebControls.CheckBox
 
         '''<summary>
         '''Control btnFiltrar.

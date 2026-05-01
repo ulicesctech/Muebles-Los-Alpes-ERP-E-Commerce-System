@@ -510,15 +510,6 @@ Namespace Modules.CatalogoInventario
         Protected WithEvents ddlFiltroNicho As Global.System.Web.UI.WebControls.DropDownList
 
         '''<summary>
-        '''Control ddlFiltroEstado.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents ddlFiltroEstado As Global.System.Web.UI.WebControls.DropDownList
-
-        '''<summary>
         '''Control btnFiltrar.
         '''</summary>
         '''<remarks>

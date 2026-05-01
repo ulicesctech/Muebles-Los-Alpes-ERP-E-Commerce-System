@@ -15,7 +15,7 @@
     <AssemblyName>MueblesAlpes.Web</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <MyType>Custom</MyType>
-    <UseIISExpress>false</UseIISExpress>
+    <UseIISExpress>true</UseIISExpress>
     <Use64BitIISExpress />
     <IISExpressSSLPort>44375</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
@@ -728,13 +728,13 @@
     <Content Include="Handlers\Cliente\CatalogoClienteHandler.ashx" />
     <Content Include="Handlers\Cliente\MisComprasHandler.ashx" />
     <Content Include="Handlers\ComprasProveedor\OrdenesCompraHandler.ashx" />
-    <Content Include="Handlers\ComprasProveedor\PedidosHandler.ashx" />
     <Content Include="Handlers\Reportes\ReporteComprasHandler.ashx" />
     <Content Include="Handlers\Reportes\ReporteStockHandler.ashx" />
     <Content Include="Handlers\Reportes\ReporteVentasHandler.ashx" />
     <Content Include="Handlers\VentasFacturacion\CarritoHandler.ashx" />
     <Content Include="Handlers\VentasFacturacion\FacturaHandler.ashx" />
     <Content Include="Handlers\ComprasProveedor\ProveedorHandler.ashx" />
+    <Content Include="Handlers\ComprasProveedor\OrdenCompraHandler.ashx" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
@@ -784,7 +784,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>61850</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost/MueblesAlpes.Web</IISUrl>
+          <IISUrl>http://localhost:61850/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

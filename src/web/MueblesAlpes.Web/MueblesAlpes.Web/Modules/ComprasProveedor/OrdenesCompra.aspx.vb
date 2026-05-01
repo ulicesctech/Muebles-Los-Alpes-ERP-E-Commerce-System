@@ -74,9 +74,6 @@ Namespace Modules.ComprasProveedor
             lblTotalOrden.Text = total.ToString("N2")
         End Sub
 
-        ' =============================================
-        ' VALIDACION 1 — Pedido ya asignado a otra orden
-        ' =============================================
         Private Function PedidoYaAsignado(pedidoId As Integer) As Boolean
             Try
                 Dim dt As DataTable = OrdenDetallePedidoService.BuscarPorPedido(pedidoId)
@@ -86,19 +83,15 @@ Namespace Modules.ComprasProveedor
             End Try
         End Function
 
-        ' =============================================
-        ' VALIDACION 2 — Orden con recepcion registrada
-        ' =============================================
         Private Function OrdenTieneRecepcionRegistrada(orcKey As String) As Boolean
             Try
                 Dim dtOdp As DataTable = OrdenDetallePedidoService.ListarPorOrden(orcKey)
                 If dtOdp Is Nothing OrElse dtOdp.Rows.Count = 0 Then Return False
-
                 If dtOdp.Columns.Contains("PED_PEDIDO") Then
                     Dim pedId As Integer = Convert.ToInt32(dtOdp.Rows(0)("PED_PEDIDO"))
-                    Dim dtDetalle As DataTable = DetallePedidoService.ListarPorPedido(pedId)
-                    If dtDetalle IsNot Nothing Then
-                        For Each row As DataRow In dtDetalle.Rows
+                    Dim dtDet As DataTable = DetallePedidoService.ListarPorPedido(pedId)
+                    If dtDet IsNot Nothing Then
+                        For Each row As DataRow In dtDet.Rows
                             Dim cantRecibida As Integer = 0
                             If Not IsDBNull(row("DETPE_CANTIDAD_RECIBIDA")) Then
                                 cantRecibida = Convert.ToInt32(row("DETPE_CANTIDAD_RECIBIDA"))
@@ -113,6 +106,20 @@ Namespace Modules.ComprasProveedor
             End Try
         End Function
 
+        Private Sub ScrollAPanel(control As System.Web.UI.Control)
+            Dim clientId As String = control.ClientID
+            Dim script As String =
+                "setTimeout(function(){" &
+                "  var el = document.getElementById('" & clientId & "');" &
+                "  if(el){" &
+                "    el.setAttribute('tabindex','-1');" &
+                "    el.focus({preventScroll:true});" &
+                "    el.scrollIntoView({behavior:'smooth',block:'start'});" &
+                "  }" &
+                "}, 200);"
+            Page.ClientScript.RegisterStartupScript(Me.GetType(), "scrollTo_" & clientId, script, True)
+        End Sub
+
         ' =============================================
         ' BOTONES PRINCIPALES
         ' =============================================
@@ -121,6 +128,7 @@ Namespace Modules.ComprasProveedor
             pnlFormCabecera.Visible = True
             txtBuscarPedido.Text = ""
             If ddlProveedor.Items.Count > 0 Then ddlProveedor.SelectedIndex = 0
+            ScrollAPanel(pnlFormCabecera)
         End Sub
 
         Protected Sub btnCancelar_Click(sender As Object, e As EventArgs)
@@ -158,55 +166,59 @@ Namespace Modules.ComprasProveedor
                     MostrarMsg("Debes seleccionar un pedido antes de confirmar la orden.", True) : Exit Sub
                 End If
 
-                Dim siguiente As Integer = OrdenCompraService.SiguienteNumero()
-                Dim orcKey As String = "OC-" & siguiente.ToString()
-                Dim codigo As String = "COD-" & siguiente.ToString()
+                Dim pedId As Integer = Convert.ToInt32(hfPedidoVinculado.Value)
 
-                OrdenCompraService.Crear(orcKey, codigo, provId, 0)
+                ' Paso 1: validar precios ANTES de crear nada en Oracle
+                If pedId > 0 Then
+                    Dim itemsFaltantes As New List(Of String)
+                    For Each row As GridViewRow In gvItemsPedido.Rows
+                        Dim txtPrecio As TextBox = CType(row.FindControl("txtPrecioItem"), TextBox)
+                        Dim hfProd As HiddenField = CType(row.FindControl("hfProducto"), HiddenField)
+                        If txtPrecio Is Nothing Then Continue For
+                        Dim precio As Decimal = 0
+                        If Not Decimal.TryParse(txtPrecio.Text.Trim().Replace(",", "."),
+                                                System.Globalization.NumberStyles.Any,
+                                                System.Globalization.CultureInfo.InvariantCulture,
+                                                precio) OrElse precio <= 0 Then
+                            Dim nombreProd As String = If(hfProd IsNot Nothing AndAlso
+                                                          Not String.IsNullOrEmpty(hfProd.Value),
+                                                          hfProd.Value, "Item " & (row.RowIndex + 1).ToString())
+                            itemsFaltantes.Add(nombreProd)
+                        End If
+                    Next
+                    If itemsFaltantes.Count > 0 Then
+                        MostrarMsg("Debes ingresar un precio valido (mayor a 0) para todos los productos. " &
+                                   "Falta precio en: " & String.Join(", ", itemsFaltantes) & ".", True)
+                        Exit Sub
+                    End If
+                End If
+
+                ' Paso 2: validacion superada — crear la orden en Oracle
+                Dim orcKey As String = OrdenCompraService.Crear(Convert.ToInt32(provId), 0)
+                If String.IsNullOrEmpty(orcKey) Then
+                    MostrarMsg("No se pudo obtener el identificador de la orden. Intenta de nuevo.", True)
+                    Exit Sub
+                End If
                 hfKey.Value = orcKey
 
-                Dim pedId As Integer = Convert.ToInt32(hfPedidoVinculado.Value)
-                Dim itemsInsertados As Integer = 0
-                Dim itemsSinPrecio As Integer = 0
-
+                ' Paso 3: insertar items
                 If pedId > 0 Then
                     For Each row As GridViewRow In gvItemsPedido.Rows
                         Dim txtPrecio As TextBox = CType(row.FindControl("txtPrecioItem"), TextBox)
                         Dim hfMat As HiddenField = CType(row.FindControl("hfMaterial"), HiddenField)
                         Dim hfProd As HiddenField = CType(row.FindControl("hfProducto"), HiddenField)
                         Dim hfCant As HiddenField = CType(row.FindControl("hfCantidad"), HiddenField)
-
                         If txtPrecio Is Nothing OrElse hfMat Is Nothing OrElse
                            hfProd Is Nothing OrElse hfCant Is Nothing Then Continue For
-
                         Dim precio As Decimal = 0
                         Dim cantidad As Integer = 0
-                        Dim material As String = hfMat.Value
-                        Dim producto As String = hfProd.Value
-
-                        If Not Decimal.TryParse(txtPrecio.Text.Trim().Replace(",", "."),
-                                                System.Globalization.NumberStyles.Any,
-                                                System.Globalization.CultureInfo.InvariantCulture,
-                                                precio) OrElse precio <= 0 Then
-                            itemsSinPrecio += 1
-                            Continue For
-                        End If
-
+                        Decimal.TryParse(txtPrecio.Text.Trim().Replace(",", "."),
+                                         System.Globalization.NumberStyles.Any,
+                                         System.Globalization.CultureInfo.InvariantCulture, precio)
                         Integer.TryParse(hfCant.Value, cantidad)
                         If cantidad <= 0 Then cantidad = 1
-
-                        OrdenDetallePedidoService.Insertar(orcKey, pedId, material, producto, precio, cantidad)
-                        itemsInsertados += 1
+                        OrdenDetallePedidoService.Insertar(orcKey, pedId, hfMat.Value, hfProd.Value, precio, cantidad)
                     Next
-
-                    If itemsSinPrecio > 0 AndAlso itemsInsertados = 0 Then
-                        MostrarMsg("Debes ingresar el precio para al menos un item antes de confirmar.", True)
-                        OrdenCompraService.Eliminar(orcKey)
-                        Exit Sub
-                    ElseIf itemsSinPrecio > 0 Then
-                        MostrarMsg(itemsInsertados & " item(s) insertados. " &
-                                   itemsSinPrecio & " item(s) sin precio fueron omitidos.", False)
-                    End If
                 End If
 
                 ActualizarTotalOrden(orcKey)
@@ -220,6 +232,7 @@ Namespace Modules.ComprasProveedor
                 hfPedidoVinculado.Value = "0"
                 CargarOrdenes()
                 CargarDetalle(orcKey)
+                ScrollAPanel(pnlDetalleOrden)
 
                 If String.IsNullOrEmpty(lblMsg.Text) OrElse Not pnlMsg.Visible Then
                     MostrarMsg("Orden " & orcKey & " creada correctamente.", False)
@@ -233,12 +246,12 @@ Namespace Modules.ComprasProveedor
         ' BUSCAR PEDIDOS
         ' =============================================
         Protected Sub btnBuscarPedido_Click(sender As Object, e As EventArgs)
-            Dim texto As String = txtBuscarPedido.Text.Trim()
-            Dim dt As DataTable = OrdenCompraService.BuscarPedidos(texto)
+            Dim dt As DataTable = OrdenCompraService.BuscarPedidos(txtBuscarPedido.Text.Trim())
             gvBuscarPedidos.DataSource = dt
             gvBuscarPedidos.DataBind()
             pnlResultadosPedidos.Visible = True
             pnlItemsPedido.Visible = False
+            ScrollAPanel(pnlResultadosPedidos)
         End Sub
 
         Protected Sub gvBuscarPedidos_RowDataBound(sender As Object, e As GridViewRowEventArgs)
@@ -247,30 +260,22 @@ Namespace Modules.ComprasProveedor
 
                 Dim gvSub As GridView = CType(e.Row.FindControl("gvSubItemsBuscar"), GridView)
                 If gvSub IsNot Nothing Then
-                    Dim dtSub As DataTable = OrdenCompraService.DetallesPedido(pedId)
-                    gvSub.DataSource = dtSub
+                    gvSub.DataSource = OrdenCompraService.DetallesPedido(pedId)
                     gvSub.DataBind()
                 End If
 
-                Dim lnkSeleccionar As System.Web.UI.WebControls.LinkButton =
+                Dim lnkSel As System.Web.UI.WebControls.LinkButton =
                     CType(e.Row.FindControl("lnkSeleccionar"), System.Web.UI.WebControls.LinkButton)
 
-                If lnkSeleccionar IsNot Nothing AndAlso PedidoYaAsignado(pedId) Then
-                    lnkSeleccionar.Enabled = False
-                    lnkSeleccionar.Text = "&#128274; Ya asignado"
-                    lnkSeleccionar.CssClass = "btn-disabled-t"
-                    lnkSeleccionar.ToolTip = "Este pedido ya fue asignado a una Orden de Compra."
+                If lnkSel IsNot Nothing AndAlso PedidoYaAsignado(pedId) Then
+                    lnkSel.Enabled = False
+                    lnkSel.Text = "&#128274; Ya asignado"
+                    lnkSel.CssClass = "btn-disabled-t"
+                    lnkSel.ToolTip = "Este pedido ya fue asignado a una Orden de Compra."
                 End If
             End If
         End Sub
 
-        ''' <summary>
-        ''' Al seleccionar un pedido el CommandArgument trae tres partes:
-        '''   PED_PEDIDO | PED_CODIGO | PED_FORMA_PAGO
-        ''' La forma de pago viene directamente de Oracle (ORC_BUSCAR_PEDIDOS
-        ''' incluye ped_forma_pago). Se guarda en hfFormaPago y se muestra en
-        ''' lblFormaPagoPedido sin ningun valor hardcodeado.
-        ''' </summary>
         Protected Sub gvBuscarPedidos_RowCommand(sender As Object, e As GridViewCommandEventArgs)
             If e.CommandName = "VerItemsPedido" Then
                 Dim partes As String() = e.CommandArgument.ToString().Split("|")
@@ -283,19 +288,18 @@ Namespace Modules.ComprasProveedor
                     Exit Sub
                 End If
 
-                Dim dt As DataTable = OrdenCompraService.DetallesPedido(pedId)
-
                 hfPedidoVinculado.Value = pedId.ToString()
-                hfFormaPago.Value = pedFP          ' persiste entre postbacks
+                hfFormaPago.Value = pedFP
                 lblPedidoId.Text = pedId.ToString()
                 lblPedidoCodigo.Text = pedCod
                 lblFormaPagoPedido.Text = If(pedFP <> "", pedFP, "—")
 
-                gvItemsPedido.DataSource = dt
+                gvItemsPedido.DataSource = OrdenCompraService.DetallesPedido(pedId)
                 gvItemsPedido.DataBind()
                 pnlItemsPedido.Visible = True
                 pnlResultadosPedidos.Visible = False
                 txtBuscarPedido.Text = ""
+                ScrollAPanel(pnlItemsPedido)
             End If
         End Sub
 
@@ -309,7 +313,6 @@ Namespace Modules.ComprasProveedor
                 End Try
                 hfKey.Value = ""
             End If
-
             hfPedidoVinculado.Value = "0"
             hfFormaPago.Value = ""
             lblFormaPagoPedido.Text = ""
@@ -328,6 +331,7 @@ Namespace Modules.ComprasProveedor
                 pnlFormCabecera.Visible = False
                 gvItemsOrden.EditIndex = -1
                 CargarDetalle(orcKey)
+                ScrollAPanel(pnlDetalleOrden)
             End If
         End Sub
 
@@ -418,40 +422,6 @@ Namespace Modules.ComprasProveedor
             Catch ex As Exception
                 MostrarMsg("Error al guardar: " & ex.Message, True)
             End Try
-        End Sub
-
-        Protected Sub gvItemsOrden_RowCommand(sender As Object, e As GridViewCommandEventArgs)
-            If e.CommandName = "BorrarItem" Then
-                Try
-                    OrdenDetallePedidoService.Eliminar(Convert.ToInt32(e.CommandArgument))
-
-                    Dim dtRestantes As DataTable = OrdenDetallePedidoService.ListarPorOrden(hfOrdenActiva.Value)
-
-                    If dtRestantes Is Nothing OrElse dtRestantes.Rows.Count = 0 Then
-                        Dim orcKeyEliminada As String = hfOrdenActiva.Value
-                        Try
-                            OrdenCompraService.Eliminar(orcKeyEliminada)
-                        Catch exFk As Exception
-                            CerrarTodosLosPaneles()
-                            CargarOrdenes()
-                            MostrarMsg("Item eliminado. La orden quedo sin items pero no se pudo eliminar " &
-                                       "automaticamente porque tiene facturas o reclamos vinculados.", True)
-                            Exit Sub
-                        End Try
-                        CargarOrdenes()
-                        CerrarTodosLosPaneles()
-                        MostrarMsg("Se elimino el ultimo item. La Orden de Compra " &
-                                   orcKeyEliminada & " fue eliminada automaticamente.", False)
-                    Else
-                        ActualizarTotalOrden(hfOrdenActiva.Value)
-                        CargarDetalle(hfOrdenActiva.Value)
-                        CargarOrdenes()
-                        MostrarMsg("Item eliminado correctamente.", False)
-                    End If
-                Catch ex As Exception
-                    MostrarMsg("Error: " & ex.Message, True)
-                End Try
-            End If
         End Sub
 
         ' =============================================

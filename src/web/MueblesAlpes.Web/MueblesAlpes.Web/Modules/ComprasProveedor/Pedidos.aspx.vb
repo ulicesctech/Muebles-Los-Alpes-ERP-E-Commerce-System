@@ -27,11 +27,6 @@ Namespace Modules.ComprasProveedor
         ' HELPERS
         ' =============================================
 
-        ''' <summary>
-        ''' Devuelve True si el pedido ya tiene al menos un item en BOD_ORDEN_DETALLE_PEDIDO,
-        ''' lo que indica que fue vinculado a una Orden de Compra.
-        ''' Cuando esto es True, solo se permite registrar cantidades recibidas.
-        ''' </summary>
         Private Function PedidoTieneOrdenCompra(pedidoId As Integer) As Boolean
             Try
                 Dim dt As DataTable = OrdenDetallePedidoService.BuscarPorPedido(pedidoId)
@@ -41,11 +36,6 @@ Namespace Modules.ComprasProveedor
             End Try
         End Function
 
-        ''' <summary>
-        ''' Carga las formas de pago desde Oracle (PKG_CP_BOD_PEDIDO.PED_LISTAR_FORMAS_PAGO).
-        ''' Alimenta tanto ddlFormaPago (nuevo pedido) como ddlCabeceraFormaPago (edicion).
-        ''' Nunca se hardcodea CONTADO/CREDITO en el VB.
-        ''' </summary>
         Private Sub CargarFormasPago()
             Try
                 Dim dt As DataTable = PedidoService.ListarFormasPago()
@@ -76,14 +66,22 @@ Namespace Modules.ComprasProveedor
             ddlProducto.Items.Insert(0, New System.Web.UI.WebControls.ListItem("-- Seleccione producto --", ""))
         End Sub
 
+        ''' <summary>
+        ''' Carga los detalles del pedido en gvDetalles y aplica restricciones de OC.
+        ''' NO resetea EditIndex: cada evento (RowEditing, RowUpdating, etc.) lo maneja
+        ''' por su cuenta antes de llamar a este metodo.
+        ''' </summary>
         Private Sub CargarDetallesPedido(pedidoId As Integer)
-            gvDetalles.EditIndex = -1
+            ' *** CAMBIO CLAVE: se elimino "gvDetalles.EditIndex = -1" de aqui.
+            ' Antes ese reset cancelaba el modo edicion cada vez que se llamaba
+            ' CargarDetallesPedido, incluyendo cuando lo llamaba gvDetalles_RowEditing.
+            ' Ahora solo los eventos que quieren salir del modo edicion lo hacen
+            ' explicitamente con "gvDetalles.EditIndex = -1" antes de llamar a este metodo.
             Dim dt As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
             gvDetalles.DataSource = dt
             gvDetalles.DataBind()
             RecalcularTotal(dt, pedidoId)
 
-            ' Si el pedido ya tiene OC: bloquear controles de edicion de cabecera
             Dim tieneOC As Boolean = PedidoTieneOrdenCompra(pedidoId)
             ddlCabeceraFormaPago.Enabled = Not tieneOC
             btnGuardarCabecera.Enabled = Not tieneOC
@@ -127,6 +125,20 @@ Namespace Modules.ComprasProveedor
             pnlMsg.Visible = True
         End Sub
 
+        Private Sub ScrollAPanel(control As System.Web.UI.Control)
+            Dim clientId As String = control.ClientID
+            Dim script As String =
+                "setTimeout(function(){" &
+                "  var el = document.getElementById('" & clientId & "');" &
+                "  if(el){" &
+                "    el.setAttribute('tabindex','-1');" &
+                "    el.focus({preventScroll:true});" &
+                "    el.scrollIntoView({behavior:'smooth',block:'start'});" &
+                "  }" &
+                "}, 200);"
+            Page.ClientScript.RegisterStartupScript(Me.GetType(), "scrollTo_" & clientId, script, True)
+        End Sub
+
         ' =============================================
         ' NUEVO PEDIDO
         ' =============================================
@@ -136,6 +148,7 @@ Namespace Modules.ComprasProveedor
             pnlDetalleContenedor.Visible = False
             pnlMsg.Visible = False
             If ddlFormaPago.Items.Count > 0 Then ddlFormaPago.SelectedIndex = 0
+            ScrollAPanel(pnlFormCabecera)
         End Sub
 
         Protected Sub btnCancelarForm_Click(sender As Object, e As EventArgs)
@@ -143,10 +156,6 @@ Namespace Modules.ComprasProveedor
             pnlMsg.Visible = False
         End Sub
 
-        ''' <summary>
-        ''' Guarda cambios en la cabecera del pedido (forma de pago).
-        ''' BLOQUEADO si el pedido ya tiene una Orden de Compra asociada.
-        ''' </summary>
         Protected Sub btnGuardarCabecera_Click(sender As Object, e As EventArgs)
             Try
                 Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
@@ -178,9 +187,7 @@ Namespace Modules.ComprasProveedor
                     MostrarMensaje("Selecciona una forma de pago.", True) : Exit Sub
                 End If
 
-                Dim nuevoId As Decimal = PedidoService.Crear("TEMP", formaPago, 0)
-                Dim codigoAuto As String = "PED-" & nuevoId.ToString()
-                PedidoService.Actualizar(nuevoId, codigoAuto, formaPago, 0)
+                Dim nuevoId As Decimal = PedidoService.Crear(formaPago, 0)
 
                 hfPedidoActivo.Value = nuevoId.ToString()
                 lblIdSeleccionado.Text = nuevoId.ToString()
@@ -190,7 +197,10 @@ Namespace Modules.ComprasProveedor
                 pnlFormCabecera.Visible = False
                 pnlDetalleContenedor.Visible = True
                 CargarPedidos()
-                MostrarMensaje("Pedido " & codigoAuto & " creado correctamente. Agrega al menos un producto antes de finalizar.", False)
+                ScrollAPanel(pnlDetalleContenedor)
+
+                Dim codigoGenerado As String = lblCabeceraCode.Text
+                MostrarMensaje("Pedido " & codigoGenerado & " creado correctamente. Agrega al menos un producto antes de finalizar.", False)
             Catch ex As Exception
                 MostrarMensaje("Error: " & ex.Message, True)
             End Try
@@ -254,13 +264,14 @@ Namespace Modules.ComprasProveedor
                 hfPedidoActivo.Value = pedidoId.ToString()
                 hfDetalleRecibir.Value = "0"
                 lblIdSeleccionado.Text = pedidoId.ToString()
+                gvDetalles.EditIndex = -1
                 CargarProductosDropDown()
-                CargarDetallesPedido(pedidoId)   ' <-- ya bloquea controles si tiene OC
+                CargarDetallesPedido(pedidoId)
                 CargarInfoCabecera(pedidoId)
                 pnlDetalleContenedor.Visible = True
                 pnlFormCabecera.Visible = False
+                ScrollAPanel(pnlDetalleContenedor)
 
-                ' Informar al usuario si el pedido esta bloqueado por OC
                 If PedidoTieneOrdenCompra(pedidoId) Then
                     MostrarMensaje("Este pedido tiene una Orden de Compra asociada. Solo puedes registrar cantidades recibidas.", False)
                 End If
@@ -288,7 +299,6 @@ Namespace Modules.ComprasProveedor
 
         ' =============================================
         ' AGREGAR PRODUCTO
-        ' BLOQUEADO si el pedido tiene OC asociada
         ' =============================================
         Protected Sub btnAgregarItem_Click(sender As Object, e As EventArgs)
             Try
@@ -323,6 +333,7 @@ Namespace Modules.ComprasProveedor
 
                 txtCantSolicitada.Text = ""
                 ddlProducto.SelectedIndex = 0
+                gvDetalles.EditIndex = -1
                 CargarDetallesPedido(pedidoId)
                 CargarPedidos()
                 MostrarMensaje("Producto agregado correctamente.", False)
@@ -338,7 +349,6 @@ Namespace Modules.ComprasProveedor
             Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
 
             If e.CommandName = "BorrarItem" Then
-                ' BLOQUEADO si el pedido tiene OC asociada
                 If PedidoTieneOrdenCompra(pedidoId) Then
                     MostrarMensaje("No se puede eliminar productos porque este pedido ya tiene una Orden de Compra asociada.", True)
                     Exit Sub
@@ -346,6 +356,7 @@ Namespace Modules.ComprasProveedor
                 Try
                     DetallePedidoService.Eliminar(Convert.ToInt32(e.CommandArgument))
                     hfDetalleRecibir.Value = "0"
+                    gvDetalles.EditIndex = -1
                     CargarDetallesPedido(pedidoId)
                     CargarPedidos()
                     MostrarMensaje("Producto eliminado correctamente.", False)
@@ -357,9 +368,11 @@ Namespace Modules.ComprasProveedor
                 hfDetalleRecibir.Value = e.CommandArgument.ToString()
                 gvDetalles.EditIndex = -1
                 CargarDetallesPedido(pedidoId)
+                ScrollAPanel(pnlDetalleContenedor)
 
             ElseIf e.CommandName = "CancelarRecibido" Then
                 hfDetalleRecibir.Value = "0"
+                gvDetalles.EditIndex = -1
                 CargarDetallesPedido(pedidoId)
 
             ElseIf e.CommandName = "ConfirmarRecibido" Then
@@ -395,6 +408,7 @@ Namespace Modules.ComprasProveedor
                     If dtOrdenes Is Nothing OrElse dtOrdenes.Rows.Count = 0 Then
                         MostrarMensaje("Este pedido no tiene una Orden de Compra asociada. Vinculala primero.", True)
                         hfDetalleRecibir.Value = "0"
+                        gvDetalles.EditIndex = -1
                         CargarDetallesPedido(pedidoId)
                         Exit Sub
                     End If
@@ -411,7 +425,7 @@ Namespace Modules.ComprasProveedor
                     End If
 
                     Dim filtro As String = "TRIM(ODP_MATERIAL) = '" & materialItem.Replace("'", "''") & "'" &
-                                             " AND TRIM(ODP_PRODUCTO) = '" & productoItem.Replace("'", "''") & "'"
+                                           " AND TRIM(ODP_PRODUCTO) = '" & productoItem.Replace("'", "''") & "'"
                     Dim filasODP = dtOrdenes.Select(filtro)
                     Dim precioODP As Decimal = 0
                     If filasODP.Length > 0 Then
@@ -443,7 +457,6 @@ Namespace Modules.ComprasProveedor
             If e.Row.RowType = DataControlRowType.DataRow Then
                 Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
 
-                ' Mostrar/ocultar panel Recibir segun el item activo
                 Dim detalleActivo As Integer = 0
                 Integer.TryParse(hfDetalleRecibir.Value, detalleActivo)
                 If detalleActivo > 0 Then
@@ -452,8 +465,6 @@ Namespace Modules.ComprasProveedor
                     If pnl IsNot Nothing Then pnl.Visible = (detalleId = detalleActivo)
                 End If
 
-                ' Si el pedido tiene OC: ocultar botones Editar y Eliminar,
-                ' dejar solo el boton Recibido
                 If PedidoTieneOrdenCompra(pedidoId) Then
                     Dim lnkEditar As System.Web.UI.WebControls.LinkButton =
                         CType(e.Row.FindControl("btnEditarItem"), System.Web.UI.WebControls.LinkButton)
@@ -487,7 +498,6 @@ Namespace Modules.ComprasProveedor
                 Dim detalleId As Integer = Convert.ToInt32(gvDetalles.DataKeys(e.RowIndex).Value)
                 Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
 
-                ' Doble verificacion por si el boton llega por postback directo
                 If PedidoTieneOrdenCompra(pedidoId) Then
                     MostrarMensaje("No se puede editar la cantidad porque este pedido ya tiene una Orden de Compra asociada.", True)
                     gvDetalles.EditIndex = -1

@@ -4,36 +4,35 @@ Imports Oracle.ManagedDataAccess.Client
 
 ' ============================================================
 ' RUTA: App_Code/Services/ComprasProveedor/OrdenCompraService.vb
+' Package: PKG_CP_BOD_ORDEN_COMPRA
 ' ============================================================
 Public Class OrdenCompraService
 
     Private Shared ReadOnly PKG As String = "PKG_CP_BOD_ORDEN_COMPRA"
 
     ''' <summary>
-    ''' Consulta el siguiente numero disponible para la orden desde Oracle.
-    ''' Extrae el numero del campo orc_orden_compra con formato OC-N
-    ''' y devuelve MAX(N) + 1. Si no hay registros devuelve 1.
+    ''' Crea una orden de compra.
+    ''' El key (orc_orden_compra) y el codigo (orc_codigo) los genera Oracle
+    ''' internamente con los prefijos C_PREFIJO_ORC y C_PREFIJO_COD del package body.
+    ''' Devuelve el key generado para usarlo en los inserts de detalle.
+    ''' Para cambiar los prefijos edita esas constantes en Oracle; nada cambia aqui.
     ''' </summary>
-    Public Shared Function SiguienteNumero() As Integer
-        Dim pNum As New OracleParameter("p_numero", OracleDbType.Decimal)
-        pNum.Direction = ParameterDirection.Output
+    Public Shared Function Crear(provId As Integer, total As Decimal) As String
+        Dim pKey As New OracleParameter("p_orc_key_out", OracleDbType.Varchar2, 50)
+        pKey.Direction = ParameterDirection.Output
 
-        Dim ps As New List(Of OracleParameter) From {pNum}
-        OracleDb.ExecNonQuery(PKG & ".ORC_SIGUIENTE_NUMERO", ps)
-
-        If pNum.Value Is Nothing OrElse IsDBNull(pNum.Value) Then Return 1
-        Return Convert.ToInt32(pNum.Value.ToString())
-    End Function
-
-    Public Shared Sub Crear(orcKey As String, codigo As String, provId As Integer, total As Decimal)
         Dim ps As New List(Of OracleParameter) From {
-            New OracleParameter("p_orc_key", OracleDbType.Varchar2, orcKey, ParameterDirection.Input),
-            New OracleParameter("p_codigo", OracleDbType.Varchar2, codigo, ParameterDirection.Input),
             New OracleParameter("p_prov_id", OracleDbType.Decimal, provId, ParameterDirection.Input),
-            New OracleParameter("p_total", OracleDbType.Decimal, total, ParameterDirection.Input)
+            New OracleParameter("p_total", OracleDbType.Decimal, total, ParameterDirection.Input),
+            pKey
         }
         OracleDb.ExecNonQuery(PKG & ".ORC_CREAR", ps)
-    End Sub
+
+        If pKey.Value IsNot Nothing AndAlso Not IsDBNull(pKey.Value) Then
+            Return pKey.Value.ToString()
+        End If
+        Return String.Empty
+    End Function
 
     Public Shared Sub Actualizar(orcKey As String, codigo As String, provId As Integer, total As Decimal)
         Dim ps As New List(Of OracleParameter) From {
