@@ -12,7 +12,25 @@ Option Explicit On
 
 Namespace Modules.Cliente
 
-    Partial Public Class Registro
+    Partial Public Class MiPerfil
+
+        '''<summary>
+        '''pnlNoLogin control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents pnlNoLogin As Global.System.Web.UI.WebControls.Panel
+
+        '''<summary>
+        '''pnlPerfil control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents pnlPerfil As Global.System.Web.UI.WebControls.Panel
 
         '''<summary>
         '''pnlMsg control.
@@ -33,42 +51,6 @@ Namespace Modules.Cliente
         Protected WithEvents lblMsg As Global.System.Web.UI.WebControls.Label
 
         '''<summary>
-        '''txtPNombre control.
-        '''</summary>
-        '''<remarks>
-        '''Auto-generated field.
-        '''To modify move field declaration from designer file to code-behind file.
-        '''</remarks>
-        Protected WithEvents txtPNombre As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
-        '''txtSNombre control.
-        '''</summary>
-        '''<remarks>
-        '''Auto-generated field.
-        '''To modify move field declaration from designer file to code-behind file.
-        '''</remarks>
-        Protected WithEvents txtSNombre As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
-        '''txtPApellido control.
-        '''</summary>
-        '''<remarks>
-        '''Auto-generated field.
-        '''To modify move field declaration from designer file to code-behind file.
-        '''</remarks>
-        Protected WithEvents txtPApellido As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
-        '''txtSApellido control.
-        '''</summary>
-        '''<remarks>
-        '''Auto-generated field.
-        '''To modify move field declaration from designer file to code-behind file.
-        '''</remarks>
-        Protected WithEvents txtSApellido As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
         '''ddlTipoDoc control.
         '''</summary>
         '''<remarks>
@@ -87,6 +69,69 @@ Namespace Modules.Cliente
         Protected WithEvents txtNumDoc As Global.System.Web.UI.WebControls.TextBox
 
         '''<summary>
+        '''txtNit control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents txtNit As Global.System.Web.UI.WebControls.TextBox
+
+        '''<summary>
+        '''txtPrimerNombre control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents txtPrimerNombre As Global.System.Web.UI.WebControls.TextBox
+
+        '''<summary>
+        '''txtSegundoNombre control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents txtSegundoNombre As Global.System.Web.UI.WebControls.TextBox
+
+        '''<summary>
+        '''txtPrimerApellido control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents txtPrimerApellido As Global.System.Web.UI.WebControls.TextBox
+
+        '''<summary>
+        '''txtSegundoApellido control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents txtSegundoApellido As Global.System.Web.UI.WebControls.TextBox
+
+        '''<summary>
+        '''txtEmail control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents txtEmail As Global.System.Web.UI.WebControls.TextBox
+
+        '''<summary>
+        '''txtProfesion control.
+        '''</summary>
+        '''<remarks>
+        '''Auto-generated field.
+        '''To modify move field declaration from designer file to code-behind file.
+        '''</remarks>
+        Protected WithEvents txtProfesion As Global.System.Web.UI.WebControls.TextBox
+
+        '''<summary>
         '''txtTel1 control.
         '''</summary>
         '''<remarks>
@@ -103,24 +148,6 @@ Namespace Modules.Cliente
         '''To modify move field declaration from designer file to code-behind file.
         '''</remarks>
         Protected WithEvents txtTel2 As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
-        '''txtProfesion control.
-        '''</summary>
-        '''<remarks>
-        '''Auto-generated field.
-        '''To modify move field declaration from designer file to code-behind file.
-        '''</remarks>
-        Protected WithEvents txtProfesion As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
-        '''ddlTipoCliente control.
-        '''</summary>
-        '''<remarks>
-        '''Auto-generated field.
-        '''To modify move field declaration from designer file to code-behind file.
-        '''</remarks>
-        Protected WithEvents ddlTipoCliente As Global.System.Web.UI.WebControls.DropDownList
 
         '''<summary>
         '''txtPais control.
@@ -159,13 +186,13 @@ Namespace Modules.Cliente
         Protected WithEvents txtZona As Global.System.Web.UI.WebControls.TextBox
 
         '''<summary>
-        '''txtCP control.
+        '''txtCodigoPostal control.
         '''</summary>
         '''<remarks>
         '''Auto-generated field.
         '''To modify move field declaration from designer file to code-behind file.
         '''</remarks>
-        Protected WithEvents txtCP As Global.System.Web.UI.WebControls.TextBox
+        Protected WithEvents txtCodigoPostal As Global.System.Web.UI.WebControls.TextBox
 
         '''<summary>
         '''txtDireccion control.
@@ -177,30 +204,12 @@ Namespace Modules.Cliente
         Protected WithEvents txtDireccion As Global.System.Web.UI.WebControls.TextBox
 
         '''<summary>
-        '''txtEmail control.
+        '''btnGuardar control.
         '''</summary>
         '''<remarks>
         '''Auto-generated field.
         '''To modify move field declaration from designer file to code-behind file.
         '''</remarks>
-        Protected WithEvents txtEmail As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
-        '''txtPassword control.
-        '''</summary>
-        '''<remarks>
-        '''Auto-generated field.
-        '''To modify move field declaration from designer file to code-behind file.
-        '''</remarks>
-        Protected WithEvents txtPassword As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
-        '''btnRegistrar control.
-        '''</summary>
-        '''<remarks>
-        '''Auto-generated field.
-        '''To modify move field declaration from designer file to code-behind file.
-        '''</remarks>
-        Protected WithEvents btnRegistrar As Global.System.Web.UI.WebControls.Button
+        Protected WithEvents btnGuardar As Global.System.Web.UI.WebControls.Button
     End Class
 End Namespace

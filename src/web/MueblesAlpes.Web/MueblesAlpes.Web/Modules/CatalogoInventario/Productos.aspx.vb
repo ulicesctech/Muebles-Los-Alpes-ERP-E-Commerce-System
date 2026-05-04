@@ -136,20 +136,20 @@ Namespace Modules.CatalogoInventario
             Select Case e.CommandName
                 Case "Editar"
                     Try
-                        Dim dt As DataTable = ProductoService.Listar()
-                        Dim fila As DataRow() = dt.Select("PRO_REFERENCIA = '" & ref.Replace("'", "''") & "'")
-                        If fila.Length > 0 Then
+                        Dim dt As DataTable = ProductoService.Obtener(ref)
+                        If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
+                            Dim fila As DataRow = dt.Rows(0)
                             hfReferencia.Value = ref : hfModo.Value = "E"
                             txtReferencia.Text = ref : txtReferencia.Enabled = False
-                            txtNombre.Text = fila(0)("PRO_NOMBRE").ToString()
-                            txtDescripcion.Text = fila(0)("PRO_DESCRIPCION").ToString()
-                            txtColor.Text = fila(0)("PRO_COLOR").ToString()
-                            txtPeso.Text = fila(0)("PRO_PESO").ToString()
-                            txtAlto.Text = fila(0)("PRO_ALTO_CM").ToString()
-                            txtAncho.Text = fila(0)("PRO_ANCHO_CM").ToString()
-                            txtProfundidad.Text = fila(0)("PRO_PROFUNDIDAD_CM").ToString()
-                            ddlMaterial.SelectedValue = fila(0)("MAT_MATERIAL").ToString()
-                            Dim tipId As String = fila(0)("TIP_TIPO").ToString()
+                            txtNombre.Text = fila("PRO_NOMBRE").ToString()
+                            txtDescripcion.Text = If(fila("PRO_DESCRIPCION") Is DBNull.Value, "", fila("PRO_DESCRIPCION").ToString())
+                            txtColor.Text = If(fila("PRO_COLOR") Is DBNull.Value, "", fila("PRO_COLOR").ToString())
+                            txtPeso.Text = fila("PRO_PESO").ToString()
+                            txtAlto.Text = fila("PRO_ALTO_CM").ToString()
+                            txtAncho.Text = fila("PRO_ANCHO_CM").ToString()
+                            txtProfundidad.Text = fila("PRO_PROFUNDIDAD_CM").ToString()
+                            ddlMaterial.SelectedValue = fila("MAT_MATERIAL").ToString()
+                            Dim tipId As String = fila("TIP_TIPO").ToString()
                             Dim dtTipo As DataTable = TipoService.Listar()
                             Dim filaT As DataRow() = dtTipo.Select("TIP_TIPO = " & tipId)
                             If filaT.Length > 0 Then
@@ -166,6 +166,7 @@ Namespace Modules.CatalogoInventario
                     Catch ex As Exception
                         MostrarError("Error al cargar: " & ex.Message)
                     End Try
+
                 Case "Eliminar"
                     Try
                         ProductoService.Eliminar(ref)

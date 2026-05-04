@@ -47,7 +47,7 @@ Namespace Modules.ComprasProveedor
         Private Sub RecalcularYActualizarTotal(dt As DataTable, pedidoId As Integer)
             Dim total As Decimal = 0
             For Each row As DataRow In dt.Rows
-                total += Convert.ToDecimal(row("DETPE_CANTIDAD_SOLICITADA")) * Convert.ToDecimal(row("DETPE_PRECIO_UNITARIO"))
+                total += Convert.ToDecimal(row("DETPE_CANTIDAD_SOLICITADA")) * Convert.ToDecimal(row("HIP_PRECIO"))
             Next
             lblTotalDetalle.Text = total.ToString("N2")
             Dim dtPed As DataTable = PedidoService.ObtenerPorId(pedidoId)
@@ -174,14 +174,9 @@ Namespace Modules.ComprasProveedor
                 Dim pedidoId As Integer = Convert.ToInt32(hfPedidoActivo.Value)
                 Dim historialId As Integer = Convert.ToInt32(ddlProducto.SelectedValue)
                 Dim cantidad As Integer = 0
-                Dim precio As Decimal = 0
 
                 If Not Integer.TryParse(txtCantSolicitada.Text, cantidad) OrElse cantidad <= 0 Then
                     MostrarMensaje("Ingrese una cantidad valida mayor a cero.", True)
-                    Return
-                End If
-                If Not Decimal.TryParse(txtPrecioUnitario.Text.Replace(",", "."), precio) OrElse precio <= 0 Then
-                    MostrarMensaje("Ingrese un precio de compra valido mayor a cero.", True)
                     Return
                 End If
                 If historialId = 0 Then
@@ -189,9 +184,8 @@ Namespace Modules.ComprasProveedor
                     Return
                 End If
                 If pedidoId > 0 Then
-                    DetallePedidoService.Insertar(pedidoId, historialId, cantidad, precio)
+                    DetallePedidoService.Insertar(pedidoId, historialId, cantidad)
                     txtCantSolicitada.Text = ""
-                    txtPrecioUnitario.Text = ""
                     CargarDetallesPedido(pedidoId)
                     CargarPedidos()
                     MostrarMensaje("Producto agregado.", False)
@@ -233,7 +227,6 @@ Namespace Modules.ComprasProveedor
                 Dim detalleId As Integer = Convert.ToInt32(gvDetalles.DataKeys(e.RowIndex).Value)
                 Dim cantSol As Integer
                 Dim cantRec As Integer
-                Dim precio As Decimal
 
                 If Not Integer.TryParse(CType(row.FindControl("txtECantSol"), TextBox).Text, cantSol) OrElse cantSol < 0 Then
                     MostrarMensaje("Cantidad solicitada invalida.", True) : Return
@@ -241,11 +234,8 @@ Namespace Modules.ComprasProveedor
                 If Not Integer.TryParse(CType(row.FindControl("txtECantRec"), TextBox).Text, cantRec) OrElse cantRec < 0 Then
                     MostrarMensaje("Cantidad recibida invalida.", True) : Return
                 End If
-                If Not Decimal.TryParse(CType(row.FindControl("txtEPrecio"), TextBox).Text.Replace(",", "."), precio) OrElse precio < 0 Then
-                    MostrarMensaje("Precio unitario invalido.", True) : Return
-                End If
 
-                DetallePedidoService.Actualizar(detalleId, cantSol, cantRec, precio)
+                DetallePedidoService.Actualizar(detalleId, cantSol, cantRec)
                 gvDetalles.EditIndex = -1
                 CargarDetallesPedido(pedidoId)
                 CargarPedidos()

@@ -178,6 +178,8 @@
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />
     <Content Include="favicon.ico" />
+    <Content Include="Images\no-foto.png" />
+    <!-- AUTH USUARIOS -->
     <Content Include="Modules\AuthUsuarios\Admin\GrupoUsuario.aspx" />
     <Content Include="Modules\AuthUsuarios\Admin\Permisos.aspx" />
     <Content Include="Modules\AuthUsuarios\Ascensos.aspx" />
@@ -186,17 +188,11 @@
     <Content Include="Modules\AuthUsuarios\LoginCliente.aspx" />
     <Content Include="Modules\AuthUsuarios\LoginEmpleado.aspx" />
     <Content Include="Modules\AuthUsuarios\Puestos.aspx" />
+    <Content Include="Modules\AuthUsuarios\Index.aspx" />
+    <!-- CATALOGO INVENTARIO -->
     <Content Include="Modules\CatalogoInventario\Precios.aspx" />
     <Content Include="Modules\CatalogoInventario\Promociones.aspx" />
     <Content Include="Modules\CatalogoInventario\Stock.aspx" />
-    <Content Include="Modules\Cliente\Login.aspx" />
-    <Content Include="Modules\Cliente\Registro.aspx" />
-    <Content Include="Web.config" />
-    <Content Include="Bundle.config" />
-    <Content Include="Site.Master" />
-    <Content Include="Site.Mobile.Master" />
-    <Content Include="ViewSwitcher.ascx" />
-    <Content Include="Modules\AuthUsuarios\Index.aspx" />
     <Content Include="Modules\CatalogoInventario\Almacenes.aspx" />
     <Content Include="Modules\CatalogoInventario\Categorias.aspx" />
     <Content Include="Modules\CatalogoInventario\Index.aspx" />
@@ -204,27 +200,48 @@
     <Content Include="Modules\CatalogoInventario\Nichos.aspx" />
     <Content Include="Modules\CatalogoInventario\Productos.aspx" />
     <Content Include="Modules\CatalogoInventario\Tipos.aspx" />
+    <Content Include="Modules\Cliente\.gitkeep" />
+    <Content Include="Modules\Cliente\Carrito.aspx" />
+    <Content Include="Modules\Cliente\Catalogo.aspx" />
+    <Content Include="Modules\Cliente\DetalleProducto.aspx" />
+    <Content Include="Modules\Cliente\Factura.aspx" />
+    <Content Include="Modules\Cliente\Login.aspx" />
+    <Content Include="Modules\Cliente\MiPerfil.aspx" />
+    <Content Include="Modules\Cliente\MisCompras.aspx" />
+    <Content Include="Modules\Cliente\Promociones.aspx" />
+    <Content Include="Modules\Cliente\Registro.aspx" />
+    <Content Include="Modules\Cliente\Tiendas.aspx" />
+    <!-- COMPRAS PROVEEDOR -->
     <Content Include="Modules\ComprasProveedor\FacturasProveedor.aspx" />
     <Content Include="Modules\ComprasProveedor\Index.aspx" />
     <Content Include="Modules\ComprasProveedor\OrdenesCompra.aspx" />
     <Content Include="Modules\ComprasProveedor\Pedidos.aspx" />
     <Content Include="Modules\ComprasProveedor\Proveedores.aspx" />
     <Content Include="Modules\ComprasProveedor\ReclamosProveedor.aspx" />
+    <!-- VENTAS FACTURACION -->
     <Content Include="Modules\VentasFacturacion\Carrito.aspx" />
     <Content Include="Modules\VentasFacturacion\DetalleCarrito.aspx" />
     <Content Include="Modules\VentasFacturacion\Factura.aspx" />
     <Content Include="Modules\VentasFacturacion\Index.aspx" />
+    <!-- CLIENTE -->
+    <!-- MASTER / CONFIG -->
+    <Content Include="Web.config" />
+    <Content Include="Bundle.config" />
+    <Content Include="Site.Master" />
+    <Content Include="Site.Mobile.Master" />
+    <Content Include="ViewSwitcher.ascx" />
+    <!-- GITKEEP -->
     <Content Include="Modules\AuthUsuarios\.gitkeep" />
     <Content Include="Modules\CatalogoInventario\.gitkeep" />
     <Content Include="Modules\ComprasProveedor\.gitkeep" />
     <Content Include="Modules\VentasFacturacion\.gitkeep" />
-    <Content Include="Modules\Cliente\.gitkeep" />
     <Content Include="App_Code\Models\.gitkeep" />
     <Content Include="App_Code\Services\.gitkeep" />
     <Content Include="App_Code\Utils\.gitkeep" />
     <Content Include="App_Code\Common\.gitkeep" />
     <Content Include="App_Code\Data\.gitkeep" />
     <Content Include="App_Code\Services\Cliente\.gitkeep" />
+    <!-- BIN -->
     <Content Include="bin\Antlr3.Runtime.dll" />
     <Content Include="bin\Antlr3.Runtime.pdb" />
     <Content Include="bin\Microsoft.AspNet.FriendlyUrls.dll" />
@@ -304,6 +321,7 @@
     <Content Include="bin\roslyn\vbc.exe.config" />
     <Content Include="bin\roslyn\vbc.rsp" />
     <Content Include="bin\roslyn\VBCSCompiler.exe.config" />
+    <!-- CSS -->
     <Content Include="Content\Site.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
@@ -337,6 +355,7 @@
     <Content Include="Content\bootstrap-utilities.min.css.map" />
     <Content Include="Content\bootstrap-utilities.rtl.css.map" />
     <Content Include="Content\bootstrap-utilities.rtl.min.css.map" />
+    <!-- SCRIPTS -->
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.bundle.js.map" />
@@ -377,6 +396,7 @@
     <Content Include="Scripts\WebForms\MSAjax\MicrosoftAjaxTimer.js" />
     <Content Include="Scripts\WebForms\MSAjax\MicrosoftAjaxWebForms.js" />
     <Content Include="Scripts\WebForms\MSAjax\MicrosoftAjaxWebServices.js" />
+    <!-- OBJ -->
     <Content Include="obj\Debug\MueblesAlpes.Web.dll" />
     <Content Include="obj\Debug\MueblesAlpes.Web.pdb" />
     <Content Include="obj\Debug\MueblesAlpes.Web.vbproj.FileListAbsolute.txt" />
@@ -391,8 +411,11 @@
     <Content Include="obj\Release\MueblesAlpes.Web.vbproj.AssemblyReference.cache" />
   </ItemGroup>
   <ItemGroup>
-    <!-- SERVICES -->
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SERVICES                                    -->
+    <!-- ═══════════════════════════════════════════ -->
     <Compile Include="App_Code\Data\OracleDb.vb" />
+    <!-- Auth Usuarios -->
     <Compile Include="App_Code\Services\AuthUsuarios\AscensoService.vb" />
     <Compile Include="App_Code\Services\AuthUsuarios\ClienteService.vb" />
     <Compile Include="App_Code\Services\AuthUsuarios\EmpleadoService.vb" />
@@ -401,6 +424,7 @@
     <Compile Include="App_Code\Services\AuthUsuarios\LoginEmpleadoService.vb" />
     <Compile Include="App_Code\Services\AuthUsuarios\PermisoService.vb" />
     <Compile Include="App_Code\Services\AuthUsuarios\PuestoService.vb" />
+    <!-- Catalogo Inventario -->
     <Compile Include="App_Code\Services\CatalogoInventario\AlmacenService.vb" />
     <Compile Include="App_Code\Services\CatalogoInventario\CategoriaService.vb" />
     <Compile Include="App_Code\Services\CatalogoInventario\HistorialPrecioService.vb" />
@@ -411,7 +435,12 @@
     <Compile Include="App_Code\Services\CatalogoInventario\PromocionService.vb" />
     <Compile Include="App_Code\Services\CatalogoInventario\StockService.vb" />
     <Compile Include="App_Code\Services\CatalogoInventario\TipoService.vb" />
+    <!-- Cliente -->
     <Compile Include="App_Code\Services\Cliente\AuthClienteService.vb" />
+    <Compile Include="App_Code\Services\Cliente\CatalogoClienteService.vb" />
+    <Compile Include="App_Code\Services\Cliente\CarritoService.vb" />
+    <Compile Include="App_Code\Services\Cliente\FacturaClienteService.vb" />
+    <!-- Compras Proveedor -->
     <Compile Include="App_Code\Services\ComprasProveedor\DetallePedidoService.vb" />
     <Compile Include="App_Code\Services\ComprasProveedor\FacturaProveedorService.vb" />
     <Compile Include="App_Code\Services\ComprasProveedor\OrdenCompraService.vb" />
@@ -419,10 +448,14 @@
     <Compile Include="App_Code\Services\ComprasProveedor\PedidoService.vb" />
     <Compile Include="App_Code\Services\ComprasProveedor\ProveedorService.vb" />
     <Compile Include="App_Code\Services\ComprasProveedor\ReclamoProveedorService.vb" />
-    <!-- APP START -->
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- APP START                                   -->
+    <!-- ═══════════════════════════════════════════ -->
     <Compile Include="App_Start\BundleConfig.vb" />
     <Compile Include="App_Start\RouteConfig.vb" />
-    <!-- RAIZ -->
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- RAIZ                                        -->
+    <!-- ═══════════════════════════════════════════ -->
     <Compile Include="About.aspx.designer.vb">
       <DependentUpon>About.aspx</DependentUpon>
     </Compile>
@@ -446,6 +479,107 @@
     </Compile>
     <Compile Include="Global.asax.vb">
       <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Cliente\Carrito.aspx.designer.vb">
+      <DependentUpon>Carrito.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Cliente\Carrito.aspx.vb">
+      <DependentUpon>Carrito.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Cliente\Catalogo.aspx.designer.vb">
+      <DependentUpon>Catalogo.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Cliente\Catalogo.aspx.vb">
+      <DependentUpon>Catalogo.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Cliente\DetalleProducto.aspx.designer.vb">
+      <DependentUpon>DetalleProducto.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Cliente\DetalleProducto.aspx.vb">
+      <DependentUpon>DetalleProducto.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Cliente\Factura.aspx.designer.vb">
+      <DependentUpon>Factura.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Cliente\Factura.aspx.vb">
+      <DependentUpon>Factura.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Cliente\Login.aspx.designer.vb">
+      <DependentUpon>Login.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Cliente\Login.aspx.vb">
+      <DependentUpon>Login.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Cliente\MiPerfil.aspx.designer.vb">
+      <DependentUpon>MiPerfil.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Cliente\MiPerfil.aspx.vb">
+      <DependentUpon>MiPerfil.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Cliente\MisCompras.aspx.designer.vb">
+      <DependentUpon>MisCompras.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Cliente\MisCompras.aspx.vb">
+      <DependentUpon>MisCompras.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Cliente\Promociones.aspx.designer.vb">
+      <DependentUpon>Promociones.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Cliente\Promociones.aspx.vb">
+      <DependentUpon>Promociones.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Cliente\Registro.aspx.designer.vb">
+      <DependentUpon>Registro.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Cliente\Registro.aspx.vb">
+      <DependentUpon>Registro.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Cliente\Tiendas.aspx.designer.vb">
+      <DependentUpon>Tiendas.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Cliente\Tiendas.aspx.vb">
+      <DependentUpon>Tiendas.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="Site.Master.designer.vb">
+      <DependentUpon>Site.Master</DependentUpon>
+    </Compile>
+    <Compile Include="Site.Master.vb">
+      <DependentUpon>Site.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ViewSwitcher.ascx.vb">
+      <DependentUpon>ViewSwitcher.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ViewSwitcher.ascx.designer.vb">
+      <DependentUpon>ViewSwitcher.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Site.Mobile.Master.vb">
+      <DependentUpon>Site.Mobile.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Site.Mobile.Master.designer.vb">
+      <DependentUpon>Site.Mobile.Master</DependentUpon>
+    </Compile>
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- AUTH USUARIOS                               -->
+    <!-- ═══════════════════════════════════════════ -->
+    <Compile Include="Modules\AuthUsuarios\Index.aspx.designer.vb">
+      <DependentUpon>Index.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\Index.aspx.vb">
+      <DependentUpon>Index.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Modules\AuthUsuarios\Admin\GrupoUsuario.aspx.designer.vb">
       <DependentUpon>GrupoUsuario.aspx</DependentUpon>
@@ -503,69 +637,9 @@
       <DependentUpon>Puestos.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Modules\CatalogoInventario\Precios.aspx.designer.vb">
-      <DependentUpon>Precios.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Modules\CatalogoInventario\Precios.aspx.vb">
-      <DependentUpon>Precios.aspx</DependentUpon>
-      <SubType>ASPXCodebehind</SubType>
-    </Compile>
-    <Compile Include="Modules\CatalogoInventario\Promociones.aspx.designer.vb">
-      <DependentUpon>Promociones.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Modules\CatalogoInventario\Promociones.aspx.vb">
-      <DependentUpon>Promociones.aspx</DependentUpon>
-      <SubType>ASPXCodebehind</SubType>
-    </Compile>
-    <Compile Include="Modules\CatalogoInventario\Stock.aspx.designer.vb">
-      <DependentUpon>Stock.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Modules\CatalogoInventario\Stock.aspx.vb">
-      <DependentUpon>Stock.aspx</DependentUpon>
-      <SubType>ASPXCodebehind</SubType>
-    </Compile>
-    <Compile Include="Modules\Cliente\Login.aspx.designer.vb">
-      <DependentUpon>Login.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Modules\Cliente\Login.aspx.vb">
-      <DependentUpon>Login.aspx</DependentUpon>
-      <SubType>ASPXCodebehind</SubType>
-    </Compile>
-    <Compile Include="Modules\Cliente\Registro.aspx.designer.vb">
-      <DependentUpon>Registro.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Modules\Cliente\Registro.aspx.vb">
-      <DependentUpon>Registro.aspx</DependentUpon>
-      <SubType>ASPXCodebehind</SubType>
-    </Compile>
-    <Compile Include="Site.Master.designer.vb">
-      <DependentUpon>Site.Master</DependentUpon>
-    </Compile>
-    <Compile Include="Site.Master.vb">
-      <DependentUpon>Site.Master</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="ViewSwitcher.ascx.vb">
-      <DependentUpon>ViewSwitcher.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="ViewSwitcher.ascx.designer.vb">
-      <DependentUpon>ViewSwitcher.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="Site.Mobile.Master.vb">
-      <DependentUpon>Site.Mobile.Master</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Site.Mobile.Master.designer.vb">
-      <DependentUpon>Site.Mobile.Master</DependentUpon>
-    </Compile>
-    <Compile Include="Modules\AuthUsuarios\Index.aspx.designer.vb">
-      <DependentUpon>Index.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Modules\AuthUsuarios\Index.aspx.vb">
-      <DependentUpon>Index.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- CATALOGO INVENTARIO                         -->
+    <!-- ═══════════════════════════════════════════ -->
     <Compile Include="Modules\CatalogoInventario\Almacenes.aspx.designer.vb">
       <DependentUpon>Almacenes.aspx</DependentUpon>
     </Compile>
@@ -601,12 +675,33 @@
       <DependentUpon>Nichos.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="Modules\CatalogoInventario\Precios.aspx.designer.vb">
+      <DependentUpon>Precios.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Precios.aspx.vb">
+      <DependentUpon>Precios.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
     <Compile Include="Modules\CatalogoInventario\Productos.aspx.designer.vb">
       <DependentUpon>Productos.aspx</DependentUpon>
     </Compile>
     <Compile Include="Modules\CatalogoInventario\Productos.aspx.vb">
       <DependentUpon>Productos.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Promociones.aspx.designer.vb">
+      <DependentUpon>Promociones.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Promociones.aspx.vb">
+      <DependentUpon>Promociones.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Stock.aspx.designer.vb">
+      <DependentUpon>Stock.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Stock.aspx.vb">
+      <DependentUpon>Stock.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
     </Compile>
     <Compile Include="Modules\CatalogoInventario\Tipos.aspx.designer.vb">
       <DependentUpon>Tipos.aspx</DependentUpon>
@@ -615,6 +710,9 @@
       <DependentUpon>Tipos.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- COMPRAS PROVEEDOR                           -->
+    <!-- ═══════════════════════════════════════════ -->
     <Compile Include="Modules\ComprasProveedor\FacturasProveedor.aspx.designer.vb">
       <DependentUpon>FacturasProveedor.aspx</DependentUpon>
     </Compile>
@@ -657,6 +755,9 @@
       <DependentUpon>ReclamosProveedor.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- VENTAS FACTURACION                          -->
+    <!-- ═══════════════════════════════════════════ -->
     <Compile Include="Modules\VentasFacturacion\Carrito.aspx.designer.vb">
       <DependentUpon>Carrito.aspx</DependentUpon>
     </Compile>
@@ -685,6 +786,12 @@
       <DependentUpon>Index.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- CLIENTE                                     -->
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- MY PROJECT                                  -->
+    <!-- ═══════════════════════════════════════════ -->
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -715,6 +822,7 @@
     <EmbeddedResource Include="obj\Debug\MueblesAlpes.Web.Resources.resources" />
   </ItemGroup>
   <ItemGroup>
+    <!-- HANDLERS -->
     <Content Include="Handlers\Auth\AuthHandler.ashx" />
     <Content Include="Handlers\CatalogoInventario\AlmacenesHandler.ashx" />
     <Content Include="Handlers\CatalogoInventario\CategoriasHandler.ashx" />

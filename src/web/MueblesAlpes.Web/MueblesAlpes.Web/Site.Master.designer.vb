@@ -14,6 +14,141 @@ Option Explicit On
 Partial Public Class SiteMaster
 
     '''<summary>
+    '''lblCartCount control.
+    '''</summary>
+    '''<remarks>
+    '''Auto-generated field.
+    '''To modify move field declaration from designer file to code-behind file.
+    '''</remarks>
+    Protected WithEvents lblCartCount As Global.System.Web.UI.WebControls.Label
+
+    '''<summary>
+    '''lblDropCartCount control.
+    '''</summary>
+    '''<remarks>
+    '''Auto-generated field.
+    '''To modify move field declaration from designer file to code-behind file.
+    '''</remarks>
+    Protected WithEvents lblDropCartCount As Global.System.Web.UI.WebControls.Label
+
+    '''<summary>
+    '''rptDropCarrito control.
+    '''</summary>
+    '''<remarks>
+    '''Auto-generated field.
+    '''To modify move field declaration from designer file to code-behind file.
+    '''</remarks>
+    Protected WithEvents rptDropCarrito As Global.System.Web.UI.WebControls.Repeater
+
+    '''<summary>
+    '''pnlDropVacio control.
+    '''</summary>
+    '''<remarks>
+    '''Auto-generated field.
+    '''To modify move field declaration from designer file to code-behind file.
+    '''</remarks>
+    Protected WithEvents pnlDropVacio As Global.System.Web.UI.WebControls.Panel
+
+    '''<summary>
+    '''lblDropTotal control.
+    '''</summary>
+    '''<remarks>
+    '''Auto-generated field.
+    '''To modify move field declaration from designer file to code-behind file.
+    '''</remarks>
+    Protected WithEvents lblDropTotal As Global.System.Web.UI.WebControls.Label
+
+    '''<summary>
+    '''pnlNoLogueado control.
+    '''</summary>
+    '''<remarks>
+    '''Auto-generated field.
+    '''To modify move field declaration from designer file to code-behind file.
+    '''</remarks>
+    Protected WithEvents pnlNoLogueado As Global.System.Web.UI.WebControls.Panel
+
+    '''<summary>
+    '''pnlLogueado control.
+    '''</summary>
+    '''<remarks>
+    '''Auto-generated field.
+    '''To modify move field declaration from designer file to code-behind file.
+    '''</remarks>
+    Protected WithEvents pnlLogueado As Global.System.Web.UI.WebControls.Panel
+
+    '''<summary>
+    '''btnCerrarSesion control.
+    '''</summary>
+    '''<remarks>
+    '''Auto-generated field.
+    '''To modify move field declaration from designer file to code-behind file.
+    '''</remarks>
+    Protected WithEvents btnCerrarSesion As Global.System.Web.UI.WebControls.LinkButton
+
+    '''<summary>
+    '''lblNombreCliente control.
+    '''</summary>
+    '''<remarks>
+    '''Auto-generated field.
+    '''To modify move field declaration from designer file to code-behind file.
+    '''</remarks>
+    Protected WithEvents lblNombreCliente As Global.System.Web.UI.WebControls.Label
+
+    '''<summary>
+    '''pnlNavAdmin control.
+    '''</summary>
+    '''<remarks>
+    '''Auto-generated field.
+    '''To modify move field declaration from designer file to code-behind file.
+    '''</remarks>
+    Protected WithEvents pnlNavAdmin As Global.System.Web.UI.WebControls.Panel
+
+    '''<summary>
+    '''pnlNavCliente control.
+    '''</summary>
+    '''<remarks>
+    '''Auto-generated field.
+    '''To modify move field declaration from designer file to code-behind file.
+    '''</remarks>
+    Protected WithEvents pnlNavCliente As Global.System.Web.UI.WebControls.Panel
+
+    '''<summary>
+    '''pnlNavLogueado control.
+    '''</summary>
+    '''<remarks>
+    '''Auto-generated field.
+    '''To modify move field declaration from designer file to code-behind file.
+    '''</remarks>
+    Protected WithEvents pnlNavLogueado As Global.System.Web.UI.WebControls.Panel
+
+    '''<summary>
+    '''lblNavNombre control.
+    '''</summary>
+    '''<remarks>
+    '''Auto-generated field.
+    '''To modify move field declaration from designer file to code-behind file.
+    '''</remarks>
+    Protected WithEvents lblNavNombre As Global.System.Web.UI.WebControls.Label
+
+    '''<summary>
+    '''btnNavCerrarSesion control.
+    '''</summary>
+    '''<remarks>
+    '''Auto-generated field.
+    '''To modify move field declaration from designer file to code-behind file.
+    '''</remarks>
+    Protected WithEvents btnNavCerrarSesion As Global.System.Web.UI.WebControls.LinkButton
+
+    '''<summary>
+    '''pnlNavNoLogueado control.
+    '''</summary>
+    '''<remarks>
+    '''Auto-generated field.
+    '''To modify move field declaration from designer file to code-behind file.
+    '''</remarks>
+    Protected WithEvents pnlNavNoLogueado As Global.System.Web.UI.WebControls.Panel
+
+    '''<summary>
     '''MainContent control.
     '''</summary>
     '''<remarks>

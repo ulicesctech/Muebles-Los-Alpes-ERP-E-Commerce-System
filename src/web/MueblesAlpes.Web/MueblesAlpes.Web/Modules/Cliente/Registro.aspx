@@ -7,8 +7,7 @@
     .reg-wrap { max-width: 680px; margin: 40px auto; padding: 0 16px; }
     .reg-card { background: white; border-radius: 16px; border: 1px solid #e8d8c0;
         box-shadow: 0 4px 20px rgba(92,58,30,0.08); overflow: hidden; }
-    .reg-head { background: linear-gradient(135deg,#5C3A1E,#8B5E3C);
-        padding: 24px 30px; }
+    .reg-head { background: linear-gradient(135deg,#5C3A1E,#8B5E3C); padding: 24px 30px; }
     .reg-head h2 { color: #f0d9a0; font-family: Georgia,serif; font-size: 20px; margin: 0; }
     .reg-head p  { color: #d4b896; font-family: Arial,sans-serif; font-size: 13px; margin: 4px 0 0; }
     .reg-body { padding: 28px 30px; }
@@ -150,10 +149,6 @@
                     TextMode="Email" MaxLength="100" />
             </div>
             <div class="f-row">
-                <div class="f-group">
-                    <label>Usuario *</label>
-                    <asp:TextBox ID="txtUsuario" runat="server" CssClass="form-control" MaxLength="100" />
-                </div>
                 <div class="f-group">
                     <label>Contraseña *</label>
                     <asp:TextBox ID="txtPassword" runat="server" CssClass="form-control"
