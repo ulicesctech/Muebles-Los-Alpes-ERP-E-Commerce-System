@@ -1,3 +1,19 @@
+CREATE OR REPLACE PACKAGE PKG_CLI_CARRITO AS
+    PROCEDURE CARRITO_CREAR(p_cliente IN NUMBER, p_id OUT NUMBER);
+    PROCEDURE CARRITO_AGREGAR_DETALLE(p_carrito IN NUMBER, p_hv_precio IN NUMBER, p_cantidad IN NUMBER, p_id OUT NUMBER);
+    PROCEDURE CARRITO_ELIMINAR_DETALLE(p_id IN NUMBER);
+    PROCEDURE CARRITO_ELIMINAR(p_id IN NUMBER);
+    PROCEDURE CARRITO_LISTAR(p_data OUT SYS_REFCURSOR);
+    PROCEDURE CARRITO_VACIAR(p_carrito IN NUMBER);
+    PROCEDURE CARRITO_BUSCAR(p_cliente IN NUMBER, p_data OUT SYS_REFCURSOR);
+    PROCEDURE CARRITO_LISTAR_DETALLE(p_carrito IN NUMBER, p_data OUT SYS_REFCURSOR);
+    PROCEDURE CARRITO_PRODUCTOS_DISPONIBLES(p_data OUT SYS_REFCURSOR);
+    PROCEDURE CARRITO_RESUMEN(p_carrito IN NUMBER, p_data OUT SYS_REFCURSOR);
+    PROCEDURE CARRITO_RESUMEN_TODOS(p_data OUT SYS_REFCURSOR);
+    PROCEDURE CARRITO_FACTURAR(p_carrito IN NUMBER);
+END PKG_CLI_CARRITO;
+/
+
 CREATE OR REPLACE PACKAGE BODY PKG_CLI_CARRITO AS
 
     PROCEDURE assert_id(p_id IN NUMBER, p_msg IN VARCHAR2) IS
@@ -122,9 +138,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_CLI_CARRITO AS
                    p.pro_nombre,
                    hv.hv_precio_final,
                    d.detpre_cantidad,
-                   hv.hv_precio_final * d.detpre_cantidad             AS subtotal,
+                   hv.hv_precio_final * d.detpre_cantidad AS subtotal,
                    SUM(hv.hv_precio_final * d.detpre_cantidad)
-                       OVER (PARTITION BY c.pre_carrito)               AS total
+                       OVER (PARTITION BY c.pre_carrito) AS total
               FROM CLI_CARRITO             c
               JOIN CLI_CLIENTE             cl ON cl.cli_cliente               = c.cli_cliente
               JOIN CLI_DETALLE_CARRITO     d  ON d.pre_carrito                = c.pre_carrito
@@ -145,9 +161,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_CLI_CARRITO AS
                    p.pro_nombre,
                    hv.hv_precio_final,
                    d.detpre_cantidad,
-                   hv.hv_precio_final * d.detpre_cantidad             AS subtotal,
+                   hv.hv_precio_final * d.detpre_cantidad AS subtotal,
                    SUM(hv.hv_precio_final * d.detpre_cantidad)
-                       OVER (PARTITION BY c.pre_carrito)               AS total
+                       OVER (PARTITION BY c.pre_carrito) AS total
               FROM CLI_CARRITO             c
               JOIN CLI_CLIENTE             cl ON cl.cli_cliente               = c.cli_cliente
               JOIN CLI_DETALLE_CARRITO     d  ON d.pre_carrito                = c.pre_carrito
@@ -158,13 +174,18 @@ CREATE OR REPLACE PACKAGE BODY PKG_CLI_CARRITO AS
 
     PROCEDURE CARRITO_FACTURAR(p_carrito IN NUMBER) IS
         CURSOR c_detalles IS
-          SELECT hv_historial_precio_venta, detpre_cantidad
-            FROM CLI_DETALLE_CARRITO
-           WHERE pre_carrito = p_carrito;
+            SELECT d.detpre_cantidad,
+                   h.hip_historial_precio
+              FROM CLI_DETALLE_CARRITO d
+              JOIN BOD_HISTORIAL_PRECIO_VENTA hv ON hv.hv_historial_precio_venta = d.hv_historial_precio_venta
+              JOIN BOD_HISTORIAL_PRECIO h ON h.pro_referencia = hv.pro_referencia
+                                         AND h.hip_fecha_final IS NULL
+                                         AND h.hip_precio IS NOT NULL
+             WHERE d.pre_carrito = p_carrito;
     BEGIN
         assert_id(p_carrito, 'Carrito: ID obligatorio.');
         FOR r IN c_detalles LOOP
-            PKG_BOD_STOCK.SALIDA(r.hv_historial_precio_venta, r.detpre_cantidad);
+            PKG_BOD_STOCK.SALIDA(r.hip_historial_precio, r.detpre_cantidad);
         END LOOP;
     END;
 

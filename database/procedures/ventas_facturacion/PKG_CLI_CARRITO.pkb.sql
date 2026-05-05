@@ -158,13 +158,18 @@ CREATE OR REPLACE PACKAGE BODY PKG_CLI_CARRITO AS
 
     PROCEDURE CARRITO_FACTURAR(p_carrito IN NUMBER) IS
         CURSOR c_detalles IS
-          SELECT hv_historial_precio_venta, detpre_cantidad
-            FROM CLI_DETALLE_CARRITO
-           WHERE pre_carrito = p_carrito;
+            SELECT d.detpre_cantidad,
+                   h.hip_historial_precio
+              FROM CLI_DETALLE_CARRITO d
+              JOIN BOD_HISTORIAL_PRECIO_VENTA hv ON hv.hv_historial_precio_venta = d.hv_historial_precio_venta
+              JOIN BOD_HISTORIAL_PRECIO h ON h.pro_referencia = hv.pro_referencia
+                                         AND h.hip_fecha_final IS NULL
+                                         AND h.hip_precio IS NOT NULL
+             WHERE d.pre_carrito = p_carrito;
     BEGIN
         assert_id(p_carrito, 'Carrito: ID obligatorio.');
         FOR r IN c_detalles LOOP
-            PKG_BOD_STOCK.SALIDA(r.hv_historial_precio_venta, r.detpre_cantidad);
+            PKG_BOD_STOCK.SALIDA(r.hip_historial_precio, r.detpre_cantidad);
         END LOOP;
     END;
 
