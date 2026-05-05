@@ -1,5 +1,5 @@
-Imports System.Data
 Imports Oracle.ManagedDataAccess.Client
+Imports System.Data
 
 ' ============================================================
 ' RUTA: App_Code/Services/ComprasProveedor/ReclamoProveedorService.vb
@@ -39,8 +39,8 @@ Public Class ReclamoProveedorService
     ''' </summary>
     Public Shared Function Crear(orcKey As String, comentarios As String) As Decimal
         Dim ps As New List(Of OracleParameter) From {
-            New OracleParameter("p_orc_key", OracleDbType.Varchar2, orcKey,       ParameterDirection.Input),
-            New OracleParameter("p_coment",  OracleDbType.Varchar2, comentarios,  ParameterDirection.Input)
+            New OracleParameter("p_orc_key", OracleDbType.Varchar2, orcKey, ParameterDirection.Input),
+            New OracleParameter("p_coment", OracleDbType.Varchar2, comentarios, ParameterDirection.Input)
         }
         Return OracleDb.ExecOutNumber(PKG & ".REC_PROV_CREAR", ps, "p_id")
     End Function
@@ -50,7 +50,7 @@ Public Class ReclamoProveedorService
     ''' </summary>
     Public Shared Sub Actualizar(id As Decimal, comentarios As String)
         Dim ps As New List(Of OracleParameter) From {
-            New OracleParameter("p_id",     OracleDbType.Decimal,  id,          ParameterDirection.Input),
+            New OracleParameter("p_id", OracleDbType.Decimal, id, ParameterDirection.Input),
             New OracleParameter("p_coment", OracleDbType.Varchar2, comentarios, ParameterDirection.Input)
         }
         OracleDb.ExecNonQuery(PKG & ".REC_PROV_ACTUALIZAR", ps)
@@ -63,7 +63,7 @@ Public Class ReclamoProveedorService
     ''' </summary>
     Public Shared Sub CambiarEstado(id As Decimal, estado As String)
         Dim ps As New List(Of OracleParameter) From {
-            New OracleParameter("p_id",     OracleDbType.Decimal,  id,     ParameterDirection.Input),
+            New OracleParameter("p_id", OracleDbType.Decimal, id, ParameterDirection.Input),
             New OracleParameter("p_estado", OracleDbType.Varchar2, estado, ParameterDirection.Input)
         }
         OracleDb.ExecNonQuery(PKG & ".REC_PROV_CAMBIAR_ESTADO", ps)

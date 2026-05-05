@@ -1,7 +1,4 @@
-﻿Imports System
-Imports System.Data
-
-' ============================================================
+﻿' ============================================================
 ' RUTA: Modules/CatalogoInventario/Stock.aspx.vb
 ' ============================================================
 Namespace Modules.CatalogoInventario

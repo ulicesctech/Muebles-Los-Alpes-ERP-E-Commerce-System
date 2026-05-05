@@ -1,4 +1,3 @@
-Imports System.Data
 Imports Oracle.ManagedDataAccess.Client
 
 Namespace Modules.ComprasProveedor

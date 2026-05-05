@@ -1,6 +1,4 @@
-﻿Imports System.Data
-
-Namespace Modules.Cliente
+﻿Namespace Modules.Cliente
 
     Public Class Login
         Inherits System.Web.UI.Page

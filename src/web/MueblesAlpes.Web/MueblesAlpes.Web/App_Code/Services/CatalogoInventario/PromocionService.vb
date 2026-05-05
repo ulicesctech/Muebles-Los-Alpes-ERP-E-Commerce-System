@@ -1,5 +1,5 @@
-Imports System.Data
 Imports Oracle.ManagedDataAccess.Client
+Imports System.Data
 
 ' ============================================================
 ' RUTA: App_Code/Services/CatalogoInventario/PromocionService.vb

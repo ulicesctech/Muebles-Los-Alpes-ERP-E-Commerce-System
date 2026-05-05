@@ -1,5 +1,4 @@
-﻿Imports System.Data
-Imports Oracle.ManagedDataAccess.Client
+﻿Imports Oracle.ManagedDataAccess.Client
 
 Namespace Modules.VentasFacturacion
     Public Class Factura

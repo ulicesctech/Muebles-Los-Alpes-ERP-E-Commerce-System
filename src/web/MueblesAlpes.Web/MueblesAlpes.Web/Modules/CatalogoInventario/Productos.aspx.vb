@@ -1,6 +1,4 @@
-﻿Imports System
-Imports System.Data
-Imports System.IO
+﻿Imports System.IO
 Imports Oracle.ManagedDataAccess.Client
 
 Namespace Modules.CatalogoInventario

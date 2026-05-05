@@ -1,14 +1,16 @@
-Imports System.Data
 Imports Oracle.ManagedDataAccess.Client
+Imports System.Data
 
 Public Class EmpleadoService
     Private Const PKG As String = "PKG_RH_EMPLEADO"
 
     Public Shared Function Crear(dpi As String, primerNombre As String, segundoNombre As String,
-                                  primerApellido As String, segundoApellido As String,
-                                  direccion As String, avenida As String, codigoPostal As String,
-                                  primerTelefono As String, segundoTelefono As String,
-                                  rolUsuario As Integer) As Integer
+                              primerApellido As String, segundoApellido As String,
+                              direccion As String, avenida As String, codigoPostal As String,
+                              primerTelefono As String, segundoTelefono As String,
+                              rolUsuario As Integer,
+                              password As String) As Integer
+
         Dim pId As New OracleParameter("p_id", OracleDbType.Decimal, ParameterDirection.Output)
 
         Dim pSegNom As New OracleParameter("p_s_nom", OracleDbType.Varchar2, 100)
@@ -24,22 +26,24 @@ Public Class EmpleadoService
         pTel2.Value = If(String.IsNullOrWhiteSpace(segundoTelefono), DBNull.Value, CObj(segundoTelefono.Trim()))
 
         Dim ps As New List(Of OracleParameter) From {
-            New OracleParameter("p_dpi", OracleDbType.Varchar2, dpi, ParameterDirection.Input),
-            New OracleParameter("p_p_nom", OracleDbType.Varchar2, primerNombre, ParameterDirection.Input),
-            pSegNom,
-            New OracleParameter("p_p_ape", OracleDbType.Varchar2, primerApellido, ParameterDirection.Input),
-            pSegApe,
-            New OracleParameter("p_dir", OracleDbType.Varchar2, direccion, ParameterDirection.Input),
-            New OracleParameter("p_ave", OracleDbType.Varchar2, avenida, ParameterDirection.Input),
-            New OracleParameter("p_cp", OracleDbType.Varchar2, codigoPostal, ParameterDirection.Input),
-            New OracleParameter("p_tel1", OracleDbType.Varchar2, primerTelefono, ParameterDirection.Input),
-            pTel2,
-            New OracleParameter("p_rol", OracleDbType.Decimal, rolUsuario, ParameterDirection.Input),
-            pId
-        }
+        New OracleParameter("p_dpi", OracleDbType.Varchar2, dpi, ParameterDirection.Input),
+        New OracleParameter("p_p_nom", OracleDbType.Varchar2, primerNombre, ParameterDirection.Input),
+        pSegNom,
+        New OracleParameter("p_p_ape", OracleDbType.Varchar2, primerApellido, ParameterDirection.Input),
+        pSegApe,
+        New OracleParameter("p_dir", OracleDbType.Varchar2, direccion, ParameterDirection.Input),
+        New OracleParameter("p_ave", OracleDbType.Varchar2, avenida, ParameterDirection.Input),
+        New OracleParameter("p_cp", OracleDbType.Varchar2, codigoPostal, ParameterDirection.Input),
+        New OracleParameter("p_tel1", OracleDbType.Varchar2, primerTelefono, ParameterDirection.Input),
+        pTel2,
+        New OracleParameter("p_rol", OracleDbType.Decimal, rolUsuario, ParameterDirection.Input),
+        pId
+    }
         OracleDb.ExecNonQuery(PKG & ".emp_crear", ps)
         Dim nuevoId As Integer = Convert.ToInt32(pId.Value.ToString())
-        LoginEmpleadoService.Crear(nuevoId, primerNombre.ToLower().Trim(), dpi.Trim())
+
+        ' Usuario = DPI, password = asignado por quien crea
+        LoginEmpleadoService.Crear(nuevoId, dpi.Trim(), password.Trim())
         Return nuevoId
     End Function
 

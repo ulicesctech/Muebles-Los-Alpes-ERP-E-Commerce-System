@@ -29,8 +29,11 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
 
         Private Sub CargarEmpleados()
             Try
-                gvEmpleados.DataSource = EmpleadoService.Listar()
+                Dim dt As DataTable = EmpleadoService.Listar()
+                gvEmpleados.DataSource = dt
                 gvEmpleados.DataBind()
+                lblResultado.Text = "📋 Total de empleados: " & dt.Rows.Count
+                lblResultado.Visible = True
                 lblMensaje.Visible = False
                 lblError.Visible = False
             Catch ex As Exception
@@ -38,6 +41,15 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
                 lblError.Visible = True
             End Try
         End Sub
+
+        Private Function ValidarPassword(pass As String) As String
+            If String.IsNullOrWhiteSpace(pass) Then Return "⚠️ La contraseña es obligatoria."
+            If pass.Length < 8 Then Return "⚠️ La contraseña debe tener mínimo 8 caracteres."
+            If Not Regex.IsMatch(pass, "[A-Z]") Then Return "⚠️ Debe tener al menos una mayúscula."
+            If Not Regex.IsMatch(pass, "[a-z]") Then Return "⚠️ Debe tener al menos una minúscula."
+            If Not Regex.IsMatch(pass, "[0-9]") Then Return "⚠️ Debe tener al menos un número."
+            Return ""
+        End Function
 
         Protected Sub btnBuscar_Click(sender As Object, e As EventArgs)
             If String.IsNullOrWhiteSpace(txtBuscarDPI.Text) Then
@@ -55,11 +67,12 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
                 gvEmpleados.DataSource = result
                 gvEmpleados.DataBind()
                 If result.Rows.Count = 0 Then
-                    lblError.Text = "🔍 No se encontró ningún empleado con ese DPI."
-                    lblError.Visible = True
+                    lblResultado.Text = "🔍 No se encontró ningún empleado con ese DPI."
+                    lblResultado.Visible = True
+                    lblError.Visible = False
                 Else
-                    lblMensaje.Text = "✅ Se encontró " & result.Rows.Count & " resultado(s)."
-                    lblMensaje.Visible = True
+                    lblResultado.Text = "🔍 Se encontró " & result.Rows.Count & " resultado(s)."
+                    lblResultado.Visible = True
                     lblError.Visible = False
                 End If
             Catch ex As Exception
@@ -85,24 +98,45 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
                String.IsNullOrWhiteSpace(txtCodigoPostal.Text) Then
                 lblError.Text = "⚠️ Los campos marcados con * son obligatorios."
                 lblError.Visible = True
+                hfFormOpen.Value = "true"
+                hfFormEditing.Value = If(hfId.Value <> "", "true", "false")
                 Return
             End If
+
             If ddlRol.SelectedValue = "0" Then
                 lblError.Text = "⚠️ Debe seleccionar un rol."
                 lblError.Visible = True
+                hfFormOpen.Value = "true"
+                hfFormEditing.Value = If(hfId.Value <> "", "true", "false")
                 Return
             End If
+
             If txtDPI.Text.Trim().Length <> 13 OrElse
                Not txtDPI.Text.Trim().All(Function(c) Char.IsDigit(c)) Then
                 lblError.Text = "⚠️ DPI debe tener exactamente 13 dígitos."
                 lblError.Visible = True
+                hfFormOpen.Value = "true"
+                hfFormEditing.Value = If(hfId.Value <> "", "true", "false")
                 Return
             End If
+
             If txtTelefono1.Text.Trim().Length <> 8 OrElse
                Not txtTelefono1.Text.Trim().All(Function(c) Char.IsDigit(c)) Then
                 lblError.Text = "⚠️ Teléfono debe tener exactamente 8 dígitos."
                 lblError.Visible = True
+                hfFormOpen.Value = "true"
+                hfFormEditing.Value = If(hfId.Value <> "", "true", "false")
                 Return
+            End If
+
+            If hfId.Value = "" Then
+                Dim errPass As String = ValidarPassword(txtPassword.Text)
+                If errPass <> "" Then
+                    lblError.Text = errPass
+                    lblError.Visible = True
+                    hfFormOpen.Value = "true"
+                    Return
+                End If
             End If
 
             Try
@@ -120,7 +154,7 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
                         txtTelefono1.Text.Trim(),
                         If(String.IsNullOrWhiteSpace(txtTelefono2.Text), " ", txtTelefono2.Text.Trim()),
                         Convert.ToInt32(ddlRol.SelectedValue))
-                    lblMensaje.Text = "✅ Empleado actualizado correctamente."
+                    lblMensaje.Text = "✅ Datos del empleado modificados con éxito."
                 Else
                     Dim nuevoId As Integer = EmpleadoService.Crear(
                         txtDPI.Text.Trim(),
@@ -133,13 +167,15 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
                         txtCodigoPostal.Text.Trim(),
                         txtTelefono1.Text.Trim(),
                         If(String.IsNullOrWhiteSpace(txtTelefono2.Text), " ", txtTelefono2.Text.Trim()),
-                        Convert.ToInt32(ddlRol.SelectedValue))
+                        Convert.ToInt32(ddlRol.SelectedValue),
+                        txtPassword.Text.Trim())
                     lblMensaje.Text = "✅ Empleado creado ID: " & nuevoId &
-                                      " — Login: " & txtPrimerNombre.Text.Trim().ToLower() &
-                                      " / Pass: " & txtDPI.Text.Trim()
+                                      " — Usuario: " & txtDPI.Text.Trim()
                 End If
                 lblMensaje.Visible = True
                 lblError.Visible = False
+                hfFormOpen.Value = "false"
+                hfFormEditing.Value = "false"
                 LimpiarFormulario()
                 CargarEmpleados()
             Catch ex As Exception
@@ -149,13 +185,18 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
                     lblError.Text = "Error: " & ex.Message
                 End If
                 lblError.Visible = True
+                hfFormOpen.Value = "true"
+                hfFormEditing.Value = If(hfId.Value <> "", "true", "false")
             End Try
         End Sub
 
         Protected Sub btnNuevo_Click(sender As Object, e As EventArgs)
             LimpiarFormulario()
+            hfFormOpen.Value = "false"
+            hfFormEditing.Value = "false"
             lblMensaje.Visible = False
             lblError.Visible = False
+            CargarEmpleados()
         End Sub
 
         Protected Sub gvEmpleados_RowCommand(sender As Object, e As System.Web.UI.WebControls.GridViewCommandEventArgs)
@@ -178,9 +219,11 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
                         txtTelefono1.Text = row("em_primer_telefono").ToString()
                         txtTelefono2.Text = row("em_segundo_telefono").ToString().Trim()
                         ddlRol.SelectedValue = row("rolus_rol_usuario").ToString()
+                        txtPassword.Text = ""
                     End If
-                    lblMensaje.Text = "✏️ Editando empleado ID: " & id
-                    lblMensaje.Visible = True
+                    hfFormOpen.Value = "true"
+                    hfFormEditing.Value = "true"
+                    lblMensaje.Visible = False
                     lblError.Visible = False
                 Catch ex As Exception
                     lblError.Text = "Error al cargar: " & ex.Message
@@ -216,6 +259,7 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
             txtSegundoNombre.Text = ""
             txtPrimerApellido.Text = ""
             txtSegundoApellido.Text = ""
+            txtPassword.Text = ""
             txtDireccion.Text = ""
             txtAvenida.Text = ""
             txtCodigoPostal.Text = ""

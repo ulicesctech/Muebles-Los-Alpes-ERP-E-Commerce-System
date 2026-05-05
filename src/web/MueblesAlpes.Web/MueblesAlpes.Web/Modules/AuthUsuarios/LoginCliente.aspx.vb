@@ -1,4 +1,5 @@
 ﻿Imports System
+Imports System.Data
 
 Namespace MueblesAlpes.Web.Modules.AuthUsuarios
 
@@ -12,6 +13,25 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
                 End If
             End If
         End Sub
+
+        Private Function ValidarPassword(pass As String) As String
+            If String.IsNullOrWhiteSpace(pass) Then
+                Return "⚠️ La contraseña es obligatoria."
+            End If
+            If pass.Length < 8 Then
+                Return "⚠️ La contraseña debe tener mínimo 8 caracteres."
+            End If
+            If Not Regex.IsMatch(pass, "[A-Z]") Then
+                Return "⚠️ La contraseña debe tener al menos una letra mayúscula."
+            End If
+            If Not Regex.IsMatch(pass, "[a-z]") Then
+                Return "⚠️ La contraseña debe tener al menos una letra minúscula."
+            End If
+            If Not Regex.IsMatch(pass, "[0-9]") Then
+                Return "⚠️ La contraseña debe tener al menos un número."
+            End If
+            Return ""
+        End Function
 
         Protected Sub btnLogin_Click(sender As Object, e As EventArgs)
             If String.IsNullOrWhiteSpace(txtEmail.Text) OrElse
@@ -57,13 +77,16 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
                String.IsNullOrWhiteSpace(txtPrimerNombre.Text) OrElse
                String.IsNullOrWhiteSpace(txtPrimerApellido.Text) OrElse
                String.IsNullOrWhiteSpace(txtRegEmail.Text) OrElse
+               String.IsNullOrWhiteSpace(txtRegPassword.Text) OrElse
+               String.IsNullOrWhiteSpace(txtConfirmPassword.Text) OrElse
                String.IsNullOrWhiteSpace(txtTelefono.Text) OrElse
                String.IsNullOrWhiteSpace(txtPais.Text) OrElse
                String.IsNullOrWhiteSpace(txtDepartamento.Text) OrElse
                String.IsNullOrWhiteSpace(txtMunicipio.Text) OrElse
                String.IsNullOrWhiteSpace(txtZona.Text) OrElse
                String.IsNullOrWhiteSpace(txtDireccion.Text) OrElse
-               String.IsNullOrWhiteSpace(txtCodigoPostal.Text) Then
+               String.IsNullOrWhiteSpace(txtCodigoPostal.Text) OrElse
+               ddlTipoClienteReg.SelectedValue = "" Then
                 lblError.Text = "⚠️ Los campos marcados con * son obligatorios."
                 lblError.Visible = True
                 Return
@@ -85,11 +108,24 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
                 Return
             End If
 
+            Dim errPass As String = ValidarPassword(txtRegPassword.Text)
+            If errPass <> "" Then
+                lblError.Text = errPass
+                lblError.Visible = True
+                Return
+            End If
+
+            If txtRegPassword.Text <> txtConfirmPassword.Text Then
+                lblError.Text = "⚠️ Las contraseñas no coinciden."
+                lblError.Visible = True
+                Return
+            End If
+
             Try
                 Dim nuevoId As Integer = ClienteService.Crear(
                     ddlTipoDoc.SelectedValue,
                     txtNumDoc.Text.Trim(),
-                    "",
+                    If(String.IsNullOrWhiteSpace(txtNITReg.Text), " ", txtNITReg.Text.Trim()),
                     txtPrimerNombre.Text.Trim(),
                     txtSegundoNombre.Text.Trim(),
                     txtPrimerApellido.Text.Trim(),
@@ -104,9 +140,10 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
                     "",
                     txtRegEmail.Text.Trim(),
                     "",
-                    "NATURAL")
+                    ddlTipoClienteReg.SelectedValue,
+                    txtRegPassword.Text.Trim())
 
-                lblMensaje.Text = "✅ Cuenta creada. Ya puedes ingresar con tu email y número de documento."
+                lblMensaje.Text = "✅ Cuenta creada exitosamente. Ya puedes iniciar sesión con tu email."
                 lblMensaje.Visible = True
                 lblError.Visible = False
                 LimpiarRegistro()
@@ -123,11 +160,15 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
         Private Sub LimpiarRegistro()
             ddlTipoDoc.SelectedIndex = 0
             txtNumDoc.Text = ""
+            txtNITReg.Text = ""
+            ddlTipoClienteReg.SelectedIndex = 0
             txtPrimerNombre.Text = ""
             txtSegundoNombre.Text = ""
             txtPrimerApellido.Text = ""
             txtSegundoApellido.Text = ""
             txtRegEmail.Text = ""
+            txtRegPassword.Text = ""
+            txtConfirmPassword.Text = ""
             txtTelefono.Text = ""
             txtPais.Text = ""
             txtDepartamento.Text = ""

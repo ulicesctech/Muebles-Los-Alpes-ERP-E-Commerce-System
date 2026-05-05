@@ -1,5 +1,5 @@
-Imports System.Data
 Imports Oracle.ManagedDataAccess.Client
+Imports System.Data
 
 Public Class LoginClienteService
     Private Const PKG As String = "PKG_ADMIN_LOGIN_CLIENTE"

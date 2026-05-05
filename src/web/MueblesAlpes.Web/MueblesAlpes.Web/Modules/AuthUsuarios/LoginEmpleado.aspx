@@ -52,7 +52,7 @@
             <div class="form-group">
                 <label>👤 Usuario * <small style="color:#aaa;font-weight:normal;"></small></label>
                 <asp:TextBox ID="txtUsuario" runat="server" CssClass="form-control"
-                    placeholder="agrega tu usuario"
+                    placeholder="agrega tu usuario/CUI"
                     autocomplete="off" />
             </div>
 

@@ -1,8 +1,6 @@
 ' ============================================================
 ' RUTA: Modules/ComprasProveedor/Proveedores.aspx.vb
 ' ============================================================
-Imports System
-Imports System.Data
 
 Namespace Modules.ComprasProveedor
     Partial Public Class Proveedores
