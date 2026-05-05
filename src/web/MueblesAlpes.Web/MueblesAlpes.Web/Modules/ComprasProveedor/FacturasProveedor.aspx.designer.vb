@@ -60,6 +60,15 @@ Namespace Modules.ComprasProveedor
         Protected WithEvents hfModo As Global.System.Web.UI.WebControls.HiddenField
 
         '''<summary>
+        '''Control pnlOrdenNuevo.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents pnlOrdenNuevo As Global.System.Web.UI.WebControls.Panel
+
+        '''<summary>
         '''Control ddlOrden.
         '''</summary>
         '''<remarks>
@@ -67,6 +76,24 @@ Namespace Modules.ComprasProveedor
         '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         '''</remarks>
         Protected WithEvents ddlOrden As Global.System.Web.UI.WebControls.DropDownList
+
+        '''<summary>
+        '''Control pnlOrdenEditar.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents pnlOrdenEditar As Global.System.Web.UI.WebControls.Panel
+
+        '''<summary>
+        '''Control lblOrdenEditar.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents lblOrdenEditar As Global.System.Web.UI.WebControls.Label
 
         '''<summary>
         '''Control txtCodigoFac.
@@ -103,6 +130,24 @@ Namespace Modules.ComprasProveedor
         '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         '''</remarks>
         Protected WithEvents txtBuscar As Global.System.Web.UI.WebControls.TextBox
+
+        '''<summary>
+        '''Control txtFechaDesde.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents txtFechaDesde As Global.System.Web.UI.WebControls.TextBox
+
+        '''<summary>
+        '''Control txtFechaHasta.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents txtFechaHasta As Global.System.Web.UI.WebControls.TextBox
 
         '''<summary>
         '''Control btnBuscar.

@@ -15,15 +15,6 @@ Namespace Modules.ComprasProveedor
     Partial Public Class OrdenesCompra
 
         '''<summary>
-        '''Control upOrdenes.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents upOrdenes As Global.System.Web.UI.UpdatePanel
-
-        '''<summary>
         '''Control pnlMsg.
         '''</summary>
         '''<remarks>
@@ -105,24 +96,6 @@ Namespace Modules.ComprasProveedor
         Protected WithEvents hfKey As Global.System.Web.UI.WebControls.HiddenField
 
         '''<summary>
-        '''Control txtIDOrden.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents txtIDOrden As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
-        '''Control txtCodigo.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents txtCodigo As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
         '''Control ddlProveedor.
         '''</summary>
         '''<remarks>
@@ -130,6 +103,114 @@ Namespace Modules.ComprasProveedor
         '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         '''</remarks>
         Protected WithEvents ddlProveedor As Global.System.Web.UI.WebControls.DropDownList
+
+        '''<summary>
+        '''Control txtBuscarPedido.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents txtBuscarPedido As Global.System.Web.UI.WebControls.TextBox
+
+        '''<summary>
+        '''Control btnBuscarPedido.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents btnBuscarPedido As Global.System.Web.UI.WebControls.Button
+
+        '''<summary>
+        '''Control pnlResultadosPedidos.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents pnlResultadosPedidos As Global.System.Web.UI.WebControls.Panel
+
+        '''<summary>
+        '''Control gvBuscarPedidos.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents gvBuscarPedidos As Global.System.Web.UI.WebControls.GridView
+
+        '''<summary>
+        '''Control pnlItemsPedido.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents pnlItemsPedido As Global.System.Web.UI.WebControls.Panel
+
+        '''<summary>
+        '''Control hfPedidoVinculado.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents hfPedidoVinculado As Global.System.Web.UI.WebControls.HiddenField
+
+        '''<summary>
+        '''Control hfFormaPago.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents hfFormaPago As Global.System.Web.UI.WebControls.HiddenField
+
+        '''<summary>
+        '''Control lblPedidoId.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents lblPedidoId As Global.System.Web.UI.WebControls.Label
+
+        '''<summary>
+        '''Control lblPedidoCodigo.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents lblPedidoCodigo As Global.System.Web.UI.WebControls.Label
+
+        '''<summary>
+        '''Control lblFormaPagoPedido.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents lblFormaPagoPedido As Global.System.Web.UI.WebControls.Label
+
+        '''<summary>
+        '''Control lnkQuitarPedido.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents lnkQuitarPedido As Global.System.Web.UI.WebControls.LinkButton
+
+        '''<summary>
+        '''Control gvItemsPedido.
+        '''</summary>
+        '''<remarks>
+        '''Campo generado automáticamente.
+        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+        '''</remarks>
+        Protected WithEvents gvItemsPedido As Global.System.Web.UI.WebControls.GridView
 
         '''<summary>
         '''Control btnGuardar.
@@ -184,42 +265,6 @@ Namespace Modules.ComprasProveedor
         '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
         '''</remarks>
         Protected WithEvents hfOrdenActiva As Global.System.Web.UI.WebControls.HiddenField
-
-        '''<summary>
-        '''Control txtMat.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents txtMat As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
-        '''Control txtPre.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents txtPre As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
-        '''Control txtCan.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents txtCan As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
-        '''Control btnAddMat.
-        '''</summary>
-        '''<remarks>
-        '''Campo generado automáticamente.
-        '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
-        '''</remarks>
-        Protected WithEvents btnAddMat As Global.System.Web.UI.WebControls.Button
 
         '''<summary>
         '''Control gvItemsOrden.
