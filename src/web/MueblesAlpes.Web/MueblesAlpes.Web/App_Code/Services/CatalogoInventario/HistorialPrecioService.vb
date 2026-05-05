@@ -1,5 +1,5 @@
-Imports System.Data
 Imports Oracle.ManagedDataAccess.Client
+Imports System.Data
 ' ============================================================
 ' RUTA: App_Code/Services/CatalogoInventario/HistorialPrecioService.vb
 ' Package: PKG_BOD_HISTORIAL_PRECIO

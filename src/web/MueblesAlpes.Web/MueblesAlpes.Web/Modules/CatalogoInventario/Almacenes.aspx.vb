@@ -1,8 +1,4 @@
-﻿Imports System
-Imports System.Data
-Imports Oracle.ManagedDataAccess.Client
-
-Namespace Modules.CatalogoInventario
+﻿Namespace Modules.CatalogoInventario
 
     Partial Public Class Almacenes
         Inherits System.Web.UI.Page

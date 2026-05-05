@@ -1,6 +1,4 @@
-﻿Imports System
-Imports System.Data
-Imports Oracle.ManagedDataAccess.Client
+﻿Imports Oracle.ManagedDataAccess.Client
 
 ' ============================================================
 ' RUTA: Modules/CatalogoInventario/Categorias.aspx.vb

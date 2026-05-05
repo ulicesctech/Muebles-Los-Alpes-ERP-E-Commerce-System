@@ -1,5 +1,3 @@
-Imports System.Data
-
 Namespace Modules.ComprasProveedor
 
     Partial Public Class OrdenesCompra

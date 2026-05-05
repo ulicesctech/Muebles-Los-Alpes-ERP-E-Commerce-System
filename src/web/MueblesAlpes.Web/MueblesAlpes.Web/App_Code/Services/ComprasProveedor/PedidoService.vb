@@ -1,6 +1,5 @@
-Imports System.Collections.Generic
-Imports System.Data
 Imports Oracle.ManagedDataAccess.Client
+Imports System.Data
 
 ' ============================================================
 ' RUTA: App_Code/Services/ComprasProveedor/PedidoService.vb

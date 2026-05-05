@@ -1,8 +1,6 @@
 ' ============================================================
 ' RUTA: Modules/ComprasProveedor/ReclamosProveedor.aspx.vb
 ' ============================================================
-Imports System
-Imports System.Data
 Imports Oracle.ManagedDataAccess.Client
 
 Namespace Modules.ComprasProveedor

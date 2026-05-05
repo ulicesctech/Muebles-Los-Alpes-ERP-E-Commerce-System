@@ -1,7 +1,4 @@
-﻿Imports System
-Imports System.Data
-
-' ============================================================
+﻿' ============================================================
 ' RUTA: Modules/CatalogoInventario/Precios.aspx.vb
 ' Solo listado — el registro de precios se hace desde Pedidos.
 ' ============================================================

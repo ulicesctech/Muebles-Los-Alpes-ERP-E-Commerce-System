@@ -12,6 +12,7 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
         Protected WithEvents txtSegundoNombre As Global.System.Web.UI.WebControls.TextBox
         Protected WithEvents txtPrimerApellido As Global.System.Web.UI.WebControls.TextBox
         Protected WithEvents txtSegundoApellido As Global.System.Web.UI.WebControls.TextBox
+        Protected WithEvents txtPassword As Global.System.Web.UI.WebControls.TextBox
         Protected WithEvents txtTelefono1 As Global.System.Web.UI.WebControls.TextBox
         Protected WithEvents txtTelefono2 As Global.System.Web.UI.WebControls.TextBox
         Protected WithEvents txtDireccion As Global.System.Web.UI.WebControls.TextBox
@@ -23,5 +24,8 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
         Protected WithEvents btnBuscar As Global.System.Web.UI.WebControls.Button
         Protected WithEvents btnVerTodos As Global.System.Web.UI.WebControls.Button
         Protected WithEvents gvEmpleados As Global.System.Web.UI.WebControls.GridView
+        Protected WithEvents hfFormOpen As Global.System.Web.UI.WebControls.HiddenField
+        Protected WithEvents hfFormEditing As Global.System.Web.UI.WebControls.HiddenField
+        Protected WithEvents lblResultado As Global.System.Web.UI.WebControls.Label
     End Class
 End Namespace
