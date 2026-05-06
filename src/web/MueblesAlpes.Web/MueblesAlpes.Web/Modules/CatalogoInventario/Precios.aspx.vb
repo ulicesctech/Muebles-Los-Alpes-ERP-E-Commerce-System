@@ -1,8 +1,6 @@
-﻿Imports System
-Imports System.Data
-
-' ============================================================
+﻿' ============================================================
 ' RUTA: Modules/CatalogoInventario/Precios.aspx.vb
+' Solo listado — el registro de precios se hace desde Pedidos.
 ' ============================================================
 Namespace Modules.CatalogoInventario
 
@@ -11,52 +9,15 @@ Namespace Modules.CatalogoInventario
 
         Protected Sub Page_Load(sender As Object, e As EventArgs) Handles Me.Load
             If Not IsPostBack Then
-                CargarProductos()
-                CargarAlmacenes()
                 CargarFiltroMes()
-                LimpiarNichos()
-                txtFechaInicio.Text = DateTime.Now.ToString("yyyy-MM-dd")
                 CargarHistorialTodos()
             End If
         End Sub
 
         ' =============================================
-        ' DROPDOWNS PRINCIPALES
-        ' =============================================
-        Private Sub CargarProductos()
-            Try
-                ddlProducto.DataSource = ProductoService.Listar()
-                ddlProducto.DataTextField = "PRO_NOMBRE"
-                ddlProducto.DataValueField = "PRO_REFERENCIA"
-                ddlProducto.DataBind()
-                ddlProducto.Items.Insert(0, New ListItem("-- Seleccione un producto --", ""))
-            Catch ex As Exception
-                MostrarError("Error al cargar productos: " & ex.Message)
-            End Try
-        End Sub
-
-        Private Sub CargarAlmacenes()
-            Try
-                ddlAlmacen.DataSource = AlmacenService.Listar()
-                ddlAlmacen.DataTextField = "ALM_NOMBRE"
-                ddlAlmacen.DataValueField = "ALM_ALMACEN"
-                ddlAlmacen.DataBind()
-                ddlAlmacen.Items.Insert(0, New ListItem("-- Seleccione un almacen --", ""))
-            Catch ex As Exception
-                MostrarError("Error al cargar almacenes: " & ex.Message)
-            End Try
-        End Sub
-
-        Private Sub LimpiarNichos()
-            ddlNicho.Items.Clear()
-            ddlNicho.Items.Add(New ListItem("-- Primero seleccione un almacen --", ""))
-        End Sub
-
-        ' =============================================
-        ' FILTRO POR MES
+        ' FILTRO MES/AÑO
         ' =============================================
         Private Sub CargarFiltroMes()
-            ' Meses
             ddlMes.Items.Clear()
             ddlMes.Items.Add(New ListItem("-- Todos --", "0"))
             ddlMes.Items.Add(New ListItem("Enero", "1"))
@@ -72,7 +33,6 @@ Namespace Modules.CatalogoInventario
             ddlMes.Items.Add(New ListItem("Noviembre", "11"))
             ddlMes.Items.Add(New ListItem("Diciembre", "12"))
 
-            ' Anios — desde 2023 hasta el actual
             ddlAnio.Items.Clear()
             Dim anioActual As Integer = DateTime.Now.Year
             For i As Integer = anioActual To 2023 Step -1
@@ -80,151 +40,106 @@ Namespace Modules.CatalogoInventario
             Next
         End Sub
 
+        ' =============================================
+        ' BOTON FILTRAR
+        ' 1. Obtiene datos base desde Oracle (por mes o todos)
+        ' 2. Aplica filtros en memoria: producto y estado vigente
+        ' =============================================
         Protected Sub btnFiltrar_Click(sender As Object, e As EventArgs)
-            Dim mes As Integer = Convert.ToInt32(ddlMes.SelectedValue)
-            If mes = 0 Then
-                CargarHistorialTodos()
-            Else
-                Dim anio As Integer = Convert.ToInt32(ddlAnio.SelectedValue)
-                Try
-                    gvHistorial.DataSource = HistorialPrecioService.ListarPorMes(mes, anio)
-                    gvHistorial.DataBind()
-                Catch ex As Exception
-                    MostrarError("Error al filtrar: " & ex.Message)
-                End Try
-            End If
-        End Sub
-
-        ' =============================================
-        ' CASCADA PRODUCTO → ALMACEN → NICHO
-        ' =============================================
-        Protected Sub ddlProducto_SelectedIndexChanged(sender As Object, e As EventArgs)
-            pnlInfoProducto.Visible = False
-            pnlPrecioNicho.Visible = False
-            LimpiarNichos()
-            If ddlProducto.SelectedValue = "" Then
-                CargarHistorialTodos()
-                Return
-            End If
             Try
-                Dim dt As DataTable = ProductoService.Listar()
-                Dim fila As DataRow() = dt.Select("PRO_REFERENCIA = '" & ddlProducto.SelectedValue & "'")
-                If fila.Length > 0 Then
-                    lblNombreProducto.Text = fila(0)("PRO_NOMBRE").ToString()
-                    lblTipo.Text = fila(0)("TIP_DESCRIPCION").ToString()
-                    lblMaterial.Text = fila(0)("MAT_DESCRIPCION").ToString()
-                    pnlInfoProducto.Visible = True
+                Dim mes As Integer = Convert.ToInt32(ddlMes.SelectedValue)
+                Dim dt As DataTable
+
+                If mes = 0 Then
+                    dt = HistorialPrecioService.ListarTodos()
+                Else
+                    Dim anio As Integer = Convert.ToInt32(ddlAnio.SelectedValue)
+                    dt = HistorialPrecioService.ListarPorMes(mes, anio)
                 End If
-                CargarHistorial(ddlProducto.SelectedValue)
-            Catch ex As Exception
-                MostrarError("Error: " & ex.Message)
-            End Try
-        End Sub
 
-        Protected Sub ddlAlmacen_SelectedIndexChanged(sender As Object, e As EventArgs)
-            pnlPrecioNicho.Visible = False
-            LimpiarNichos()
-            If ddlAlmacen.SelectedValue = "" Then Return
-            Try
-                ddlNicho.DataSource = NicAlmService.ListarPorAlmacen(Convert.ToDecimal(ddlAlmacen.SelectedValue))
-                ddlNicho.DataTextField = "NIC_DISPLAY"
-                ddlNicho.DataValueField = "NIC_NICHO"
-                ddlNicho.DataBind()
-                ddlNicho.Items.Insert(0, New ListItem("-- Seleccione un nicho --", ""))
-            Catch ex As Exception
-                MostrarError("Error al cargar nichos: " & ex.Message)
-            End Try
-        End Sub
+                dt = AplicarFiltrosEnMemoria(dt)
 
-        Protected Sub ddlNicho_SelectedIndexChanged(sender As Object, e As EventArgs)
-            pnlPrecioNicho.Visible = False
-            If ddlNicho.SelectedValue = "" OrElse ddlProducto.SelectedValue = "" Then Return
-            Try
-                Dim dtVigente As DataTable = HistorialPrecioService.Vigente(
-                    ddlProducto.SelectedValue,
-                    Convert.ToDecimal(ddlNicho.SelectedValue)
-                )
-                If dtVigente.Rows.Count > 0 Then
-                    lblPrecioNicho.Text = String.Format("{0:C2}", dtVigente.Rows(0)("HIP_PRECIO"))
-                    pnlPrecioNicho.Visible = True
-                End If
-            Catch ex As Exception
-                ' Sin precio vigente aun
-            End Try
-        End Sub
-
-        ' =============================================
-        ' HISTORIAL
-        ' =============================================
-        Private Sub CargarHistorialTodos()
-            Try
-                gvHistorial.DataSource = HistorialPrecioService.ListarTodos()
+                gvHistorial.DataSource = dt
                 gvHistorial.DataBind()
+                lblContador.Text = If(dt IsNot Nothing, dt.Rows.Count.ToString(), "0")
             Catch ex As Exception
-                MostrarError("Error al cargar historial: " & ex.Message)
-            End Try
-        End Sub
-
-        Private Sub CargarHistorial(referencia As String)
-            Try
-                gvHistorial.DataSource = HistorialPrecioService.ListarPorProducto(referencia)
-                gvHistorial.DataBind()
-            Catch ex As Exception
-                MostrarError("Error al cargar historial: " & ex.Message)
+                MostrarError("Error al filtrar: " & ex.Message)
             End Try
         End Sub
 
         ' =============================================
-        ' REGISTRAR PRECIO
+        ' BOTON LIMPIAR
         ' =============================================
-        Protected Sub btnRegistrar_Click(sender As Object, e As EventArgs)
-            If ddlProducto.SelectedValue = "" Then MostrarError("Debe seleccionar un producto.") : Return
-            If ddlAlmacen.SelectedValue = "" Then MostrarError("Debe seleccionar un almacen.") : Return
-            If ddlNicho.SelectedValue = "" Then MostrarError("Debe seleccionar un nicho.") : Return
-            If txtPrecio.Text.Trim() = "" Then MostrarError("El precio es obligatorio.") : Return
-            If txtFechaInicio.Text.Trim() = "" Then MostrarError("La fecha de inicio es obligatoria.") : Return
-            Try
-                HistorialPrecioService.Registrar(
-                    ddlProducto.SelectedValue,
-                    Convert.ToDecimal(ddlNicho.SelectedValue),
-                    Convert.ToDecimal(txtPrecio.Text.Trim()),
-                    Convert.ToDateTime(txtFechaInicio.Text.Trim())
-                )
-                MostrarExito("Precio registrado correctamente.")
-                txtPrecio.Text = ""
-                txtFechaInicio.Text = DateTime.Now.ToString("yyyy-MM-dd")
-                ddlNicho_SelectedIndexChanged(Nothing, EventArgs.Empty)
-                CargarHistorial(ddlProducto.SelectedValue)
-            Catch ex As Exception
-                MostrarError("Error al registrar: " & ex.Message)
-            End Try
-        End Sub
-
-        Protected Sub btnCancelar_Click(sender As Object, e As EventArgs)
-            LimpiarFormulario()
-        End Sub
-
-        Private Sub LimpiarFormulario()
-            ddlProducto.SelectedIndex = 0
-            ddlAlmacen.SelectedIndex = 0
-            txtPrecio.Text = ""
-            txtFechaInicio.Text = DateTime.Now.ToString("yyyy-MM-dd")
-            pnlInfoProducto.Visible = False
-            pnlPrecioNicho.Visible = False
+        Protected Sub btnLimpiar_Click(sender As Object, e As EventArgs)
+            ddlMes.SelectedIndex = 0
+            ddlAnio.SelectedIndex = 0
+            txtFiltroProducto.Text = ""
+            chkSoloVigentes.Checked = False
             pnlMsg.Visible = False
-            LimpiarNichos()
             CargarHistorialTodos()
         End Sub
 
+        ' =============================================
+        ' FILTROS EN MEMORIA
+        ' - Producto: contiene el texto en PRO_NOMBRE (insensible a mayúsculas)
+        ' - Solo vigentes: HIP_FECHA_FINAL IS NULL
+        '
+        ' Ambos filtros son independientes y se acumulan (AND).
+        ' =============================================
+        Private Function AplicarFiltrosEnMemoria(dt As DataTable) As DataTable
+            If dt Is Nothing OrElse dt.Rows.Count = 0 Then Return dt
+
+            Dim filtroProd As String = txtFiltroProducto.Text.Trim()
+            Dim soloVigentes As Boolean = chkSoloVigentes.Checked
+            Dim hayFiltro As Boolean = Not String.IsNullOrEmpty(filtroProd) OrElse soloVigentes
+
+            ' Si no hay ningún filtro activo devolvemos el DataTable tal cual
+            If Not hayFiltro Then Return dt
+
+            Dim filtroUp As String = filtroProd.ToUpper()
+            Dim filas As IEnumerable(Of DataRow) = dt.AsEnumerable()
+
+            ' Filtro por nombre de producto (contiene, insensible a mayúsculas)
+            If Not String.IsNullOrEmpty(filtroProd) Then
+                filas = filas.Where(Function(r)
+                                        If IsDBNull(r("PRO_NOMBRE")) Then Return False
+                                        Return r("PRO_NOMBRE").ToString().ToUpper().Contains(filtroUp)
+                                    End Function)
+            End If
+
+            ' Filtro solo vigentes: fecha final nula
+            If soloVigentes Then
+                filas = filas.Where(Function(r) IsDBNull(r("HIP_FECHA_FINAL")))
+            End If
+
+            Dim dtResultado As DataTable = dt.Clone()
+            For Each fila As DataRow In filas
+                dtResultado.ImportRow(fila)
+            Next
+
+            Return dtResultado
+        End Function
+
+        ' =============================================
+        ' CARGAR HISTORIAL COMPLETO (sin filtros)
+        ' =============================================
+        Private Sub CargarHistorialTodos()
+            Try
+                Dim dt As DataTable = HistorialPrecioService.ListarTodos()
+                gvHistorial.DataSource = dt
+                gvHistorial.DataBind()
+                lblContador.Text = If(dt IsNot Nothing, dt.Rows.Count.ToString(), "0")
+            Catch ex As Exception
+                MostrarError("Error al cargar historial: " & ex.Message)
+            End Try
+        End Sub
+
+        ' =============================================
+        ' HELPERS
+        ' =============================================
         Private Sub MostrarError(msg As String)
             lblMsg.Text = msg
             pnlMsg.CssClass = "alert-err"
-            pnlMsg.Visible = True
-        End Sub
-
-        Private Sub MostrarExito(msg As String)
-            lblMsg.Text = msg
-            pnlMsg.CssClass = "alert-ok"
             pnlMsg.Visible = True
         End Sub
 

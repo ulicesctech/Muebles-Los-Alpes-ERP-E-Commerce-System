@@ -25,11 +25,11 @@ CREATE OR REPLACE PACKAGE BODY PKG_FAC_FACTURA_CLIENTE AS
             SELECT f.pre_presupuesto,
                    f.facli_codigo_factura,
                    f.facli_fecha,
-                   c.pre_correlativo         AS pre_presupuesto,
+                   c.pre_correlativo AS pre_presupuesto,
                    e.em_primer_nombre || ' ' || e.em_primer_apellido AS em_empleado
               FROM FAC_FACTURA_CLIENTE f
-              JOIN CLI_CARRITO  c ON c.pre_carrito = f.pre_carrito
-              JOIN RH_EMPLEADO  e ON e.em_empleado = f.em_empleado
+              JOIN CLI_CARRITO c ON c.pre_carrito = f.pre_carrito
+              JOIN RH_EMPLEADO e ON e.em_empleado = f.em_empleado
              ORDER BY f.facli_fecha DESC;
     END;
 
@@ -37,6 +37,21 @@ CREATE OR REPLACE PACKAGE BODY PKG_FAC_FACTURA_CLIENTE AS
     BEGIN
         assert_id(p_presupuesto, 'Factura: Presupuesto obligatorio.');
         OPEN p_data FOR SELECT * FROM FAC_FACTURA_CLIENTE WHERE pre_carrito = p_presupuesto;
+    END;
+
+    PROCEDURE FACTURA_LISTAR_POR_CLIENTE(p_cliente IN NUMBER, p_data OUT SYS_REFCURSOR) IS
+    BEGIN
+        assert_id(p_cliente, 'Factura: Cliente obligatorio.');
+        OPEN p_data FOR
+            SELECT f.facli_codigo_factura,
+                   f.facli_fecha,
+                   f.pre_carrito,
+                   c.pre_total,
+                   c.cli_cliente
+              FROM FAC_FACTURA_CLIENTE f
+              JOIN CLI_CARRITO c ON c.pre_carrito = f.pre_carrito
+             WHERE c.cli_cliente = p_cliente
+             ORDER BY f.facli_fecha DESC;
     END;
 
 END PKG_FAC_FACTURA_CLIENTE;

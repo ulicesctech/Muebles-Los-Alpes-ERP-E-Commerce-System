@@ -8,9 +8,11 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
         Protected WithEvents hfId As Global.System.Web.UI.WebControls.HiddenField
         Protected WithEvents hfMode As Global.System.Web.UI.WebControls.HiddenField
         Protected WithEvents ddlEmpleado As Global.System.Web.UI.WebControls.DropDownList
+        Protected WithEvents pnlPuestoActual As Global.System.Web.UI.WebControls.Panel
+        Protected WithEvents litPuestoActual As Global.System.Web.UI.WebControls.Literal
+        Protected WithEvents litSalarioActual As Global.System.Web.UI.WebControls.Literal
         Protected WithEvents ddlPuesto As Global.System.Web.UI.WebControls.DropDownList
-        Protected WithEvents txtFechaInicio As Global.System.Web.UI.WebControls.TextBox
-        Protected WithEvents txtFechaFinal As Global.System.Web.UI.WebControls.TextBox
+        Protected WithEvents pnlSinPuestos As Global.System.Web.UI.WebControls.Panel
         Protected WithEvents btnGuardar As Global.System.Web.UI.WebControls.Button
         Protected WithEvents btnNuevo As Global.System.Web.UI.WebControls.Button
         Protected WithEvents gvAscensos As Global.System.Web.UI.WebControls.GridView

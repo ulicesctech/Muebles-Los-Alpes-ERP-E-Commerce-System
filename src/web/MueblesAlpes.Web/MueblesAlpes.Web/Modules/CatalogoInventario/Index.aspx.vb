@@ -1,6 +1,4 @@
-﻿Imports System
-
-Namespace Modules.CatalogoInventario
+﻿Namespace Modules.CatalogoInventario
 
     Partial Public Class Index
         Inherits System.Web.UI.Page

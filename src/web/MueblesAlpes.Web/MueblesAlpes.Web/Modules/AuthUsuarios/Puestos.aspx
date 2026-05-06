@@ -11,8 +11,7 @@
     .form-card-head { background:linear-gradient(135deg,#5C3A1E,#8B5E3C); padding:14px 20px; }
     .form-card-head span { color:#f0d9a0; font-size:14px; font-weight:bold; }
     .form-card-body { padding:20px; }
-    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-    .form-row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
     .form-group { margin-bottom:16px; }
     .form-group label { display:block; font-size:13px; font-weight:bold; color:#5C3A1E; margin-bottom:6px; font-family:Arial,sans-serif; }
     .form-control { width:100%; padding:10px 12px; border:1px solid #e8d8c0; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; color:#333; box-sizing:border-box; }
@@ -21,6 +20,7 @@
     .btn-gold:hover { background:linear-gradient(135deg,#a87a2e,#7a5818); color:white; }
     .btn-outline { background:white; color:#5C3A1E; border:2px solid #e8d8c0; padding:10px 18px; border-radius:8px; font-size:13px; cursor:pointer; }
     .btn-outline:hover { border-color:#C9973A; color:#C9973A; }
+    .hint-box { background:#fdf6ec; border:1px solid #e8d8c0; border-radius:8px; padding:12px 16px; margin-bottom:20px; font-size:12px; color:#8B5E3C; font-family:Arial,sans-serif; }
     .table-card { background:white; border-radius:12px; border:1px solid #e8d8c0; overflow:hidden; box-shadow:0 2px 8px rgba(92,58,30,0.06); overflow-x:auto; }
     .table-card table { width:100%; border-collapse:collapse; font-family:Arial,sans-serif; }
     .table-card thead tr { background:linear-gradient(135deg,#5C3A1E,#8B5E3C); }
@@ -29,6 +29,7 @@
     .table-card tbody tr:hover { background:#fdf8f3; }
     .table-card tbody td { padding:14px 18px; font-size:13px; white-space:nowrap; }
     .badge-id { background:#fdf6ec; color:#C9973A; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:bold; border:1px solid #e8d8c0; }
+    .badge-salary { background:#f0fff4; color:#276749; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:bold; }
     .actions-cell { display:flex; gap:8px; justify-content:flex-end; }
     .btn-edit-t { background:#fdf6ec; color:#C9973A; border:1px solid #e8d8c0; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer; }
     .btn-edit-t:hover { background:#C9973A; color:white; }
@@ -47,22 +48,29 @@
 <asp:Label ID="lblMensaje" runat="server" CssClass="alert-ok"  Visible="false" />
 <asp:Label ID="lblError"   runat="server" CssClass="alert-err" Visible="false" />
 
+<div class="hint-box">
+    💡 Cada puesto corresponde a un rol del sistema. El salario es el ingreso base mensual en Quetzales.
+</div>
+
 <div class="form-card">
     <div class="form-card-head"><span>🔧 Nuevo / Editar Puesto</span></div>
     <div class="form-card-body">
         <asp:HiddenField ID="hfId" runat="server" />
-        <div class="form-row-3">
+        <div class="form-row">
             <div class="form-group">
-                <label>Nombre *</label>
-                <asp:TextBox ID="txtNombre" runat="server" CssClass="form-control" placeholder="Nombre del puesto..." />
+                <label>Rol / Grupo *</label>
+                <asp:DropDownList ID="ddlGrupo" runat="server" CssClass="form-control"
+                    AutoPostBack="true" OnSelectedIndexChanged="ddlGrupo_SelectedIndexChanged" />
             </div>
             <div class="form-group">
-                <label>Salario *</label>
-                <asp:TextBox ID="txtSalario" runat="server" CssClass="form-control" placeholder="Ej: 5000.00..." />
+                <label>Salario Base (Q) *</label>
+                <asp:TextBox ID="txtSalario" runat="server" CssClass="form-control"
+                    placeholder="Ej: 5000.00" />
             </div>
             <div class="form-group">
                 <label>Descripción *</label>
-                <asp:TextBox ID="txtDescripcion" runat="server" CssClass="form-control" placeholder="Descripción..." />
+                <asp:TextBox ID="txtDescripcion" runat="server" CssClass="form-control"
+                    placeholder="Descripción del puesto..." />
             </div>
         </div>
         <div style="display:flex; gap:10px;">
@@ -83,9 +91,13 @@
                     <span class="badge-id"><%# Eval("pue_puestos") %></span>
                 </ItemTemplate>
             </asp:TemplateField>
-            <asp:BoundField DataField="pue_nombre"      HeaderText="Nombre" />
-            <asp:BoundField DataField="pue_salario"     HeaderText="Salario" DataFormatString="{0:C}" />
+            <asp:BoundField DataField="pue_nombre"      HeaderText="Puesto / Rol" />
             <asp:BoundField DataField="pue_descripcion" HeaderText="Descripción" />
+            <asp:TemplateField HeaderText="Salario Base">
+                <ItemTemplate>
+                    <span class="badge-salary">Q <%# String.Format("{0:N2}", Eval("pue_salario")) %></span>
+                </ItemTemplate>
+            </asp:TemplateField>
             <asp:TemplateField HeaderText="Acciones">
                 <ItemTemplate>
                     <div class="actions-cell">

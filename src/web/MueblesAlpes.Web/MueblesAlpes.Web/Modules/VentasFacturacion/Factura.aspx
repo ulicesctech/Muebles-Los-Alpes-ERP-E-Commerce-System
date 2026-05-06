@@ -245,12 +245,28 @@
             <RowStyle />
             <AlternatingRowStyle />
             <Columns>
-                <asp:BoundField DataField="FACLI_CODIGO_FACTURA" HeaderText="Código Factura" ItemStyle-Width="220px" />
-                <asp:BoundField DataField="PRE_PRESUPUESTO" HeaderText="Carrito" ItemStyle-Width="120px" />
-                <asp:BoundField DataField="EM_EMPLEADO" HeaderText="Empleado" ItemStyle-Width="120px" />
-                <asp:BoundField DataField="FACLI_FECHA" HeaderText="Fecha" ItemStyle-Width="220px" />
-            </Columns>
+    <asp:BoundField DataField="FACLI_CODIGO_FACTURA" HeaderText="Código Factura" ItemStyle-Width="220px" />
+    <asp:BoundField DataField="PRE_CORRELATIVO"      HeaderText="Carrito"        ItemStyle-Width="120px" />
+    <asp:BoundField DataField="NOMBRE_EMPLEADO"      HeaderText="Empleado"       ItemStyle-Width="200px" />
+    <asp:BoundField DataField="FACLI_FECHA"          HeaderText="Fecha"          ItemStyle-Width="220px" />
+</Columns>
         </asp:GridView>
     </div>
-
+    <div id="modalStock" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+     background:rgba(0,0,0,0.5); z-index:99999; align-items:center; justify-content:center;">
+    <div style="background:white; border-radius:16px; padding:36px; max-width:420px; width:90%;
+                text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+        <div style="font-size:64px; margin-bottom:12px;"></div>
+        <div style="font-size:20px; font-weight:bold; color:#3a2a1a; font-family:Georgia,serif;
+                    margin-bottom:10px;">Stock insuficiente</div>
+        <div id="modalStockMsg" style="font-size:14px; color:#666; font-family:Arial,sans-serif;
+             margin-bottom:24px; line-height:1.6;"></div>
+        <button onclick="document.getElementById('modalStock').style.display='none';"
+                style="padding:12px 28px; background:linear-gradient(135deg,#5C3A1E,#8B5E3C);
+                       color:white; border:none; border-radius:8px; font-family:Arial,sans-serif;
+                       font-size:14px; cursor:pointer;">
+            Cerrar
+        </button>
+    </div>
+</div>
 </asp:Content>

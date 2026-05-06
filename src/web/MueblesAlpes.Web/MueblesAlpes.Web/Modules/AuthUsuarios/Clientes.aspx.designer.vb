@@ -6,6 +6,8 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
         Protected WithEvents lblMensaje As Global.System.Web.UI.WebControls.Label
         Protected WithEvents lblError As Global.System.Web.UI.WebControls.Label
         Protected WithEvents hfId As Global.System.Web.UI.WebControls.HiddenField
+        Protected WithEvents hfFormOpen As Global.System.Web.UI.WebControls.HiddenField
+        Protected WithEvents hfFormEditing As Global.System.Web.UI.WebControls.HiddenField
         Protected WithEvents ddlTipoDoc As Global.System.Web.UI.WebControls.DropDownList
         Protected WithEvents txtNumDoc As Global.System.Web.UI.WebControls.TextBox
         Protected WithEvents txtNIT As Global.System.Web.UI.WebControls.TextBox
@@ -16,6 +18,7 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
         Protected WithEvents txtSegundoApellido As Global.System.Web.UI.WebControls.TextBox
         Protected WithEvents txtEmail As Global.System.Web.UI.WebControls.TextBox
         Protected WithEvents txtProfesion As Global.System.Web.UI.WebControls.TextBox
+        Protected WithEvents txtPassword As Global.System.Web.UI.WebControls.TextBox
         Protected WithEvents txtTelefono1 As Global.System.Web.UI.WebControls.TextBox
         Protected WithEvents txtTelefono2 As Global.System.Web.UI.WebControls.TextBox
         Protected WithEvents txtPais As Global.System.Web.UI.WebControls.TextBox
@@ -31,5 +34,6 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
         Protected WithEvents btnBuscar As Global.System.Web.UI.WebControls.Button
         Protected WithEvents btnVerTodos As Global.System.Web.UI.WebControls.Button
         Protected WithEvents gvClientes As Global.System.Web.UI.WebControls.GridView
+        Protected WithEvents lblResultado As Global.System.Web.UI.WebControls.Label
     End Class
 End Namespace

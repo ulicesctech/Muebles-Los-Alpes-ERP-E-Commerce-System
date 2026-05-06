@@ -1,4 +1,7 @@
-﻿Namespace Modules.Cliente
+﻿Imports System.Data
+Imports OracleInternal
+
+Namespace Modules.Cliente
 
     Public Class Registro
         Inherits System.Web.UI.Page
@@ -12,19 +15,16 @@
         Protected Sub btnRegistrar_Click(sender As Object, e As EventArgs)
             pnlMsg.Visible = False
 
-            ' Validaciones básicas
             If String.IsNullOrEmpty(txtPNombre.Text.Trim()) OrElse
                String.IsNullOrEmpty(txtPApellido.Text.Trim()) OrElse
                String.IsNullOrEmpty(txtNumDoc.Text.Trim()) OrElse
                String.IsNullOrEmpty(txtEmail.Text.Trim()) OrElse
-               String.IsNullOrEmpty(txtUsuario.Text.Trim()) OrElse
                String.IsNullOrEmpty(txtPassword.Text.Trim()) Then
                 MostrarError("Completa todos los campos obligatorios (*).")
                 Return
             End If
 
             Try
-                ' 1. Crear cliente
                 Dim clienteId As Integer = AuthClienteService.RegistrarCliente(
                     ddlTipoDoc.SelectedValue,
                     txtNumDoc.Text.Trim(),
@@ -45,10 +45,8 @@
                     ddlTipoCliente.SelectedValue
                 )
 
-                ' 2. Crear login
-                AuthClienteService.CrearLogin(clienteId, txtUsuario.Text.Trim(), txtPassword.Text.Trim())
+                AuthClienteService.CrearLogin(clienteId, txtPNombre.Text.Trim(), txtPassword.Text.Trim())
 
-                ' 3. Sesión automática
                 Session("CLI_CLIENTE") = clienteId
                 Session("CLI_NOMBRE") = txtPNombre.Text.Trim() & " " & txtPApellido.Text.Trim()
                 Session("CLI_EMAIL") = txtEmail.Text.Trim()
@@ -56,7 +54,7 @@
                 Response.Redirect("~/Modules/Cliente/Catalogo.aspx")
 
             Catch ex As Exception
-                If ex.Message.Contains("unique") OrElse ex.Message.Contains("ORA-00001") Then
+                If ex.Message.Contains("ORA-00001") Then
                     MostrarError("Ya existe una cuenta con ese email, documento o usuario.")
                 Else
                     MostrarError("Error al crear cuenta: " & ex.Message)

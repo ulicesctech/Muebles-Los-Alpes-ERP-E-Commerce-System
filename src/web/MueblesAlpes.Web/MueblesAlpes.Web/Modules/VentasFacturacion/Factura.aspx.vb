@@ -1,5 +1,4 @@
-ï»¿Imports System.Data
-Imports Oracle.ManagedDataAccess.Client
+Imports System.Data
 
 Namespace Modules.VentasFacturacion
     Public Class Factura
@@ -14,15 +13,8 @@ Namespace Modules.VentasFacturacion
         End Sub
 
         Private Sub CargarCarritos()
-            Dim conn As New OracleConnection(ConfigurationManager.ConnectionStrings("OracleConn").ConnectionString)
-            Dim cmd As New OracleCommand("PKG_CLI_CARRITO.CARRITO_LISTAR", conn)
-            cmd.CommandType = CommandType.StoredProcedure
-            cmd.Parameters.Add("p_data", OracleDbType.RefCursor).Direction = ParameterDirection.Output
             Try
-                conn.Open()
-                Dim da As New OracleDataAdapter(cmd)
-                Dim dt As New DataTable()
-                da.Fill(dt)
+                Dim dt As DataTable = CarritoVentasService.Listar()
                 ddlCarrito.DataSource = dt
                 ddlCarrito.DataTextField = "PRE_CORRELATIVO"
                 ddlCarrito.DataValueField = "PRE_CARRITO"
@@ -30,76 +22,47 @@ Namespace Modules.VentasFacturacion
                 ddlCarrito.Items.Insert(0, New ListItem("-- Seleccione --", ""))
             Catch ex As Exception
                 MostrarMensaje("Error al cargar carritos: " & ex.Message, "alert-danger")
-            Finally
-                conn.Close()
             End Try
         End Sub
 
         Private Sub CargarEmpleados()
-            Dim conn As New OracleConnection(ConfigurationManager.ConnectionStrings("OracleConn").ConnectionString)
-            Dim cmd As New OracleCommand("SELECT EM_EMPLEADO, EM_PRIMER_NOMBRE || ' ' || EM_PRIMER_APELLIDO AS NOMBRE_COMPLETO FROM RH_EMPLEADO", conn)
             Try
-                conn.Open()
-                Dim da As New OracleDataAdapter(cmd)
-                Dim dt As New DataTable()
-                da.Fill(dt)
+                Dim dt As DataTable = EmpleadoService.Listar()
                 ddlEmpleado.DataSource = dt
-                ddlEmpleado.DataTextField = "NOMBRE_COMPLETO"
+                ddlEmpleado.DataTextField = "EM_PRIMER_NOMBRE"
                 ddlEmpleado.DataValueField = "EM_EMPLEADO"
                 ddlEmpleado.DataBind()
                 ddlEmpleado.Items.Insert(0, New ListItem("-- Seleccione --", ""))
             Catch ex As Exception
                 MostrarMensaje("Error al cargar empleados: " & ex.Message, "alert-danger")
-            Finally
-                conn.Close()
             End Try
         End Sub
 
         Private Sub CargarFacturas()
-            Dim conn As New OracleConnection(ConfigurationManager.ConnectionStrings("OracleConn").ConnectionString)
-            Dim cmd As New OracleCommand("PKG_FAC_FACTURA_CLIENTE.FACTURA_LISTAR", conn)
-            cmd.CommandType = CommandType.StoredProcedure
-            cmd.Parameters.Add("p_data", OracleDbType.RefCursor).Direction = ParameterDirection.Output
             Try
-                conn.Open()
-                Dim da As New OracleDataAdapter(cmd)
-                Dim dt As New DataTable()
-                da.Fill(dt)
-                gvFacturas.DataSource = dt
+                gvFacturas.DataSource = FacturaService.Listar()
                 gvFacturas.DataBind()
             Catch ex As Exception
                 MostrarMensaje("Error al cargar facturas: " & ex.Message, "alert-danger")
-            Finally
-                conn.Close()
             End Try
         End Sub
 
         Protected Sub btnGuardar_Click(ByVal sender As Object, ByVal e As EventArgs)
-            Dim conn As New OracleConnection(ConfigurationManager.ConnectionStrings("OracleConn").ConnectionString)
-            Dim cmd As New OracleCommand("PKG_FAC_FACTURA_CLIENTE.FACTURA_CREAR", conn)
-            cmd.CommandType = CommandType.StoredProcedure
-            cmd.Parameters.Add("p_presupuesto", OracleDbType.Int32).Value = ddlCarrito.SelectedValue
-            cmd.Parameters.Add("p_empleado", OracleDbType.Int32).Value = ddlEmpleado.SelectedValue
-            Dim pCodigo As New OracleParameter("p_codigo_factura", OracleDbType.Varchar2, 50)
-            pCodigo.Direction = ParameterDirection.Output
-            cmd.Parameters.Add(pCodigo)
             Try
-                conn.Open()
-                cmd.ExecuteNonQuery()
-                txtCodigoFactura.Text = pCodigo.Value.ToString()
-
-                ' Descontar stock de cada producto del carrito
-                Dim cmdStock As New OracleCommand("PKG_CLI_CARRITO.CARRITO_FACTURAR", conn)
-                cmdStock.CommandType = CommandType.StoredProcedure
-                cmdStock.Parameters.Add("p_carrito", OracleDbType.Int32).Value = Convert.ToInt32(ddlCarrito.SelectedValue)
-                cmdStock.ExecuteNonQuery()
-
+                Dim carrito As Decimal = Convert.ToDecimal(ddlCarrito.SelectedValue)
+                Dim empleado As Decimal = Convert.ToDecimal(ddlEmpleado.SelectedValue)
+                txtCodigoFactura.Text = FacturaService.Crear(carrito, empleado)
+                CarritoVentasService.Facturar(carrito)
                 MostrarMensaje("Factura generada exitosamente. Codigo: " & txtCodigoFactura.Text, "alert-success")
                 CargarFacturas()
             Catch ex As Exception
-                MostrarMensaje("Error: " & ex.Message, "alert-danger")
-            Finally
-                conn.Close()
+                If ex.Message.Contains("ORA-20012") OrElse ex.Message.Contains("stock insuficiente") Then
+                    ScriptManager.RegisterStartupScript(Me, Me.GetType(), "modalStock",
+                "document.getElementById('modalStock').style.display='flex';" &
+                "document.getElementById('modalStockMsg').innerHTML='Lo sentimos, no hay suficiente stock para uno o más productos. Verifique Su Stock.';", True)
+                Else
+                    MostrarMensaje("Error: " & ex.Message, "alert-danger")
+                End If
             End Try
         End Sub
 

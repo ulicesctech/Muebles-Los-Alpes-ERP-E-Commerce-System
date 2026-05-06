@@ -6,7 +6,7 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
         Protected WithEvents lblMensaje As Global.System.Web.UI.WebControls.Label
         Protected WithEvents lblError As Global.System.Web.UI.WebControls.Label
         Protected WithEvents hfId As Global.System.Web.UI.WebControls.HiddenField
-        Protected WithEvents txtNombre As Global.System.Web.UI.WebControls.TextBox
+        Protected WithEvents ddlGrupo As Global.System.Web.UI.WebControls.DropDownList
         Protected WithEvents txtSalario As Global.System.Web.UI.WebControls.TextBox
         Protected WithEvents txtDescripcion As Global.System.Web.UI.WebControls.TextBox
         Protected WithEvents btnGuardar As Global.System.Web.UI.WebControls.Button

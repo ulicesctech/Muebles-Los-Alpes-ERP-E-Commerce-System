@@ -1,8 +1,5 @@
-Imports System
-Imports System.Collections.Generic
-Imports System.Configuration
-Imports System.Data
 Imports Oracle.ManagedDataAccess.Client
+Imports System.Data
 
 Public NotInheritable Class OracleDb
 

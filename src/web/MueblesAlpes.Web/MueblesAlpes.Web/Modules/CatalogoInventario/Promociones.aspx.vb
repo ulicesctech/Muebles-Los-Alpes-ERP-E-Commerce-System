@@ -1,7 +1,4 @@
-﻿Imports System
-Imports System.Data
-
-' ============================================================
+﻿' ============================================================
 ' RUTA: Modules/CatalogoInventario/Promociones.aspx.vb
 ' ============================================================
 Namespace Modules.CatalogoInventario

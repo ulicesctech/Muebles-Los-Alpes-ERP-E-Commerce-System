@@ -186,15 +186,6 @@ Namespace Modules.Cliente
         Protected WithEvents txtEmail As Global.System.Web.UI.WebControls.TextBox
 
         '''<summary>
-        '''txtUsuario control.
-        '''</summary>
-        '''<remarks>
-        '''Auto-generated field.
-        '''To modify move field declaration from designer file to code-behind file.
-        '''</remarks>
-        Protected WithEvents txtUsuario As Global.System.Web.UI.WebControls.TextBox
-
-        '''<summary>
         '''txtPassword control.
         '''</summary>
         '''<remarks>

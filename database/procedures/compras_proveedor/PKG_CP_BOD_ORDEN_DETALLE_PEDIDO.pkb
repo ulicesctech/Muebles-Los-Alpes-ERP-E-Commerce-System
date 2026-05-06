@@ -4,34 +4,41 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_ORDEN_DETALLE_PEDIDO AS
         p_orc_key  IN VARCHAR2,
         p_ped_id   IN NUMBER,
         p_material IN VARCHAR2,
+        p_producto IN VARCHAR2,
         p_precio   IN NUMBER,
         p_cantidad IN NUMBER
     ) IS
     BEGIN
         INSERT INTO BOD_ORDEN_DETALLE_PEDIDO
-            (orc_orden_compra, ped_pedido, odp_material, odp_precio, odp_cantidad)
+            (orc_orden_compra, ped_pedido, odp_material, odp_producto, odp_precio, odp_cantidad)
         VALUES
-            (p_orc_key, p_ped_id, p_material, p_precio, p_cantidad);
+            (p_orc_key, p_ped_id, p_material, p_producto, p_precio, p_cantidad);
         COMMIT;
     EXCEPTION
-        WHEN OTHERS THEN ROLLBACK; RAISE;
+        WHEN OTHERS THEN
+            ROLLBACK;
+            RAISE;
     END ODP_INSERTAR;
 
     PROCEDURE ODP_ACTUALIZAR(
         p_odp_id   IN NUMBER,
         p_material IN VARCHAR2,
+        p_producto IN VARCHAR2,
         p_precio   IN NUMBER,
         p_cantidad IN NUMBER
     ) IS
     BEGIN
         UPDATE BOD_ORDEN_DETALLE_PEDIDO
            SET odp_material = p_material,
+               odp_producto = p_producto,
                odp_precio   = p_precio,
                odp_cantidad = p_cantidad
          WHERE odp_orden_detalle_pedido = p_odp_id;
         COMMIT;
     EXCEPTION
-        WHEN OTHERS THEN ROLLBACK; RAISE;
+        WHEN OTHERS THEN
+            ROLLBACK;
+            RAISE;
     END ODP_ACTUALIZAR;
 
     PROCEDURE ODP_ELIMINAR(p_odp_id IN NUMBER) IS
@@ -40,7 +47,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_ORDEN_DETALLE_PEDIDO AS
          WHERE odp_orden_detalle_pedido = p_odp_id;
         COMMIT;
     EXCEPTION
-        WHEN OTHERS THEN ROLLBACK; RAISE;
+        WHEN OTHERS THEN
+            ROLLBACK;
+            RAISE;
     END ODP_ELIMINAR;
 
     PROCEDURE ODP_LISTAR_POR_ORDEN(
@@ -49,16 +58,50 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_ORDEN_DETALLE_PEDIDO AS
     ) IS
     BEGIN
         OPEN p_data FOR
+            SELECT d.odp_orden_detalle_pedido,
+                   d.orc_orden_compra,
+                   d.ped_pedido,
+                   pe.ped_codigo,
+                   pe.ped_forma_pago,
+                   d.odp_material,
+                   d.odp_producto,
+                   NVL(
+                       (SELECT pr.pro_nombre
+                          FROM BOD_DETALLE_PEDIDO  dp
+                          JOIN BOD_HISTORIAL_PRECIO h  ON h.hip_historial_precio = dp.hip_historial_precio
+                          JOIN BOD_PRODUCTO         pr ON pr.pro_referencia      = h.pro_referencia
+                          JOIN BOD_MATERIAL         m  ON m.mat_material         = pr.mat_material
+                         WHERE dp.ped_pedido = d.ped_pedido
+                           AND UPPER(TRIM(m.mat_descripcion)) = UPPER(TRIM(d.odp_material))
+                           AND UPPER(TRIM(pr.pro_nombre))     = UPPER(TRIM(d.odp_producto))
+                           AND ROWNUM = 1),
+                       d.odp_producto
+                   ) AS pro_nombre,
+                   d.odp_precio,
+                   d.odp_cantidad
+              FROM BOD_ORDEN_DETALLE_PEDIDO d
+              LEFT JOIN BOD_PEDIDO pe ON pe.ped_pedido = d.ped_pedido
+             WHERE d.orc_orden_compra = p_orc_key
+             ORDER BY d.odp_orden_detalle_pedido;
+    END ODP_LISTAR_POR_ORDEN;
+
+    PROCEDURE ODP_LISTAR_POR_PEDIDO(
+        p_ped_id IN NUMBER,
+        p_data   OUT SYS_REFCURSOR
+    ) IS
+    BEGIN
+        OPEN p_data FOR
             SELECT odp_orden_detalle_pedido,
                    orc_orden_compra,
                    ped_pedido,
                    odp_material,
+                   odp_producto,
                    odp_precio,
                    odp_cantidad
               FROM BOD_ORDEN_DETALLE_PEDIDO
-             WHERE orc_orden_compra = p_orc_key
+             WHERE ped_pedido = p_ped_id
              ORDER BY odp_orden_detalle_pedido;
-    END ODP_LISTAR_POR_ORDEN;
+    END ODP_LISTAR_POR_PEDIDO;
 
 END PKG_BOD_ORDEN_DETALLE_PEDIDO;
 /

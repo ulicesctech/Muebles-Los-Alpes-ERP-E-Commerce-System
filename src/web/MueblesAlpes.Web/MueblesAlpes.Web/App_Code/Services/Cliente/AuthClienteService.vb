@@ -1,5 +1,5 @@
-﻿Imports System.Data
-Imports Oracle.ManagedDataAccess.Client
+﻿Imports Oracle.ManagedDataAccess.Client
+Imports System.Data
 
 Public Class AuthClienteService
 
@@ -13,7 +13,37 @@ Public Class AuthClienteService
         OracleDb.ExecNonQuery("PKG_ADMIN_LOGIN_CLIENTE.LOGC_AUTENTICAR", ps)
         Return Convert.ToInt32(ps(2).Value.ToString())
     End Function
+    Public Shared Function AutenticarPorEmail(email As String, password As String) As Integer
+        Try
+            ' Buscar el usuario asociado al email
+            Dim dt As DataTable = OracleDb.ExecRefCursor(
+            "PKG_CLI_CLIENTE.CLI_BUSCAR",
+            New List(Of OracleParameter) From {
+                New OracleParameter("p_texto", OracleDbType.Varchar2, email, ParameterDirection.Input)
+            }, "p_data")
 
+            For Each row As DataRow In dt.Rows
+                If row("CLI_EMAIL").ToString().ToLower() = email.ToLower() Then
+                    Dim clienteId As Integer = Convert.ToInt32(row("CLI_CLIENTE"))
+                    ' Buscar usuario en ADMIN_LOGIN_CLIENTE
+                    Using conn As New OracleConnection(
+                    System.Configuration.ConfigurationManager.ConnectionStrings("OracleConn").ConnectionString)
+                        Using cmd As New OracleCommand(
+                            "SELECT logcli_usuario FROM ADMIN_LOGIN_CLIENTE WHERE cli_cliente = :id", conn)
+                            cmd.Parameters.Add(New OracleParameter("id", clienteId))
+                            conn.Open()
+                            Dim usuario As Object = cmd.ExecuteScalar()
+                            If usuario IsNot Nothing AndAlso usuario IsNot DBNull.Value Then
+                                Return Autenticar(usuario.ToString(), password)
+                            End If
+                        End Using
+                    End Using
+                End If
+            Next
+        Catch
+        End Try
+        Return 0
+    End Function
     Public Shared Function RegistrarCliente(
         tipodoc As String, numdoc As String,
         pNom As String, sNom As String,

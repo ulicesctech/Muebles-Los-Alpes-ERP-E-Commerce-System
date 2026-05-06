@@ -1,7 +1,4 @@
-﻿Imports System
-Imports System.Data
-
-' ============================================================
+﻿' ============================================================
 ' RUTA: Modules/CatalogoInventario/Stock.aspx.vb
 ' ============================================================
 Namespace Modules.CatalogoInventario
@@ -12,7 +9,179 @@ Namespace Modules.CatalogoInventario
         Protected Sub Page_Load(sender As Object, e As EventArgs) Handles Me.Load
             If Not IsPostBack Then
                 CargarProductos()
+                CargarFiltros()
                 CargarTablaStock()
+
+                Dim fromPed As String = Request.QueryString("fromped")
+                If fromPed = "1" Then
+                    Dim refParam As String = Request.QueryString("ref")
+                    Dim precioParam As String = Request.QueryString("precio")
+                    Dim hipParam As String = Request.QueryString("hip")
+                    Dim detpeParam As String = Request.QueryString("detpe")
+                    Dim pedidoParam As String = Request.QueryString("pedido")
+                    Dim cantRecibParam As String = Request.QueryString("cantrecibida")
+                    Dim cantTotalParam As String = Request.QueryString("canttotalrecib")
+
+                    hfFromPed.Value = "1"
+                    hfPedParam.Value = If(String.IsNullOrEmpty(pedidoParam), "0", pedidoParam)
+                    hfHipSemilla.Value = If(String.IsNullOrEmpty(hipParam), "0", hipParam)
+                    hfDetpeParam.Value = If(String.IsNullOrEmpty(detpeParam), "0", detpeParam)
+                    hfPrecioODP.Value = If(String.IsNullOrEmpty(precioParam), "0", precioParam)
+                    hfCantRecibida.Value = If(String.IsNullOrEmpty(cantRecibParam), "0", cantRecibParam)
+                    hfCantTotalRecib.Value = If(String.IsNullOrEmpty(cantTotalParam),
+                                               hfCantRecibida.Value, cantTotalParam)
+
+                    If Not String.IsNullOrEmpty(refParam) Then
+                        Dim item = ddlProducto.Items.FindByValue(refParam)
+                        If item IsNot Nothing Then
+                            ddlProducto.SelectedValue = refParam
+                            ddlProducto.Enabled = False
+                            pnlPaso1.Visible = True
+                            ddlProducto_SelectedIndexChanged(Nothing, EventArgs.Empty)
+                        End If
+                    End If
+
+                    MostrarExito("Recepcion del Pedido #" & pedidoParam &
+                        ". Selecciona almacen y nicho donde ingresa la mercancia. " &
+                        "Al confirmar el stock se registrara la cantidad recibida en el pedido.")
+                    pnlAvisoPedido.Visible = True
+                End If
+            End If
+        End Sub
+
+        ' =============================================
+        ' HELPER — SCROLL
+        ' =============================================
+        ' block: 'start' | 'center' | 'end' | 'nearest'
+        Private Sub ScrollAPanel(control As System.Web.UI.Control,
+                                  Optional block As String = "start")
+            Dim clientId As String = control.ClientID
+            Dim script As String =
+                "setTimeout(function(){" &
+                "  var el = document.getElementById('" & clientId & "');" &
+                "  if(el){" &
+                "    el.setAttribute('tabindex','-1');" &
+                "    el.focus({preventScroll:true});" &
+                "    el.scrollIntoView({behavior:'smooth',block:'" & block & "'});" &
+                "  }" &
+                "}, 200);"
+            Page.ClientScript.RegisterStartupScript(Me.GetType(), "scrollTo_" & clientId, script, True)
+        End Sub
+
+        ' =============================================
+        ' FILTROS
+        ' =============================================
+        Private Sub CargarFiltros()
+            Try
+                Dim dt As DataTable = StockService.Listar()
+                If dt Is Nothing OrElse dt.Rows.Count = 0 Then Return
+
+                Dim almacenes As DataTable = dt.DefaultView.ToTable(True, "ALM_NOMBRE")
+                ddlFiltroAlmacen.Items.Clear()
+                ddlFiltroAlmacen.Items.Add(New ListItem("-- Todos --", ""))
+                For Each fila As DataRow In almacenes.Rows
+                    Dim nombre As String = fila("ALM_NOMBRE").ToString()
+                    ddlFiltroAlmacen.Items.Add(New ListItem(nombre, nombre))
+                Next
+
+                Dim nichos As DataTable = dt.DefaultView.ToTable(True, "NIC_NUMERO")
+                ddlFiltroNicho.Items.Clear()
+                ddlFiltroNicho.Items.Add(New ListItem("-- Todos --", ""))
+                For Each fila As DataRow In nichos.Rows
+                    Dim numero As String = fila("NIC_NUMERO").ToString()
+                    ddlFiltroNicho.Items.Add(New ListItem(numero, numero))
+                Next
+            Catch ex As Exception
+                MostrarError("Error al cargar filtros: " & ex.Message)
+            End Try
+        End Sub
+
+        Protected Sub btnFiltrar_Click(sender As Object, e As EventArgs)
+            AplicarFiltros()
+        End Sub
+
+        Protected Sub btnLimpiar_Click(sender As Object, e As EventArgs)
+            txtFiltroProducto.Text = ""
+            ddlFiltroAlmacen.SelectedIndex = 0
+            ddlFiltroNicho.SelectedIndex = 0
+            CargarTablaStock()
+        End Sub
+
+        Private Sub AplicarFiltros()
+            Try
+                Dim dtTodo As DataTable = StockService.Listar()
+
+                Dim filtroProd As String = txtFiltroProducto.Text.Trim().ToUpper()
+                Dim filtroAlmacen As String = ddlFiltroAlmacen.SelectedValue
+                Dim filtroNicho As String = ddlFiltroNicho.SelectedValue
+
+                Dim filas As IEnumerable(Of DataRow) = dtTodo.AsEnumerable()
+
+                If Not String.IsNullOrEmpty(filtroProd) Then
+                    filas = filas.Where(Function(r) r("PRO_NOMBRE").ToString().ToUpper().Contains(filtroProd))
+                End If
+                If Not String.IsNullOrEmpty(filtroAlmacen) Then
+                    filas = filas.Where(Function(r) r("ALM_NOMBRE").ToString() = filtroAlmacen)
+                End If
+                If Not String.IsNullOrEmpty(filtroNicho) Then
+                    filas = filas.Where(Function(r) r("NIC_NUMERO").ToString() = filtroNicho)
+                End If
+
+                Dim dtResultado As DataTable = dtTodo.Clone()
+                For Each fila As DataRow In filas
+                    dtResultado.ImportRow(fila)
+                Next
+
+                gvStock.DataSource = dtResultado
+                gvStock.DataBind()
+                lblContador.Text = dtResultado.Rows.Count.ToString()
+            Catch ex As Exception
+                MostrarError("Error al filtrar: " & ex.Message)
+            End Try
+        End Sub
+
+        ' =============================================
+        ' HELPERS — HIP y STOCK
+        ' =============================================
+        Private Function ResolverHipParaRecepcion(proRef As String,
+                                                   hipSemilla As Decimal,
+                                                   nichoId As Decimal,
+                                                   precioNuevo As Decimal,
+                                                   fechaHoy As Date) As Decimal
+            Dim dtVigenteNicho As DataTable = HistorialPrecioService.Vigente(proRef, nichoId)
+
+            If dtVigenteNicho IsNot Nothing AndAlso dtVigenteNicho.Rows.Count > 0 Then
+                Dim precioVigente As Decimal = Convert.ToDecimal(dtVigenteNicho.Rows(0)("HIP_PRECIO"))
+                Dim hipVigente As Decimal = Convert.ToDecimal(dtVigenteNicho.Rows(0)("HIP_HISTORIAL_PRECIO"))
+                If precioVigente = precioNuevo Then
+                    HistorialPrecioService.CerrarSemilla(hipSemilla, fechaHoy)
+                    Return hipVigente
+                End If
+            End If
+
+            HistorialPrecioService.CerrarTodos(proRef, fechaHoy)
+            HistorialPrecioService.ActualizarSemilla(hipSemilla, nichoId, precioNuevo, fechaHoy)
+            Return hipSemilla
+        End Function
+
+        Private Sub GuardarStockSumando(dtExistente As DataTable,
+                                         hipFinal As Decimal,
+                                         cantIncremento As Decimal,
+                                         minimoDefault As Decimal,
+                                         maximoDefault As Decimal)
+            If dtExistente IsNot Nothing AndAlso dtExistente.Rows.Count > 0 Then
+                Dim hipExistente As Decimal = Convert.ToDecimal(dtExistente.Rows(0)("HIP_HISTORIAL_PRECIO"))
+                Dim dispActual As Decimal = Convert.ToDecimal(dtExistente.Rows(0)("STO_DISPONIBLE"))
+                Dim minActual As Decimal = Convert.ToDecimal(dtExistente.Rows(0)("STO_MINIMO"))
+                Dim maxActual As Decimal = Convert.ToDecimal(dtExistente.Rows(0)("STO_MAXIMO"))
+                Dim nuevoDisponible As Decimal = dispActual + cantIncremento
+
+                If hipExistente <> hipFinal Then
+                    StockService.Eliminar(hipExistente)
+                End If
+                StockService.Guardar(hipFinal, minActual, maxActual, nuevoDisponible)
+            Else
+                StockService.Guardar(hipFinal, minimoDefault, maximoDefault, cantIncremento)
             End If
         End Sub
 
@@ -45,6 +214,7 @@ Namespace Modules.CatalogoInventario
                 End If
                 CargarAlmacenes()
                 pnlPaso2.Visible = True
+                ScrollAPanel(pnlPaso1, "end")   ' end: baja solo lo necesario, paso 1 sigue visible
             Catch ex As Exception
                 MostrarError("Error: " & ex.Message)
             End Try
@@ -71,6 +241,7 @@ Namespace Modules.CatalogoInventario
             Try
                 CargarNichos(Convert.ToDecimal(ddlAlmacen.SelectedValue))
                 pnlPaso3.Visible = True
+                ScrollAPanel(pnlPaso3)
             Catch ex As Exception
                 MostrarError("Error: " & ex.Message)
             End Try
@@ -97,31 +268,60 @@ Namespace Modules.CatalogoInventario
             Try
                 Dim referencia As String = ddlProducto.SelectedValue
                 Dim nicId As Decimal = Convert.ToDecimal(ddlNicho.SelectedValue)
+                Dim cantIncremento As Decimal = Convert.ToDecimal(hfCantRecibida.Value)
 
-                ' Verificar precio vigente
-                Dim dtVigente As DataTable = HistorialPrecioService.Vigente(referencia, nicId)
-                If dtVigente.Rows.Count = 0 Then
-                    pnlAvisoPrecio.Visible = True
-                    pnlPaso4.Visible = True
-                    Return
-                End If
+                hfHipAnterior.Value = "0"
+                Dim dtStock As DataTable = Nothing
+                Try
+                    Dim dtStockNicho As DataTable = StockService.ObtenerPorNicho(referencia, nicId)
+                    If dtStockNicho IsNot Nothing AndAlso dtStockNicho.Rows.Count > 0 Then
+                        hfHipAnterior.Value = dtStockNicho.Rows(0)("HIP_HISTORIAL_PRECIO").ToString()
+                        dtStock = dtStockNicho
+                    End If
+                Catch
+                    dtStock = Nothing
+                End Try
 
-                hfHipId.Value = dtVigente.Rows(0)("HIP_HISTORIAL_PRECIO").ToString()
-                lblPrecioVigente.Text = String.Format("{0:C2}", dtVigente.Rows(0)("HIP_PRECIO"))
-                pnlPrecioVigente.Visible = True
+                Dim tieneStock As Boolean = (dtStock IsNot Nothing AndAlso dtStock.Rows.Count > 0)
 
-                ' Verificar si ya tiene stock
-                Dim dtStock As DataTable = StockService.Obtener(Convert.ToDecimal(hfHipId.Value))
-                If dtStock.Rows.Count > 0 Then
+                If tieneStock Then
                     CargarDatosStock(dtStock.Rows(0))
+
+                    Dim disponibleActual As Decimal = Convert.ToDecimal(dtStock.Rows(0)("STO_DISPONIBLE"))
+                    Dim nuevoDisponible As Decimal = disponibleActual + cantIncremento
+
+                    lblSumaInfo.Text = disponibleActual.ToString() & " + " &
+                                       cantIncremento.ToString() & " = <strong>" &
+                                       nuevoDisponible.ToString() & "</strong>"
+                    pnlSumaInfo.Visible = True
+
+                    txtCantidadEntrada.Text = cantIncremento.ToString()
+                    txtCantidadEntrada.ReadOnly = True
+                    lblCantEntradaLabel.Text = "Cantidad a ingresar esta vez"
+                    btnEntrada.Text = "Confirmar Recepcion y Volver a Pedidos"
+
+                    txtMinimo.ReadOnly = True
+                    txtMaximo.ReadOnly = True
+                    pnlEditarLimites.Visible = True
+                    btnGuardar.Visible = False
+                    pnlEntradaMercancia.Visible = True
                     pnlStockActual.Visible = True
                     pnlSinStock.Visible = False
+
+                    pnlPaso4.Visible = True
+                    ScrollAPanel(pnlStockActual)   ' ← lleva directo al stock actual + botón confirmar
                 Else
+                    txtDisponibleNuevo.Text = cantIncremento.ToString()
+                    txtDisponibleNuevo.ReadOnly = True
+                    lblDisponibleNuevoLabel.Text = "Disponible inicial (cantidad recibida esta vez)"
+                    btnCrearStock.Text = "Confirmar Recepcion y Volver a Pedidos"
                     pnlStockActual.Visible = False
                     pnlSinStock.Visible = True
+
+                    pnlPaso4.Visible = True
+                    ScrollAPanel(pnlSinStock)      ' ← lleva directo al formulario de crear stock
                 End If
 
-                pnlPaso4.Visible = True
             Catch ex As Exception
                 MostrarError("Error al cargar datos: " & ex.Message)
             End Try
@@ -150,49 +350,103 @@ Namespace Modules.CatalogoInventario
         End Sub
 
         ' =============================================
-        ' CREAR STOCK (primera vez)
+        ' CREAR STOCK
         ' =============================================
         Protected Sub btnCrearStock_Click(sender As Object, e As EventArgs)
-            If txtDisponibleNuevo.Text.Trim() = "" OrElse txtMinimoNuevo.Text.Trim() = "" OrElse txtMaximoNuevo.Text.Trim() = "" Then
-                MostrarError("Todos los campos son obligatorios.")
+            If hfFromPed.Value <> "1" Then
+                MostrarError("El registro de stock solo esta disponible desde Pedidos.")
+                Return
+            End If
+            If txtMinimoNuevo.Text.Trim() = "" OrElse txtMaximoNuevo.Text.Trim() = "" Then
+                MostrarError("Minimo y maximo son obligatorios.")
                 Return
             End If
             Try
-                StockService.Guardar(
-                    Convert.ToDecimal(hfHipId.Value),
-                    Convert.ToDecimal(txtMinimoNuevo.Text.Trim()),
-                    Convert.ToDecimal(txtMaximoNuevo.Text.Trim()),
-                    Convert.ToDecimal(txtDisponibleNuevo.Text.Trim())
-                )
-                MostrarExito("Stock creado correctamente.")
-                ddlNicho_SelectedIndexChanged(Nothing, EventArgs.Empty)
-                CargarTablaStock()
+                Dim minimo As Decimal = Convert.ToDecimal(txtMinimoNuevo.Text.Trim())
+                Dim maximo As Decimal = Convert.ToDecimal(txtMaximoNuevo.Text.Trim())
+                Dim hipSemilla As Decimal = Convert.ToDecimal(hfHipSemilla.Value)
+                Dim nichoId As Decimal = Convert.ToDecimal(ddlNicho.SelectedValue)
+                Dim precio As Decimal = Convert.ToDecimal(hfPrecioODP.Value, System.Globalization.CultureInfo.InvariantCulture)
+                Dim fechaHoy As Date = Date.Today
+                Dim proRef As String = ddlProducto.SelectedValue
+                Dim cantIncremento As Decimal = Convert.ToDecimal(hfCantRecibida.Value)
+                Dim cantTotal As Integer = Convert.ToInt32(hfCantTotalRecib.Value)
+
+                Dim dtExistente As DataTable = StockService.ObtenerPorNicho(proRef, nichoId)
+                Dim hipFinal As Decimal = ResolverHipParaRecepcion(proRef, hipSemilla, nichoId, precio, fechaHoy)
+                GuardarStockSumando(dtExistente, hipFinal, cantIncremento, minimo, maximo)
+
+                Dim detpeId As Integer = Convert.ToInt32(hfDetpeParam.Value)
+                Dim pedidoId As Integer = Convert.ToInt32(hfPedParam.Value)
+                Dim dtDetalle As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
+                Dim filaDetalle = dtDetalle.Select("DETPE_DETALLE_PEDIDO = " & detpeId)
+                Dim cantSol As Integer = If(filaDetalle.Length > 0,
+                                               Convert.ToInt32(filaDetalle(0)("DETPE_CANTIDAD_SOLICITADA")),
+                                               cantTotal)
+                DetallePedidoService.Actualizar(detpeId, cantSol, cantTotal)
+
+                Response.Redirect(ResolveUrl("~/Modules/ComprasProveedor/Pedidos.aspx") &
+                                  "?pedido=" & pedidoId)
             Catch ex As Exception
                 MostrarError("Error: " & ex.Message)
             End Try
         End Sub
 
         ' =============================================
-        ' REGISTRAR ENTRADA DE MERCANCIA
+        ' REGISTRAR ENTRADA
         ' =============================================
         Protected Sub btnEntrada_Click(sender As Object, e As EventArgs)
-            If txtCantidadEntrada.Text.Trim() = "" Then
-                MostrarError("Ingresa la cantidad que entro.")
+            If hfFromPed.Value <> "1" Then
+                MostrarError("El registro de entradas solo esta disponible desde Pedidos.")
                 Return
             End If
             Try
-                Dim cantidad As Decimal = Convert.ToDecimal(txtCantidadEntrada.Text.Trim())
-                StockService.Entrada(Convert.ToDecimal(hfHipId.Value), cantidad)
-                MostrarExito("Entrada registrada. Se sumaron " & cantidad.ToString() & " unidades al disponible.")
-                ddlNicho_SelectedIndexChanged(Nothing, EventArgs.Empty)
-                CargarTablaStock()
+                Dim cantIncremento As Decimal = Convert.ToDecimal(hfCantRecibida.Value)
+                Dim cantTotal As Integer = Convert.ToInt32(hfCantTotalRecib.Value)
+                Dim hipSemilla As Decimal = Convert.ToDecimal(hfHipSemilla.Value)
+                Dim nichoId As Decimal = Convert.ToDecimal(ddlNicho.SelectedValue)
+                Dim precio As Decimal = Convert.ToDecimal(hfPrecioODP.Value, System.Globalization.CultureInfo.InvariantCulture)
+                Dim fechaHoy As Date = Date.Today
+                Dim proRef As String = ddlProducto.SelectedValue
+
+                Dim dtExistente As DataTable = StockService.ObtenerPorNicho(proRef, nichoId)
+                Dim minimoFallback As Decimal = 0
+                Dim maximoFallback As Decimal = 0
+
+                If dtExistente Is Nothing OrElse dtExistente.Rows.Count = 0 Then
+                    Dim hipAnterior As Decimal = If(hfHipAnterior.Value <> "" AndAlso hfHipAnterior.Value <> "0",
+                                                    Convert.ToDecimal(hfHipAnterior.Value), 0D)
+                    If hipAnterior > 0 Then
+                        Dim dtPrev As DataTable = StockService.Obtener(hipAnterior)
+                        If dtPrev IsNot Nothing AndAlso dtPrev.Rows.Count > 0 Then
+                            minimoFallback = Convert.ToDecimal(dtPrev.Rows(0)("STO_MINIMO"))
+                            maximoFallback = Convert.ToDecimal(dtPrev.Rows(0)("STO_MAXIMO"))
+                            dtExistente = dtPrev
+                        End If
+                    End If
+                End If
+
+                Dim hipFinal As Decimal = ResolverHipParaRecepcion(proRef, hipSemilla, nichoId, precio, fechaHoy)
+                GuardarStockSumando(dtExistente, hipFinal, cantIncremento, minimoFallback, maximoFallback)
+
+                Dim detpeId As Integer = Convert.ToInt32(hfDetpeParam.Value)
+                Dim pedidoId As Integer = Convert.ToInt32(hfPedParam.Value)
+                Dim dtDetalle As DataTable = DetallePedidoService.ListarPorPedido(pedidoId)
+                Dim filaDetalle = dtDetalle.Select("DETPE_DETALLE_PEDIDO = " & detpeId)
+                Dim cantSol As Integer = If(filaDetalle.Length > 0,
+                                               Convert.ToInt32(filaDetalle(0)("DETPE_CANTIDAD_SOLICITADA")),
+                                               cantTotal)
+                DetallePedidoService.Actualizar(detpeId, cantSol, cantTotal)
+
+                Response.Redirect(ResolveUrl("~/Modules/ComprasProveedor/Pedidos.aspx") &
+                                  "?pedido=" & pedidoId)
             Catch ex As Exception
                 MostrarError("Error: " & ex.Message)
             End Try
         End Sub
 
         ' =============================================
-        ' GUARDAR LIMITES (min y max)
+        ' GUARDAR LIMITES
         ' =============================================
         Protected Sub btnGuardar_Click(sender As Object, e As EventArgs)
             If txtMinimo.Text.Trim() = "" OrElse txtMaximo.Text.Trim() = "" Then
@@ -204,10 +458,8 @@ Namespace Modules.CatalogoInventario
                     Convert.ToDecimal(hfHipId.Value),
                     Convert.ToDecimal(txtMinimo.Text.Trim()),
                     Convert.ToDecimal(txtMaximo.Text.Trim()),
-                    Convert.ToDecimal(txtDisponible.Text.Trim())
-                )
+                    Convert.ToDecimal(txtDisponible.Text.Trim()))
                 MostrarExito("Limites actualizados correctamente.")
-                ddlNicho_SelectedIndexChanged(Nothing, EventArgs.Empty)
                 CargarTablaStock()
             Catch ex As Exception
                 MostrarError("Error: " & ex.Message)
@@ -220,13 +472,85 @@ Namespace Modules.CatalogoInventario
             CargarTablaStock()
         End Sub
 
+        Protected Sub btnEditarLimites_Click(sender As Object, e As EventArgs)
+            txtMinimo.ReadOnly = False
+            txtMaximo.ReadOnly = False
+            btnGuardar.Visible = True
+            pnlEditarLimites.Visible = False
+            pnlCancelarLimites.Visible = True
+            MostrarExito("Puedes editar el minimo y maximo. Luego haz clic en Guardar Limites.")
+        End Sub
+
+        Protected Sub btnCancelarLimites_Click(sender As Object, e As EventArgs)
+            txtMinimo.ReadOnly = True
+            txtMaximo.ReadOnly = True
+            btnGuardar.Visible = False
+            pnlEditarLimites.Visible = True
+            pnlCancelarLimites.Visible = False
+            pnlMsg.Visible = False
+        End Sub
+
+        ' =============================================
+        ' GRIDVIEW STOCK
+        ' =============================================
+        Protected Sub gvStock_RowEditing(sender As Object, e As GridViewEditEventArgs)
+            gvStock.EditIndex = e.NewEditIndex
+            CargarTablaStock()
+        End Sub
+
+        Protected Sub gvStock_RowCancelingEdit(sender As Object, e As GridViewCancelEditEventArgs)
+            gvStock.EditIndex = -1
+            CargarTablaStock()
+        End Sub
+
+        Protected Sub gvStock_RowUpdating(sender As Object, e As GridViewUpdateEventArgs)
+            Try
+                Dim row As GridViewRow = gvStock.Rows(e.RowIndex)
+                Dim hipId As Decimal = Convert.ToDecimal(gvStock.DataKeys(e.RowIndex).Value)
+                Dim txtMin As TextBox = CType(row.FindControl("txtGvMinimo"), TextBox)
+                Dim txtMax As TextBox = CType(row.FindControl("txtGvMaximo"), TextBox)
+                Dim lblDis As Label = CType(row.FindControl("lblGvDisponible"), Label)
+
+                If txtMin Is Nothing OrElse txtMax Is Nothing Then
+                    MostrarError("No se encontraron los campos de edicion.") : Return
+                End If
+
+                Dim nuevoMin As Decimal
+                Dim nuevoMax As Decimal
+                If Not Decimal.TryParse(txtMin.Text.Trim(), nuevoMin) OrElse nuevoMin < 0 Then
+                    MostrarError("Minimo invalido.") : Return
+                End If
+                If Not Decimal.TryParse(txtMax.Text.Trim(), nuevoMax) OrElse nuevoMax < 0 Then
+                    MostrarError("Maximo invalido.") : Return
+                End If
+                If nuevoMin > nuevoMax Then
+                    MostrarError("El minimo no puede ser mayor al maximo.") : Return
+                End If
+
+                Dim disponibleActual As Decimal = 0
+                If lblDis IsNot Nothing Then Decimal.TryParse(lblDis.Text, disponibleActual)
+
+                StockService.Guardar(hipId, nuevoMin, nuevoMax, disponibleActual)
+                gvStock.EditIndex = -1
+                CargarTablaStock()
+                MostrarExito("Limites actualizados correctamente.")
+            Catch ex As Exception
+                MostrarError("Error al actualizar: " & ex.Message)
+            End Try
+        End Sub
+
+        Protected Sub gvStock_RowCommand(sender As Object, e As GridViewCommandEventArgs)
+        End Sub
+
         ' =============================================
         ' TABLA
         ' =============================================
         Private Sub CargarTablaStock()
             Try
-                gvStock.DataSource = StockService.Listar()
+                Dim dt As DataTable = StockService.Listar()
+                gvStock.DataSource = dt
                 gvStock.DataBind()
+                lblContador.Text = If(dt IsNot Nothing, dt.Rows.Count.ToString(), "0")
             Catch ex As Exception
                 MostrarError("Error al cargar stock: " & ex.Message)
             End Try
@@ -250,14 +574,26 @@ Namespace Modules.CatalogoInventario
                 pnlAvisoPrecio.Visible = False
                 pnlStockActual.Visible = False
                 pnlSinStock.Visible = False
+                pnlSumaInfo.Visible = False
+                pnlEntradaMercancia.Visible = True
+                pnlEditarLimites.Visible = False
+                pnlCancelarLimites.Visible = False
                 hfHipId.Value = ""
+                hfHipAnterior.Value = ""
                 txtDisponible.Text = ""
                 txtMinimo.Text = ""
                 txtMaximo.Text = ""
+                txtMinimo.ReadOnly = False
+                txtMaximo.ReadOnly = False
+                btnGuardar.Visible = True
                 txtCantidadEntrada.Text = ""
+                txtCantidadEntrada.ReadOnly = False
+                lblCantEntradaLabel.Text = "Cantidad que ingresa *"
+                btnEntrada.Text = "Registrar Entrada"
                 txtDisponibleNuevo.Text = ""
                 txtMinimoNuevo.Text = ""
                 txtMaximoNuevo.Text = ""
+                btnCrearStock.Text = "Crear Stock"
             End If
         End Sub
 
