@@ -138,9 +138,9 @@
 
         <div style="display:flex; gap:10px;">
             <asp:Button ID="btnGuardarPermiso" runat="server" Text="💾 Guardar Permiso"
-                CssClass="btn-gold" OnClick="btnGuardarPermiso_Click" />
+                CssClass="btn-gold tiempoInhabilitado" OnClick="btnGuardarPermiso_Click" />
             <asp:Button ID="btnNuevoPermiso" runat="server" Text="❌ Cancelar"
-                CssClass="btn-outline" OnClick="btnNuevoPermiso_Click" />
+                CssClass="btn-outline tiempoInhabilitado" OnClick="btnNuevoPermiso_Click" />
         </div>
     </div>
 </div>
@@ -196,11 +196,11 @@
                     <ItemTemplate>
                         <div class="actions-cell">
                             <asp:LinkButton runat="server" Text="✏️" CommandName="EditarPermiso"
-                                CommandArgument='<%# Eval("per_permisos") %>' CssClass="btn-edit-t" />
+                                CommandArgument='<%# Eval("per_permisos") %>' CssClass="btn-edit-t tiempoInhabilitado" />
                             <asp:LinkButton runat="server" Text="👥 Usar" CommandName="UsarPermiso"
-                                CommandArgument='<%# Eval("per_permisos") %>' CssClass="btn-usar-t" />
+                                CommandArgument='<%# Eval("per_permisos") %>' CssClass="btn-usar-t tiempoInhabilitado" />
                             <asp:LinkButton runat="server" Text="🗑" CommandName="EliminarPermiso"
-                                CommandArgument='<%# Eval("per_permisos") %>' CssClass="btn-del-t"
+                                CommandArgument='<%# Eval("per_permisos") %>' CssClass="btn-del-t tiempoInhabilitado"
                                 OnClientClick="return confirm('¿Eliminar este permiso?');" />
                         </div>
                     </ItemTemplate>
@@ -253,9 +253,9 @@
 
         <div style="display:flex; gap:10px;">
             <asp:Button ID="btnGuardarGrupo" runat="server" Text="💾 Guardar Grupo"
-                CssClass="btn-gold" OnClick="btnGuardarGrupo_Click" />
+                CssClass="btn-gold tiempoInhabilitado" OnClick="btnGuardarGrupo_Click" />
             <asp:Button ID="btnNuevoGrupo" runat="server" Text="❌ Cancelar"
-                CssClass="btn-outline" OnClick="btnNuevoGrupo_Click" />
+                CssClass="btn-outline tiempoInhabilitado" OnClick="btnNuevoGrupo_Click" />
         </div>
     </div>
 </div>
@@ -276,9 +276,9 @@
                 <ItemTemplate>
                     <div class="actions-cell">
                         <asp:LinkButton runat="server" Text="✏️" CommandName="EditarGrupo"
-                            CommandArgument='<%# Eval("grupus_grupo_usuario") %>' CssClass="btn-edit-t" />
+                            CommandArgument='<%# Eval("grupus_grupo_usuario") %>' CssClass="btn-edit-t tiempoInhabilitado" />
                         <asp:LinkButton runat="server" Text="🗑" CommandName="EliminarGrupo"
-                            CommandArgument='<%# Eval("grupus_grupo_usuario") %>' CssClass="btn-del-t"
+                            CommandArgument='<%# Eval("grupus_grupo_usuario") %>' CssClass="btn-del-t tiempoInhabilitado"
                             OnClientClick="return confirm('¿Eliminar este grupo?');" />
                     </div>
                 </ItemTemplate>

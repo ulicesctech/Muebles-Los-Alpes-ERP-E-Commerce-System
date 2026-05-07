@@ -157,7 +157,7 @@
             </div>
 
             <asp:Button ID="btnRegistrar" runat="server" Text="✓ Crear Cuenta"
-                CssClass="btn-registrar" OnClick="btnRegistrar_Click" />
+                CssClass="btn-registrar tiempoInhabilitado" OnClick="btnRegistrar_Click" />
         </div>
         <div class="reg-footer">
             ¿Ya tienes cuenta?

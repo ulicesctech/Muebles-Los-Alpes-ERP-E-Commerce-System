@@ -9,20 +9,151 @@
 
 Option Strict On
 Option Explicit On
+
+
 Partial Public Class SiteMaster
-    Protected WithEvents MainContent As Global.System.Web.UI.WebControls.ContentPlaceHolder
-    Protected WithEvents pnlNavAdmin As Global.System.Web.UI.WebControls.Panel
-    Protected WithEvents pnlNavCliente As Global.System.Web.UI.WebControls.Panel
-    Protected WithEvents pnlNavLogueado As Global.System.Web.UI.WebControls.Panel
-    Protected WithEvents pnlNavNoLogueado As Global.System.Web.UI.WebControls.Panel
-    Protected WithEvents pnlNoLogueado As Global.System.Web.UI.WebControls.Panel
-    Protected WithEvents pnlLogueado As Global.System.Web.UI.WebControls.Panel
-    Protected WithEvents pnlDropVacio As Global.System.Web.UI.WebControls.Panel
-    Protected WithEvents lblNombreCliente As Global.System.Web.UI.WebControls.Label
-    Protected WithEvents lblNavNombre As Global.System.Web.UI.WebControls.Label
+
+    '''<summary>
+    '''Control lblCartCount.
+    '''</summary>
+    '''<remarks>
+    '''Campo generado automáticamente.
+    '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+    '''</remarks>
     Protected WithEvents lblCartCount As Global.System.Web.UI.WebControls.Label
+
+    '''<summary>
+    '''Control lblDropCartCount.
+    '''</summary>
+    '''<remarks>
+    '''Campo generado automáticamente.
+    '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+    '''</remarks>
     Protected WithEvents lblDropCartCount As Global.System.Web.UI.WebControls.Label
-    Protected WithEvents lblDropTotal As Global.System.Web.UI.WebControls.Label
+
+    '''<summary>
+    '''Control rptDropCarrito.
+    '''</summary>
+    '''<remarks>
+    '''Campo generado automáticamente.
+    '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+    '''</remarks>
     Protected WithEvents rptDropCarrito As Global.System.Web.UI.WebControls.Repeater
+
+    '''<summary>
+    '''Control pnlDropVacio.
+    '''</summary>
+    '''<remarks>
+    '''Campo generado automáticamente.
+    '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+    '''</remarks>
+    Protected WithEvents pnlDropVacio As Global.System.Web.UI.WebControls.Panel
+
+    '''<summary>
+    '''Control lblDropTotal.
+    '''</summary>
+    '''<remarks>
+    '''Campo generado automáticamente.
+    '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+    '''</remarks>
+    Protected WithEvents lblDropTotal As Global.System.Web.UI.WebControls.Label
+
+    '''<summary>
+    '''Control pnlNoLogueado.
+    '''</summary>
+    '''<remarks>
+    '''Campo generado automáticamente.
+    '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+    '''</remarks>
+    Protected WithEvents pnlNoLogueado As Global.System.Web.UI.WebControls.Panel
+
+    '''<summary>
+    '''Control pnlLogueado.
+    '''</summary>
+    '''<remarks>
+    '''Campo generado automáticamente.
+    '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+    '''</remarks>
+    Protected WithEvents pnlLogueado As Global.System.Web.UI.WebControls.Panel
+
+    '''<summary>
+    '''Control btnCerrarSesion.
+    '''</summary>
+    '''<remarks>
+    '''Campo generado automáticamente.
+    '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+    '''</remarks>
     Protected WithEvents btnCerrarSesion As Global.System.Web.UI.WebControls.LinkButton
+
+    '''<summary>
+    '''Control lblNombreCliente.
+    '''</summary>
+    '''<remarks>
+    '''Campo generado automáticamente.
+    '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+    '''</remarks>
+    Protected WithEvents lblNombreCliente As Global.System.Web.UI.WebControls.Label
+
+    '''<summary>
+    '''Control pnlNavAdmin.
+    '''</summary>
+    '''<remarks>
+    '''Campo generado automáticamente.
+    '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+    '''</remarks>
+    Protected WithEvents pnlNavAdmin As Global.System.Web.UI.WebControls.Panel
+
+    '''<summary>
+    '''Control pnlNavCliente.
+    '''</summary>
+    '''<remarks>
+    '''Campo generado automáticamente.
+    '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+    '''</remarks>
+    Protected WithEvents pnlNavCliente As Global.System.Web.UI.WebControls.Panel
+
+    '''<summary>
+    '''Control pnlNavLogueado.
+    '''</summary>
+    '''<remarks>
+    '''Campo generado automáticamente.
+    '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+    '''</remarks>
+    Protected WithEvents pnlNavLogueado As Global.System.Web.UI.WebControls.Panel
+
+    '''<summary>
+    '''Control lblNavNombre.
+    '''</summary>
+    '''<remarks>
+    '''Campo generado automáticamente.
+    '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+    '''</remarks>
+    Protected WithEvents lblNavNombre As Global.System.Web.UI.WebControls.Label
+
+    '''<summary>
+    '''Control btnNavCerrarSesion.
+    '''</summary>
+    '''<remarks>
+    '''Campo generado automáticamente.
+    '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+    '''</remarks>
+    Protected WithEvents btnNavCerrarSesion As Global.System.Web.UI.WebControls.LinkButton
+
+    '''<summary>
+    '''Control pnlNavNoLogueado.
+    '''</summary>
+    '''<remarks>
+    '''Campo generado automáticamente.
+    '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+    '''</remarks>
+    Protected WithEvents pnlNavNoLogueado As Global.System.Web.UI.WebControls.Panel
+
+    '''<summary>
+    '''Control MainContent.
+    '''</summary>
+    '''<remarks>
+    '''Campo generado automáticamente.
+    '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+    '''</remarks>
+    Protected WithEvents MainContent As Global.System.Web.UI.WebControls.ContentPlaceHolder
 End Class

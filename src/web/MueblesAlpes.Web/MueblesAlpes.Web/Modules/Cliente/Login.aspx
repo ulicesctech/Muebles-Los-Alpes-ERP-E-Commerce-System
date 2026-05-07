@@ -61,7 +61,7 @@
                     TextMode="Password" placeholder="Tu contraseña" MaxLength="100" />
             </div>
             <asp:Button ID="btnLogin" runat="server" Text="Iniciar Sesión"
-                CssClass="btn-login" OnClick="btnLogin_Click" />
+                CssClass="btn-login tiempoInhabilitado" OnClick="btnLogin_Click" />
         </div>
         <div class="login-footer">
             ¿No tienes cuenta?

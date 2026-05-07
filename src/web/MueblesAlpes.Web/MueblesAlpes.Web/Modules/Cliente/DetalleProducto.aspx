@@ -138,15 +138,15 @@
         <%-- Cantidad --%>
         <div class="qty-wrap">
             <span class="qty-label">Cantidad:</span>
-            <button type="button" class="qty-btn" onclick="cambiarCantidad(-1)">−</button>
-            <span class="qty-val" id="spnCantidad">1</span>
-            <button type="button" class="qty-btn" onclick="cambiarCantidad(1)">+</button>
+            <button type="button" class="qty-btn tiempoInhabilitado" onclick="cambiarCantidad(-1)">−</button>
+            <span class="qty-val " id="spnCantidad">1</span>
+            <button type="button" class="qty-btn tiempoInhabilitado" onclick="cambiarCantidad(1)">+</button>
             <asp:HiddenField ID="hfCantidad" runat="server" Value="1" />
             <asp:HiddenField ID="hfHipId" runat="server" />
         </div>
 
         <asp:Button ID="btnAgregar" runat="server" Text="🛒 Agregar al Carrito"
-            CssClass="btn-agregar" OnClick="btnAgregar_Click" />
+            CssClass="btn-agregar tiempoInhabilitado" OnClick="btnAgregar_Click" />
     </div>
 
 </div>
