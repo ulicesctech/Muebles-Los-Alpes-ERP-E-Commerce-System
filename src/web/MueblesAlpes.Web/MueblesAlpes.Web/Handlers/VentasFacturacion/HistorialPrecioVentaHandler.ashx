@@ -1,11 +1,11 @@
-<%@ WebHandler Language="VB" Class="CarritoHandler" %>
+<%@ WebHandler Language="VB" Class="HistorialPrecioVentaHandler" %>
 
 Imports System
 Imports System.Text
 Imports System.Web
 Imports System.Data
 
-Public Class CarritoHandler
+Public Class HistorialPrecioVentaHandler
     Implements IHttpHandler
 
     Public Sub ProcessRequest(context As HttpContext) Implements IHttpHandler.ProcessRequest
@@ -19,11 +19,7 @@ Public Class CarritoHandler
             If method = "GET" Then
                 Select Case action
                     Case "listar"
-                        Dim dt As DataTable = CarritoService.Listar()
-                        context.Response.Write(SerializeTable(dt))
-
-                    Case "productos"
-                        Dim dt As DataTable = CarritoService.ListarProductosConPrecio()
+                        Dim dt As DataTable = HistorialPrecioVentaService.Listar()
                         context.Response.Write(SerializeTable(dt))
 
                     Case Else
@@ -33,37 +29,11 @@ Public Class CarritoHandler
 
             ElseIf method = "POST" Then
                 Select Case action
-                    Case "crear"
-                        Dim cliente As Decimal = Convert.ToDecimal(context.Request("cliente"))
-                        Dim id As Decimal = CarritoService.Crear(cliente)
+                    Case "registrar"
+                        Dim proReferencia As String = context.Request("proReferencia")
+                        Dim porcetaje As Decimal = Convert.ToDecimal(context.Request("porcetaje"))
+                        Dim id As Decimal = HistorialPrecioVentaService.Registrar(proReferencia, porcetaje)
                         context.Response.Write("{""id"":" & id.ToString() & "}")
-
-                    Case "agregardetalle"
-                        Dim carrito As Decimal = Convert.ToDecimal(context.Request("carrito"))
-                        Dim hvPrecio As Decimal = Convert.ToDecimal(context.Request("hvPrecio"))
-                        Dim cantidad As Decimal = Convert.ToDecimal(context.Request("cantidad"))
-                        Dim id As Decimal = CarritoService.AgregarDetalle(carrito, hvPrecio, cantidad)
-                        context.Response.Write("{""id"":" & id.ToString() & "}")
-
-                    Case "eliminardetalle"
-                        Dim id As Decimal = Convert.ToDecimal(context.Request("id"))
-                        CarritoService.EliminarDetalle(id)
-                        context.Response.Write("{""ok"":true}")
-
-                    Case "vaciar"
-                        Dim carrito As Decimal = Convert.ToDecimal(context.Request("carrito"))
-                        CarritoService.Vaciar(carrito)
-                        context.Response.Write("{""ok"":true}")
-
-                    Case "eliminar"
-                        Dim id As Decimal = Convert.ToDecimal(context.Request("id"))
-                        CarritoService.Eliminar(id)
-                        context.Response.Write("{""ok"":true}")
-
-                    Case "facturar"
-                        Dim carrito As Decimal = Convert.ToDecimal(context.Request("carrito"))
-                        CarritoService.Facturar(carrito)
-                        context.Response.Write("{""ok"":true}")
 
                     Case Else
                         context.Response.StatusCode = 400
