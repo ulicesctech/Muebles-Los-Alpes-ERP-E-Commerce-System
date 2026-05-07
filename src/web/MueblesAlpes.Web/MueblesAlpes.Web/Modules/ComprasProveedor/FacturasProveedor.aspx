@@ -92,8 +92,8 @@
         </div>
 
         <div class="f-row" style="margin-top:16px; justify-content:flex-end;">
-            <asp:Button ID="btnGuardar"  runat="server" Text="💾 Guardar"  CssClass="btn-gold"    OnClick="btnGuardar_Click" />
-            <asp:Button ID="btnCancelar" runat="server" Text="✕ Cancelar" CssClass="btn-outline" OnClick="btnCancelar_Click" CausesValidation="false" />
+            <asp:Button ID="btnGuardar"  runat="server" Text="💾 Guardar"  CssClass="btn-gold tiempoInhabilitado"    OnClick="btnGuardar_Click tiempoInhabilitado" />
+            <asp:Button ID="btnCancelar" runat="server" Text="✕ Cancelar" CssClass="btn-outline tiempoInhabilitado" OnClick="btnCancelar_Click tiempoInhabilitado" CausesValidation="false" />
         </div>
     </div>
 </div>
@@ -117,8 +117,8 @@
             <asp:TextBox ID="txtFechaHasta" runat="server" TextMode="Date" CssClass="fctl" />
         </div>
         <div style="display:flex; gap:8px; align-items:flex-end; padding-bottom:1px;">
-            <asp:Button ID="btnBuscar"  runat="server" Text="Buscar"  CssClass="btn-gold"    OnClick="btnBuscar_Click"  CausesValidation="false" />
-            <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" CssClass="btn-outline" OnClick="btnLimpiar_Click" CausesValidation="false" />
+            <asp:Button ID="btnBuscar"  runat="server" Text="Buscar"  CssClass="btn-gold tiempoInhabilitado "    OnClick="btnBuscar_Click"  CausesValidation="false" />
+            <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" CssClass="btn-outline tiempoInhabilitado" OnClick="btnLimpiar_Click" CausesValidation="false" />
         </div>
     </div>
 </div>
@@ -140,10 +140,10 @@
                     <div class="actions-cell">
                         <asp:LinkButton CommandName="Editar"
                             CommandArgument='<%# Eval("ORC_ORDEN_COMPRA") %>'
-                            runat="server" CssClass="btn-edit-t">✏️ Editar</asp:LinkButton>
+                            runat="server" CssClass="btn-edit-t tiempoInhabilitado">✏️ Editar</asp:LinkButton>
                         <asp:LinkButton CommandName="Eliminar"
                             CommandArgument='<%# Eval("ORC_ORDEN_COMPRA") %>'
-                            runat="server" CssClass="btn-del-t"
+                            runat="server" CssClass="btn-del-t tiempoInhabilitado"
                             OnClientClick="return confirm('¿Eliminar esta factura?');">🗑 Borrar</asp:LinkButton>
                     </div>
                 </ItemTemplate>

@@ -109,8 +109,8 @@
             </div>
         </div>
         <div class="f-row" style="margin-top:16px; justify-content:flex-end;">
-            <asp:Button ID="btnGuardar"  runat="server" Text="💾 Guardar"  CssClass="btn-gold"    OnClick="btnGuardar_Click" />
-            <asp:Button ID="btnCancelar" runat="server" Text="✕ Cancelar" CssClass="btn-outline" OnClick="btnCancelar_Click" CausesValidation="false" />
+            <asp:Button ID="btnGuardar"  runat="server" Text="💾 Guardar"  CssClass="btn-gold tiempoInhabilitado"    OnClick="btnGuardar_Click" />
+            <asp:Button ID="btnCancelar" runat="server" Text="✕ Cancelar" CssClass="btn-outline tiempoInhabilitado" OnClick="btnCancelar_Click" CausesValidation="false" />
         </div>
     </div>
 </div>
@@ -149,8 +149,8 @@
         </asp:Panel>
 
         <div class="f-row" style="margin-top:16px; justify-content:flex-end;">
-            <asp:Button ID="btnCambiarEstado"  runat="server" Text="🔄 Aplicar Estado" CssClass="btn-blue"    OnClick="btnCambiarEstado_Click" />
-            <asp:Button ID="btnCancelarEstado" runat="server" Text="✕ Cancelar"       CssClass="btn-outline" OnClick="btnCancelarEstado_Click" CausesValidation="false" />
+            <asp:Button ID="btnCambiarEstado"  runat="server" Text="🔄 Aplicar Estado" CssClass="btn-blue tiempoInhabilitado"    OnClick="btnCambiarEstado_Click" />
+            <asp:Button ID="btnCancelarEstado" runat="server" Text="✕ Cancelar"       CssClass="btn-outline tiempoInhabilitado" OnClick="btnCancelarEstado_Click" CausesValidation="false" />
         </div>
     </div>
 </div>
@@ -177,8 +177,8 @@
             </div>
         </div>
         <div class="f-row" style="margin-top:16px; justify-content:flex-end;">
-            <asp:Button ID="btnGuardarComentarios"   runat="server" Text="💾 Guardar Comentarios" CssClass="btn-green"   OnClick="btnGuardarComentarios_Click" />
-            <asp:Button ID="btnCancelarComentarios"  runat="server" Text="✕ Cancelar"             CssClass="btn-outline" OnClick="btnCancelarComentarios_Click" CausesValidation="false" />
+            <asp:Button ID="btnGuardarComentarios"   runat="server" Text="💾 Guardar Comentarios" CssClass="btn-green tiempoInhabilitado"   OnClick="btnGuardarComentarios_Click" />
+            <asp:Button ID="btnCancelarComentarios"  runat="server" Text="✕ Cancelar"             CssClass="btn-outline tiempoInhabilitado" OnClick="btnCancelarComentarios_Click" CausesValidation="false" />
         </div>
     </div>
 </div>
@@ -208,8 +208,8 @@
             <asp:TextBox ID="txtFechaHasta" runat="server" TextMode="Date" CssClass="fctl" />
         </div>
         <div style="display:flex; gap:8px; align-items:flex-end; padding-bottom:1px;">
-            <asp:Button ID="btnBuscar"  runat="server" Text="Buscar"  CssClass="btn-gold"    OnClick="btnBuscar_Click"  CausesValidation="false" />
-            <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" CssClass="btn-outline" OnClick="btnLimpiar_Click" CausesValidation="false" />
+            <asp:Button ID="btnBuscar"  runat="server" Text="Buscar"  CssClass="btn-gold tiempoInhabilitado"    OnClick="btnBuscar_Click"  CausesValidation="false" />
+            <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" CssClass="btn-outline tiempoInhabilitado" OnClick="btnLimpiar_Click " CausesValidation="false" />
         </div>
     </div>
 </div>
@@ -250,23 +250,23 @@
                         <asp:LinkButton CommandName="Editar"
                             CommandArgument='<%# Eval("REP_RECLAMO_PROVEEDOR") %>'
                             runat="server"
-                            CssClass='<%# If(Eval("REP_ESTADO").ToString() = "RESUELTO" OrElse Eval("REP_ESTADO").ToString() = "RECHAZADO", "btn-disabled-t", "btn-edit-t") %>'
+                            CssClass='<%# If(Eval("REP_ESTADO").ToString() = "RESUELTO" OrElse Eval("REP_ESTADO").ToString() = "RECHAZADO", "btn-disabled-t tiempoInhabilitado", "btn-edit-t tiempoInhabilitado") %>'
                             Enabled='<%# Eval("REP_ESTADO").ToString() <> "RESUELTO" AndAlso Eval("REP_ESTADO").ToString() <> "RECHAZADO" %>'>✏️ Desc.</asp:LinkButton>
                         <%-- Cambiar estado: solo INICIADO o PENDIENTE --%>
                         <asp:LinkButton CommandName="CambiarEstado"
                             CommandArgument='<%# Eval("REP_RECLAMO_PROVEEDOR") %>'
                             runat="server"
-                            CssClass='<%# If(Eval("REP_ESTADO").ToString() = "RESUELTO" OrElse Eval("REP_ESTADO").ToString() = "RECHAZADO", "btn-disabled-t", "btn-estado-t") %>'
+                            CssClass='<%# If(Eval("REP_ESTADO").ToString() = "RESUELTO" OrElse Eval("REP_ESTADO").ToString() = "RECHAZADO", "btn-disabled-t tiempoInhabilitado", "btn-estado-t tiempoInhabilitado") %>'
                             Enabled='<%# Eval("REP_ESTADO").ToString() <> "RESUELTO" AndAlso Eval("REP_ESTADO").ToString() <> "RECHAZADO" %>'>🔄 Estado</asp:LinkButton>
                         <%-- Editar comentarios: solo RESUELTO o RECHAZADO --%>
                         <asp:LinkButton CommandName="EditarComentarios"
                             CommandArgument='<%# Eval("REP_RECLAMO_PROVEEDOR") %>'
                             runat="server"
-                            CssClass='<%# If(Eval("REP_ESTADO").ToString() = "RESUELTO" OrElse Eval("REP_ESTADO").ToString() = "RECHAZADO", "btn-coment-t", "btn-disabled-t") %>'
+                            CssClass='<%# If(Eval("REP_ESTADO").ToString() = "RESUELTO" OrElse Eval("REP_ESTADO").ToString() = "RECHAZADO", "btn-coment-t tiempoInhabilitado", "btn-disabled-t tiempoInhabilitado") %>'
                             Enabled='<%# Eval("REP_ESTADO").ToString() = "RESUELTO" OrElse Eval("REP_ESTADO").ToString() = "RECHAZADO" %>'>💬 Coment.</asp:LinkButton>
                         <asp:LinkButton CommandName="Eliminar"
                             CommandArgument='<%# Eval("REP_RECLAMO_PROVEEDOR") %>'
-                            runat="server" CssClass="btn-del-t"
+                            runat="server" CssClass="btn-del-t tiempoInhabilitado"
                             OnClientClick="return confirm('¿Eliminar este reclamo?');">🗑</asp:LinkButton>
                     </div>
                 </ItemTemplate>

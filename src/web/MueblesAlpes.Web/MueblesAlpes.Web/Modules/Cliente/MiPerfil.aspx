@@ -171,7 +171,7 @@
 
     <div style="text-align:right; margin-top:8px;">
         <asp:Button ID="btnGuardar" runat="server" Text=" Guardar cambios"
-            CssClass="btn-guardar" OnClick="btnGuardar_Click" />
+            CssClass="btn-guardar tiempoInhabilitado" OnClick="btnGuardar_Click" />
     </div>
 
 </asp:Panel>

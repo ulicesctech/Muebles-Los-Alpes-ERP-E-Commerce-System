@@ -166,9 +166,9 @@
 
         <div style="display:flex; gap:10px; margin-top:8px;">
             <asp:Button ID="btnGuardar" runat="server" Text="💾 Guardar"
-                CssClass="btn-gold" OnClick="btnGuardar_Click" />
+                CssClass="btn-gold tiempoInhabilitado" OnClick="btnGuardar_Click" />
             <asp:Button ID="btnNuevo" runat="server" Text="❌ Cancelar"
-                CssClass="btn-outline" OnClick="btnNuevo_Click" />
+                CssClass="btn-outline tiempoInhabilitado" OnClick="btnNuevo_Click" />
         </div>
     </div>
 </div>
@@ -180,9 +180,9 @@
             placeholder="Ingresa el DPI..." MaxLength="13" />
     </div>
     <asp:Button ID="btnBuscar" runat="server" Text="🔍 Buscar"
-        CssClass="btn-gold" OnClick="btnBuscar_Click" />
+        CssClass="btn-gold tiempoInhabilitado" OnClick="btnBuscar_Click" />
     <asp:Button ID="btnVerTodos" runat="server" Text="📋 Ver Todos"
-        CssClass="btn-outline" OnClick="btnVerTodos_Click" />
+        CssClass="btn-outline tiempoInhabilitado" OnClick="btnVerTodos_Click" />
 </div>
 
 <div class="table-card" id="tablaEmpleados">
@@ -202,10 +202,10 @@
             <asp:TemplateField HeaderText="Acciones">
                 <ItemTemplate>
                     <div class="actions-cell">
-                        <asp:LinkButton runat="server" Text="✏️" CommandName="Editar"
-                            CommandArgument='<%# Eval("em_empleado") %>' CssClass="btn-edit-t" />
+                        <asp:LinkButton runat="server" Text="✏️" CommandName="Editar" 
+                            CommandArgument='<%# Eval("em_empleado") %>' CssClass="btn-edit-t tiempoInhabilitado" />
                         <asp:LinkButton runat="server" Text="🗑" CommandName="Eliminar"
-                            CommandArgument='<%# Eval("em_empleado") %>' CssClass="btn-del-t"
+                            CommandArgument='<%# Eval("em_empleado") %>' CssClass="btn-del-t tiempoInhabilitado"
                             OnClientClick="return confirm('¿Eliminar este empleado?');"
                             Visible='<%# Convert.ToInt32(Eval("em_empleado")) <> Convert.ToInt32(Session("UsuarioId")) %>' />
                         <%# If(Convert.ToInt32(Eval("em_empleado")) = Convert.ToInt32(Session("UsuarioId")),

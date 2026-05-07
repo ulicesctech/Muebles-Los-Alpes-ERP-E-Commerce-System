@@ -203,7 +203,7 @@
                 </div>
             </div>
             <asp:Button ID="btnConfirmar" runat="server" Text="✓ Confirmar Pedido"
-                CssClass="btn-confirmar" OnClick="btnConfirmar_Click" />
+                CssClass="btn-confirmar tiempoInhabilitado" OnClick="btnConfirmar_Click" />
             <a href="/Modules/Cliente/Carrito.aspx" class="btn-volver">← Volver al carrito</a>
         </div>
     </div>

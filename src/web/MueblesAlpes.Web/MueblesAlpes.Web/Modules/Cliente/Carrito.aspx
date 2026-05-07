@@ -159,14 +159,14 @@
                         <div class="cart-item-actions">
                             <div class="qty-wrap">
                                 <asp:LinkButton CommandName="Restar" CommandArgument='<%# Eval("HIP_ID") %>'
-                                    runat="server" CssClass="qty-btn">−</asp:LinkButton>
+                                    runat="server" CssClass="qty-btn tiempoInhabilitado">−</asp:LinkButton>
                                 <span class="qty-val"><%# Eval("CANTIDAD") %></span>
                                 <asp:LinkButton CommandName="Sumar" CommandArgument='<%# Eval("HIP_ID") %>'
-                                    runat="server" CssClass="qty-btn">+</asp:LinkButton>
+                                    runat="server" CssClass="qty-btn tiempoInhabilitado">+</asp:LinkButton>
                             </div>
                             <span class="btn-sep">|</span>
                             <asp:LinkButton CommandName="Quitar" CommandArgument='<%# Eval("HIP_ID") %>'
-                                runat="server" CssClass="btn-del-item">Eliminar</asp:LinkButton>
+                                runat="server" CssClass="btn-del-item tiempoInhabilitado">Eliminar</asp:LinkButton>
                         </div>
                     </div>
 
@@ -220,7 +220,7 @@
                 <span>Q <asp:Label ID="lblTotal" runat="server" Text="0.00" /></span>
             </div>
             <asp:Button ID="btnPagar" runat="server" Text="✓ Proceder al Pago"
-                CssClass="btn-pagar" OnClick="btnPagar_Click" />
+                CssClass="btn-pagar tiempoInhabilitado" OnClick="btnPagar_Click" />
             <a href='<%: ResolveUrl("~/Modules/Cliente/Catalogo.aspx") %>'
                class="btn-seguir">← Seguir comprando</a>
         </div>

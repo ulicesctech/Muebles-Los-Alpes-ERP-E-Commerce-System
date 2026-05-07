@@ -98,8 +98,18 @@
             z-index: 99999; overflow: hidden;
         }
         .carrito-drop-wrap:hover .carrito-drop { display: block; }
+        .bloqueo-total {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(255, 255, 255, 0.1); /* Casi invisible */
+    z-index: 99999; /* Por encima de todo */
+    display: none; /* Oculta por defecto */
+    cursor: wait;
+}
     </style>
 </head>
+    <div id="capaBloqueo" class="bloqueo-total"></div>
 <body>
     <form runat="server">
         <asp:ScriptManager runat="server">
@@ -384,5 +394,7 @@
     <asp:PlaceHolder runat="server">
         <%: Scripts.Render("~/Scripts/bootstrap.js") %>
     </asp:PlaceHolder>
+
+    <script src="<%: ResolveUrl("~/Scripts/global-buttons.js") %>"></script>
 </body>
 </html>

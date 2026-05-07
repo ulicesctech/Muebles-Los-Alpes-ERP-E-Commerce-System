@@ -89,14 +89,14 @@
     <div class="form-card-head">
         <span>&#128230; LISTADO DE PEDIDOS</span>
         <asp:Button ID="btnNuevoPedido" runat="server" Text="+ Nuevo Pedido"
-            CssClass="btn-gold" OnClick="btnNuevoPedido_Click" />
+            CssClass="btn-gold tiempoInhabilitado" OnClick="btnNuevoPedido_Click" />
     </div>
     <div class="form-card-body">
         <div class="f-row" style="margin-bottom:15px;">
             <asp:TextBox ID="txtBuscar" runat="server" CssClass="form-control"
                 placeholder="Buscar por codigo..." style="flex:3;" />
-            <asp:Button ID="btnBuscar"  runat="server" Text="Buscar"  CssClass="btn-gold"    OnClick="btnBuscar_Click" />
-            <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" CssClass="btn-outline" OnClick="btnLimpiar_Click" />
+            <asp:Button ID="btnBuscar"  runat="server" Text="Buscar"  CssClass="btn-gold tiempoInhabilitado"    OnClick="btnBuscar_Click" />
+            <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" CssClass="btn-outline tiempoInhabilitado" OnClick="btnLimpiar_Click" />
         </div>
         <div class="table-card">
             <asp:GridView ID="gvPedidos" runat="server"
@@ -153,10 +153,10 @@
                             <div class="actions-cell">
                                 <asp:LinkButton CommandName="VerDetalle"
                                     CommandArgument='<%# Eval("PED_PEDIDO") %>'
-                                    runat="server" CssClass="btn-edit-t">&#9999; Editar</asp:LinkButton>
+                                    runat="server" CssClass="btn-edit-t tiempoInhabilitado">&#9999; Editar</asp:LinkButton>
                                 <asp:LinkButton CommandName="Eliminar"
                                     CommandArgument='<%# Eval("PED_PEDIDO") %>'
-                                    runat="server" CssClass="btn-del-t"
+                                    runat="server" CssClass="btn-del-t tiempoInhabilitado"
                                     OnClientClick="return confirm('Eliminar este pedido?');">&#128465;</asp:LinkButton>
                             </div>
                         </ItemTemplate>
@@ -189,9 +189,9 @@
         </div>
         <div class="f-row" style="margin-top:12px;">
             <asp:Button ID="btnGuardar" runat="server" Text="Guardar y Agregar Productos"
-                CssClass="btn-gold" OnClick="btnGuardar_Click" />
+                CssClass="btn-gold tiempoInhabilitado" OnClick="btnGuardar_Click" />
             <asp:Button ID="btnCancelarForm" runat="server" Text="Cancelar"
-                CssClass="btn-outline" OnClick="btnCancelarForm_Click" CausesValidation="false" />
+                CssClass="btn-outline tiempoInhabilitado " OnClick="btnCancelarForm_Click" CausesValidation="false" />
         </div>
     </div>
 </div>
@@ -203,7 +203,7 @@
     <div class="form-card-head">
         <span>&#128230; PRODUCTOS DEL PEDIDO: <asp:Label ID="lblIdSeleccionado" runat="server" /></span>
         <asp:Button ID="btnCerrarDetalle" runat="server" Text="X Cerrar"
-            CssClass="btn-outline" OnClick="btnCerrarDetalle_Click" CausesValidation="false"
+            CssClass="btn-outline tiempoInhabilitado" OnClick="btnCerrarDetalle_Click" CausesValidation="false"
             style="background:transparent;color:#f0d9a0;border-color:#f0d9a0;" />
     </div>
     <div class="form-card-body">
@@ -222,7 +222,7 @@
             <div style="display:flex;align-items:flex-end;">
                 <%-- btnGuardarCabecera se deshabilita en CargarDetallesPedido si el pedido tiene OC --%>
                 <asp:Button ID="btnGuardarCabecera" runat="server" Text="&#10003; Guardar"
-                    CssClass="btn-save-t" OnClick="btnGuardarCabecera_Click" CausesValidation="false" />
+                    CssClass="btn-save-t tiempoInhabilitado" OnClick="btnGuardarCabecera_Click" CausesValidation="false" />
             </div>
         </div>
 
@@ -246,7 +246,7 @@
                 <div style="display:flex;align-items:flex-end;">
                     <%-- btnAgregarItem se deshabilita en CargarDetallesPedido si el pedido tiene OC --%>
                     <asp:Button ID="btnAgregarItem" runat="server" Text="+ Agregar"
-                        CssClass="btn-gold" OnClick="btnAgregarItem_Click" />
+                        CssClass="btn-gold tiempoInhabilitado" OnClick="btnAgregarItem_Click" />
                 </div>
             </div>
         </div>
@@ -321,10 +321,10 @@
                                     <div class="actions-cell">
                                         <asp:LinkButton CommandName="ConfirmarRecibido"
                                             CommandArgument='<%# Eval("DETPE_DETALLE_PEDIDO") & "|" & Eval("PRO_REFERENCIA") & "|" & Eval("DETPE_CANTIDAD_SOLICITADA") & "|" & Eval("DETPE_CANTIDAD_RECIBIDA") %>'
-                                            runat="server" CssClass="btn-save-t" CausesValidation="false">&#10003; Confirmar</asp:LinkButton>
+                                            runat="server" CssClass="btn-save-t tiempoInhabilitado" CausesValidation="false">&#10003; Confirmar</asp:LinkButton>
                                         <asp:LinkButton CommandName="CancelarRecibido"
                                             CommandArgument='<%# Eval("DETPE_DETALLE_PEDIDO") %>'
-                                            runat="server" CssClass="btn-cancel-t" CausesValidation="false">&#10005; Cancelar</asp:LinkButton>
+                                            runat="server" CssClass="btn-cancel-t tiempoInhabilitado" CausesValidation="false">&#10005; Cancelar</asp:LinkButton>
                                     </div>
                                 </div>
                             </asp:Panel>
@@ -336,21 +336,21 @@
                             <div class="actions-cell">
                                 <%-- ID requerido para que gvDetalles_RowDataBound pueda ocultarlo cuando hay OC --%>
                                 <asp:LinkButton ID="btnEditarItem" CommandName="Edit"
-                                    runat="server" CssClass="btn-edit-t" CausesValidation="false">&#9999; Editar</asp:LinkButton>
+                                    runat="server" CssClass="btn-edit-t tiempoInhabilitado" CausesValidation="false">&#9999; Editar</asp:LinkButton>
                                 <asp:LinkButton CommandName="MarcarRecibido"
                                     CommandArgument='<%# Eval("DETPE_DETALLE_PEDIDO") %>'
-                                    runat="server" CssClass="btn-precio-t" CausesValidation="false">&#10003; Recibido</asp:LinkButton>
+                                    runat="server" CssClass="btn-precio-t tiempoInhabilitado" CausesValidation="false">&#10003; Recibido</asp:LinkButton>
                                 <%-- ID requerido para que gvDetalles_RowDataBound pueda ocultarlo cuando hay OC --%>
                                 <asp:LinkButton ID="btnBorrarItem" CommandName="BorrarItem"
                                     CommandArgument='<%# Eval("DETPE_DETALLE_PEDIDO") %>'
-                                    runat="server" CssClass="btn-del-t"
+                                    runat="server" CssClass="btn-del-t tiempoInhabilitado"
                                     OnClientClick="return confirm('Eliminar este producto?');">&#128465;</asp:LinkButton>
                             </div>
                         </ItemTemplate>
                         <EditItemTemplate>
                             <div class="actions-cell">
-                                <asp:LinkButton CommandName="Update" runat="server" CssClass="btn-save-t" CausesValidation="false">&#10003; Guardar</asp:LinkButton>
-                                <asp:LinkButton CommandName="Cancel" runat="server" CssClass="btn-cancel-t" CausesValidation="false">&#10005; Cancelar</asp:LinkButton>
+                                <asp:LinkButton CommandName="Update" runat="server" CssClass="btn-save-t tiempoInhabilitado" CausesValidation="false">&#10003; Guardar</asp:LinkButton>
+                                <asp:LinkButton CommandName="Cancel" runat="server" CssClass="btn-cancel-t tiempoInhabilitado" CausesValidation="false">&#10005; Cancelar</asp:LinkButton>
                             </div>
                         </EditItemTemplate>
                     </asp:TemplateField>
@@ -363,7 +363,7 @@
 
         <div class="f-row" style="margin-top:16px;">
             <asp:Button ID="btnFinalizarPedido" runat="server" Text="&#10003; Finalizar Pedido"
-                CssClass="btn-green" OnClick="btnFinalizarPedido_Click" />
+                CssClass="btn-green tiempoInhabilitado" OnClick="btnFinalizarPedido_Click" />
         </div>
     </div>
 </div>

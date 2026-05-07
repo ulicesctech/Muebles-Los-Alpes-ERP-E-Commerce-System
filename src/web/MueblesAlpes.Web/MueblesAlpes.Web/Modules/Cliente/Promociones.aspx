@@ -122,10 +122,10 @@
                     <div class="card-footer">
                         <asp:LinkButton CommandName="VerDetalle"
                             CommandArgument='<%# Eval("PRO_REFERENCIA") %>'
-                            runat="server" CssClass="btn-detalle">  Ver</asp:LinkButton>
+                            runat="server" CssClass="btn-detalle tiempoInhabilitado">  Ver</asp:LinkButton>
                         <asp:LinkButton CommandName="AgregarCarrito"
                             CommandArgument='<%# Eval("HIP_HISTORIAL_PRECIO") %>'
-                            runat="server" CssClass="btn-carrito"
+                            runat="server" CssClass="btn-carrito tiempoInhabilitado"
                             Enabled='<%# Convert.ToInt32(Eval("STO_DISPONIBLE")) > 0 %>'>
                             🛒 Agregar
                         </asp:LinkButton>
