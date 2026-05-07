@@ -81,14 +81,14 @@
     <div class="form-card-head">
         <span>&#128203; LISTADO DE ORDENES</span>
         <asp:Button ID="btnNuevaOrden" runat="server" Text="+ Nueva Orden"
-            CssClass="btn-gold" OnClick="btnNuevaOrden_Click" />
+            CssClass="btn-gold tiempoInhabilitado" OnClick="btnNuevaOrden_Click" />
     </div>
     <div class="form-card-body">
         <div class="f-row" style="margin-bottom:15px;">
             <asp:TextBox ID="txtBuscar" runat="server" CssClass="form-control"
                 placeholder="Buscar por ID, codigo o proveedor..." style="flex:3;" />
-            <asp:Button ID="btnBuscar"  runat="server" Text="Buscar"  CssClass="btn-gold"    OnClick="btnBuscar_Click" />
-            <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" CssClass="btn-outline" OnClick="btnLimpiar_Click" />
+            <asp:Button ID="btnBuscar"  runat="server" Text="Buscar"  CssClass="btn-gold tiempoInhabilitado"    OnClick="btnBuscar_Click" />
+            <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" CssClass="btn-outline tiempoInhabilitado" OnClick="btnLimpiar_Click" />
         </div>
         <div class="table-card">
             <asp:GridView ID="gvOrdenes" runat="server"
@@ -144,10 +144,10 @@
                             <div class="actions-cell">
                                 <asp:LinkButton CommandName="VerDetalle"
                                     CommandArgument='<%# Eval("ORC_KEY") %>'
-                                    runat="server" CssClass="btn-edit-t">&#128230; Ver</asp:LinkButton>
+                                    runat="server" CssClass="btn-edit-t tiempoInhabilitado">&#128230; Ver</asp:LinkButton>
                                 <asp:LinkButton CommandName="Delete"
                                     CommandArgument='<%# Eval("ORC_KEY") %>'
-                                    runat="server" CssClass="btn-del-t"
+                                    runat="server" CssClass="btn-del-t tiempoInhabilitado"
                                     OnClientClick="return confirm('Eliminar esta orden y todos sus items?');">&#128465;</asp:LinkButton>
                             </div>
                         </ItemTemplate>
@@ -194,7 +194,7 @@
                 <asp:TextBox ID="txtBuscarPedido" runat="server" CssClass="form-control"
                     placeholder="Buscar pedido por codigo o ID..." style="flex:3;" />
                 <asp:Button ID="btnBuscarPedido" runat="server" Text="&#128269; Buscar"
-                    CssClass="btn-gold" OnClick="btnBuscarPedido_Click" CausesValidation="false" />
+                    CssClass="btn-gold tiempoInhabilitado" OnClick="btnBuscarPedido_Click" CausesValidation="false" />
             </div>
 
             <asp:Panel ID="pnlResultadosPedidos" runat="server" Visible="false">
@@ -238,7 +238,7 @@
                                 <ItemTemplate>
                                     <asp:LinkButton ID="lnkSeleccionar" CommandName="VerItemsPedido"
                                         CommandArgument='<%# Eval("PED_PEDIDO") & "|" & Eval("PED_CODIGO") & "|" & Eval("PED_FORMA_PAGO") %>'
-                                        runat="server" CssClass="btn-edit-t"
+                                        runat="server" CssClass="btn-edit-t tiempoInhabilitado"
                                         CausesValidation="false">&#10003; Seleccionar</asp:LinkButton>
                                 </ItemTemplate>
                             </asp:TemplateField>
@@ -266,7 +266,7 @@
                             </span>
                         </div>
                         <asp:LinkButton ID="lnkQuitarPedido" runat="server"
-                            CssClass="btn-del-t" CausesValidation="false"
+                            CssClass="btn-del-t tiempoInhabilitado" CausesValidation="false"
                             OnClick="lnkQuitarPedido_Click">&#10005; Quitar</asp:LinkButton>
                     </div>
                     <asp:GridView ID="gvItemsPedido" runat="server"
@@ -304,9 +304,9 @@
 
         <div class="f-row" style="margin-top:12px;">
             <asp:Button ID="btnGuardar" runat="server" Text="&#10003; Confirmar Orden"
-                CssClass="btn-gold" OnClick="btnGuardar_Click" />
+                CssClass="btn-gold tiempoInhabilitado" OnClick="btnGuardar_Click" />
             <asp:Button ID="btnCancelar" runat="server" Text="&#10005; Cancelar"
-                CssClass="btn-outline" OnClick="btnCancelar_Click" CausesValidation="false" />
+                CssClass="btn-outline tiempoInhabilitado" OnClick="btnCancelar_Click" CausesValidation="false" />
         </div>
     </div>
 </div>
@@ -318,7 +318,7 @@
     <div class="form-card-head">
         <span>&#128230; ITEMS DE LA ORDEN: <asp:Label ID="lblOrdenSeleccionada" runat="server" /></span>
         <asp:Button ID="btnCerrarDetalle" runat="server" Text="X Cerrar"
-            CssClass="btn-outline" OnClick="btnCerrarDetalle_Click" CausesValidation="false"
+            CssClass="btn-outline tiempoInhabilitado" OnClick="btnCerrarDetalle_Click" CausesValidation="false"
             style="background:transparent;color:#f0d9a0;border-color:#f0d9a0;" />
     </div>
     <div class="form-card-body">
@@ -361,7 +361,7 @@
             <span>Total: Q <asp:Label ID="lblTotalOrden" runat="server" Text="0.00" /></span>
             <asp:Button ID="btnFinalizarOrden" runat="server"
                 Text="&#10005; Cerrar"
-                CssClass="btn-outline"
+                CssClass="btn-outline tiempoInhabilitado"
                 OnClick="btnFinalizarOrden_Click"
                 CausesValidation="false" />
         </div>

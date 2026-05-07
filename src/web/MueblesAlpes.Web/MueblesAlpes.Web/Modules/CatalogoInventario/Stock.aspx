@@ -190,7 +190,7 @@
                             <asp:TextBox ID="txtCantidadEntrada" runat="server" placeholder="0" />
                         </div>
                         <div style="display:flex; align-items:flex-end;">
-                            <asp:Button ID="btnEntrada" runat="server" Text="Registrar Entrada" CssClass="btn-green" OnClick="btnEntrada_Click" />
+                            <asp:Button ID="btnEntrada" runat="server" Text="Registrar Entrada" CssClass="btn-green tiempoInhabilitado" OnClick="btnEntrada_Click" />
                         </div>
                     </div>
                 </div>
@@ -213,14 +213,14 @@
                     <asp:TextBox ID="txtMaximo" runat="server" placeholder="0" />
                 </div>
             </div>
-            <asp:Button ID="btnGuardar" runat="server" Text="Guardar Limites" CssClass="btn-gold" OnClick="btnGuardar_Click" />
+            <asp:Button ID="btnGuardar" runat="server" Text="Guardar Limites" CssClass="btn-gold tiempoInhabilitado" OnClick="btnGuardar_Click" />
             <asp:Panel ID="pnlEditarLimites" runat="server" Visible="false" style="display:inline;">
-                <asp:Button ID="btnEditarLimites" runat="server" Text="&#9998; Editar Limites" CssClass="btn-outline" OnClick="btnEditarLimites_Click" CausesValidation="false" />
+                <asp:Button ID="btnEditarLimites" runat="server" Text="&#9998; Editar Limites" CssClass="btn-outline tiempoInhabilitado" OnClick="btnEditarLimites_Click" CausesValidation="false" />
             </asp:Panel>
             <asp:Panel ID="pnlCancelarLimites" runat="server" Visible="false" style="display:inline;">
-                <asp:Button ID="btnCancelarLimites" runat="server" Text="Cancelar edicion" CssClass="btn-outline" OnClick="btnCancelarLimites_Click" CausesValidation="false" />
+                <asp:Button ID="btnCancelarLimites" runat="server" Text="Cancelar edicion" CssClass="btn-outline tiempoInhabilitado" OnClick="btnCancelarLimites_Click" CausesValidation="false" />
             </asp:Panel>
-            <asp:Button ID="btnCancelar" runat="server" Text="Cancelar" CssClass="btn-outline" OnClick="btnCancelar_Click" CausesValidation="false" />
+            <asp:Button ID="btnCancelar" runat="server" Text="Cancelar" CssClass="btn-outline" OnClick="btnCancelar_Click tiempoInhabilitado" CausesValidation="false" />
         </asp:Panel>
 
         <asp:Panel ID="pnlSinStock" runat="server" Visible="false">
@@ -241,8 +241,8 @@
                     <asp:TextBox ID="txtMaximoNuevo" runat="server" placeholder="0" />
                 </div>
             </div>
-            <asp:Button ID="btnCrearStock" runat="server" Text="Crear Stock" CssClass="btn-gold"    OnClick="btnCrearStock_Click" />
-            <asp:Button ID="btnCancelar2"  runat="server" Text="Cancelar"    CssClass="btn-outline" OnClick="btnCancelar_Click" CausesValidation="false" />
+            <asp:Button ID="btnCrearStock" runat="server" Text="Crear Stock" CssClass="btn-gold tiempoInhabilitado"    OnClick="btnCrearStock_Click" />
+            <asp:Button ID="btnCancelar2"  runat="server" Text="Cancelar"    CssClass="btn-outline tiempoInhabilitado" OnClick="btnCancelar_Click" CausesValidation="false" />
         </asp:Panel>
     </div>
 </asp:Panel>
@@ -268,8 +268,8 @@
         </div>
       
         <div style="display:flex; align-items:flex-end; gap:8px;">
-            <asp:Button ID="btnFiltrar" runat="server" Text="&#128269; Filtrar" CssClass="btn-gold"   OnClick="btnFiltrar_Click"  CausesValidation="false" style="margin-left:0;" />
-            <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar"           CssClass="btn-outline" OnClick="btnLimpiar_Click"  CausesValidation="false" style="margin-left:0;" />
+            <asp:Button ID="btnFiltrar" runat="server" Text="&#128269; Filtrar" CssClass="btn-gold tiempoInhabilitado"   OnClick="btnFiltrar_Click"  CausesValidation="false" style="margin-left:0;" />
+            <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar"           CssClass="btn-outline tiempoInhabilitado" OnClick="btnLimpiar_Click"  CausesValidation="false" style="margin-left:0;" />
         </div>
     </div>
 </div>
@@ -325,13 +325,13 @@
            
             <asp:TemplateField HeaderText="" ItemStyle-Width="120px">
                 <ItemTemplate>
-                    <asp:Button CommandName="Edit" runat="server" Text="&#9998; Editar" CssClass="btn-outline"
+                    <asp:Button CommandName="Edit" runat="server" Text="&#9998; Editar" CssClass="btn-outline tiempoInhabilitado"
                         style="padding:5px 12px;font-size:12px;" />
                 </ItemTemplate>
                 <EditItemTemplate>
-                    <asp:Button CommandName="Update" runat="server" Text="&#10003; Guardar" CssClass="btn-gold"
+                    <asp:Button CommandName="Update" runat="server" Text="&#10003; Guardar" CssClass="btn-gold tiempoInhabilitado"
                         style="padding:5px 10px;font-size:12px;" />
-                    <asp:Button CommandName="Cancel" runat="server" Text="&#10005;" CssClass="btn-outline"
+                    <asp:Button CommandName="Cancel" runat="server" Text="&#10005;" CssClass="btn-outline tiempoInhabilitado"
                         style="padding:5px 8px;font-size:12px;margin-left:4px;" CausesValidation="false" />
                 </EditItemTemplate>
             </asp:TemplateField>

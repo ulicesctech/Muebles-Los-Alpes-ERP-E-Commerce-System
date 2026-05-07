@@ -98,8 +98,8 @@
         </div>
     </div>
     <div style="margin-top:18px;">
-        <asp:Button ID="btnCrear" runat="server" Text="Crear Promocion" CssClass="btn-gold" OnClick="btnCrear_Click" />
-        <asp:Button ID="btnCancelar" runat="server" Text="Cancelar" CssClass="btn-outline" OnClick="btnCancelar_Click" />
+        <asp:Button ID="btnCrear" runat="server" Text="Crear Promocion" CssClass="btn-gold tiempoInhabilitado" OnClick="btnCrear_Click" />
+        <asp:Button ID="btnCancelar" runat="server" Text="Cancelar" CssClass="btn-outline tiempoInhabilitado" OnClick="btnCancelar_Click" />
     </div>
 </div>
 
@@ -143,7 +143,7 @@
                 <ItemTemplate>
                     <asp:LinkButton runat="server" CommandName="Eliminar"
                         CommandArgument='<%# Eval("PROM_PROMOCION") %>'
-                        CssClass="btn-eliminar"
+                        CssClass="btn-eliminar tiempoInhabilitado"
                         OnClientClick="return confirm('Desea eliminar esta promocion?');">
                         Eliminar
                     </asp:LinkButton>

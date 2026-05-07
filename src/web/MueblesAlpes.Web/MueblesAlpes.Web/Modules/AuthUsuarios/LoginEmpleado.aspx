@@ -64,7 +64,7 @@
             </div>
 
             <asp:Button ID="btnIngresar" runat="server" Text="🔑 Ingresar al sistema"
-                CssClass="btn-gold" OnClick="btnLogin_Click" CausesValidation="false" />
+                CssClass="btn-gold tiempoInhabilitado" OnClick="btnLogin_Click" CausesValidation="false" />
 
             <hr class="le-divider" />
         </div>

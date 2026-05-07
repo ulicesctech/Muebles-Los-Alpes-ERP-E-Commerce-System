@@ -153,13 +153,13 @@
                             <asp:LinkButton CommandName="FiltrarCategoria"
                                 CommandArgument='<%# Eval("CAT_CATEGORIA") %>'
                                 runat="server"
-                                CssClass='<%# If(Eval("CAT_CATEGORIA").ToString() = hfCatActiva.Value, "cat-item active", "cat-item") %>'>
+                                CssClass= '<%# If(Eval("CAT_CATEGORIA").ToString() = hfCatActiva.Value, "cat-item active tiempoInhabilitado", "cat-item tiempoInhabilitado") %>'> 
                                 <%# Eval("CAT_DESCRIPCION") %>
                             </asp:LinkButton>
                         </ItemTemplate>
                     </asp:Repeater>
                     <asp:LinkButton CommandName="FiltrarCategoria" CommandArgument="0"
-                        runat="server" CssClass="cat-item"
+                        runat="server" CssClass="cat-item tiempoInhabilitado"
                         OnCommand="rptCategorias_ItemCommand">
                         Todas las categorías
                     </asp:LinkButton>
@@ -176,9 +176,9 @@
                     <span class="search-ico">🔍</span>
                     <asp:TextBox ID="txtBuscar" runat="server" placeholder="Buscar por nombre, tipo, material..." />
                 </div>
-                <asp:Button ID="btnBuscar" runat="server" Text="Buscar" CssClass="btn-gold"
+                <asp:Button ID="btnBuscar" runat="server" Text="Buscar" CssClass="btn-gold tiempoInhabilitado"
                     OnClick="btnBuscar_Click" CausesValidation="false" />
-                <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" CssClass="btn-outline"
+                <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" CssClass="btn-outline tiempoInhabilitado"
                     OnClick="btnLimpiar_Click" CausesValidation="false" />
             </div>
 
@@ -220,10 +220,10 @@
                             <div class="card-footer">
                                 <asp:LinkButton CommandName="VerDetalle"
                                     CommandArgument='<%# Eval("PRO_REFERENCIA") %>'
-                                    runat="server" CssClass="btn-detalle">👁 Ver</asp:LinkButton>
+                                    runat="server" CssClass="btn-detalle tiempoInhabilitado">👁 Ver</asp:LinkButton>
                                 <asp:LinkButton CommandName="AgregarCarrito"
                                     CommandArgument='<%# Eval("HIP_HISTORIAL_PRECIO") %>'
-                                    runat="server" CssClass="btn-carrito"
+                                    runat="server" CssClass="btn-carrito tiempoInhabilitado"
                                     Enabled='<%# Convert.ToInt32(Eval("STO_DISPONIBLE")) > 0 %>'>
                                     🛒 Agregar
                                 </asp:LinkButton>

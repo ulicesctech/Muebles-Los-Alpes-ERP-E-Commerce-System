@@ -77,8 +77,8 @@
                 </div>
             </div>
             <div class="f-row" style="margin-top:12px;">
-                <asp:Button ID="btnGuardar"  runat="server" Text="Actualizar" CssClass="btn-gold"    OnClick="btnGuardar_Click" />
-                <asp:Button ID="btnCancelar" runat="server" Text="Cancelar"   CssClass="btn-outline" OnClick="btnCancelar_Click" CausesValidation="false" />
+                <asp:Button ID="btnGuardar"  runat="server" Text="Actualizar" CssClass="btn-gold tiempoInhabilitado"    OnClick="btnGuardar_Click" />
+                <asp:Button ID="btnCancelar" runat="server" Text="Cancelar"   CssClass="btn-outline tiempoInhabilitado" OnClick="btnCancelar_Click" CausesValidation="false" />
             </div>
         </div>
     </div>
@@ -98,8 +98,8 @@
             <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="160px">
                 <ItemTemplate>
                     <div class="actions-cell">
-                        <asp:LinkButton CommandName="Editar"   CommandArgument='<%# Eval("NIC_NICHO") %>' runat="server" CssClass="btn-edit-t">Editar</asp:LinkButton>
-                        <asp:LinkButton CommandName="Eliminar" CommandArgument='<%# Eval("NIC_NICHO") %>' runat="server" CssClass="btn-del-t" OnClientClick="return confirm('Desea eliminar este nicho?');">Eliminar</asp:LinkButton>
+                        <asp:LinkButton CommandName="Editar"   CommandArgument='<%# Eval("NIC_NICHO") %>' runat="server" CssClass="btn-edit-t tiempoInhabilitado">Editar</asp:LinkButton>
+                        <asp:LinkButton CommandName="Eliminar" CommandArgument='<%# Eval("NIC_NICHO") %>' runat="server" CssClass="btn-del-t tiempoInhabilitado" OnClientClick="return confirm('Desea eliminar este nicho?');">Eliminar</asp:LinkButton>
                     </div>
                 </ItemTemplate>
             </asp:TemplateField>
