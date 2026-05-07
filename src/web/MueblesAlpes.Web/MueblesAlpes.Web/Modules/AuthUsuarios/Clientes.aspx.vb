@@ -14,8 +14,11 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
 
         Private Sub CargarClientes()
             Try
-                gvClientes.DataSource = ClienteService.Listar()
+                Dim dt As DataTable = ClienteService.Listar()
+                gvClientes.DataSource = dt
                 gvClientes.DataBind()
+                lblResultado.Text = "📋 Total de clientes: " & dt.Rows.Count
+                lblResultado.Visible = True
                 lblMensaje.Visible = False
                 lblError.Visible = False
             Catch ex As Exception
@@ -23,6 +26,15 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
                 lblError.Visible = True
             End Try
         End Sub
+
+        Private Function ValidarPassword(pass As String) As String
+            If String.IsNullOrWhiteSpace(pass) Then Return "⚠️ La contraseña es obligatoria."
+            If pass.Length < 8 Then Return "⚠️ La contraseña debe tener mínimo 8 caracteres."
+            If Not Regex.IsMatch(pass, "[A-Z]") Then Return "⚠️ Debe tener al menos una mayúscula."
+            If Not Regex.IsMatch(pass, "[a-z]") Then Return "⚠️ Debe tener al menos una minúscula."
+            If Not Regex.IsMatch(pass, "[0-9]") Then Return "⚠️ Debe tener al menos un número."
+            Return ""
+        End Function
 
         Protected Sub btnBuscar_Click(sender As Object, e As EventArgs)
             Try
@@ -46,6 +58,8 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
         Protected Sub btnVerTodos_Click(sender As Object, e As EventArgs)
             txtBuscarEmail.Text = ""
             txtBuscarDoc.Text = ""
+            lblMensaje.Visible = False
+            lblError.Visible = False
             CargarClientes()
         End Sub
 
@@ -65,6 +79,8 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
                ddlTipoCliente.SelectedValue = "" Then
                 lblError.Text = "⚠️ Los campos marcados con * son obligatorios."
                 lblError.Visible = True
+                hfFormOpen.Value = "true"
+                hfFormEditing.Value = If(hfId.Value <> "", "true", "false")
                 Return
             End If
 
@@ -73,6 +89,8 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
                    Not txtNumDoc.Text.Trim().All(Function(c) Char.IsDigit(c)) Then
                     lblError.Text = "⚠️ DPI debe tener exactamente 13 dígitos."
                     lblError.Visible = True
+                    hfFormOpen.Value = "true"
+                    hfFormEditing.Value = If(hfId.Value <> "", "true", "false")
                     Return
                 End If
             End If
@@ -81,6 +99,8 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
                Not txtTelefono1.Text.Trim().All(Function(c) Char.IsDigit(c)) Then
                 lblError.Text = "⚠️ Teléfono debe tener exactamente 8 dígitos."
                 lblError.Visible = True
+                hfFormOpen.Value = "true"
+                hfFormEditing.Value = If(hfId.Value <> "", "true", "false")
                 Return
             End If
 
@@ -106,8 +126,29 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
                         txtEmail.Text.Trim(),
                         If(String.IsNullOrWhiteSpace(txtProfesion.Text), " ", txtProfesion.Text.Trim()),
                         ddlTipoCliente.SelectedValue)
-                    lblMensaje.Text = "✅ Cliente actualizado correctamente."
+
+                    If Not String.IsNullOrWhiteSpace(txtPassword.Text) Then
+                        Dim errPass As String = ValidarPassword(txtPassword.Text)
+                        If errPass <> "" Then
+                            lblError.Text = errPass
+                            lblError.Visible = True
+                            hfFormOpen.Value = "true"
+                            hfFormEditing.Value = "true"
+                            Return
+                        End If
+                        LoginClienteService.ActualizarPassword(
+                            Convert.ToInt32(hfId.Value),
+                            txtPassword.Text.Trim())
+                    End If
+                    lblMensaje.Text = "✅ Datos del cliente modificados con éxito."
                 Else
+                    Dim errPass As String = ValidarPassword(txtPassword.Text)
+                    If errPass <> "" Then
+                        lblError.Text = errPass
+                        lblError.Visible = True
+                        hfFormOpen.Value = "true"
+                        Return
+                    End If
                     Dim nuevoId As Integer = ClienteService.Crear(
                         ddlTipoDoc.SelectedValue,
                         txtNumDoc.Text.Trim(),
@@ -126,13 +167,15 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
                         If(String.IsNullOrWhiteSpace(txtTelefono2.Text), " ", txtTelefono2.Text.Trim()),
                         txtEmail.Text.Trim(),
                         If(String.IsNullOrWhiteSpace(txtProfesion.Text), " ", txtProfesion.Text.Trim()),
-                        ddlTipoCliente.SelectedValue)
+                        ddlTipoCliente.SelectedValue,
+                        txtPassword.Text.Trim())
                     lblMensaje.Text = "✅ Cliente creado ID: " & nuevoId &
-                                      " — Login: " & txtEmail.Text.Trim() &
-                                      " / Pass: " & txtNumDoc.Text.Trim()
+                                      " — Usuario: " & txtEmail.Text.Trim()
                 End If
                 lblMensaje.Visible = True
                 lblError.Visible = False
+                hfFormOpen.Value = "false"
+                hfFormEditing.Value = "false"
                 LimpiarFormulario()
                 CargarClientes()
             Catch ex As Exception
@@ -142,13 +185,18 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
                     lblError.Text = "Error: " & ex.Message
                 End If
                 lblError.Visible = True
+                hfFormOpen.Value = "true"
+                hfFormEditing.Value = If(hfId.Value <> "", "true", "false")
             End Try
         End Sub
 
         Protected Sub btnNuevo_Click(sender As Object, e As EventArgs)
             LimpiarFormulario()
+            hfFormOpen.Value = "false"
+            hfFormEditing.Value = "false"
             lblMensaje.Visible = False
             lblError.Visible = False
+            CargarClientes()
         End Sub
 
         Protected Sub gvClientes_RowCommand(sender As Object, e As System.Web.UI.WebControls.GridViewCommandEventArgs)
@@ -178,27 +226,30 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
                         txtDireccion.Text = row("cli_direccion").ToString()
                         txtCodigoPostal.Text = row("cli_codigo_postal").ToString()
                         ddlTipoCliente.SelectedValue = row("cli_tipocliente").ToString()
+                        txtPassword.Text = ""
                     End If
-                    lblMensaje.Text = "✏️ Editando cliente ID: " & id
-                    lblMensaje.Visible = True
+                    hfFormOpen.Value = "true"
+                    hfFormEditing.Value = "true"
+                    lblMensaje.Visible = False
+                    lblError.Visible = False
                 Catch ex As Exception
                     lblError.Text = "Error al cargar: " & ex.Message
                     lblError.Visible = True
                 End Try
+                CargarClientes()
 
             ElseIf e.CommandName = "Eliminar" Then
                 Try
                     ClienteService.Eliminar(id)
                     lblMensaje.Text = "🗑️ Cliente ID " & id & " eliminado."
                     lblMensaje.Visible = True
-                    CargarClientes()
+                    lblError.Visible = False
                 Catch ex As Exception
                     lblError.Text = "Error al eliminar: " & ex.Message
                     lblError.Visible = True
                 End Try
+                CargarClientes()
             End If
-
-            CargarClientes()
         End Sub
 
         Private Sub LimpiarFormulario()
@@ -213,6 +264,7 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
             txtSegundoApellido.Text = ""
             txtEmail.Text = ""
             txtProfesion.Text = ""
+            txtPassword.Text = ""
             txtTelefono1.Text = ""
             txtTelefono2.Text = ""
             txtPais.Text = ""

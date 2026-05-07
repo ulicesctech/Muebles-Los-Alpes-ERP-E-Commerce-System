@@ -1,6 +1,5 @@
-Imports System.Collections.Generic
-Imports System.Data
 Imports Oracle.ManagedDataAccess.Client
+Imports System.Data
 
 Public Class OrdenDetallePedidoService
     Private Const PKG As String = "PKG_BOD_ORDEN_DETALLE_PEDIDO"

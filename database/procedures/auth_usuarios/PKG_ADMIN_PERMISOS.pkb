@@ -1,13 +1,12 @@
 ﻿CREATE OR REPLACE PACKAGE BODY PKG_ADMIN_PERMISOS AS
 
-    PROCEDURE assert_id(p_id IN NUMBER, p_msg IN VARCHAR2) IS 
-    BEGIN 
-        IF p_id IS NULL OR p_id <= 0 THEN 
-            RAISE_APPLICATION_ERROR(-20002, p_msg); 
-        END IF; 
+    PROCEDURE assert_id(p_id IN NUMBER, p_msg IN VARCHAR2) IS
+    BEGIN
+        IF p_id IS NULL OR p_id <= 0 THEN
+            RAISE_APPLICATION_ERROR(-20002, p_msg);
+        END IF;
     END assert_id;
 
-    -- CREATE (sin fecha_crea)
     PROCEDURE per_crear(
         p_admin   IN NUMBER DEFAULT 0,
         p_rh      IN NUMBER DEFAULT 0,
@@ -21,19 +20,16 @@
         INSERT INTO ADMIN_PERMISOS (
             per_admin, per_rh, per_fac, per_cli, per_bod, per_promo
         ) VALUES (
-            NVL(p_admin, 0), NVL(p_rh, 0), NVL(p_fac, 0), NVL(p_cli, 0), 
-            NVL(p_bod, 0), NVL(p_promo, 0)
+            NVL(p_admin,0), NVL(p_rh,0), NVL(p_fac,0),
+            NVL(p_cli,0), NVL(p_bod,0), NVL(p_promo,0)
         ) RETURNING per_permisos INTO p_id;
-        
         COMMIT;
-        DBMS_OUTPUT.PUT_LINE('✅ Creado ID: ' || p_id);
     EXCEPTION
         WHEN OTHERS THEN
             ROLLBACK;
             RAISE;
     END per_crear;
 
-    -- UPDATE (sin fecha_crea)
     PROCEDURE per_actualizar(
         p_id      IN NUMBER,
         p_admin   IN NUMBER DEFAULT NULL,
@@ -46,57 +42,47 @@
         v_rows NUMBER;
     BEGIN
         assert_id(p_id, 'ID obligatorio');
-        
         UPDATE ADMIN_PERMISOS SET
             per_admin = NVL(p_admin, per_admin),
-            per_rh    = NVL(p_rh, per_rh),
-            per_fac   = NVL(p_fac, per_fac),
-            per_cli   = NVL(p_cli, per_cli),
-            per_bod   = NVL(p_bod, per_bod),
+            per_rh    = NVL(p_rh,    per_rh),
+            per_fac   = NVL(p_fac,   per_fac),
+            per_cli   = NVL(p_cli,   per_cli),
+            per_bod   = NVL(p_bod,   per_bod),
             per_promo = NVL(p_promo, per_promo)
         WHERE per_permisos = p_id;
-        
         v_rows := SQL%ROWCOUNT;
-        COMMIT;
-        
         IF v_rows = 0 THEN
-            RAISE_APPLICATION_ERROR(-20004, 'No encontrado');
+            RAISE_APPLICATION_ERROR(-20004, 'Permiso no encontrado');
         END IF;
-        
-        DBMS_OUTPUT.PUT_LINE('✅ Actualizado: ' || p_id);
+        COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
             ROLLBACK;
             RAISE;
     END per_actualizar;
 
-    -- DELETE
     PROCEDURE per_eliminar(p_id IN NUMBER) IS
         v_rows NUMBER;
     BEGIN
         assert_id(p_id, 'ID obligatorio');
-        
         DELETE FROM ADMIN_PERMISOS WHERE per_permisos = p_id;
         v_rows := SQL%ROWCOUNT;
-        
         IF v_rows = 0 THEN
-            RAISE_APPLICATION_ERROR(-20004, 'No encontrado');
+            RAISE_APPLICATION_ERROR(-20004, 'Permiso no encontrado');
         END IF;
-        
         COMMIT;
-        DBMS_OUTPUT.PUT_LINE('✅ Eliminado: ' || p_id);
     EXCEPTION
         WHEN OTHERS THEN
             ROLLBACK;
             RAISE;
     END per_eliminar;
 
-    -- LISTAR (sin fecha_crea)
     PROCEDURE per_listar(p_cursor OUT SYS_REFCURSOR) IS
     BEGIN
         OPEN p_cursor FOR
-            SELECT per_permisos, per_admin, per_rh, per_fac, per_cli, per_bod, per_promo
-            FROM ADMIN_PERMISOS 
+            SELECT per_permisos, per_admin, per_rh, per_fac,
+                   per_cli, per_bod, per_promo
+            FROM ADMIN_PERMISOS
             ORDER BY per_permisos;
     END per_listar;
 

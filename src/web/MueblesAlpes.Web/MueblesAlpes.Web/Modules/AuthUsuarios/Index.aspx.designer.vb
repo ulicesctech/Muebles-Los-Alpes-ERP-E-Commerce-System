@@ -11,5 +11,6 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
         Protected WithEvents lblNombre As Global.System.Web.UI.WebControls.Label
         Protected WithEvents lblGrupo As Global.System.Web.UI.WebControls.Label
         Protected WithEvents btnCerrarSesion As Global.System.Web.UI.WebControls.Button
+        Protected WithEvents pnlFac As Global.System.Web.UI.WebControls.Panel
     End Class
 End Namespace

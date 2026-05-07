@@ -3,18 +3,22 @@ Option Explicit On
 
 Namespace MueblesAlpes.Web.Modules.AuthUsuarios
     Partial Public Class LoginClientePage
-        Protected WithEvents lblLoginError As Global.System.Web.UI.WebControls.Label
-        Protected WithEvents lblLoginMensaje As Global.System.Web.UI.WebControls.Label
+        Protected WithEvents lblMensaje As Global.System.Web.UI.WebControls.Label
+        Protected WithEvents lblError As Global.System.Web.UI.WebControls.Label
         Protected WithEvents txtEmail As Global.System.Web.UI.WebControls.TextBox
         Protected WithEvents txtPassword As Global.System.Web.UI.WebControls.TextBox
         Protected WithEvents btnLogin As Global.System.Web.UI.WebControls.Button
-        Protected WithEvents lblRegError As Global.System.Web.UI.WebControls.Label
-        Protected WithEvents lblRegMensaje As Global.System.Web.UI.WebControls.Label
         Protected WithEvents ddlTipoDoc As Global.System.Web.UI.WebControls.DropDownList
         Protected WithEvents txtNumDoc As Global.System.Web.UI.WebControls.TextBox
+        Protected WithEvents txtNITReg As Global.System.Web.UI.WebControls.TextBox
+        Protected WithEvents ddlTipoClienteReg As Global.System.Web.UI.WebControls.DropDownList
         Protected WithEvents txtPrimerNombre As Global.System.Web.UI.WebControls.TextBox
+        Protected WithEvents txtSegundoNombre As Global.System.Web.UI.WebControls.TextBox
         Protected WithEvents txtPrimerApellido As Global.System.Web.UI.WebControls.TextBox
-        Protected WithEvents txtEmailReg As Global.System.Web.UI.WebControls.TextBox
+        Protected WithEvents txtSegundoApellido As Global.System.Web.UI.WebControls.TextBox
+        Protected WithEvents txtRegEmail As Global.System.Web.UI.WebControls.TextBox
+        Protected WithEvents txtRegPassword As Global.System.Web.UI.WebControls.TextBox
+        Protected WithEvents txtConfirmPassword As Global.System.Web.UI.WebControls.TextBox
         Protected WithEvents txtTelefono As Global.System.Web.UI.WebControls.TextBox
         Protected WithEvents txtPais As Global.System.Web.UI.WebControls.TextBox
         Protected WithEvents txtDepartamento As Global.System.Web.UI.WebControls.TextBox
@@ -22,7 +26,6 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
         Protected WithEvents txtZona As Global.System.Web.UI.WebControls.TextBox
         Protected WithEvents txtDireccion As Global.System.Web.UI.WebControls.TextBox
         Protected WithEvents txtCodigoPostal As Global.System.Web.UI.WebControls.TextBox
-        Protected WithEvents ddlTipoCliente As Global.System.Web.UI.WebControls.DropDownList
         Protected WithEvents btnRegistrar As Global.System.Web.UI.WebControls.Button
     End Class
 End Namespace

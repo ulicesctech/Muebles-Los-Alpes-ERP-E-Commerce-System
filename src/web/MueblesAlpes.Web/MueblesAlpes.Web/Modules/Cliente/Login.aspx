@@ -50,11 +50,11 @@
             <asp:Panel ID="pnlMsg" runat="server" Visible="false">
                 <asp:Label ID="lblMsg" runat="server" />
             </asp:Panel>
-            <div class="f-group">
-                <label>Usuario</label>
-                <asp:TextBox ID="txtUsuario" runat="server" CssClass="form-control"
-                    placeholder="Tu usuario" MaxLength="100" />
-            </div>
+                <div class="f-group">
+                    <label>Usuario o Email</label>
+                    <asp:TextBox ID="txtUsuario" runat="server" CssClass="form-control"
+                        placeholder="Tu usuario o email" MaxLength="100" />
+                </div>
             <div class="f-group">
                 <label>Contraseña</label>
                 <asp:TextBox ID="txtPassword" runat="server" CssClass="form-control"

@@ -1,6 +1,4 @@
-﻿Imports System.Data
-
-Namespace Modules.Cliente
+﻿Namespace Modules.Cliente
 
     Public Class Login
         Inherits System.Web.UI.Page
@@ -18,24 +16,39 @@ Namespace Modules.Cliente
             Dim password As String = txtPassword.Text.Trim()
 
             If String.IsNullOrEmpty(usuario) OrElse String.IsNullOrEmpty(password) Then
-                MostrarError("Ingresa tu usuario y contraseña.")
+                MostrarError("Ingresa tu usuario o email y contraseña.")
                 Return
             End If
 
             Try
-                Dim clienteId As Integer = AuthClienteService.Autenticar(usuario, password)
+                Dim clienteId As Integer = 0
 
-                ' Guardar sesión
+                ' Intentar por usuario
+                Try
+                    clienteId = AuthClienteService.Autenticar(usuario, password)
+                Catch
+                End Try
+
+                ' Si falla, intentar por email
+                If clienteId = 0 Then
+                    Try
+                        clienteId = AuthClienteService.AutenticarPorEmail(usuario, password)
+                    Catch
+                    End Try
+                End If
+
+                If clienteId = 0 Then
+                    MostrarError("Usuario, email o contraseña incorrectos.")
+                    Return
+                End If
+
                 Session("CLI_CLIENTE") = clienteId
-
-                ' Obtener nombre para sesión
                 Dim nombre As String = ""
                 Dim email As String = ""
                 AuthClienteService.ObtenerDatosCliente(clienteId, nombre, email)
                 Session("CLI_NOMBRE") = nombre
                 Session("CLI_EMAIL") = email
 
-                ' Redirigir a returnUrl o catálogo
                 Dim returnUrl As String = Request.QueryString("returnUrl")
                 If Not String.IsNullOrEmpty(returnUrl) Then
                     Response.Redirect(returnUrl)
@@ -44,7 +57,7 @@ Namespace Modules.Cliente
                 End If
 
             Catch ex As Exception
-                MostrarError("Usuario o contraseña incorrectos.")
+                MostrarError("Usuario, email o contraseña incorrectos.")
             End Try
         End Sub
 

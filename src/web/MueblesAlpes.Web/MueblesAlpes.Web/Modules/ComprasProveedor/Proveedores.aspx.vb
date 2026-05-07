@@ -4,8 +4,6 @@
 ' El code-behind solo valida que los campos no esten vacios
 ' antes de ir a la base de datos.
 ' ============================================================
-Imports System
-Imports System.Data
 
 Namespace Modules.ComprasProveedor
 

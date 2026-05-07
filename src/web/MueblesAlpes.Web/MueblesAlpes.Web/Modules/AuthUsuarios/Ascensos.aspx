@@ -12,11 +12,11 @@
     .form-card-head span { color:#f0d9a0; font-size:14px; font-weight:bold; }
     .form-card-body { padding:20px; }
     .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-    .form-row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
     .form-group { margin-bottom:16px; }
     .form-group label { display:block; font-size:13px; font-weight:bold; color:#5C3A1E; margin-bottom:6px; font-family:Arial,sans-serif; }
     .form-control { width:100%; padding:10px 12px; border:1px solid #e8d8c0; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; color:#333; box-sizing:border-box; }
     .form-control:focus { outline:none; border-color:#C9973A; }
+    .info-box { background:#fdf6ec; border:1px solid #e8d8c0; border-radius:8px; padding:10px 14px; font-size:12px; color:#8B5E3C; font-family:Arial,sans-serif; margin-top:8px; }
     .btn-gold { background:linear-gradient(135deg,#C9973A,#a87a2e); color:#1a1a1a; border:none; padding:10px 20px; border-radius:8px; font-size:13px; font-weight:bold; cursor:pointer; }
     .btn-gold:hover { background:linear-gradient(135deg,#a87a2e,#7a5818); color:white; }
     .btn-outline { background:white; color:#5C3A1E; border:2px solid #e8d8c0; padding:10px 18px; border-radius:8px; font-size:13px; cursor:pointer; }
@@ -29,6 +29,8 @@
     .table-card tbody tr:hover { background:#fdf8f3; }
     .table-card tbody td { padding:14px 18px; font-size:13px; white-space:nowrap; }
     .badge-id { background:#fdf6ec; color:#C9973A; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:bold; border:1px solid #e8d8c0; }
+    .badge-active { background:#f0fff4; color:#276749; padding:3px 10px; border-radius:12px; font-size:11px; font-weight:bold; }
+    .badge-closed { background:#fff5f5; color:#c53030; padding:3px 10px; border-radius:12px; font-size:11px; font-weight:bold; }
     .actions-cell { display:flex; gap:8px; justify-content:flex-end; }
     .btn-edit-t { background:#fdf6ec; color:#C9973A; border:1px solid #e8d8c0; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer; }
     .btn-edit-t:hover { background:#C9973A; color:white; }
@@ -48,7 +50,7 @@
 <asp:Label ID="lblError"   runat="server" CssClass="alert-err" Visible="false" />
 
 <div class="form-card">
-    <div class="form-card-head"><span>🔧 Nuevo / Editar Ascenso</span></div>
+    <div class="form-card-head"><span>🔧 Nuevo Ascenso</span></div>
     <div class="form-card-body">
         <asp:HiddenField ID="hfId"   runat="server" />
         <asp:HiddenField ID="hfMode" runat="server" Value="crear" />
@@ -56,28 +58,28 @@
         <div class="form-row">
             <div class="form-group">
                 <label>Empleado *</label>
-                <asp:DropDownList ID="ddlEmpleado" runat="server" CssClass="form-control" />
+                <asp:DropDownList ID="ddlEmpleado" runat="server" CssClass="form-control"
+                    AutoPostBack="true" OnSelectedIndexChanged="ddlEmpleado_SelectedIndexChanged" />
+                <asp:Panel ID="pnlPuestoActual" runat="server" Visible="false">
+                    <div class="info-box">
+                        📌 Puesto actual: <strong><asp:Literal ID="litPuestoActual" runat="server" /></strong>
+                        — Salario: <strong>Q <asp:Literal ID="litSalarioActual" runat="server" /></strong>
+                    </div>
+                </asp:Panel>
             </div>
             <div class="form-group">
-                <label>Puesto *</label>
+                <label>Puesto a Ascender * <small style="color:#aaa;">(solo puestos con mayor salario)</small></label>
                 <asp:DropDownList ID="ddlPuesto" runat="server" CssClass="form-control" />
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group">
-                <label>Fecha Inicio *</label>
-                <asp:TextBox ID="txtFechaInicio" runat="server" CssClass="form-control"
-                    TextMode="Date" />
-            </div>
-            <div class="form-group">
-                <label>Fecha Final <small style="color:#aaa;">(opcional)</small></label>
-                <asp:TextBox ID="txtFechaFinal" runat="server" CssClass="form-control"
-                    TextMode="Date" />
+                <asp:Panel ID="pnlSinPuestos" runat="server" Visible="false">
+                    <div class="info-box" style="background:#fff5f5; border-color:#fed7d7; color:#c53030;">
+                        ⚠️ Este empleado ya está en el puesto de mayor salario disponible.
+                    </div>
+                </asp:Panel>
             </div>
         </div>
 
         <div style="display:flex; gap:10px;">
-            <asp:Button ID="btnGuardar" runat="server" Text="💾 Guardar"
+            <asp:Button ID="btnGuardar" runat="server" Text="📈 Aplicar Ascenso"
                 CssClass="btn-gold" OnClick="btnGuardar_Click" />
             <asp:Button ID="btnNuevo" runat="server" Text="🆕 Nuevo"
                 CssClass="btn-outline" OnClick="btnNuevo_Click" />
@@ -96,13 +98,21 @@
             </asp:TemplateField>
             <asp:BoundField DataField="em_nombre_completo" HeaderText="Empleado" />
             <asp:BoundField DataField="pue_nombre"         HeaderText="Puesto" />
-            <asp:BoundField DataField="asc_fecha_inicio"   HeaderText="Fecha Inicio" DataFormatString="{0:dd/MM/yyyy}" />
-            <asp:BoundField DataField="asc_fecha_final"    HeaderText="Fecha Final"  DataFormatString="{0:dd/MM/yyyy}" NullDisplayText="—" />
+            <asp:BoundField DataField="asc_fecha_inicio"   HeaderText="Desde" DataFormatString="{0:dd/MM/yyyy}" />
+            <asp:TemplateField HeaderText="Hasta">
+                <ItemTemplate>
+                    <%# If(IsDBNull(Eval("asc_fecha_final")),
+                        "<span class='badge-active'>● Activo</span>",
+                        "<span class='badge-closed'>" & Convert.ToDateTime(Eval("asc_fecha_final")).ToString("dd/MM/yyyy") & "</span>") %>
+                </ItemTemplate>
+            </asp:TemplateField>
             <asp:TemplateField HeaderText="Acciones">
                 <ItemTemplate>
                     <div class="actions-cell">
-                        <asp:LinkButton runat="server" Text="✏️" CommandName="Editar"
-                            CommandArgument='<%# Eval("asc_ascenso") %>' CssClass="btn-edit-t" />
+                        <asp:LinkButton runat="server" Text="🔒" CommandName="Cerrar"
+                            CommandArgument='<%# Eval("asc_ascenso") %>' CssClass="btn-edit-t"
+                            OnClientClick="return confirm('¿Cerrar este ascenso?');"
+                            ToolTip="Cerrar ascenso" />
                         <asp:LinkButton runat="server" Text="🗑" CommandName="Eliminar"
                             CommandArgument='<%# Eval("asc_ascenso") %>' CssClass="btn-del-t"
                             OnClientClick="return confirm('¿Eliminar este ascenso?');" />

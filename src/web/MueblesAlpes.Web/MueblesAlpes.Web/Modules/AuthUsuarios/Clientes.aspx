@@ -8,17 +8,25 @@
     .alert-ok  { padding:12px 18px; border-radius:8px; font-size:13px; margin-bottom:20px; background:#f0fff4; color:#276749; border-left:4px solid #48bb78; display:block; }
     .alert-err { padding:12px 18px; border-radius:8px; font-size:13px; margin-bottom:20px; background:#fff5f5; color:#c53030; border-left:4px solid #fc8181; display:block; }
     .form-card { background:white; border-radius:12px; border:1px solid #e8d8c0; overflow:hidden; margin-bottom:24px; box-shadow:0 2px 8px rgba(92,58,30,0.06); }
-    .form-card-head { background:linear-gradient(135deg,#5C3A1E,#8B5E3C); padding:14px 20px; }
+    .form-card-head { background:linear-gradient(135deg,#5C3A1E,#8B5E3C); padding:14px 20px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; user-select:none; }
     .form-card-head span { color:#f0d9a0; font-size:14px; font-weight:bold; }
-    .form-card-body { padding:20px; }
+    .form-card-head .toggle-icon { color:#f0d9a0; font-size:18px; transition:transform 0.3s; }
+    .form-card-head.open .toggle-icon { transform:rotate(45deg); }
+    .form-card-body { padding:20px; display:none; }
+    .form-card-body.open { display:block; }
+    .form-card-body.editing .form-control { border-color:#7c3aed; background:#faf5ff; }
+    .form-card-body.editing label { color:#7c3aed; }
+    .form-card-body.editing .section-title { color:#7c3aed; border-color:#7c3aed; }
     .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
     .form-row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
     .form-group { margin-bottom:16px; }
-    .form-group label { display:block; font-size:13px; font-weight:bold; color:#5C3A1E; margin-bottom:6px; font-family:Arial,sans-serif; }
-    .form-control { width:100%; padding:10px 12px; border:1px solid #e8d8c0; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; color:#333; box-sizing:border-box; }
+    .form-group label { display:block; font-size:13px; font-weight:bold; color:#5C3A1E; margin-bottom:6px; font-family:Arial,sans-serif; transition:color 0.2s; }
+    .form-control { width:100%; padding:10px 12px; border:1px solid #e8d8c0; border-radius:8px; font-size:13px; font-family:Arial,sans-serif; color:#333; box-sizing:border-box; transition:border-color 0.2s, background 0.2s; }
     .form-control:focus { outline:none; border-color:#C9973A; }
-    .section-title { font-size:13px; font-weight:bold; color:#8B5E3C; font-family:Arial,sans-serif; margin:16px 0 10px; padding-bottom:6px; border-bottom:1px solid #e8d8c0; }
+    .section-title { font-size:13px; font-weight:bold; color:#8B5E3C; font-family:Arial,sans-serif; margin:16px 0 10px; padding-bottom:6px; border-bottom:1px solid #e8d8c0; transition:color 0.2s; }
     .hint-text { font-size:11px; color:#aaa; font-family:Arial,sans-serif; margin-top:3px; }
+    .hint-warn { font-size:11px; font-family:Arial,sans-serif; margin-top:5px; padding:5px 10px; background:#fdf6ec; border-left:3px solid #C9973A; border-radius:4px; color:#8B5E3C; }
+    .pass-rules { font-size:11px; color:#8B5E3C; font-family:Arial,sans-serif; margin-top:5px; padding:6px 10px; background:#fdf6ec; border-radius:6px; border-left:3px solid #C9973A; }
     .btn-gold { background:linear-gradient(135deg,#C9973A,#a87a2e); color:#1a1a1a; border:none; padding:10px 20px; border-radius:8px; font-size:13px; font-weight:bold; cursor:pointer; }
     .btn-gold:hover { background:linear-gradient(135deg,#a87a2e,#7a5818); color:white; }
     .btn-outline { background:white; color:#5C3A1E; border:2px solid #e8d8c0; padding:10px 18px; border-radius:8px; font-size:13px; cursor:pointer; }
@@ -41,6 +49,8 @@
     .btn-del-t { background:#fff5f5; color:#e53e3e; border:1px solid #fed7d7; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:bold; cursor:pointer; }
     .btn-del-t:hover { background:#e53e3e; color:white; }
     .empty-state { text-align:center; padding:40px; color:#aaa; }
+    .result-count { font-size:12px; color:#8B5E3C; font-family:Arial,sans-serif; padding:10px 18px; background:#fdf6ec; border-top:1px solid #e8d8c0; }
+    .editing-badge { background:#ede9fe; color:#7c3aed; border:1px solid #c4b5fd; border-radius:8px; padding:8px 14px; font-size:12px; font-family:Arial,sans-serif; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
 </style>
 
 <div class="breadcrumb-mod">
@@ -53,10 +63,17 @@
 <asp:Label ID="lblMensaje" runat="server" CssClass="alert-ok"  Visible="false" />
 <asp:Label ID="lblError"   runat="server" CssClass="alert-err" Visible="false" />
 
-<div class="form-card">
-    <div class="form-card-head"><span>🔧 Nuevo / Editar Cliente</span></div>
-    <div class="form-card-body">
+<div class="form-card" id="formCard">
+    <div class="form-card-head" id="formCardHead" onclick="toggleForm()">
+        <span id="formCardTitle">➕ Nuevo Cliente — clic para desplegar</span>
+        <span class="toggle-icon" id="toggleIcon">+</span>
+    </div>
+    <div class="form-card-body" id="formCardBody">
         <asp:HiddenField ID="hfId" runat="server" />
+
+        <div id="editingBadge" style="display:none;" class="editing-badge">
+            ✏️ <strong>Modo edición</strong> — Los campos en morado serán modificados al guardar.
+        </div>
 
         <div class="section-title">📄 Documento</div>
         <div class="form-row">
@@ -73,14 +90,15 @@
             <div class="form-group">
                 <label>Número Documento * <small style="color:#888;">(DPI: 13 dígitos)</small></label>
                 <asp:TextBox ID="txtNumDoc" runat="server" CssClass="form-control"
-                    placeholder="Ej: 1234567890101" MaxLength="13" />
-                <span class="hint-text">📌 Será el password del cliente</span>
+                    placeholder="Ej: 1234567890101" MaxLength="13" autocomplete="off" />
             </div>
         </div>
         <div class="form-row">
             <div class="form-group">
-                <label>NIT <small style="color:#888;">(mínimo 6 dígitos)</small></label>
-                <asp:TextBox ID="txtNIT" runat="server" CssClass="form-control" placeholder="NIT..." MaxLength="20" />
+                <label>NIT <small style="color:#888;">(opcional — si llenas este campo se asignará Jurídica)</small></label>
+                <asp:TextBox ID="txtNIT" runat="server" CssClass="form-control"
+                    placeholder="NIT..." MaxLength="20" autocomplete="off"
+                    onkeyup="onNitChange(this.value)" onchange="onNitChange(this.value)" />
             </div>
             <div class="form-group">
                 <label>Tipo Cliente *</label>
@@ -96,31 +114,50 @@
         <div class="form-row">
             <div class="form-group">
                 <label>Primer Nombre *</label>
-                <asp:TextBox ID="txtPrimerNombre" runat="server" CssClass="form-control" placeholder="Primer nombre..." />
+                <asp:TextBox ID="txtPrimerNombre" runat="server" CssClass="form-control"
+                    placeholder="Primer nombre..." autocomplete="off" />
             </div>
             <div class="form-group">
                 <label>Segundo Nombre</label>
-                <asp:TextBox ID="txtSegundoNombre" runat="server" CssClass="form-control" placeholder="Segundo nombre..." />
+                <asp:TextBox ID="txtSegundoNombre" runat="server" CssClass="form-control"
+                    placeholder="Segundo nombre..." autocomplete="off" />
             </div>
         </div>
         <div class="form-row">
             <div class="form-group">
                 <label>Primer Apellido *</label>
-                <asp:TextBox ID="txtPrimerApellido" runat="server" CssClass="form-control" placeholder="Primer apellido..." />
+                <asp:TextBox ID="txtPrimerApellido" runat="server" CssClass="form-control"
+                    placeholder="Primer apellido..." autocomplete="off" />
             </div>
             <div class="form-group">
                 <label>Segundo Apellido</label>
-                <asp:TextBox ID="txtSegundoApellido" runat="server" CssClass="form-control" placeholder="Segundo apellido..." />
+                <asp:TextBox ID="txtSegundoApellido" runat="server" CssClass="form-control"
+                    placeholder="Segundo apellido..." autocomplete="off" />
             </div>
         </div>
         <div class="form-row">
             <div class="form-group">
                 <label>Email * <small style="color:#888;">(será su usuario)</small></label>
-                <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control" placeholder="Email..." />
+                <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control"
+                    placeholder="Email..." autocomplete="off" />
             </div>
             <div class="form-group">
                 <label>Profesión</label>
-                <asp:TextBox ID="txtProfesion" runat="server" CssClass="form-control" placeholder="Profesión..." />
+                <asp:TextBox ID="txtProfesion" runat="server" CssClass="form-control"
+                    placeholder="Profesión..." autocomplete="off" />
+            </div>
+        </div>
+
+        <div class="section-title">🔐 Acceso</div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>🔑 Contraseña <small style="color:#888;">(obligatoria al crear, opcional al editar)</small></label>
+                <asp:TextBox ID="txtPassword" runat="server" CssClass="form-control"
+                    TextMode="Password" placeholder="Contraseña..." autocomplete="new-password" />
+                <div class="pass-rules">
+                    🔒 Mínimo 8 caracteres — mayúscula, minúscula y número.<br/>
+                    Al editar, solo llena este campo si deseas cambiar la contraseña.
+                </div>
             </div>
         </div>
 
@@ -129,12 +166,12 @@
             <div class="form-group">
                 <label>Teléfono Principal * <small style="color:#888;">(8 dígitos)</small></label>
                 <asp:TextBox ID="txtTelefono1" runat="server" CssClass="form-control"
-                    placeholder="Ej: 55551001" MaxLength="8" />
+                    placeholder="Ej: 55551001" MaxLength="8" autocomplete="off" />
             </div>
             <div class="form-group">
                 <label>Teléfono Secundario <small style="color:#888;">(8 dígitos)</small></label>
                 <asp:TextBox ID="txtTelefono2" runat="server" CssClass="form-control"
-                    placeholder="Opcional..." MaxLength="8" />
+                    placeholder="Opcional..." MaxLength="8" autocomplete="off" />
             </div>
         </div>
 
@@ -142,36 +179,42 @@
         <div class="form-row-3">
             <div class="form-group">
                 <label>País *</label>
-                <asp:TextBox ID="txtPais" runat="server" CssClass="form-control" placeholder="País..." />
+                <asp:TextBox ID="txtPais" runat="server" CssClass="form-control"
+                    placeholder="País..." autocomplete="off" />
             </div>
             <div class="form-group">
                 <label>Departamento *</label>
-                <asp:TextBox ID="txtDepartamento" runat="server" CssClass="form-control" placeholder="Departamento..." />
+                <asp:TextBox ID="txtDepartamento" runat="server" CssClass="form-control"
+                    placeholder="Departamento..." autocomplete="off" />
             </div>
             <div class="form-group">
                 <label>Municipio *</label>
-                <asp:TextBox ID="txtMunicipio" runat="server" CssClass="form-control" placeholder="Municipio..." />
+                <asp:TextBox ID="txtMunicipio" runat="server" CssClass="form-control"
+                    placeholder="Municipio..." autocomplete="off" />
             </div>
         </div>
         <div class="form-row-3">
             <div class="form-group">
                 <label>Zona *</label>
-                <asp:TextBox ID="txtZona" runat="server" CssClass="form-control" placeholder="Zona..." />
+                <asp:TextBox ID="txtZona" runat="server" CssClass="form-control"
+                    placeholder="Zona..." autocomplete="off" />
             </div>
             <div class="form-group">
                 <label>Dirección *</label>
-                <asp:TextBox ID="txtDireccion" runat="server" CssClass="form-control" placeholder="Dirección..." />
+                <asp:TextBox ID="txtDireccion" runat="server" CssClass="form-control"
+                    placeholder="Dirección..." autocomplete="off" />
             </div>
             <div class="form-group">
                 <label>Código Postal *</label>
-                <asp:TextBox ID="txtCodigoPostal" runat="server" CssClass="form-control" placeholder="Código postal..." />
+                <asp:TextBox ID="txtCodigoPostal" runat="server" CssClass="form-control"
+                    placeholder="Código postal..." autocomplete="off" />
             </div>
         </div>
 
         <div style="display:flex; gap:10px; margin-top:8px;">
             <asp:Button ID="btnGuardar" runat="server" Text="💾 Guardar"
                 CssClass="btn-gold" OnClick="btnGuardar_Click" />
-            <asp:Button ID="btnNuevo" runat="server" Text="🆕 Nuevo"
+            <asp:Button ID="btnNuevo" runat="server" Text="❌ Cancelar"
                 CssClass="btn-outline" OnClick="btnNuevo_Click" />
         </div>
     </div>
@@ -180,11 +223,13 @@
 <div class="search-bar">
     <div class="form-group">
         <label>🔍 Buscar por Email</label>
-        <asp:TextBox ID="txtBuscarEmail" runat="server" CssClass="form-control" placeholder="Email..." />
+        <asp:TextBox ID="txtBuscarEmail" runat="server" CssClass="form-control"
+            placeholder="Email..." autocomplete="off" />
     </div>
     <div class="form-group">
         <label>🔍 Buscar por Documento</label>
-        <asp:TextBox ID="txtBuscarDoc" runat="server" CssClass="form-control" placeholder="Número documento..." />
+        <asp:TextBox ID="txtBuscarDoc" runat="server" CssClass="form-control"
+            placeholder="Número documento..." autocomplete="off" />
     </div>
     <asp:Button ID="btnBuscar" runat="server" Text="🔍 Buscar"
         CssClass="btn-gold" OnClick="btnBuscar_Click" />
@@ -192,7 +237,7 @@
         CssClass="btn-outline" OnClick="btnVerTodos_Click" />
 </div>
 
-<div class="table-card">
+<div class="table-card" id="tablaClientes">
     <asp:GridView ID="gvClientes" runat="server" AutoGenerateColumns="false"
         OnRowCommand="gvClientes_RowCommand" GridLines="None">
         <Columns>
@@ -203,15 +248,19 @@
             </asp:TemplateField>
             <asp:BoundField DataField="cli_tipodocumento"   HeaderText="Tipo Doc" />
             <asp:BoundField DataField="cli_numdocumento"    HeaderText="Documento" />
-            <asp:BoundField DataField="cli_nombre_completo" HeaderText="Nombre" />
+            <asp:TemplateField HeaderText="Nombre">
+                <ItemTemplate>
+                    <%# Eval("cli_primer_nombre").ToString().Trim() & " " & Eval("cli_primer_apellido").ToString().Trim() %>
+                </ItemTemplate>
+            </asp:TemplateField>
             <asp:BoundField DataField="cli_email"           HeaderText="Email" />
             <asp:BoundField DataField="cli_primer_telefono" HeaderText="Teléfono" />
             <asp:BoundField DataField="cli_pais"            HeaderText="País" />
             <asp:TemplateField HeaderText="Tipo">
                 <ItemTemplate>
-                    <%# If(Eval("cli_tipocliente").ToString()="NATURAL",
-                        "<span class='badge-nat'>Natural</span>",
-                        "<span class='badge-jur'>Jurídica</span>") %>
+                    <%# If(Eval("cli_tipocliente").ToString() = "NATURAL",
+                                    "<span class='badge-nat'>Natural</span>",
+                                    "<span class='badge-jur'>Jurídica</span>") %>
                 </ItemTemplate>
             </asp:TemplateField>
             <asp:TemplateField HeaderText="Acciones">
@@ -233,5 +282,61 @@
             </div>
         </EmptyDataTemplate>
     </asp:GridView>
+    <asp:Label ID="lblResultado" runat="server" CssClass="result-count" Visible="false" />
 </div>
+
+<asp:HiddenField ID="hfFormOpen"    runat="server" Value="false" />
+<asp:HiddenField ID="hfFormEditing" runat="server" Value="false" />
+
+<script>
+    function toggleForm() {
+        var body  = document.getElementById('formCardBody');
+        var head  = document.getElementById('formCardHead');
+        var icon  = document.getElementById('toggleIcon');
+        var title = document.getElementById('formCardTitle');
+        var hf    = document.getElementById('<%: hfFormOpen.ClientID %>');
+        if (body.classList.contains('open')) {
+            body.classList.remove('open');
+            head.classList.remove('open');
+            icon.textContent  = '+';
+            title.textContent = '➕ Nuevo Cliente — clic para desplegar';
+            hf.value = 'false';
+        } else {
+            body.classList.add('open');
+            head.classList.add('open');
+            icon.textContent  = '×';
+            title.textContent = '➕ Nuevo Cliente';
+            hf.value = 'true';
+        }
+    }
+
+    function onNitChange(val) {
+        var ddl = document.getElementById('<%: ddlTipoCliente.ClientID %>');
+        if (val.trim().length > 0) {
+            ddl.value = 'JURIDICA';
+        }
+    }
+
+    window.onload = function () {
+        var hfOpen    = document.getElementById('<%: hfFormOpen.ClientID %>');
+        var hfEditing = document.getElementById('<%: hfFormEditing.ClientID %>');
+        var body = document.getElementById('formCardBody');
+        var head = document.getElementById('formCardHead');
+        var icon = document.getElementById('toggleIcon');
+        var title = document.getElementById('formCardTitle');
+        var badge = document.getElementById('editingBadge');
+
+        if (hfOpen && hfOpen.value === 'true') {
+            body.classList.add('open');
+            head.classList.add('open');
+            icon.textContent = '×';
+        }
+        if (hfEditing && hfEditing.value === 'true') {
+            body.classList.add('editing');
+            badge.style.display = 'flex';
+            title.textContent = '✏️ Editando Cliente';
+            icon.textContent = '×';
+        }
+    };
+</script>
 </asp:Content>
