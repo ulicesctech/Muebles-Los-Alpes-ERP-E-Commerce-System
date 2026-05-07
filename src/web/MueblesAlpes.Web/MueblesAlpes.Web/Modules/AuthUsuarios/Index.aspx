@@ -41,7 +41,7 @@
             <small><asp:Label ID="lblGrupo" runat="server" /></small>
         </div>
         <asp:Button ID="btnCerrarSesion" runat="server" Text="🚪 Cerrar Sesión"
-            CssClass="btn-cerrar" OnClick="btnCerrarSesion_Click" />
+            CssClass="btn-cerrar tiempoInhabilitado" OnClick="btnCerrarSesion_Click" />
     </div>
 </asp:Panel>
 

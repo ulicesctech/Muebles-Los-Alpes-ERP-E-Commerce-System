@@ -70,7 +70,7 @@
                     TextMode="Password" placeholder="Tu contraseña..." autocomplete="new-password" />
             </div>
             <asp:Button ID="btnLogin" runat="server" Text="🔑 Ingresar a mi cuenta"
-                CssClass="btn-gold" OnClick="btnLogin_Click" />
+                CssClass="btn-gold tiempoInhabilitado" OnClick="btnLogin_Click" />
         </div>
 
         <%-- PANEL REGISTRO --%>
@@ -209,7 +209,7 @@
             </div>
 
             <asp:Button ID="btnRegistrar" runat="server" Text="✅ Crear mi cuenta"
-                CssClass="btn-gold" OnClick="btnRegistrar_Click" />
+                CssClass="btn-gold tiempoInhabilitado" OnClick="btnRegistrar_Click" />
         </div>
 
     </div>

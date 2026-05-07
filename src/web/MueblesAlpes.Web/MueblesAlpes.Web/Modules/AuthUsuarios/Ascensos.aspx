@@ -80,9 +80,9 @@
 
         <div style="display:flex; gap:10px;">
             <asp:Button ID="btnGuardar" runat="server" Text="📈 Aplicar Ascenso"
-                CssClass="btn-gold" OnClick="btnGuardar_Click" />
+                CssClass="btn-gold tiempoInhabilitado" OnClick="btnGuardar_Click" />
             <asp:Button ID="btnNuevo" runat="server" Text="🆕 Nuevo"
-                CssClass="btn-outline" OnClick="btnNuevo_Click" />
+                CssClass="btn-outline tiempoInhabilitado" OnClick="btnNuevo_Click" />
         </div>
     </div>
 </div>
@@ -110,11 +110,11 @@
                 <ItemTemplate>
                     <div class="actions-cell">
                         <asp:LinkButton runat="server" Text="🔒" CommandName="Cerrar"
-                            CommandArgument='<%# Eval("asc_ascenso") %>' CssClass="btn-edit-t"
+                            CommandArgument='<%# Eval("asc_ascenso") %>' CssClass="btn-edit-t tiempoInhabilitado"
                             OnClientClick="return confirm('¿Cerrar este ascenso?');"
                             ToolTip="Cerrar ascenso" />
                         <asp:LinkButton runat="server" Text="🗑" CommandName="Eliminar"
-                            CommandArgument='<%# Eval("asc_ascenso") %>' CssClass="btn-del-t"
+                            CommandArgument='<%# Eval("asc_ascenso") %>' CssClass="btn-del-t tiempoInhabilitado"
                             OnClientClick="return confirm('¿Eliminar este ascenso?');" />
                     </div>
                 </ItemTemplate>

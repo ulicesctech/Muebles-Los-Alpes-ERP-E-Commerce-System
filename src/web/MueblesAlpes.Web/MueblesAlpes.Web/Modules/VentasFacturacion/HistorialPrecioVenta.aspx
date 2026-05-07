@@ -136,7 +136,7 @@
             </div>
         </div>
         <asp:Button ID="btnRegistrar" runat="server" Text="Registrar precio"
-            CssClass="btn-ui btn-principal" OnClick="btnRegistrar_Click"
+            CssClass="btn-ui btn-principal tiempoInhabilitado" OnClick="btnRegistrar_Click"
             style="margin-top:10px;" />
     </div>
 

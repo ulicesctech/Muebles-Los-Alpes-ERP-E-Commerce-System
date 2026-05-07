@@ -115,8 +115,8 @@
             </div>
         </div>
         <div class="f-row" style="margin-top:4px;">
-            <asp:Button ID="btnGuardar"  runat="server" Text="💾 Guardar"  CssClass="btn-gold"    OnClick="btnGuardar_Click" />
-            <asp:Button ID="btnCancelar" runat="server" Text="✕ Cancelar" CssClass="btn-outline" OnClick="btnCancelar_Click" CausesValidation="false" />
+            <asp:Button ID="btnGuardar"  runat="server" Text="💾 Guardar"  CssClass="btn-gold tiempoInhabilitado"    OnClick="btnGuardar_Click" />
+            <asp:Button ID="btnCancelar" runat="server" Text="✕ Cancelar" CssClass="btn-outline tiempoInhabilitado" OnClick="btnCancelar_Click" CausesValidation="false" />
         </div>
     </div>
 </div>
@@ -125,8 +125,8 @@
         <span class="search-icon-abs">🔍</span>
         <asp:TextBox ID="txtBuscar" runat="server" placeholder="Buscar por referencia, nombre, tipo, material..."></asp:TextBox>
     </div>
-    <asp:Button ID="btnBuscar"  runat="server" Text="Buscar"  CssClass="btn-gold"    OnClick="btnBuscar_Click"  CausesValidation="false" />
-    <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" CssClass="btn-outline" OnClick="btnLimpiar_Click" CausesValidation="false" />
+    <asp:Button ID="btnBuscar"  runat="server" Text="Buscar"  CssClass="btn-gold tiempoInhabilitado"    OnClick="btnBuscar_Click"  CausesValidation="false" />
+    <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" CssClass="btn-outline tiempoInhabilitado" OnClick="btnLimpiar_Click" CausesValidation="false" />
 </div>
 <div class="table-card">
     <asp:GridView ID="gvProductos" runat="server" AutoGenerateColumns="false" CssClass="table" OnRowCommand="gvProductos_RowCommand" GridLines="None">
@@ -149,8 +149,8 @@
             <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="200px">
                 <ItemTemplate>
                     <div class="actions-cell">
-                        <asp:LinkButton CommandName="Editar"   CommandArgument='<%# Eval("PRO_REFERENCIA") %>' runat="server" CssClass="btn-edit-t">✏️ Editar</asp:LinkButton>
-                        <asp:LinkButton CommandName="Eliminar" CommandArgument='<%# Eval("PRO_REFERENCIA") %>' runat="server" CssClass="btn-del-t" OnClientClick="return confirm('¿Eliminar este producto?');">Eliminar</asp:LinkButton>
+                        <asp:LinkButton CommandName="Editar"   CommandArgument='<%# Eval("PRO_REFERENCIA") %>' runat="server" CssClass="btn-edit-t tiempoInhabilitado">✏️ Editar</asp:LinkButton>
+                        <asp:LinkButton CommandName="Eliminar" CommandArgument='<%# Eval("PRO_REFERENCIA") %>' runat="server" CssClass="btn-del-t tiempoInhabilitado" OnClientClick="return confirm('¿Eliminar este producto?');">Eliminar</asp:LinkButton>
                     </div>
                 </ItemTemplate>
             </asp:TemplateField>
