@@ -457,7 +457,7 @@
     </Compile>
     <Compile Include="ErrorLimite.aspx.vb">
       <DependentUpon>ErrorLimite.aspx</DependentUpon>
-      <SubType>ASPXCodebehind</SubType>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Global.asax.vb">
       <DependentUpon>Global.asax</DependentUpon>
