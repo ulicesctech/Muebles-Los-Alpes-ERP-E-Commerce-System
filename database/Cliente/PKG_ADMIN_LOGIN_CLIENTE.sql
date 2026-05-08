@@ -70,19 +70,21 @@ CREATE OR REPLACE PACKAGE BODY PKG_ADMIN_LOGIN_CLIENTE AS
     END logc_eliminar;
 
     PROCEDURE logc_autenticar(
-        p_usuario    IN  VARCHAR2,
-        p_password   IN  VARCHAR2,
-        p_id_cliente OUT NUMBER
-    ) IS
-    BEGIN
-        SELECT cli_cliente INTO p_id_cliente
-        FROM ADMIN_LOGIN_CLIENTE
-        WHERE logcli_usuario  = LOWER(TRIM(p_usuario))
-        AND   logcli_password = TRIM(p_password);
-    EXCEPTION
-        WHEN NO_DATA_FOUND THEN
-            RAISE_APPLICATION_ERROR(-20007, 'Credenciales de cliente incorrectas.');
-    END logc_autenticar;
+    p_usuario    IN  VARCHAR2,
+    p_password   IN  VARCHAR2,
+    p_id_cliente OUT NUMBER
+) IS
+BEGIN
+    SELECT al.cli_cliente INTO p_id_cliente
+      FROM ADMIN_LOGIN_CLIENTE al
+      JOIN CLI_CLIENTE c ON c.cli_cliente = al.cli_cliente
+     WHERE (LOWER(al.logcli_usuario) = LOWER(TRIM(p_usuario))
+        OR  LOWER(c.cli_email)       = LOWER(TRIM(p_usuario)))
+       AND al.logcli_password = TRIM(p_password);
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RAISE_APPLICATION_ERROR(-20007, 'Credenciales de cliente incorrectas.');
+END logc_autenticar;
 
 END PKG_ADMIN_LOGIN_CLIENTE;
 /

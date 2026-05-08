@@ -118,22 +118,18 @@ Public Class ClienteService
         Return OracleDb.ExecRefCursor(PKG & ".cli_listar", Nothing, "p_data")
     End Function
 
-    Public Shared Function BuscarPorId(id As Integer) As DataTable
-        Dim dt As DataTable = Listar()
-        Dim result As DataTable = dt.Clone()
-        For Each row As DataRow In dt.Rows
-            If Convert.ToInt32(row("cli_cliente")) = id Then
-                result.ImportRow(row)
-            End If
-        Next
-        Return result
+    Public Shared Function BuscarPorId(clienteId As Integer) As DataTable
+        Dim ps As New List(Of OracleParameter) From {
+        New OracleParameter("p_id", OracleDbType.Decimal, clienteId, ParameterDirection.Input)
+    }
+        Return OracleDb.ExecRefCursor("PKG_CLI_CLIENTE.CLI_BUSCAR_POR_ID", ps, "p_data")
     End Function
 
     Public Shared Function BuscarPorEmail(email As String) As DataTable
         Dim ps As New List(Of OracleParameter) From {
-            New OracleParameter("p_texto", OracleDbType.Varchar2, email, ParameterDirection.Input)
-        }
-        Return OracleDb.ExecRefCursor(PKG & ".cli_buscar", ps, "p_data")
+        New OracleParameter("p_email", OracleDbType.Varchar2, email, ParameterDirection.Input)
+    }
+        Return OracleDb.ExecRefCursor("PKG_CLI_CLIENTE.CLI_BUSCAR_POR_EMAIL", ps, "p_data")
     End Function
 
     Public Shared Function BuscarPorDocumento(numDoc As String) As DataTable

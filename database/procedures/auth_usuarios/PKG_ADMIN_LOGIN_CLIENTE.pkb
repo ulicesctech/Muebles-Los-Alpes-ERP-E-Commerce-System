@@ -58,7 +58,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_ADMIN_LOGIN_CLIENTE AS
     BEGIN
         SELECT cli_cliente INTO p_id_cliente
         FROM ADMIN_LOGIN_CLIENTE
-        WHERE logcli_usuario  = LOWER(TRIM(p_usuario))
+        WHERE LOWER(logcli_usuario) = LOWER(TRIM(p_usuario))
         AND   logcli_password = TRIM(p_password);
     EXCEPTION
         WHEN NO_DATA_FOUND THEN

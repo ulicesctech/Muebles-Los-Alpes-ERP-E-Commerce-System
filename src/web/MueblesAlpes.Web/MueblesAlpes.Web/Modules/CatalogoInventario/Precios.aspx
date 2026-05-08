@@ -85,8 +85,8 @@
         </label>
     </div>
 
-    <asp:Button ID="btnFiltrar" runat="server" Text="&#128269; Filtrar" CssClass="btn-gold tiempoInhabilitado"   OnClick="btnFiltrar_Click"  CausesValidation="false" />
-    <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar"           CssClass="btn-outline tiempoInhabilitado" OnClick="btnLimpiar_Click"  CausesValidation="false" />
+    <asp:Button ID="btnFiltrar" runat="server" Text="&#128269; Filtrar" CssClass="btn-gold"   OnClick="btnFiltrar_Click"  CausesValidation="false" />
+    <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar"           CssClass="btn-outline" OnClick="btnLimpiar_Click"  CausesValidation="false" />
 </div>
 
 <div class="contador-resultados">

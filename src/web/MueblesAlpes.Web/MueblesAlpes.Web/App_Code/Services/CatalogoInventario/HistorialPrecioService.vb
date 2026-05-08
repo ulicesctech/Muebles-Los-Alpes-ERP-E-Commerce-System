@@ -110,4 +110,15 @@ Public Class HistorialPrecioService
         Return OracleDb.ExecRefCursor(PKG & ".LISTAR_POR_MES", ps, "p_data")
     End Function
 
+    Public Shared Function ObtenerAnios() As List(Of Integer)
+        Dim dt As DataTable = OracleDb.ExecRefCursor(PKG & ".OBTENER_ANIOS", Nothing, "p_data")
+        Dim lista As New List(Of Integer)
+        If dt IsNot Nothing Then
+            For Each row As DataRow In dt.Rows
+                lista.Add(Convert.ToInt32(row("ANIO")))
+            Next
+        End If
+        Return lista
+    End Function
+
 End Class

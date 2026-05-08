@@ -24,7 +24,6 @@ CREATE OR REPLACE PACKAGE BODY PKG_RH_EMPLEADO AS
         assert_not_null(p_dpi,   'Empleado: DPI obligatorio.');
         assert_not_null(p_p_nom, 'Empleado: Primer nombre obligatorio.');
         assert_id(p_rol,         'Empleado: Rol obligatorio.');
-
         INSERT INTO RH_EMPLEADO (
             em_DPI, em_primer_nombre, em_segundo_nombre,
             em_primer_apellido, em_segundo_apellido,
@@ -32,14 +31,10 @@ CREATE OR REPLACE PACKAGE BODY PKG_RH_EMPLEADO AS
             em_primer_telefono, em_segundo_telefono,
             rolus_rol_usuario
         ) VALUES (
-            TRIM(p_dpi),
-            TRIM(p_p_nom),
-            NVL(TRIM(p_s_nom), ' '),
-            TRIM(p_p_ape),
-            NVL(TRIM(p_s_ape), ' '),
+            TRIM(p_dpi), TRIM(p_p_nom), NVL(TRIM(p_s_nom), ' '),
+            TRIM(p_p_ape), NVL(TRIM(p_s_ape), ' '),
             TRIM(p_dir), TRIM(p_ave), TRIM(p_cp),
-            TRIM(p_tel1),
-            NVL(TRIM(p_tel2), ' '),
+            TRIM(p_tel1), NVL(TRIM(p_tel2), ' '),
             p_rol
         ) RETURNING em_empleado INTO p_id;
         COMMIT;
@@ -82,9 +77,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_RH_EMPLEADO AS
 
     PROCEDURE emp_eliminar(p_id IN NUMBER) IS
     BEGIN
-        DELETE FROM RH_ASCENSO           WHERE em_empleado = p_id;
-        DELETE FROM ADMIN_LOGIN_EMPLEADO  WHERE em_empleado = p_id;
-        DELETE FROM RH_EMPLEADO           WHERE em_empleado = p_id;
+        DELETE FROM RH_ASCENSO          WHERE em_empleado = p_id;
+        DELETE FROM ADMIN_LOGIN_EMPLEADO WHERE em_empleado = p_id;
+        DELETE FROM RH_EMPLEADO          WHERE em_empleado = p_id;
         COMMIT;
     EXCEPTION
         WHEN OTHERS THEN
@@ -96,9 +91,17 @@ CREATE OR REPLACE PACKAGE BODY PKG_RH_EMPLEADO AS
     BEGIN
         OPEN p_data FOR
             SELECT e.*, g.grupus_descripcion AS rol_nombre
-            FROM RH_EMPLEADO e
-            JOIN ADMIN_GRUPO_USUARIO g ON e.rolus_rol_usuario = g.grupus_grupo_usuario;
+              FROM RH_EMPLEADO e
+              JOIN ADMIN_GRUPO_USUARIO g ON e.rolus_rol_usuario = g.grupus_grupo_usuario;
     END emp_listar;
+
+    PROCEDURE emp_obtener_admin(p_id OUT NUMBER) IS
+    BEGIN
+        SELECT MIN(em_empleado) INTO p_id FROM RH_EMPLEADO;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            p_id := NULL;
+    END emp_obtener_admin;
 
 END PKG_RH_EMPLEADO;
 /
