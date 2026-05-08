@@ -220,8 +220,8 @@
             <asp:Panel ID="pnlCancelarLimites" runat="server" Visible="false" style="display:inline;">
                 <asp:Button ID="btnCancelarLimites" runat="server" Text="Cancelar edicion" CssClass="btn-outline tiempoInhabilitado" OnClick="btnCancelarLimites_Click" CausesValidation="false" />
             </asp:Panel>
-            <asp:Button ID="btnCancelar" runat="server" Text="Cancelar" CssClass="btn-outline" OnClick="btnCancelar_Click tiempoInhabilitado" CausesValidation="false" />
-        </asp:Panel>
+            <asp:Button ID="btnCancelar" runat="server" Text="Cancelar" CssClass="btn-outline tiempoInhabilitado" OnClick="btnCancelar_Click" CausesValidation="false" />
+        </asp:Panel><%-- fin pnlStockActual --%>
 
         <asp:Panel ID="pnlSinStock" runat="server" Visible="false">
             <div class="aviso-precio" style="margin-bottom:14px;">
@@ -327,7 +327,7 @@
                 <ItemTemplate>
                     <asp:Button CommandName="Edit" runat="server" Text="&#9998; Editar" CssClass="btn-outline tiempoInhabilitado"
                         style="padding:5px 12px;font-size:12px;" />
-                </ItemTemplate>
+                </ItemTemplate> 
                 <EditItemTemplate>
                     <asp:Button CommandName="Update" runat="server" Text="&#10003; Guardar" CssClass="btn-gold tiempoInhabilitado"
                         style="padding:5px 10px;font-size:12px;" />

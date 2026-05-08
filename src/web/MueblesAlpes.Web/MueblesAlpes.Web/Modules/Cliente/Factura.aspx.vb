@@ -1,4 +1,5 @@
 ﻿Imports System.Data
+Imports System.Linq
 Imports Oracle.ManagedDataAccess.Client
 
 Namespace Modules.Cliente
@@ -9,76 +10,113 @@ Namespace Modules.Cliente
         Protected Sub Page_Load(sender As Object, e As EventArgs) Handles Me.Load
             If Not IsPostBack Then
                 If Session("CLI_CLIENTE") IsNot Nothing Then
+                    pnlDocumento.Visible = True
+                    ddlTipoDoc.Enabled = False
+                    txtNumDoc.ReadOnly = True
+                    txtNombre.ReadOnly = True
+                    txtEmail.ReadOnly = True
+                    txtTelefono.ReadOnly = True
                     CargarDatosCliente()
+                Else
+                    pnlDocumento.Visible = True
                 End If
                 If Session("CARRITO_TEMP") IsNot Nothing Then
                     Dim carrito = CType(Session("CARRITO_TEMP"), List(Of Dictionary(Of String, String)))
                     If carrito.Count > 0 Then
                         CargarResumen()
+                        CargarAlmacenes()
                     End If
                 End If
             End If
         End Sub
 
+        Private Sub CargarAlmacenes()
+            Try
+                Dim carrito = CType(Session("CARRITO_TEMP"), List(Of Dictionary(Of String, String)))
+                If carrito Is Nothing OrElse carrito.Count = 0 Then Return
+
+                Dim hvIds As String = String.Join(",", carrito.Select(Function(i) i("HIP_ID")).ToArray())
+                Dim dt As DataTable = CarritoService.AlmacenesConStock(hvIds)
+
+                ddlSucursal.Items.Clear()
+                ddlSucursal.Items.Add(New System.Web.UI.WebControls.ListItem("-- Selecciona una sucursal --", ""))
+
+                If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
+                    For Each row As DataRow In dt.Rows
+                        Dim item As New System.Web.UI.WebControls.ListItem(
+                            row("ALM_NOMBRE").ToString() & " — " & row("ALM_UBICACION").ToString(),
+                            row("ALM_ALMACEN").ToString())
+                        ddlSucursal.Items.Add(item)
+                    Next
+                Else
+                    ddlSucursal.Items.Clear()
+                    ddlSucursal.Items.Add(New System.Web.UI.WebControls.ListItem("No hay sucursales con stock disponible", ""))
+                End If
+            Catch
+            End Try
+        End Sub
+
         Private Sub CargarDatosCliente()
             Try
                 Dim clienteId As Integer = Convert.ToInt32(Session("CLI_CLIENTE"))
-                Dim dt As DataTable = OracleDb.ExecRefCursor(
-                    "PKG_CLI_CLIENTE.CLI_BUSCAR",
-                    New List(Of OracleParameter) From {
-                        New OracleParameter("p_texto", OracleDbType.Varchar2, "", ParameterDirection.Input)
-                    }, "p_data")
-
-                For Each row As DataRow In dt.Rows
-                    If Convert.ToInt32(row("CLI_CLIENTE")) = clienteId Then
-                        txtNombre.Text = row("CLI_PRIMER_NOMBRE").ToString() & " " &
-                                         row("CLI_PRIMER_APELLIDO").ToString()
-                        txtEmail.Text = row("CLI_EMAIL").ToString()
-                        txtTelefono.Text = row("CLI_PRIMER_TELEFONO").ToString()
-                        txtDireccion.Text = row("CLI_DIRECCION").ToString()
-                        txtMunicipio.Text = row("CLI_MUNICIPIO").ToString()
-                        txtDepartamento.Text = row("CLI_DEPARTAMENTO").ToString()
-                        txtZona.Text = row("CLI_ZONA").ToString()
-                        txtCodigoPostal.Text = If(row("CLI_CODIGO_POSTAL") Is DBNull.Value, "", row("CLI_CODIGO_POSTAL").ToString())
-                        txtNit.Text = If(row("CLI_NIT") Is DBNull.Value, "CF", row("CLI_NIT").ToString())
-                        Exit For
-                    End If
-                Next
+                Dim dt As DataTable = ClienteService.BuscarPorId(clienteId)
+                If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
+                    Dim row As DataRow = dt.Rows(0)
+                    txtNumDoc.Text = row("CLI_NUMDOCUMENTO").ToString()
+                    ddlTipoDoc.SelectedValue = row("CLI_TIPODOCUMENTO").ToString()
+                    txtNombre.Text = row("CLI_PRIMER_NOMBRE").ToString() & " " &
+                             row("CLI_PRIMER_APELLIDO").ToString()
+                    txtEmail.Text = row("CLI_EMAIL").ToString()
+                    txtTelefono.Text = row("CLI_PRIMER_TELEFONO").ToString()
+                    txtDireccion.Text = row("CLI_DIRECCION").ToString()
+                    txtMunicipio.Text = row("CLI_MUNICIPIO").ToString()
+                    txtDepartamento.Text = row("CLI_DEPARTAMENTO").ToString()
+                    txtZona.Text = row("CLI_ZONA").ToString()
+                    txtCodigoPostal.Text = If(row("CLI_CODIGO_POSTAL") Is DBNull.Value, "", row("CLI_CODIGO_POSTAL").ToString())
+                    txtNit.Text = If(row("CLI_NIT") Is DBNull.Value, "CF", row("CLI_NIT").ToString())
+                End If
             Catch
             End Try
         End Sub
 
         Private Sub CargarResumen()
-            Dim carrito = CType(Session("CARRITO_TEMP"), List(Of Dictionary(Of String, String)))
-            Dim dtCatalogo As DataTable = CatalogoClienteService.Listar()
+            Try
+                Dim carrito = CType(Session("CARRITO_TEMP"), List(Of Dictionary(Of String, String)))
+                Dim dtCatalogo As DataTable = CatalogoClienteService.Listar()
 
-            Dim dtResumen As New DataTable()
-            dtResumen.Columns.Add("PRO_REFERENCIA")
-            dtResumen.Columns.Add("PRO_NOMBRE")
-            dtResumen.Columns.Add("PRECIO_FINAL", GetType(Decimal))
-            dtResumen.Columns.Add("CANTIDAD", GetType(Integer))
+                Dim dtResumen As New DataTable()
+                dtResumen.Columns.Add("PRO_REFERENCIA")
+                dtResumen.Columns.Add("PRO_NOMBRE")
+                dtResumen.Columns.Add("PRO_PRECIO", GetType(Decimal))
+                dtResumen.Columns.Add("PRECIO_FINAL", GetType(Decimal))
+                dtResumen.Columns.Add("CANTIDAD", GetType(Integer))
+                dtResumen.Columns.Add("CAMP_NOMBRE")
 
-            Dim total As Decimal = 0
+                Dim total As Decimal = 0
 
-            For Each item As Dictionary(Of String, String) In carrito
-                Dim filas As DataRow() = dtCatalogo.Select("HIP_HISTORIAL_PRECIO = " & item("HIP_ID"))
-                If filas.Length > 0 Then
-                    Dim precio As Decimal = Convert.ToDecimal(filas(0)("PRECIO_FINAL"))
-                    Dim cant As Integer = Convert.ToInt32(item("CANTIDAD"))
-                    Dim dr As DataRow = dtResumen.NewRow()
-                    dr("PRO_REFERENCIA") = filas(0)("PRO_REFERENCIA").ToString()
-                    dr("PRO_NOMBRE") = filas(0)("PRO_NOMBRE").ToString()
-                    dr("PRECIO_FINAL") = precio
-                    dr("CANTIDAD") = cant
-                    dtResumen.Rows.Add(dr)
-                    total += precio * cant
-                End If
-            Next
+                For Each item As Dictionary(Of String, String) In carrito
+                    Dim filas As DataRow() = dtCatalogo.Select("HV_HISTORIAL_PRECIO_VENTA = " & item("HIP_ID"))
+                    If filas.Length > 0 Then
+                        Dim precio As Decimal = Convert.ToDecimal(filas(0)("PRECIO_FINAL"))
+                        Dim precioOriginal As Decimal = Convert.ToDecimal(filas(0)("PRO_PRECIO"))
+                        Dim cant As Integer = Convert.ToInt32(item("CANTIDAD"))
+                        Dim dr As DataRow = dtResumen.NewRow()
+                        dr("PRO_REFERENCIA") = filas(0)("PRO_REFERENCIA").ToString()
+                        dr("PRO_NOMBRE") = filas(0)("PRO_NOMBRE").ToString()
+                        dr("PRO_PRECIO") = precioOriginal
+                        dr("PRECIO_FINAL") = precio
+                        dr("CANTIDAD") = cant
+                        dr("CAMP_NOMBRE") = If(IsDBNull(filas(0)("CAMP_NOMBRE")), "", filas(0)("CAMP_NOMBRE").ToString())
+                        dtResumen.Rows.Add(dr)
+                        total += precio * cant
+                    End If
+                Next
 
-            rptResumen.DataSource = dtResumen
-            rptResumen.DataBind()
-            lblSubtotal.Text = total.ToString("N2")
-            lblTotal.Text = total.ToString("N2")
+                rptResumen.DataSource = dtResumen
+                rptResumen.DataBind()
+                lblTotal.Text = total.ToString("N2")
+            Catch
+            End Try
         End Sub
 
         Protected Sub btnConfirmar_Click(sender As Object, e As EventArgs)
@@ -87,17 +125,33 @@ Namespace Modules.Cliente
                 Return
             End If
 
-            If String.IsNullOrWhiteSpace(txtNumDoc.Text) Then
-                MostrarError("Por favor ingresa tu número de documento.")
-                Return
+            If Session("CLI_CLIENTE") Is Nothing Then
+                If ddlTipoDoc.SelectedValue = "DPI" AndAlso txtNumDoc.Text.Trim().Length <> 13 Then
+                    MostrarError("El DPI debe tener exactamente 13 dígitos.")
+                    Return
+                End If
+                If String.IsNullOrWhiteSpace(txtNumDoc.Text) Then
+                    MostrarError("Por favor ingresa tu número de documento.")
+                    Return
+                End If
             End If
+
             If String.IsNullOrWhiteSpace(txtEmail.Text) Then
                 MostrarError("Por favor ingresa tu email.")
                 Return
             End If
-            If String.IsNullOrWhiteSpace(txtCodigoPostal.Text) Then
-                MostrarError("Por favor ingresa tu código postal.")
-                Return
+
+            Dim tipoEntrega As String = hfTipoEntrega.Value
+            If tipoEntrega = "SUCURSAL" Then
+                If String.IsNullOrWhiteSpace(ddlSucursal.SelectedValue) Then
+                    MostrarError("Por favor selecciona una sucursal.")
+                    Return
+                End If
+            Else
+                If String.IsNullOrWhiteSpace(txtCodigoPostal.Text) Then
+                    MostrarError("Por favor ingresa tu código postal.")
+                    Return
+                End If
             End If
 
             Try
@@ -116,17 +170,32 @@ Namespace Modules.Cliente
                 For Each item As Dictionary(Of String, String) In carrito
                     Dim hipId As Integer = Convert.ToInt32(item("HIP_ID"))
                     Dim cantidad As Integer = Convert.ToInt32(item("CANTIDAD"))
+
+                    If hipId = 0 Then
+                        MostrarError("Uno o más productos de tu carrito no tienen precio disponible. Por favor contáctanos.")
+                        Return
+                    End If
+
                     CarritoService.AgregarDetalle(carritoId, hipId, cantidad)
                 Next
 
                 CarritoService.Facturar(carritoId)
 
                 Dim empleadoId As Integer = ObtenerEmpleadoAdmin()
-                Dim codigoFactura As String = FacturaClienteService.Crear(carritoId, empleadoId)
+                Dim almacenId As Integer = 0
+                If tipoEntrega = "SUCURSAL" AndAlso Not String.IsNullOrWhiteSpace(ddlSucursal.SelectedValue) Then
+                    almacenId = Convert.ToInt32(ddlSucursal.SelectedValue)
+                End If
+
+                Dim codigoFactura As String = FacturaClienteService.Crear(
+                    carritoId, empleadoId, hfFormaPago.Value, tipoEntrega, almacenId)
 
                 Session.Remove("CARRITO_TEMP")
 
                 lblCodigoFactura.Text = codigoFactura
+                lblTipoEntregaConfirmacion.Text = If(tipoEntrega = "SUCURSAL",
+                    "📍 Recoge en: <strong>" & ddlSucursal.SelectedItem.Text & "</strong>",
+                    "🏠 Envío a domicilio")
                 pnlCrearCuenta.Visible = (Session("CLI_CLIENTE") Is Nothing)
                 pnlLogueadoOk.Visible = (Session("CLI_CLIENTE") IsNot Nothing)
                 pnlCheckout.Visible = False
@@ -135,49 +204,38 @@ Namespace Modules.Cliente
             Catch ex As Exception
                 If ex.Message.Contains("ORA-20012") OrElse ex.Message.Contains("stock insuficiente") Then
                     ScriptManager.RegisterStartupScript(Me, Me.GetType(), "modalStock",
-            "document.getElementById('modalStock').style.display='flex';" &
-            "document.getElementById('modalStockMsg').innerHTML='Lo sentimos, no hay suficiente stock para uno o más productos de tu carrito. Por favor ajusta las cantidades antes de continuar.';", True)
+                        "document.getElementById('modalStock').style.display='flex';" &
+                        "document.getElementById('modalStockMsg').innerHTML='Lo sentimos, no hay suficiente stock para uno o más productos de tu carrito. Por favor ajusta las cantidades antes de continuar.';", True)
                 Else
                     MostrarError("Error al procesar el pedido: " & ex.Message)
                 End If
             End Try
         End Sub
+
         Private Function ObtenerEmpleadoAdmin() As Integer
             Try
-                Using conn As New OracleConnection(
-            System.Configuration.ConfigurationManager.ConnectionStrings("OracleConn").ConnectionString)
-                    Using cmd As New OracleCommand(
-                "SELECT MIN(em_empleado) FROM RH_EMPLEADO", conn)
-                        conn.Open()
-                        Dim resultado As Object = cmd.ExecuteScalar()
-                        If resultado IsNot Nothing AndAlso resultado IsNot DBNull.Value Then
-                            Return Convert.ToInt32(resultado)
-                        End If
-                    End Using
-                End Using
+                Dim ps As New List(Of OracleParameter) From {
+                    New OracleParameter("p_id", OracleDbType.Decimal, Nothing, ParameterDirection.Output)
+                }
+                OracleDb.ExecNonQuery("PKG_RH_EMPLEADO.EMP_OBTENER_ADMIN", ps)
+                Dim val As String = ps(0).Value.ToString()
+                If Not String.IsNullOrEmpty(val) AndAlso val <> "null" Then
+                    Return Convert.ToInt32(val)
+                End If
             Catch
             End Try
             Return 0
         End Function
 
         Private Function CrearClienteInvitado() As Integer
-            ' Verificar si el email ya existe
             Try
-                Dim dt As DataTable = OracleDb.ExecRefCursor(
-            "PKG_CLI_CLIENTE.CLI_BUSCAR",
-            New List(Of OracleParameter) From {
-                New OracleParameter("p_texto", OracleDbType.Varchar2, txtEmail.Text.Trim(), ParameterDirection.Input)
-            }, "p_data")
-
-                For Each row As DataRow In dt.Rows
-                    If row("CLI_EMAIL").ToString().ToLower() = txtEmail.Text.Trim().ToLower() Then
-                        Return Convert.ToInt32(row("CLI_CLIENTE"))
-                    End If
-                Next
+                Dim dt As DataTable = ClienteService.BuscarPorEmail(txtEmail.Text.Trim())
+                If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
+                    Return Convert.ToInt32(dt.Rows(0)("CLI_CLIENTE"))
+                End If
             Catch
             End Try
 
-            ' Si no existe, crear nuevo cliente
             Dim partes As String() = txtNombre.Text.Trim().Split(" "c)
             Dim primerNombre As String = partes(0)
             Dim segundoNombre As String = ""
@@ -185,23 +243,23 @@ Namespace Modules.Cliente
             Dim segundoApellido As String = If(partes.Length > 2, partes(2), "")
 
             Dim clienteId As Integer = AuthClienteService.RegistrarCliente(
-        ddlTipoDoc.SelectedValue,
-        txtNumDoc.Text.Trim(),
-        primerNombre,
-        segundoNombre,
-        primerApellido,
-        segundoApellido,
-        "Guatemala",
-        If(String.IsNullOrWhiteSpace(txtDepartamento.Text), "Guatemala", txtDepartamento.Text.Trim()),
-        If(String.IsNullOrWhiteSpace(txtMunicipio.Text), "Guatemala", txtMunicipio.Text.Trim()),
-        If(String.IsNullOrWhiteSpace(txtZona.Text), "0", txtZona.Text.Trim()),
-        If(String.IsNullOrWhiteSpace(txtDireccion.Text), "Sin dirección", txtDireccion.Text.Trim()),
-        txtCodigoPostal.Text.Trim(),
-        If(String.IsNullOrWhiteSpace(txtTelefono.Text), "00000000", txtTelefono.Text.Trim()),
-        "",
-        txtEmail.Text.Trim(),
-        "",
-        "NATURAL")
+                ddlTipoDoc.SelectedValue,
+                txtNumDoc.Text.Trim(),
+                primerNombre,
+                segundoNombre,
+                primerApellido,
+                segundoApellido,
+                "Guatemala",
+                If(String.IsNullOrWhiteSpace(txtDepartamento.Text), "Guatemala", txtDepartamento.Text.Trim()),
+                If(String.IsNullOrWhiteSpace(txtMunicipio.Text), "Guatemala", txtMunicipio.Text.Trim()),
+                If(String.IsNullOrWhiteSpace(txtZona.Text), "0", txtZona.Text.Trim()),
+                If(String.IsNullOrWhiteSpace(txtDireccion.Text), "Sin dirección", txtDireccion.Text.Trim()),
+                txtCodigoPostal.Text.Trim(),
+                If(String.IsNullOrWhiteSpace(txtTelefono.Text), "00000000", txtTelefono.Text.Trim()),
+                "",
+                txtEmail.Text.Trim(),
+                "",
+                "NATURAL")
 
             Return clienteId
         End Function

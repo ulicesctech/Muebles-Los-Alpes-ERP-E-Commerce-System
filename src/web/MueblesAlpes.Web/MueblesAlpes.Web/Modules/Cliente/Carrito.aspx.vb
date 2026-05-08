@@ -29,6 +29,7 @@ Namespace Modules.Cliente
             dtCarrito.Columns.Add("PRO_PRECIO", GetType(Decimal))
             dtCarrito.Columns.Add("PRECIO_FINAL", GetType(Decimal))
             dtCarrito.Columns.Add("CANTIDAD", GetType(Integer))
+            dtCarrito.Columns.Add("CAMP_NOMBRE")
 
             Dim totalFinal As Decimal = 0
 
@@ -36,7 +37,7 @@ Namespace Modules.Cliente
                 Dim hipId As String = item("HIP_ID")
                 Dim cantidad As Integer = Convert.ToInt32(item("CANTIDAD"))
 
-                Dim filas As DataRow() = dtCatalogo.Select("HIP_HISTORIAL_PRECIO = " & hipId)
+                Dim filas As DataRow() = dtCatalogo.Select("HV_HISTORIAL_PRECIO_VENTA = " & hipId)
                 If filas.Length > 0 Then
                     Dim fila As DataRow = filas(0)
                     Dim precioOriginal As Decimal = Convert.ToDecimal(fila("PRO_PRECIO"))
@@ -48,6 +49,7 @@ Namespace Modules.Cliente
                     dr("PRO_PRECIO") = precioOriginal
                     dr("PRECIO_FINAL") = precioFinal
                     dr("CANTIDAD") = cantidad
+                    dr("CAMP_NOMBRE") = If(IsDBNull(fila("CAMP_NOMBRE")), "", fila("CAMP_NOMBRE").ToString())
                     dtCarrito.Rows.Add(dr)
                     totalFinal += precioFinal * cantidad
                 End If
@@ -121,7 +123,7 @@ Namespace Modules.Cliente
             For Each item As Dictionary(Of String, String) In carrito
                 Dim hipId As Integer = Convert.ToInt32(item("HIP_ID"))
                 Dim cantidad As Integer = Convert.ToInt32(item("CANTIDAD"))
-                Dim filas As DataRow() = dtCatalogo.Select("HIP_HISTORIAL_PRECIO = " & hipId)
+                Dim filas As DataRow() = dtCatalogo.Select("HV_HISTORIAL_PRECIO_VENTA = " & hipId)
                 If filas.Length > 0 Then
                     Dim stockDisponible As Integer = Convert.ToInt32(filas(0)("STO_DISPONIBLE"))
                     Dim nombreProducto As String = filas(0)("PRO_NOMBRE").ToString()
@@ -136,7 +138,6 @@ Namespace Modules.Cliente
 
             Response.Redirect("~/Modules/Cliente/Factura.aspx")
         End Sub
-
 
         Private Function ObtenerCarritoSession() As List(Of Dictionary(Of String, String))
             If Session("CARRITO_TEMP") Is Nothing Then
