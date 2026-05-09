@@ -46,9 +46,6 @@ Public Class HistorialPrecioService
         OracleDb.ExecNonQuery(PKG & ".CERRAR_TODOS", ps)
     End Sub
 
-    ' NUEVO: Cierra unicamente la semilla indicada por su hip_id.
-    ' Se usa cuando el precio del pedido coincide con el vigente real,
-    ' para no dejar la semilla huerfana sin generar un nuevo historial.
     Public Shared Sub CerrarSemilla(hipId As Decimal, fechaCierre As Date)
         Dim ps As New List(Of OracleParameter) From {
             New OracleParameter("p_hip_id", OracleDbType.Decimal, hipId, ParameterDirection.Input),
@@ -110,6 +107,9 @@ Public Class HistorialPrecioService
         Return OracleDb.ExecRefCursor(PKG & ".LISTAR_POR_MES", ps, "p_data")
     End Function
 
+    ' Devuelve los años como DataTable para que el handler pueda serializarlos a JSON.
+    ' El móvil recibe: [{ "ANIO": 2025 }, { "ANIO": 2024 }, ...]
+    ' Ya existía — la web (Precios.aspx.vb) la usa para poblar ddlAnio
     Public Shared Function ObtenerAnios() As List(Of Integer)
         Dim dt As DataTable = OracleDb.ExecRefCursor(PKG & ".OBTENER_ANIOS", Nothing, "p_data")
         Dim lista As New List(Of Integer)
@@ -119,6 +119,12 @@ Public Class HistorialPrecioService
             Next
         End If
         Return lista
+    End Function
+
+    ' NUEVO: igual que ObtenerAnios pero devuelve DataTable para que el
+    ' handler pueda serializarlo a JSON y enviarlo al móvil.
+    Public Shared Function ObtenerAniosDT() As DataTable
+        Return OracleDb.ExecRefCursor(PKG & ".OBTENER_ANIOS", Nothing, "p_data")
     End Function
 
 End Class

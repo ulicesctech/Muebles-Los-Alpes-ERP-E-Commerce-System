@@ -80,4 +80,20 @@ Public Class PedidoService
         Return OracleDb.ExecRefCursor(PKG & ".PED_LISTAR_FORMAS_PAGO", Nothing, "p_data")
     End Function
 
+
+
+    Public Shared Sub Recibir(detpeId As Integer, cantRecibida As Integer)
+        Dim ps As New List(Of OracleParameter) From {
+            New OracleParameter("p_detpe_id", OracleDbType.Decimal, detpeId, ParameterDirection.Input),
+            New OracleParameter("p_cantidad_recibida", OracleDbType.Decimal, cantRecibida, ParameterDirection.Input)
+        }
+        OracleDb.ExecNonQuery(PKG & ".PED_RECIBIR", ps)
+    End Sub
+
+    Public Shared Sub RecibirTodo(pedId As Integer)
+        Dim ps As New List(Of OracleParameter) From {
+            New OracleParameter("p_ped_id", OracleDbType.Decimal, pedId, ParameterDirection.Input)
+        }
+        OracleDb.ExecNonQuery(PKG & ".PED_RECIBIR_TODO", ps)
+    End Sub
 End Class

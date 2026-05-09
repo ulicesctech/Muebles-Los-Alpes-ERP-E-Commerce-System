@@ -92,8 +92,8 @@
         </div>
 
         <div class="f-row" style="margin-top:16px; justify-content:flex-end;">
-            <asp:Button ID="btnGuardar"  runat="server" Text="💾 Guardar"  CssClass="btn-gold tiempoInhabilitado"    OnClick="btnGuardar_Click tiempoInhabilitado" />
-            <asp:Button ID="btnCancelar" runat="server" Text="✕ Cancelar" CssClass="btn-outline tiempoInhabilitado" OnClick="btnCancelar_Click tiempoInhabilitado" CausesValidation="false" />
+            <asp:Button ID="btnGuardar"  runat="server" Text="💾 Guardar"  CssClass="btn-gold tiempoInhabilitado"    OnClick="btnGuardar_Click " />
+            <asp:Button ID="btnCancelar" runat="server" Text="✕ Cancelar" CssClass="btn-outline tiempoInhabilitado" OnClick="btnCancelar_Click " CausesValidation="false" />
         </div>
     </div>
 </div>

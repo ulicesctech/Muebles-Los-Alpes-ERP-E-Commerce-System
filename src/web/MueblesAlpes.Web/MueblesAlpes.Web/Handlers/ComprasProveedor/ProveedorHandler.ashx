@@ -1,244 +1,184 @@
 <%@ WebHandler Language="VB" Class="ProveedorHandler" %>
-
-Imports System
-Imports System.Data
 Imports System.Web
-Imports System.Text
+Imports System.Data
 Imports System.Text.RegularExpressions
+Imports Newtonsoft.Json
 
 ' ============================================================
 ' RUTA: Handlers/ComprasProveedor/ProveedorHandler.ashx
-' Service: ProveedorService (PKG_CP_BOD_PROVEEDOR)
-'
-' GET  ?action=listar                  → ProveedorService.Listar()
-' GET  ?action=buscar&q=texto          → ProveedorService.Buscar(texto)
-' POST ?action=crear                   → ProveedorService.Crear(nit, nombre, avenida, zona, direccion, telefono)
-' POST ?action=actualizar              → ProveedorService.Actualizar(id, nit, nombre, avenida, zona, direccion, telefono)
-' POST ?action=eliminar                → ProveedorService.Eliminar(id)
 ' ============================================================
 Public Class ProveedorHandler
     Implements IHttpHandler
 
-    Public Sub ProcessRequest(context As HttpContext) Implements IHttpHandler.ProcessRequest
+    Public Sub ProcessRequest(ByVal context As HttpContext) Implements IHttpHandler.ProcessRequest
         context.Response.ContentType = "application/json"
-        context.Response.Charset = "utf-8"
-
-        ' CORS — permite llamadas desde la app movil
         context.Response.AddHeader("Access-Control-Allow-Origin", "*")
-        context.Response.AddHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        context.Response.AddHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
         context.Response.AddHeader("Access-Control-Allow-Headers", "Content-Type")
 
-        If context.Request.HttpMethod.ToUpper() = "OPTIONS" Then
+        If context.Request.HttpMethod = "OPTIONS" Then
             context.Response.StatusCode = 200
-            context.Response.End()
             Return
         End If
 
-        Dim method As String = context.Request.HttpMethod.ToUpper()
-        Dim action As String = If(context.Request.QueryString("action"), "").ToLower().Trim()
+        Dim action As String = context.Request("action")
 
         Try
-            Select Case method
-                Case "GET"
-                    Select Case action
-                        Case "listar" : Listar(context)
-                        Case "buscar" : Buscar(context)
-                        Case Else
-                            Responder(context, 400, "action GET invalida. Opciones: listar, buscar")
-                    End Select
-                Case "POST"
-                    Select Case action
-                        Case "crear" : Crear(context)
-                        Case "actualizar" : Actualizar(context)
-                        Case "eliminar" : Eliminar(context)
-                        Case Else
-                            Responder(context, 400, "action POST invalida. Opciones: crear, actualizar, eliminar")
-                    End Select
+            Select Case action
+                Case "listar"
+                    ListarProveedores(context)
+                Case "buscar"
+                    BuscarProveedores(context)
+                Case "crear"
+                    CrearProveedor(context)
+                Case "actualizar"
+                    ActualizarProveedor(context)
+                Case "eliminar"
+                    EliminarProveedor(context)
                 Case Else
-                    Responder(context, 405, "Metodo HTTP no permitido.")
+                    context.Response.StatusCode = 400
+                    context.Response.Write("{""error"": ""Acción no válida. Usa ?action=listar|buscar|crear|actualizar|eliminar""}")
             End Select
         Catch ex As Exception
-            Responder(context, 500, "Error interno: " & ex.Message)
+            context.Response.StatusCode = 500
+            Dim msgError As String = LimpiarMensajeOracle(ex.Message)
+            context.Response.Write("{""error"": """ & msgError.Replace("""", "\""") & """}")
         End Try
     End Sub
 
-    ' =============================================
-    ' GET — listar
-    ' =============================================
-    Private Sub Listar(context As HttpContext)
-        context.Response.Write(DataTableToJson(ProveedorService.Listar()))
-    End Sub
+    ' ==========================================================
+    ' VALIDACIONES — espejo del package Oracle
+    ' PKG_CP_BOD_PROVEEDOR.VALIDAR_NIT / VALIDAR_TELEFONO
+    ' ==========================================================
 
-    ' =============================================
-    ' GET — buscar&q=texto
-    ' =============================================
-    Private Sub Buscar(context As HttpContext)
-        Dim q As String = If(context.Request.QueryString("q"), "")
-        context.Response.Write(DataTableToJson(ProveedorService.Buscar(q.Trim())))
-    End Sub
+    ''' <summary>
+    ''' NIT Guatemala sin guion: 3-10 caracteres (2-9 dígitos + dígito verificador 0-9 ó K).
+    ''' CUI: exactamente 13 dígitos.
+    ''' </summary>
+    Private Function ValidarNit(nit As String) As Boolean
+        Dim v As String = nit.Trim().ToUpper()
+        If Regex.IsMatch(v, "^\d{13}$") Then Return True          ' CUI
+        If Regex.IsMatch(v, "^\d{2,9}[\dK]$") Then Return True    ' NIT sin guion
+        Return False
+    End Function
 
-    ' =============================================
-    ' POST — crear
-    ' Body: nit, nombre, avenida, zona, direccion, telefono
-    ' Devuelve: { "ok":true, "id": X }
-    ' =============================================
-    Private Sub Crear(context As HttpContext)
-        Dim nit As String = If(context.Request.Form("nit"), "").Trim()
-        Dim nombre As String = If(context.Request.Form("nombre"), "").Trim()
-        Dim avenida As String = If(context.Request.Form("avenida"), "").Trim()
-        Dim zona As String = If(context.Request.Form("zona"), "").Trim()
-        Dim direccion As String = If(context.Request.Form("direccion"), "").Trim()
-        Dim telefono As String = If(context.Request.Form("telefono"), "").Trim()
+    ''' <summary>
+    ''' Teléfono: exactamente 8 dígitos numéricos.
+    ''' </summary>
+    Private Function ValidarTelefono(tel As String) As Boolean
+        Return Regex.IsMatch(tel.Trim(), "^\d{8}$")
+    End Function
 
-        ' Validar campos obligatorios
-        Dim err As String = ValidarCampos(nit, nombre, avenida, zona, direccion, telefono, False)
-        If Not String.IsNullOrEmpty(err) Then
-            Responder(context, 422, err) : Return
+    ''' <summary>
+    ''' Valida todos los campos obligatorios antes de llamar a Oracle.
+    ''' Lanza excepción con mensaje legible si algo falla.
+    ''' </summary>
+    Private Sub ValidarCampos(nit As String, nombre As String, avenida As String,
+                               zona As String, direccion As String, telefono As String,
+                               Optional validarNitFlag As Boolean = True)
+        If validarNitFlag Then
+            If String.IsNullOrWhiteSpace(nit) Then Throw New Exception("El NIT o CUI es obligatorio.")
+            If Not ValidarNit(nit) Then
+                Throw New Exception(
+                    "NIT o CUI con formato inválido. " &
+                    "Acepta NIT sin guion (ej: 123456789 ó 12345678K) " &
+                    "o CUI de 13 dígitos (ej: 1234567890101).")
+            End If
         End If
+
+        If String.IsNullOrWhiteSpace(nombre)    Then Throw New Exception("El nombre o razón social es obligatorio.")
+        If String.IsNullOrWhiteSpace(avenida)   Then Throw New Exception("La avenida es obligatoria.")
+        If String.IsNullOrWhiteSpace(zona)      Then Throw New Exception("La zona es obligatoria.")
+        If String.IsNullOrWhiteSpace(direccion) Then Throw New Exception("La dirección es obligatoria.")
+
+        If String.IsNullOrWhiteSpace(telefono) Then Throw New Exception("El teléfono es obligatorio.")
+        If Not ValidarTelefono(telefono) Then
+            Throw New Exception("El teléfono debe tener exactamente 8 dígitos numéricos (ej: 22223333).")
+        End If
+    End Sub
+
+    ' ==========================================================
+    ' Limpia el prefijo ORA-XXXXX: que Oracle agrega a RAISE_APPLICATION_ERROR
+    ' y deja sólo el mensaje legible para el usuario.
+    ' ==========================================================
+    Private Function LimpiarMensajeOracle(msg As String) As String
+        ' Ej: "ORA-20008: PKG_CP_BOD_PROVEEDOR: NIT o CUI con formato invalido..."
+        '     "ORA-20001: PKG_CP_BOD_PROVEEDOR: NIT obligatorio.\nORA-06512:..."
+        Dim limpio As String = msg
+
+        ' Quita todo desde el segundo ORA- en adelante (stack trace de Oracle)
+        Dim stackPos As Integer = limpio.IndexOf(vbLf & "ORA-")
+        If stackPos > 0 Then limpio = limpio.Substring(0, stackPos)
+
+        ' Quita el prefijo "ORA-NNNNN: "
+        limpio = Regex.Replace(limpio.Trim(), "^ORA-\d+:\s*", "")
+
+        ' Quita el prefijo del package si lo tiene
+        limpio = Regex.Replace(limpio, "^PKG_CP_BOD_PROVEEDOR:\s*", "")
+
+        Return limpio.Trim()
+    End Function
+
+    ' ==========================================================
+    ' ACTIONS
+    ' ==========================================================
+
+    Private Sub ListarProveedores(context As HttpContext)
+        Dim dt As DataTable = ProveedorService.Listar()
+        context.Response.Write(JsonConvert.SerializeObject(dt))
+    End Sub
+
+    ' Buscar: acepta texto vacío (devuelve todo, igual que listar)
+    ' Compatible con buscador debounce del móvil.
+    Private Sub BuscarProveedores(context As HttpContext)
+        Dim texto As String = If(context.Request("texto"), "").Trim()
+        If texto = "" Then
+            ListarProveedores(context)
+            Return
+        End If
+        Dim dt As DataTable = ProveedorService.Buscar(texto)
+        context.Response.Write(JsonConvert.SerializeObject(dt))
+    End Sub
+
+    Private Sub CrearProveedor(context As HttpContext)
+        Dim nit      As String = If(context.Request("nit"), "").Trim().ToUpper()
+        Dim nombre   As String = If(context.Request("nombre"), "").Trim()
+        Dim avenida  As String = If(context.Request("avenida"), "").Trim()
+        Dim zona     As String = If(context.Request("zona"), "").Trim()
+        Dim direccion As String = If(context.Request("direccion"), "").Trim()
+        Dim telefono As String = If(context.Request("telefono"), "").Trim()
+
+        ' Validación en el handler antes de llegar a Oracle
+        ValidarCampos(nit, nombre, avenida, zona, direccion, telefono, validarNitFlag:=True)
 
         Dim nuevoId As Decimal = ProveedorService.Crear(nit, nombre, avenida, zona, direccion, telefono)
-        context.Response.Write("{""ok"":true,""id"":" & nuevoId.ToString() & "}")
+        context.Response.Write("{""mensaje"": ""Proveedor creado con éxito"", ""id"": " & nuevoId & "}")
     End Sub
 
-    ' =============================================
-    ' POST — actualizar
-    ' Body: id, nit, nombre, avenida, zona, direccion, telefono
-    ' Devuelve: { "ok":true }
-    ' =============================================
-    Private Sub Actualizar(context As HttpContext)
-        Dim idStr As String = If(context.Request.Form("id"), "").Trim()
-        Dim nit As String = If(context.Request.Form("nit"), "").Trim()
-        Dim nombre As String = If(context.Request.Form("nombre"), "").Trim()
-        Dim avenida As String = If(context.Request.Form("avenida"), "").Trim()
-        Dim zona As String = If(context.Request.Form("zona"), "").Trim()
-        Dim direccion As String = If(context.Request.Form("direccion"), "").Trim()
-        Dim telefono As String = If(context.Request.Form("telefono"), "").Trim()
+    Private Sub ActualizarProveedor(context As HttpContext)
+        Dim id As Decimal = Convert.ToDecimal(context.Request("id"))
+        ' En actualizar el NIT viene pero no se re-valida el formato
+        ' porque Oracle no permite cambiarlo (el package lo admite pero
+        ' la web y el móvil lo envían igual que estaba).
+        ' De todas formas lo validamos para consistencia.
+        Dim nit      As String = If(context.Request("nit"), "").Trim().ToUpper()
+        Dim nombre   As String = If(context.Request("nombre"), "").Trim()
+        Dim avenida  As String = If(context.Request("avenida"), "").Trim()
+        Dim zona     As String = If(context.Request("zona"), "").Trim()
+        Dim direccion As String = If(context.Request("direccion"), "").Trim()
+        Dim telefono As String = If(context.Request("telefono"), "").Trim()
 
-        Dim id As Decimal = 0
-        If Not Decimal.TryParse(idStr, id) OrElse id <= 0 Then
-            Responder(context, 422, "Campo 'id' invalido.") : Return
-        End If
-
-        ' En edicion el NIT no se valida de formato (ya existe), solo obligatorio
-        Dim err As String = ValidarCampos(nit, nombre, avenida, zona, direccion, telefono, True)
-        If Not String.IsNullOrEmpty(err) Then
-            Responder(context, 422, err) : Return
-        End If
+        ValidarCampos(nit, nombre, avenida, zona, direccion, telefono, validarNitFlag:=True)
 
         ProveedorService.Actualizar(id, nit, nombre, avenida, zona, direccion, telefono)
-        context.Response.Write("{""ok"":true}")
+        context.Response.Write("{""mensaje"": ""Proveedor actualizado con éxito""}")
     End Sub
 
-    ' =============================================
-    ' POST — eliminar
-    ' Body: id
-    ' Devuelve: { "ok":true }
-    ' =============================================
-    Private Sub Eliminar(context As HttpContext)
-        Dim idStr As String = If(context.Request.Form("id"), "").Trim()
-
-        Dim id As Decimal = 0
-        If Not Decimal.TryParse(idStr, id) OrElse id <= 0 Then
-            Responder(context, 422, "Campo 'id' invalido.") : Return
-        End If
-
-        Try
-            ProveedorService.Eliminar(id)
-            context.Response.Write("{""ok"":true}")
-        Catch ex As Exception
-            ' FK violation de Oracle: tiene ordenes, facturas o reclamos vinculados
-            If ex.Message.Contains("ORA-02292") Then
-                Responder(context, 409, "No se puede eliminar: este proveedor tiene ordenes, facturas o reclamos vinculados.")
-            Else
-                Throw
-            End If
-        End Try
+    Private Sub EliminarProveedor(context As HttpContext)
+        Dim id As Decimal = Convert.ToDecimal(context.Request("id"))
+        ProveedorService.Eliminar(id)
+        context.Response.Write("{""mensaje"": ""Proveedor eliminado con éxito""}")
     End Sub
-
-    ' =============================================
-    ' VALIDACIONES
-    ' esEdicion=True omite la validacion de formato NIT/CUI
-    ' (en edicion el NIT no se puede cambiar)
-    ' =============================================
-    Private Function ValidarCampos(nit As String, nombre As String, avenida As String,
-                                    zona As String, direccion As String, telefono As String,
-                                    esEdicion As Boolean) As String
-        If String.IsNullOrWhiteSpace(nit) Then Return "El NIT es obligatorio."
-        If String.IsNullOrWhiteSpace(nombre) Then Return "El nombre es obligatorio."
-        If String.IsNullOrWhiteSpace(avenida) Then Return "La avenida es obligatoria."
-        If String.IsNullOrWhiteSpace(zona) Then Return "La zona es obligatoria."
-        If String.IsNullOrWhiteSpace(direccion) Then Return "La direccion es obligatoria."
-        If String.IsNullOrWhiteSpace(telefono) Then Return "El telefono es obligatorio."
-
-        ' Telefono: exactamente 8 digitos numericos
-        If Not Regex.IsMatch(telefono, "^\d{8}$") Then
-            Return "El telefono debe tener exactamente 8 digitos numericos (ej: 22223333)."
-        End If
-
-        ' Formato NIT/CUI solo al crear
-        If Not esEdicion Then
-            Dim nitUp As String = nit.ToUpper()
-            Dim esCui As Boolean = Regex.IsMatch(nitUp, "^\d{13}$")
-            Dim esNit As Boolean = Regex.IsMatch(nitUp, "^\d{2,9}[\dK]$")
-            If Not esCui AndAlso Not esNit Then
-                Return "El NIT/CUI no tiene formato valido. Acepta: NIT sin guion (ej: 123456789 o 12345678K) o CUI de 13 digitos."
-            End If
-        End If
-
-        Return ""
-    End Function
-
-    ' =============================================
-    ' HELPER — escribe { "ok":false, "error":"..." }
-    ' =============================================
-    Private Sub Responder(context As HttpContext, statusCode As Integer, mensaje As String)
-        context.Response.StatusCode = statusCode
-        context.Response.Write("{""ok"":false,""error"":""" &
-            mensaje.Replace("\", "\\").Replace("""", "\""") & """}")
-    End Sub
-
-    ' =============================================
-    ' HELPER — DataTable a JSON
-    ' Serializa cada fila con los nombres de columna
-    ' exactos que devuelve Oracle (PROV_PROVEEDOR, etc.)
-    ' =============================================
-    Private Function DataTableToJson(dt As DataTable) As String
-        If dt Is Nothing OrElse dt.Rows.Count = 0 Then Return "[]"
-
-        Dim sb As New StringBuilder()
-        sb.Append("[")
-        For i As Integer = 0 To dt.Rows.Count - 1
-            If i > 0 Then sb.Append(",")
-            sb.Append("{")
-            For j As Integer = 0 To dt.Columns.Count - 1
-                If j > 0 Then sb.Append(",")
-                Dim col As String = dt.Columns(j).ColumnName
-                Dim val As Object = dt.Rows(i)(j)
-                sb.Append("""" & col & """:")
-                If IsDBNull(val) Then
-                    sb.Append("null")
-                ElseIf TypeOf val Is Boolean Then
-                    sb.Append(If(CBool(val), "true", "false"))
-                ElseIf TypeOf val Is Date Then
-                    sb.Append("""" & CDate(val).ToString("yyyy-MM-dd") & """")
-                ElseIf TypeOf val Is Decimal OrElse TypeOf val Is Integer OrElse
-                       TypeOf val Is Long OrElse TypeOf val Is Double Then
-                    sb.Append(val.ToString())
-                Else
-                    sb.Append("""" &
-                        val.ToString() _
-                            .Replace("\", "\\") _
-                            .Replace("""", "\""") _
-                            .Replace(vbCr, "") _
-                            .Replace(vbLf, " ") &
-                        """")
-                End If
-            Next
-            sb.Append("}")
-        Next
-        sb.Append("]")
-        Return sb.ToString()
-    End Function
 
     Public ReadOnly Property IsReusable() As Boolean Implements IHttpHandler.IsReusable
         Get
