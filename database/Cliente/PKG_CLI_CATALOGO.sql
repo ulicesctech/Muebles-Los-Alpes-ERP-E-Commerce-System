@@ -25,21 +25,24 @@ CREATE OR REPLACE PACKAGE BODY PKG_CLI_CATALOGO AS
                    c.cat_descripcion,
                    m.mat_descripcion,
                    promo.prom_porcentaje,
+                   promo.camp_nombre,
                    CASE WHEN promo.prom_porcentaje IS NOT NULL
                         THEN ROUND(p.pro_precio * (1 - promo.prom_porcentaje / 100), 2)
                         ELSE p.pro_precio
                    END AS precio_final,
                    NVL(stock.sto_disponible, 0) AS sto_disponible,
-                   h.hip_historial_precio
+                   h.hv_historial_precio_venta
               FROM BOD_PRODUCTO p
               JOIN BOD_TIPO      t ON t.tip_tipo      = p.tip_tipo
               JOIN BOD_CATEGORIA c ON c.cat_categoria = t.cat_categoria
               JOIN BOD_MATERIAL  m ON m.mat_material  = p.mat_material
               LEFT JOIN (
-                  SELECT pro_referencia, MAX(prom_porcentaje) prom_porcentaje
-                    FROM PROMO_PROMOCION
-                   WHERE SYSDATE BETWEEN prom_fecha_inicio AND prom_fecha_final
-                   GROUP BY pro_referencia
+                  SELECT pr.pro_referencia, MAX(pr.prom_porcentaje) prom_porcentaje,
+                         MAX(ca.camp_nombre) camp_nombre
+                    FROM PROMO_PROMOCION pr
+                    JOIN PROMO_CAMPANA   ca ON ca.camp_campana = pr.camp_campana
+                   WHERE ca.camp_estado = 'ACTIVA'
+                   GROUP BY pr.pro_referencia
               ) promo ON promo.pro_referencia = p.pro_referencia
               LEFT JOIN (
                   SELECT h2.pro_referencia, SUM(s.sto_disponible) sto_disponible
@@ -49,9 +52,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_CLI_CATALOGO AS
                    GROUP BY h2.pro_referencia
               ) stock ON stock.pro_referencia = p.pro_referencia
               LEFT JOIN (
-                  SELECT pro_referencia, MIN(hip_historial_precio) hip_historial_precio
-                    FROM BOD_HISTORIAL_PRECIO
-                   WHERE hip_fecha_final IS NULL
+                  SELECT pro_referencia, MIN(hv_historial_precio_venta) hv_historial_precio_venta
+                    FROM BOD_HISTORIAL_PRECIO_VENTA
+                   WHERE hv_fecha_final IS NULL
                    GROUP BY pro_referencia
               ) h ON h.pro_referencia = p.pro_referencia
              WHERE p.pro_precio > 0
@@ -74,21 +77,24 @@ CREATE OR REPLACE PACKAGE BODY PKG_CLI_CATALOGO AS
                    c.cat_descripcion,
                    m.mat_descripcion,
                    promo.prom_porcentaje,
+                   promo.camp_nombre,
                    CASE WHEN promo.prom_porcentaje IS NOT NULL
                         THEN ROUND(p.pro_precio * (1 - promo.prom_porcentaje / 100), 2)
                         ELSE p.pro_precio
                    END AS precio_final,
                    NVL(stock.sto_disponible, 0) AS sto_disponible,
-                   h.hip_historial_precio
+                   h.hv_historial_precio_venta
               FROM BOD_PRODUCTO p
               JOIN BOD_TIPO      t ON t.tip_tipo      = p.tip_tipo
               JOIN BOD_CATEGORIA c ON c.cat_categoria = t.cat_categoria
               JOIN BOD_MATERIAL  m ON m.mat_material  = p.mat_material
               LEFT JOIN (
-                  SELECT pro_referencia, MAX(prom_porcentaje) prom_porcentaje
-                    FROM PROMO_PROMOCION
-                   WHERE SYSDATE BETWEEN prom_fecha_inicio AND prom_fecha_final
-                   GROUP BY pro_referencia
+                  SELECT pr.pro_referencia, MAX(pr.prom_porcentaje) prom_porcentaje,
+                         MAX(ca.camp_nombre) camp_nombre
+                    FROM PROMO_PROMOCION pr
+                    JOIN PROMO_CAMPANA   ca ON ca.camp_campana = pr.camp_campana
+                   WHERE ca.camp_estado = 'ACTIVA'
+                   GROUP BY pr.pro_referencia
               ) promo ON promo.pro_referencia = p.pro_referencia
               LEFT JOIN (
                   SELECT h2.pro_referencia, SUM(s.sto_disponible) sto_disponible
@@ -98,9 +104,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_CLI_CATALOGO AS
                    GROUP BY h2.pro_referencia
               ) stock ON stock.pro_referencia = p.pro_referencia
               LEFT JOIN (
-                  SELECT pro_referencia, MIN(hip_historial_precio) hip_historial_precio
-                    FROM BOD_HISTORIAL_PRECIO
-                   WHERE hip_fecha_final IS NULL
+                  SELECT pro_referencia, MIN(hv_historial_precio_venta) hv_historial_precio_venta
+                    FROM BOD_HISTORIAL_PRECIO_VENTA
+                   WHERE hv_fecha_final IS NULL
                    GROUP BY pro_referencia
               ) h ON h.pro_referencia = p.pro_referencia
              WHERE p.pro_precio > 0
@@ -126,21 +132,24 @@ CREATE OR REPLACE PACKAGE BODY PKG_CLI_CATALOGO AS
                    c.cat_descripcion,
                    m.mat_descripcion,
                    promo.prom_porcentaje,
+                   promo.camp_nombre,
                    CASE WHEN promo.prom_porcentaje IS NOT NULL
                         THEN ROUND(p.pro_precio * (1 - promo.prom_porcentaje / 100), 2)
                         ELSE p.pro_precio
                    END AS precio_final,
                    NVL(stock.sto_disponible, 0) AS sto_disponible,
-                   h.hip_historial_precio
+                   h.hv_historial_precio_venta
               FROM BOD_PRODUCTO p
               JOIN BOD_TIPO      t ON t.tip_tipo      = p.tip_tipo
               JOIN BOD_CATEGORIA c ON c.cat_categoria = t.cat_categoria
               JOIN BOD_MATERIAL  m ON m.mat_material  = p.mat_material
               LEFT JOIN (
-                  SELECT pro_referencia, MAX(prom_porcentaje) prom_porcentaje
-                    FROM PROMO_PROMOCION
-                   WHERE SYSDATE BETWEEN prom_fecha_inicio AND prom_fecha_final
-                   GROUP BY pro_referencia
+                  SELECT pr.pro_referencia, MAX(pr.prom_porcentaje) prom_porcentaje,
+                         MAX(ca.camp_nombre) camp_nombre
+                    FROM PROMO_PROMOCION pr
+                    JOIN PROMO_CAMPANA   ca ON ca.camp_campana = pr.camp_campana
+                   WHERE ca.camp_estado = 'ACTIVA'
+                   GROUP BY pr.pro_referencia
               ) promo ON promo.pro_referencia = p.pro_referencia
               LEFT JOIN (
                   SELECT h2.pro_referencia, SUM(s.sto_disponible) sto_disponible
@@ -150,9 +159,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_CLI_CATALOGO AS
                    GROUP BY h2.pro_referencia
               ) stock ON stock.pro_referencia = p.pro_referencia
               LEFT JOIN (
-                  SELECT pro_referencia, MIN(hip_historial_precio) hip_historial_precio
-                    FROM BOD_HISTORIAL_PRECIO
-                   WHERE hip_fecha_final IS NULL
+                  SELECT pro_referencia, MIN(hv_historial_precio_venta) hv_historial_precio_venta
+                    FROM BOD_HISTORIAL_PRECIO_VENTA
+                   WHERE hv_fecha_final IS NULL
                    GROUP BY pro_referencia
               ) h ON h.pro_referencia = p.pro_referencia
              WHERE p.pro_precio > 0
@@ -188,18 +197,21 @@ CREATE OR REPLACE PACKAGE BODY PKG_CLI_CATALOGO AS
                    c.cat_descripcion,
                    m.mat_descripcion,
                    promo.prom_porcentaje,
+                   promo.camp_nombre,
                    ROUND(p.pro_precio * (1 - promo.prom_porcentaje / 100), 2) AS precio_final,
                    NVL(stock.sto_disponible, 0) AS sto_disponible,
-                   h.hip_historial_precio
+                   h.hv_historial_precio_venta
               FROM BOD_PRODUCTO p
               JOIN BOD_TIPO      t ON t.tip_tipo      = p.tip_tipo
               JOIN BOD_CATEGORIA c ON c.cat_categoria = t.cat_categoria
               JOIN BOD_MATERIAL  m ON m.mat_material  = p.mat_material
               JOIN (
-                  SELECT pro_referencia, MAX(prom_porcentaje) prom_porcentaje
-                    FROM PROMO_PROMOCION
-                   WHERE SYSDATE BETWEEN prom_fecha_inicio AND prom_fecha_final
-                   GROUP BY pro_referencia
+                  SELECT pr.pro_referencia, MAX(pr.prom_porcentaje) prom_porcentaje,
+                         MAX(ca.camp_nombre) camp_nombre
+                    FROM PROMO_PROMOCION pr
+                    JOIN PROMO_CAMPANA   ca ON ca.camp_campana = pr.camp_campana
+                   WHERE ca.camp_estado = 'ACTIVA'
+                   GROUP BY pr.pro_referencia
               ) promo ON promo.pro_referencia = p.pro_referencia
               LEFT JOIN (
                   SELECT h2.pro_referencia, SUM(s.sto_disponible) sto_disponible
@@ -209,9 +221,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_CLI_CATALOGO AS
                    GROUP BY h2.pro_referencia
               ) stock ON stock.pro_referencia = p.pro_referencia
               LEFT JOIN (
-                  SELECT pro_referencia, MIN(hip_historial_precio) hip_historial_precio
-                    FROM BOD_HISTORIAL_PRECIO
-                   WHERE hip_fecha_final IS NULL
+                  SELECT pro_referencia, MIN(hv_historial_precio_venta) hv_historial_precio_venta
+                    FROM BOD_HISTORIAL_PRECIO_VENTA
+                   WHERE hv_fecha_final IS NULL
                    GROUP BY pro_referencia
               ) h ON h.pro_referencia = p.pro_referencia
              WHERE p.pro_precio > 0

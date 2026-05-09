@@ -124,10 +124,10 @@
                             CommandArgument='<%# Eval("PRO_REFERENCIA") %>'
                             runat="server" CssClass="btn-detalle tiempoInhabilitado">  Ver</asp:LinkButton>
                         <asp:LinkButton CommandName="AgregarCarrito"
-                            CommandArgument='<%# Eval("HIP_HISTORIAL_PRECIO") %>'
+                            CommandArgument='<%# Eval("HV_HISTORIAL_PRECIO_VENTA") %>'
                             runat="server" CssClass="btn-carrito tiempoInhabilitado"
                             Enabled='<%# Convert.ToInt32(Eval("STO_DISPONIBLE")) > 0 %>'>
-                            🛒 Agregar
+                            Agregar
                         </asp:LinkButton>
                     </div>
                 </div>

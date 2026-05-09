@@ -25,6 +25,8 @@ CREATE OR REPLACE PACKAGE PKG_CLI_CLIENTE AS
     PROCEDURE cli_eliminar(p_id IN NUMBER);
     PROCEDURE cli_listar(p_data OUT SYS_REFCURSOR);
     PROCEDURE cli_buscar(p_texto IN VARCHAR2, p_data OUT SYS_REFCURSOR);
+    PROCEDURE cli_buscar_por_id(p_id IN NUMBER, p_data OUT SYS_REFCURSOR);
+    PROCEDURE cli_buscar_por_email(p_email IN VARCHAR2, p_data OUT SYS_REFCURSOR);
 END PKG_CLI_CLIENTE;
 /
 
@@ -149,6 +151,22 @@ CREATE OR REPLACE PACKAGE BODY PKG_CLI_CLIENTE AS
            OR UPPER(cli_numdocumento)  LIKE v_txt
            OR UPPER(cli_email)         LIKE v_txt;
     END cli_buscar;
+
+    PROCEDURE cli_buscar_por_id(p_id IN NUMBER, p_data OUT SYS_REFCURSOR) IS
+    BEGIN
+        assert_id(p_id, 'Cliente: ID obligatorio.');
+        OPEN p_data FOR
+            SELECT * FROM CLI_CLIENTE
+             WHERE cli_cliente = p_id;
+    END cli_buscar_por_id;
+
+    PROCEDURE cli_buscar_por_email(p_email IN VARCHAR2, p_data OUT SYS_REFCURSOR) IS
+    BEGIN
+        assert_not_null(p_email, 'Cliente: Email obligatorio.');
+        OPEN p_data FOR
+            SELECT * FROM CLI_CLIENTE
+             WHERE LOWER(cli_email) = LOWER(TRIM(p_email));
+    END cli_buscar_por_email;
 
 END PKG_CLI_CLIENTE;
 /

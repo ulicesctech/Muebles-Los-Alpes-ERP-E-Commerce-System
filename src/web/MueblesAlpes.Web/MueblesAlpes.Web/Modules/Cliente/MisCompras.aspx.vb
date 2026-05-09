@@ -8,7 +8,7 @@ Namespace Modules.Cliente
         Protected Sub Page_Load(sender As Object, e As EventArgs) Handles Me.Load
             If Not IsPostBack Then
                 If Session("CLI_CLIENTE") Is Nothing Then
-                    pnlVacio.Visible = True
+                    pnlNoLogin.Visible = True
                 Else
                     CargarCompras()
                 End If

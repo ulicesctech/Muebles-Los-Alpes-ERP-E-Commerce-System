@@ -35,18 +35,18 @@
 </style>
 
 <div class="lc-wrap">
-    <a href='<%: ResolveUrl("~/Modules/AuthUsuarios/Index.aspx") %>' class="back-link">← Volver al inicio</a>
+    <a href='<%: ResolveUrl("~/Modules/Cliente/Catalogo.aspx") %>' class="back-link">Volver al catálogo</a>
 
     <div class="lc-card">
         <div class="lc-card-head">
-            <div class="lc-logo">🛒</div>
+            <div class="lc-logo"></div>
             <h2>Muebles Los Alpes</h2>
             <p>Portal exclusivo para clientes</p>
         </div>
 
         <div class="lc-tabs">
-            <div class="lc-tab active" onclick="switchTab('Login', this)">🔑 Iniciar Sesión</div>
-            <div class="lc-tab"        onclick="switchTab('Registro', this)">✨ Crear Cuenta</div>
+            <div class="lc-tab active" onclick="switchTab('Login', this)"> Iniciar Sesión</div>
+            <div class="lc-tab"        onclick="switchTab('Registro', this)"> Crear Cuenta</div>
         </div>
 
         <div style="padding:0 28px;">
@@ -57,15 +57,15 @@
         <%-- PANEL LOGIN --%>
         <div id="panelLogin" class="lc-panel active">
             <div class="security-badge">
-                🔒 <span>Conexión segura — ingresa con tus credenciales reales</span>
+                 <span>Conexión segura — ingresa con tus credenciales reales</span>
             </div>
             <div class="form-group">
-                <label>📧 Email *</label>
+                <label>Email *</label>
                 <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control"
                     placeholder="tucorreo@email.com" autocomplete="off" />
             </div>
             <div class="form-group">
-                <label>🔑 Contraseña *</label>
+                <label>Contraseña *</label>
                 <asp:TextBox ID="txtPassword" runat="server" CssClass="form-control"
                     TextMode="Password" placeholder="Tu contraseña..." autocomplete="new-password" />
             </div>
@@ -76,12 +76,12 @@
         <%-- PANEL REGISTRO --%>
         <div id="panelRegistro" class="lc-panel">
             <div class="security-badge">
-                ✅ <span>Completa con tus datos reales para activar tu cuenta</span>
+                 <span>Completa con tus datos reales para activar tu cuenta</span>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>📄 Tipo Documento *</label>
+                    <label>Tipo Documento *</label>
                     <asp:DropDownList ID="ddlTipoDoc" runat="server" CssClass="form-control">
                         <asp:ListItem Value="">-- Tipo --</asp:ListItem>
                         <asp:ListItem Value="DPI">DPI</asp:ListItem>
@@ -90,7 +90,7 @@
                     </asp:DropDownList>
                 </div>
                 <div class="form-group">
-                    <label>🔢 Número Documento *</label>
+                    <label>Número Documento *</label>
                     <asp:TextBox ID="txtNumDoc" runat="server" CssClass="form-control"
                         placeholder="1234567890101" MaxLength="13" autocomplete="off" />
                 </div>
@@ -98,14 +98,14 @@
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>🏢 NIT <small style="color:#aaa;font-weight:normal;">(opcional)</small></label>
+                    <label>NIT <small style="color:#aaa;font-weight:normal;">(opcional)</small></label>
                     <asp:TextBox ID="txtNITReg" runat="server" CssClass="form-control"
                         placeholder="NIT..." MaxLength="20" autocomplete="off"
                         onkeyup="onNitChangeReg(this.value)" onchange="onNitChangeReg(this.value)" />
                     <div class="hint-warn">💡 Si llenas este campo se asignará Jurídica automáticamente</div>
                 </div>
                 <div class="form-group">
-                    <label>🏷️ Tipo Cliente *</label>
+                    <label>Tipo Cliente *</label>
                     <asp:DropDownList ID="ddlTipoClienteReg" runat="server" CssClass="form-control">
                         <asp:ListItem Value="">-- Seleccione --</asp:ListItem>
                         <asp:ListItem Value="NATURAL">Natural (persona física)</asp:ListItem>
@@ -116,12 +116,12 @@
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>👤 Primer Nombre *</label>
+                    <label>Primer Nombre *</label>
                     <asp:TextBox ID="txtPrimerNombre" runat="server" CssClass="form-control"
                         placeholder="Tu nombre..." autocomplete="off" />
                 </div>
                 <div class="form-group">
-                    <label>👤 Segundo Nombre</label>
+                    <label>Segundo Nombre</label>
                     <asp:TextBox ID="txtSegundoNombre" runat="server" CssClass="form-control"
                         placeholder="Opcional..." autocomplete="off" />
                 </div>
@@ -129,54 +129,54 @@
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>👤 Primer Apellido *</label>
+                    <label>Primer Apellido *</label>
                     <asp:TextBox ID="txtPrimerApellido" runat="server" CssClass="form-control"
                         placeholder="Tu apellido..." autocomplete="off" />
                 </div>
                 <div class="form-group">
-                    <label>👤 Segundo Apellido</label>
+                    <label>Segundo Apellido</label>
                     <asp:TextBox ID="txtSegundoApellido" runat="server" CssClass="form-control"
                         placeholder="Opcional..." autocomplete="off" />
                 </div>
             </div>
 
             <div class="form-group">
-                <label>📧 Email * <small style="color:#aaa;font-weight:normal;">(será tu usuario)</small></label>
+                <label>Email * <small style="color:#aaa;font-weight:normal;">(será tu usuario)</small></label>
                 <asp:TextBox ID="txtRegEmail" runat="server" CssClass="form-control"
                     placeholder="tucorreo@email.com" autocomplete="off" />
-                <div class="hint-warn">💡 Con este email ingresarás al sistema</div>
+                <div class="hint-warn">Con este email ingresarás al sistema</div>
             </div>
 
             <div class="form-group">
-                <label>🔑 Contraseña * <small style="color:#aaa;font-weight:normal;">(mínimo 8 caracteres)</small></label>
+                <label>Contraseña * <small style="color:#aaa;font-weight:normal;">(mínimo 8 caracteres)</small></label>
                 <asp:TextBox ID="txtRegPassword" runat="server" CssClass="form-control"
                     TextMode="Password" placeholder="Crea tu contraseña..." autocomplete="new-password" />
-                <div class="pass-rules">🔒 Mínimo 8 caracteres — mayúscula, minúscula y número. Ej: <strong>Muebles1</strong></div>
+                <div class="pass-rules">Mínimo 8 caracteres — mayúscula, minúscula y número. Ej: <strong>Muebles1</strong></div>
             </div>
 
             <div class="form-group">
-                <label>🔑 Confirmar Contraseña *</label>
+                <label>Confirmar Contraseña *</label>
                 <asp:TextBox ID="txtConfirmPassword" runat="server" CssClass="form-control"
                     TextMode="Password" placeholder="Repite tu contraseña..." autocomplete="new-password" />
             </div>
 
             <div class="form-group">
-                <label>📱 Teléfono * <small style="color:#aaa;font-weight:normal;">(8 dígitos)</small></label>
+                <label>Teléfono * <small style="color:#aaa;font-weight:normal;">(8 dígitos)</small></label>
                 <asp:TextBox ID="txtTelefono" runat="server" CssClass="form-control"
                     placeholder="55551234" MaxLength="8" autocomplete="off" />
-                <div class="hint-warn">💡 Solo dígitos, sin guiones ni espacios</div>
+                <div class="hint-warn">Solo dígitos, sin guiones ni espacios</div>
             </div>
 
             <hr class="section-sep" />
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>🌍 País *</label>
+                    <label>País *</label>
                     <asp:TextBox ID="txtPais" runat="server" CssClass="form-control"
                         placeholder="Guatemala" autocomplete="off" />
                 </div>
                 <div class="form-group">
-                    <label>🗺️ Departamento *</label>
+                    <label>Departamento *</label>
                     <asp:TextBox ID="txtDepartamento" runat="server" CssClass="form-control"
                         placeholder="Guatemala" autocomplete="off" />
                 </div>
@@ -184,12 +184,12 @@
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>🏙️ Municipio *</label>
+                    <label>Municipio *</label>
                     <asp:TextBox ID="txtMunicipio" runat="server" CssClass="form-control"
                         placeholder="Guatemala" autocomplete="off" />
                 </div>
                 <div class="form-group">
-                    <label>🏘️ Zona *</label>
+                    <label>Zona *</label>
                     <asp:TextBox ID="txtZona" runat="server" CssClass="form-control"
                         placeholder="Zona 1" autocomplete="off" />
                 </div>
@@ -197,26 +197,21 @@
 
             <div class="form-row">
                 <div class="form-group">
-                    <label>📍 Dirección *</label>
+                    <label>Dirección *</label>
                     <asp:TextBox ID="txtDireccion" runat="server" CssClass="form-control"
                         placeholder="1 Calle 1-23" autocomplete="off" />
                 </div>
                 <div class="form-group">
-                    <label>📮 Código Postal *</label>
+                    <label>Código Postal *</label>
                     <asp:TextBox ID="txtCodigoPostal" runat="server" CssClass="form-control"
                         placeholder="01001" autocomplete="off" />
                 </div>
             </div>
 
-            <asp:Button ID="btnRegistrar" runat="server" Text="✅ Crear mi cuenta"
+            <asp:Button ID="btnRegistrar" runat="server" Text="Crear mi cuenta"
                 CssClass="btn-gold tiempoInhabilitado" OnClick="btnRegistrar_Click" />
         </div>
 
-    </div>
-
-    <div class="lc-footer">
-        ¿Eres empleado de Muebles Los Alpes?
-        <a href='<%: ResolveUrl("~/Modules/AuthUsuarios/LoginEmpleado.aspx") %>'>Acceso Empleados →</a>
     </div>
 </div>
 
