@@ -19,11 +19,11 @@ Public Class CarritoHandler
             If method = "GET" Then
                 Select Case action
                     Case "listar"
-                        Dim dt As DataTable = CarritoService.Listar()
+                        Dim dt As DataTable = CarritoVentasService.Listar()
                         context.Response.Write(SerializeTable(dt))
 
                     Case "productos"
-                        Dim dt As DataTable = CarritoService.ListarProductosConPrecio()
+                        Dim dt As DataTable = CarritoVentasService.ListarProductosConPrecio()
                         context.Response.Write(SerializeTable(dt))
 
                     Case Else
@@ -35,34 +35,34 @@ Public Class CarritoHandler
                 Select Case action
                     Case "crear"
                         Dim cliente As Decimal = Convert.ToDecimal(context.Request("cliente"))
-                        Dim id As Decimal = CarritoService.Crear(cliente)
+                        Dim id As Decimal = CarritoVentasService.Crear(cliente)
                         context.Response.Write("{""id"":" & id.ToString() & "}")
 
                     Case "agregardetalle"
                         Dim carrito As Decimal = Convert.ToDecimal(context.Request("carrito"))
                         Dim hvPrecio As Decimal = Convert.ToDecimal(context.Request("hvPrecio"))
                         Dim cantidad As Decimal = Convert.ToDecimal(context.Request("cantidad"))
-                        Dim id As Decimal = CarritoService.AgregarDetalle(carrito, hvPrecio, cantidad)
+                        Dim id As Decimal = CarritoVentasService.AgregarDetalle(carrito, hvPrecio, cantidad)
                         context.Response.Write("{""id"":" & id.ToString() & "}")
 
                     Case "eliminardetalle"
                         Dim id As Decimal = Convert.ToDecimal(context.Request("id"))
-                        CarritoService.EliminarDetalle(id)
+                        CarritoVentasService.EliminarDetalle(id)
                         context.Response.Write("{""ok"":true}")
 
                     Case "vaciar"
                         Dim carrito As Decimal = Convert.ToDecimal(context.Request("carrito"))
-                        CarritoService.Vaciar(carrito)
+                        CarritoVentasService.Vaciar(carrito)
                         context.Response.Write("{""ok"":true}")
 
                     Case "eliminar"
                         Dim id As Decimal = Convert.ToDecimal(context.Request("id"))
-                        CarritoService.Eliminar(id)
+                        CarritoVentasService.Eliminar(id)
                         context.Response.Write("{""ok"":true}")
 
                     Case "facturar"
                         Dim carrito As Decimal = Convert.ToDecimal(context.Request("carrito"))
-                        CarritoService.Facturar(carrito)
+                        CarritoVentasService.Facturar(carrito)
                         context.Response.Write("{""ok"":true}")
 
                     Case Else
