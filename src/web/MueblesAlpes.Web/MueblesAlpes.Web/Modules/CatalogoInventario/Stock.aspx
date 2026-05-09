@@ -327,7 +327,7 @@
                 <ItemTemplate>
                     <asp:Button CommandName="Edit" runat="server" Text="&#9998; Editar" CssClass="btn-outline tiempoInhabilitado"
                         style="padding:5px 12px;font-size:12px;" />
-                </ItemTemplate>
+                </ItemTemplate> 
                 <EditItemTemplate>
                     <asp:Button CommandName="Update" runat="server" Text="&#10003; Guardar" CssClass="btn-gold tiempoInhabilitado"
                         style="padding:5px 10px;font-size:12px;" />

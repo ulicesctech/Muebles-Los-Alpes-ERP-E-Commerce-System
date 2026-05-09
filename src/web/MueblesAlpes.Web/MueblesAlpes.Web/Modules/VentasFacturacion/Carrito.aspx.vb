@@ -1,5 +1,4 @@
 ﻿Imports System.Data
-Imports VentasFacturacion
 
 Namespace Modules.VentasFacturacion
     Public Class Carrito

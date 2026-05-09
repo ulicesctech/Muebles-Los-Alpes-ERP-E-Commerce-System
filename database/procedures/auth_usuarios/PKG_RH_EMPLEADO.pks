@@ -13,5 +13,6 @@ CREATE OR REPLACE PACKAGE PKG_RH_EMPLEADO AS
     );
     PROCEDURE emp_eliminar(p_id IN NUMBER);
     PROCEDURE emp_listar(p_data OUT SYS_REFCURSOR);
+    PROCEDURE emp_obtener_admin(p_id OUT NUMBER);
 END PKG_RH_EMPLEADO;
 /

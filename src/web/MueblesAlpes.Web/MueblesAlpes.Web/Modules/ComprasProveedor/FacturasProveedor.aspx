@@ -48,11 +48,11 @@
 </style>
 
 <div class="breadcrumb-mod">
-    <a href='<%: ResolveUrl("~/") %>'>🏠 Inicio</a> /
-    <a href='<%: ResolveUrl("~/Modules/ComprasProveedor/Index.aspx") %>'>💳 Cuentas por Pagar</a> /
+    <a href='<%: ResolveUrl("~/") %>'>Inicio</a> /
+    <a href='<%: ResolveUrl("~/Modules/ComprasProveedor/Index.aspx") %>'>Cuentas por Pagar</a> /
     <strong style="color:#5C3A1E;">Facturas de Proveedor</strong>
 </div>
-<div class="page-title">🧾 Gestión de Facturas de Proveedor</div>
+<div class="page-title">Gestión de Facturas de Proveedor</div>
 
 <asp:Panel ID="pnlMsg" runat="server" Visible="false">
     <asp:Label ID="lblMsg" runat="server"></asp:Label>
@@ -104,7 +104,7 @@
         <div style="display:flex; flex-direction:column; gap:4px; flex:3; min-width:200px;">
             <label class="flabel">Buscar</label>
             <div class="search-wrap">
-                <span class="search-icon-abs">🔍</span>
+                <span class="search-icon-abs"></span>
                 <asp:TextBox ID="txtBuscar" runat="server" placeholder="Codigo factura u orden de compra..." />
             </div>
         </div>
@@ -140,11 +140,11 @@
                     <div class="actions-cell">
                         <asp:LinkButton CommandName="Editar"
                             CommandArgument='<%# Eval("ORC_ORDEN_COMPRA") %>'
-                            runat="server" CssClass="btn-edit-t tiempoInhabilitado">✏️ Editar</asp:LinkButton>
+                            runat="server" CssClass="btn-edit-t tiempoInhabilitado">Editar</asp:LinkButton>
                         <asp:LinkButton CommandName="Eliminar"
                             CommandArgument='<%# Eval("ORC_ORDEN_COMPRA") %>'
                             runat="server" CssClass="btn-del-t tiempoInhabilitado"
-                            OnClientClick="return confirm('¿Eliminar esta factura?');">🗑 Borrar</asp:LinkButton>
+                            OnClientClick="return confirm('¿Eliminar esta factura?');">Borrar</asp:LinkButton>
                     </div>
                 </ItemTemplate>
             </asp:TemplateField>

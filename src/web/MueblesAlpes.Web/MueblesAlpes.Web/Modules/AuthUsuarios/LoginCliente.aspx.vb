@@ -8,8 +8,8 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
 
         Protected Sub Page_Load(sender As Object, e As EventArgs) Handles Me.Load
             If Not IsPostBack Then
-                If Session("UsuarioId") IsNot Nothing Then
-                    Response.Redirect("~/Modules/AuthUsuarios/Index.aspx")
+                If Session("CLI_CLIENTE") IsNot Nothing Then
+                    Response.Redirect("~/Modules/Cliente/Catalogo.aspx")
                 End If
             End If
         End Sub
@@ -35,32 +35,25 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
 
         Protected Sub btnLogin_Click(sender As Object, e As EventArgs)
             If String.IsNullOrWhiteSpace(txtEmail.Text) OrElse
-               String.IsNullOrWhiteSpace(txtPassword.Text) Then
+       String.IsNullOrWhiteSpace(txtPassword.Text) Then
                 lblError.Text = "⚠️ Ingrese email y contraseña."
                 lblError.Visible = True
                 Return
             End If
             Try
                 Dim result As LoginClienteResult = LoginClienteService.Validar(
-                    txtEmail.Text.Trim(), txtPassword.Text.Trim())
+            txtEmail.Text.Trim(), txtPassword.Text.Trim())
                 If result.Resultado = 1 Then
                     Dim dt As System.Data.DataTable = ClienteService.BuscarPorId(result.ClienteId)
                     Dim nombre As String = ""
                     If dt.Rows.Count > 0 Then
                         nombre = dt.Rows(0)("cli_primer_nombre").ToString() & " " &
-                                 dt.Rows(0)("cli_primer_apellido").ToString()
+                         dt.Rows(0)("cli_primer_apellido").ToString()
                     End If
-                    Session("UsuarioId") = result.ClienteId
-                    Session("UsuarioNombre") = nombre
-                    Session("UsuarioGrupo") = "Cliente"
-                    Session("UsuarioTipo") = "CLIENTE"
-                    Session("PerAdmin") = False
-                    Session("PerRH") = False
-                    Session("PerFac") = False
-                    Session("PerCli") = False
-                    Session("PerBod") = False
-                    Session("PerPromo") = False
-                    Response.Redirect("~/Modules/AuthUsuarios/Index.aspx")
+                    Session("CLI_CLIENTE") = result.ClienteId
+                    Session("CLI_NOMBRE") = nombre
+                    Session("CLI_EMAIL") = txtEmail.Text.Trim()
+                    Response.Redirect("~/Modules/Cliente/Catalogo.aspx")
                 Else
                     lblError.Text = "❌ Email o contraseña incorrectos."
                     lblError.Visible = True

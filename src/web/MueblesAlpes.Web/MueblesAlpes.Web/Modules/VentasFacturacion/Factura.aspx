@@ -222,12 +222,12 @@
 
             <div class="acciones-form">
                 <asp:Button ID="btnGuardar" runat="server"
-                    Text="🧾 Generar Factura"
+                    Text="Generar Factura"
                     CssClass="btn-ui btn-dorado tiempoInhabilitado"
                     OnClick="btnGuardar_Click" />
 
                 <asp:Button ID="btnCancelar" runat="server"
-                    Text="✖ Cancelar"
+                    Text="Cancelar"
                     CssClass="btn-ui btn-secundario tiempoInhabilitado"
                     OnClick="btnCancelar_Click"
                     CausesValidation="false" />
