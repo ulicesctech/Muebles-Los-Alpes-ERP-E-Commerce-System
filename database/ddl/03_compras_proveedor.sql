@@ -1,7 +1,12 @@
 -- ==========================================================
--- FASE 1: CREACIÓN DE TABLAS Y LLAVES PRIMARIAS (PK)
+-- MODULO: COMPRAS Y PROVEEDOR
+-- Tablas: Pedidos, Ordenes de Compra, Factura Proveedor
+-- REQUIERE: catalogo_inventario.sql ejecutado previamente
 -- ==========================================================
 
+-- ----------------------------------------------------------
+-- TABLAS
+-- ----------------------------------------------------------
 
 CREATE TABLE BOD_PROVEEDOR (
     prov_proveedor NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -12,18 +17,27 @@ CREATE TABLE BOD_PROVEEDOR (
     prov_direccion VARCHAR2(255) NOT NULL,
     prov_telefono VARCHAR2(20) NOT NULL
 );
--- Módulo de Pedidos, Órdenes de Compra y Facturación a Proveedores
+
 CREATE TABLE BOD_PEDIDO (
     ped_pedido NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     ped_codigo VARCHAR2(50) NOT NULL,
-    ped_fecha DATE NOT NULL
+    ped_fecha DATE DEFAULT SYSDATE NOT NULL,
+    ped_total NUMBER(10,2) DEFAULT 0 NOT NULL,
+    ped_forma_pago VARCHAR2(30) DEFAULT 'SIMULADO' NOT NULL,
+    CONSTRAINT uq_ped_codigo UNIQUE (ped_codigo),
+    CONSTRAINT ck_ped_total CHECK (ped_total >= 0)
 );
+
 CREATE TABLE BOD_DETALLE_PEDIDO (
     detpe_detalle_pedido NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     ped_pedido NUMBER NOT NULL,
-    hip_historial_precio NUMBER NOT NULL,
+    hip_historial_precio NUMBER NULL,
     detpe_cantidad_solicitada NUMBER NOT NULL,
-    detpe_cantidad_recibida NUMBER
+    detpe_cantidad_recibida NUMBER DEFAULT 0 NOT NULL,
+    CONSTRAINT ck_detpe_cant CHECK (
+        detpe_cantidad_solicitada > 0 AND
+        detpe_cantidad_recibida >= 0
+    )
 );
 
 CREATE TABLE BOD_ORDEN_COMPRA (
@@ -34,17 +48,14 @@ CREATE TABLE BOD_ORDEN_COMPRA (
     orc_total_precio NUMBER(10,2) NOT NULL
 );
 
-
-
-
-
 CREATE TABLE BOD_ORDEN_DETALLE_PEDIDO (
     odp_orden_detalle_pedido NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     orc_orden_compra VARCHAR2(255) NOT NULL,
     ped_pedido NUMBER NOT NULL,
     odp_material VARCHAR2(255) NOT NULL,
     odp_precio NUMBER(10,2) NOT NULL,
-    odp_cantidad NUMBER NOT NULL
+    odp_cantidad NUMBER NOT NULL,
+    odp_producto VARCHAR2(255) NOT NULL
 );
 
 CREATE TABLE FAC_FACTURA_PROVEEDOR (
@@ -53,53 +64,37 @@ CREATE TABLE FAC_FACTURA_PROVEEDOR (
     facpro_fecha DATE NOT NULL
 );
 
-
 CREATE TABLE FAC_RECLAMO_PROVEEDOR (
     rep_reclamo_proveedor NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     orc_orden_compra VARCHAR2(255) NOT NULL,
-    rep_comentarios VARCHAR2(500) NOT NULL,
+    rep_comentarios VARCHAR2(500) NULL,
     rep_estado VARCHAR2(50) NOT NULL,
     rep_fecha_inicio DATE NOT NULL,
-    rep_fecha_final DATE
+    rep_fecha_final DATE,
+    rep_descripcion VARCHAR2(255) NOT NULL
 );
 
+-- ----------------------------------------------------------
+-- LLAVES FORANEAS
+-- ----------------------------------------------------------
 
+ALTER TABLE BOD_DETALLE_PEDIDO ADD CONSTRAINT fk_detpe_pedido
+    FOREIGN KEY (ped_pedido) REFERENCES BOD_PEDIDO(ped_pedido);
 
+ALTER TABLE BOD_DETALLE_PEDIDO ADD CONSTRAINT fk_detpe_historial
+    FOREIGN KEY (hip_historial_precio) REFERENCES BOD_HISTORIAL_PRECIO(hip_historial_precio);
 
+ALTER TABLE BOD_ORDEN_COMPRA ADD CONSTRAINT fk_orc_proveedor
+    FOREIGN KEY (prov_proveedor) REFERENCES BOD_PROVEEDOR(prov_proveedor);
 
+ALTER TABLE BOD_ORDEN_DETALLE_PEDIDO ADD CONSTRAINT fk_odp_orden
+    FOREIGN KEY (orc_orden_compra) REFERENCES BOD_ORDEN_COMPRA(orc_orden_compra);
 
+ALTER TABLE BOD_ORDEN_DETALLE_PEDIDO ADD CONSTRAINT fk_odp_pedido
+    FOREIGN KEY (ped_pedido) REFERENCES BOD_PEDIDO(ped_pedido);
 
+ALTER TABLE FAC_FACTURA_PROVEEDOR ADD CONSTRAINT fk_facpro_orden
+    FOREIGN KEY (orc_orden_compra) REFERENCES BOD_ORDEN_COMPRA(orc_orden_compra);
 
-
-
-
-
-
-
-
-
-
-
--- ==========================================================
--- FASE 2: CREACIÓN DE LLAVES FORÁNEAS (FK) Y RELACIONES
--- ==========================================================
-ALTER TABLE BOD_DETALLE_PEDIDO 
-ADD CONSTRAINT fk_detpe_pedido FOREIGN KEY (ped_pedido) REFERENCES BOD_PEDIDO(ped_pedido);
-ALTER TABLE BOD_DETALLE_PEDIDO 
-ADD CONSTRAINT fk_detpe_historial FOREIGN KEY (hip_historial_precio) REFERENCES BOD_HISTORIAL_PRECIO(hip_historial_precio);
-
-ALTER TABLE BOD_ORDEN_COMPRA 
-ADD CONSTRAINT fk_orc_proveedor FOREIGN KEY (prov_proveedor) REFERENCES BOD_PROVEEDOR(prov_proveedor);
-
-ALTER TABLE BOD_ORDEN_DETALLE_PEDIDO 
-ADD CONSTRAINT fk_odp_orden FOREIGN KEY (orc_orden_compra) REFERENCES BOD_ORDEN_COMPRA(orc_orden_compra);
-ALTER TABLE BOD_ORDEN_DETALLE_PEDIDO 
-ADD CONSTRAINT fk_odp_pedido FOREIGN KEY (ped_pedido) REFERENCES BOD_PEDIDO(ped_pedido);
-
-ALTER TABLE FAC_FACTURA_PROVEEDOR 
-ADD CONSTRAINT fk_facpro_orden FOREIGN KEY (orc_orden_compra) REFERENCES BOD_ORDEN_COMPRA(orc_orden_compra);
-
-ALTER TABLE FAC_RECLAMO_PROVEEDOR 
-ADD CONSTRAINT fk_rep_orden FOREIGN KEY (orc_orden_compra) REFERENCES BOD_ORDEN_COMPRA(orc_orden_compra);
-
-
+ALTER TABLE FAC_RECLAMO_PROVEEDOR ADD CONSTRAINT fk_rep_orden
+    FOREIGN KEY (orc_orden_compra) REFERENCES BOD_ORDEN_COMPRA(orc_orden_compra);
