@@ -1,11 +1,11 @@
-<%@ WebHandler Language="VB" Class="FacturaHandler" %>
+<%@ WebHandler Language="VB" Class="HistorialPrecioVentaHandler" %>
 
 Imports System
 Imports System.Text
 Imports System.Web
 Imports System.Data
 
-Public Class FacturaHandler
+Public Class HistorialPrecioVentaHandler
     Implements IHttpHandler
 
     Public Sub ProcessRequest(context As HttpContext) Implements IHttpHandler.ProcessRequest
@@ -19,7 +19,7 @@ Public Class FacturaHandler
             If method = "GET" Then
                 Select Case action
                     Case "listar"
-                        Dim dt As DataTable = FacturaService.Listar()
+                        Dim dt As DataTable = HistorialPrecioVentaService.Listar()
                         context.Response.Write(SerializeTable(dt))
 
                     Case Else
@@ -29,11 +29,11 @@ Public Class FacturaHandler
 
             ElseIf method = "POST" Then
                 Select Case action
-                    Case "crear"
-                        Dim carrito As Decimal = Convert.ToDecimal(context.Request("carrito"))
-                        Dim empleado As Decimal = Convert.ToDecimal(context.Request("empleado"))
-                        Dim codigo As String = FacturaService.Crear(carrito, empleado)
-                        context.Response.Write("{""codigo"":""" & codigo.Replace("""", "\""") & """}")
+                    Case "registrar"
+                        Dim proReferencia As String = context.Request("proReferencia")
+                        Dim porcetaje As Decimal = Convert.ToDecimal(context.Request("porcetaje"))
+                        Dim id As Decimal = HistorialPrecioVentaService.Registrar(proReferencia, porcetaje)
+                        context.Response.Write("{""id"":" & id.ToString() & "}")
 
                     Case Else
                         context.Response.StatusCode = 400

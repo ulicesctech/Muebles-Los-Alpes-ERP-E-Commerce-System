@@ -1,7 +1,7 @@
 // app/services/apiClient.ts
 
 // URL Base centralizada. ¡Cámbiala aquí y afectará a toda la app!
-const BASE_URL = "http://192.168.0.3:8080";
+const BASE_URL = "http://192.168.1.24:8080";
 
 /**
  * Función genérica para hacer peticiones al servidor.
