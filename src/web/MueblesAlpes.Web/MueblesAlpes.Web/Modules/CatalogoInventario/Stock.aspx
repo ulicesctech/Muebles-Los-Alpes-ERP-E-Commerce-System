@@ -221,7 +221,7 @@
                 <asp:Button ID="btnCancelarLimites" runat="server" Text="Cancelar edicion" CssClass="btn-outline tiempoInhabilitado" OnClick="btnCancelarLimites_Click" CausesValidation="false" />
             </asp:Panel>
             <asp:Button ID="btnCancelar" runat="server" Text="Cancelar" CssClass="btn-outline tiempoInhabilitado" OnClick="btnCancelar_Click" CausesValidation="false" />
-        </asp:Panel><%-- fin pnlStockActual --%>
+        </asp:Panel>
 
         <asp:Panel ID="pnlSinStock" runat="server" Visible="false">
             <div class="aviso-precio" style="margin-bottom:14px;">

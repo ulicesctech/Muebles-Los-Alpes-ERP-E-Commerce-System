@@ -233,6 +233,14 @@
     <Content Include="Content\css\.gitkeep" />
     <Content Include="Content\img\.gitkeep" />
     <Content Include="Content\js\.gitkeep" />
+    <Content Include="Handlers\ComprasProveedor\PedidoHandler.ashx" />
+    <Content Include="Handlers\ComprasProveedor\DetallePedidoHandler.ashx" />
+    <Content Include="Handlers\ComprasProveedor\FacturaProveedorHandler.ashx" />
+    <Content Include="Handlers\ComprasProveedor\OrdenDetallePedidoHandler.ashx" />
+    <Content Include="Handlers\ComprasProveedor\ReclamoProveedorHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\NichoHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\NicAlmHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\FotoProductoHandler.ashx" />
     <None Include="Oracle.DataAccess.Common.Configuration.Section.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -245,6 +253,11 @@
     <Content Include="Scripts\jquery-3.7.0.min.js" />
     <Content Include="Scripts\jquery-3.7.0.slim.js" />
     <Content Include="Scripts\jquery-3.7.0.slim.min.js" />
+    <None Include="Scripts\jquery-3.7.1.intellisense.js" />
+    <Content Include="Scripts\jquery-3.7.1.js" />
+    <Content Include="Scripts\jquery-3.7.1.min.js" />
+    <Content Include="Scripts\jquery-3.7.1.slim.js" />
+    <Content Include="Scripts\jquery-3.7.1.slim.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Scripts\WebForms\DetailsView.js" />
     <Content Include="Scripts\WebForms\Focus.js" />
@@ -393,6 +406,8 @@
     <Content Include="obj\Debug\MueblesAlpes.Web.vbproj.CoreCompileInputs.cache" />
     <Content Include="obj\Debug\MueblesAlpes.Web.vbproj.GenerateResource.cache" />
     <Content Include="obj\Release\MueblesAlpes.Web.vbproj.AssemblyReference.cache" />
+    <Content Include="Scripts\jquery-3.7.1.slim.min.map" />
+    <Content Include="Scripts\jquery-3.7.1.min.map" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -817,7 +832,6 @@
     <Content Include="Handlers\CatalogoInventario\TiposHandler.ashx" />
     <Content Include="Handlers\Cliente\CatalogoClienteHandler.ashx" />
     <Content Include="Handlers\Cliente\MisComprasHandler.ashx" />
-    <Content Include="Handlers\ComprasProveedor\OrdenesCompraHandler.ashx" />
     <Content Include="Handlers\Reportes\ReporteComprasHandler.ashx" />
     <Content Include="Handlers\Reportes\ReporteStockHandler.ashx" />
     <Content Include="Handlers\Reportes\ReporteVentasHandler.ashx" />

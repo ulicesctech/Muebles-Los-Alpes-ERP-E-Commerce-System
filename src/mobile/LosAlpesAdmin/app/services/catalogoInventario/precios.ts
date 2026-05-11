@@ -8,11 +8,10 @@ export interface HistorialPrecio {
   NIC_CARACTERISTICA: string;
   HIP_PRECIO: number;
   HIP_FECHA_INICIO: string;
-  HIP_FECHA_FINAL?: string | null; // Es null si el precio sigue vigente
+  HIP_FECHA_FINAL?: string | null; // null = precio vigente
 }
 
-// Ruta relativa del Handler sin la barra inicial
-const HANDLER_PATH = "Handlers/CatalogoInventario/HistorialPrecioHandler.ashx";
+const HANDLER_PATH = "Handlers/CatalogoInventario/HistorialPreciosHandler.ashx";
 
 export const getHistorialTodos = async (): Promise<HistorialPrecio[]> => {
   return await fetchAPI(HANDLER_PATH, "listar_todos", "GET");
@@ -22,6 +21,11 @@ export const getHistorialPorMes = async (
   mes: number,
   anio: number,
 ): Promise<HistorialPrecio[]> => {
-  const actionString = `listar_por_mes&mes=${mes}&anio=${anio}`;
-  return await fetchAPI(HANDLER_PATH, actionString, "GET");
+  return await fetchAPI(HANDLER_PATH, `listar_por_mes&mes=${mes}&anio=${anio}`, "GET");
+};
+
+/** Años con registros en el historial — viene de OBTENER_ANIOS del paquete Oracle */
+export const getHistorialAnios = async (): Promise<number[]> => {
+  const rows = await fetchAPI(HANDLER_PATH, "obtener_anios", "GET") as { ANIO: number }[];
+  return rows.map((r) => r.ANIO);
 };
