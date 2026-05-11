@@ -224,6 +224,11 @@
     <Content Include="Modules\Cliente\Promociones.aspx" />
     <Content Include="Modules\Cliente\Registro.aspx" />
     <Content Include="Modules\Cliente\Tiendas.aspx" />
+    <Content Include="Modules\Marketing\Campana.aspx" />
+    <Content Include="Modules\Marketing\CostosADS.aspx" />
+    <Content Include="Modules\Reporteria\Gerencial\ReporteInventario.aspx" />
+    <Content Include="Modules\Reporteria\Gerencial\ReporteVentas.aspx" />
+    <Content Include="Modules\Reporteria\Marketing\ReporteMarketing.aspx" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
@@ -633,6 +638,41 @@
     </Compile>
     <Compile Include="Modules\Cliente\Tiendas.aspx.vb">
       <DependentUpon>Tiendas.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Marketing\Campana.aspx.designer.vb">
+      <DependentUpon>Campana.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Marketing\Campana.aspx.vb">
+      <DependentUpon>Campana.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Marketing\CostosADS.aspx.designer.vb">
+      <DependentUpon>CostosADS.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Marketing\CostosADS.aspx.vb">
+      <DependentUpon>CostosADS.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reporteria\Gerencial\ReporteInventario.aspx.designer.vb">
+      <DependentUpon>ReporteInventario.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reporteria\Gerencial\ReporteInventario.aspx.vb">
+      <DependentUpon>ReporteInventario.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reporteria\Gerencial\ReporteVentas.aspx.designer.vb">
+      <DependentUpon>ReporteVentas.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reporteria\Gerencial\ReporteVentas.aspx.vb">
+      <DependentUpon>ReporteVentas.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reporteria\Marketing\ReporteMarketing.aspx.designer.vb">
+      <DependentUpon>ReporteMarketing.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reporteria\Marketing\ReporteMarketing.aspx.vb">
+      <DependentUpon>ReporteMarketing.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="SecurityLogger.vb" />
