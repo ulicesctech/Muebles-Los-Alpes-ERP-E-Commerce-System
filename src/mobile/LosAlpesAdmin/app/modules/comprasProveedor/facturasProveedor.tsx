@@ -21,12 +21,12 @@ import {
   FacturaProveedor,
   getFacturasProveedor,
   registrarFactura,
-} from "../../services/comprasProveedor/facturasProveedor";
+} from "../../../services/comprasProveedor/facturasProveedor";
 
 import {
   getOrdenesCompra,
   OrdenCompra,
-} from "../../services/comprasProveedor/ordenesCompra";
+} from "../../../services/comprasProveedor/ordenesCompra";
 
 type Modo = "nuevo" | "editar";
 

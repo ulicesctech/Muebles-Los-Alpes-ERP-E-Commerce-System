@@ -16,7 +16,7 @@ import {
     eliminarNicho,
     getNichos,
     Nicho,
-} from "../../services/catalogoInventario/nichos";
+} from "../../../services/catalogoInventario/nichos";
 
 export default function NichosScreen() {
   const [nichos, setNichos] = useState<Nicho[]>([]);

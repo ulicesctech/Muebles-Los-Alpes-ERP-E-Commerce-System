@@ -16,8 +16,8 @@ import {
 import {
   PedidoService,
   DetallePedidoService,
-} from "../../services/comprasProveedor/pedidos";
-import { buscarDetallesPorPedido } from "../../services/comprasProveedor/ordenesCompra";
+} from "../../../services/comprasProveedor/pedidos";
+import { buscarDetallesPorPedido } from "../../../services/comprasProveedor/ordenesCompra";
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
 type Pedido = {

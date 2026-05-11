@@ -23,11 +23,11 @@ import {
   getEstadosReclamo,
   getReclamosProveedor,
   ReclamoProveedor,
-} from "../../services/comprasProveedor/reclamosProveedor";
+} from "../../../services/comprasProveedor/reclamosProveedor";
 import {
   getOrdenesCompra,
   OrdenCompra,
-} from "../../services/comprasProveedor/ordenesCompra";
+} from "../../../services/comprasProveedor/ordenesCompra";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // LÓGICA DE ESTADOS — espejo del paquete Oracle (sin hardcode de strings)

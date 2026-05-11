@@ -8,8 +8,8 @@ import {
   listarCarritos, listarProductos, crearCarrito,
   agregarDetalle, vaciarCarrito, eliminarCarrito,
   Carrito, Producto,
-} from '../../services/carritoService';
-import { fetchAPI } from '../../services/apiClient';
+} from '../../../services/carritoService';
+import { fetchAPI } from '../../../services/apiClient';
 
 interface Cliente {
   cli_cliente: number;

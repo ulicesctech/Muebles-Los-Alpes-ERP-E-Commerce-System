@@ -13,8 +13,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { fetchAPI } from "../../services/apiClient";
-import { StockService } from "../../services/catalogoInventario/stock";
+import { fetchAPI } from "../../../services/apiClient";
+import { StockService } from "../../../services/catalogoInventario/stock";
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 type StockItem = {

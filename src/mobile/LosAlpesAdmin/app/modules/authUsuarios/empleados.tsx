@@ -11,7 +11,7 @@ import {
     View
 } from 'react-native';
 import { useAuth } from '../../../context/AuthContext';
-import { actualizarEmpleado, crearEmpleado, eliminarEmpleado, listarEmpleados } from '../../services/authUsuarios/empleados';
+import { actualizarEmpleado, crearEmpleado, eliminarEmpleado, listarEmpleados } from '../../../services/authUsuarios/empleados';
 
 const CAFE = '#5C3A1E';
 const GOLD = '#C9973A';

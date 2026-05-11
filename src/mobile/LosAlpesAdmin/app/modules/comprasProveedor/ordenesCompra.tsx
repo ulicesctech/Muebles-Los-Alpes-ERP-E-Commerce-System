@@ -21,17 +21,17 @@ import {
   buscarPedidosParaOrden,
   getDetallesPedidoParaOrden,
   actualizarTotalOrden,
-} from "../../services/comprasProveedor/ordenesCompra";
+} from "../../../services/comprasProveedor/ordenesCompra";
 import {
   buscarProveedores,
   Proveedor,
-} from "../../services/comprasProveedor/proveedores";
+} from "../../../services/comprasProveedor/proveedores";
 import {
   buscarPorPedido,
   insertarOrdenDetalle,
   listarPorOrden,
   OrdenDetalle,
-} from "../../services/comprasProveedor/ordenDetallePedido";
+} from "../../../services/comprasProveedor/ordenDetallePedido";
 
 type Vista = "lista" | "nuevaOrden" | "detalle";
 

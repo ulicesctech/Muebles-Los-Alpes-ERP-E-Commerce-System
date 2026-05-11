@@ -3,7 +3,7 @@ import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
   TextInput, ActivityIndicator, Alert, ScrollView,
 } from 'react-native';
-import { fetchAPI } from '../../services/apiClient';
+import { fetchAPI } from '../../../services/apiClient';
 
 interface HistorialPrecio {
   HV_HISTORIAL_PRECIO_VENTA: number;

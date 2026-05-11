@@ -21,7 +21,7 @@ import {
   Proveedor,
   validarNit,
   validarTelefono,
-} from "../../services/comprasProveedor/proveedores";
+} from "../../../services/comprasProveedor/proveedores";
 
 const DEBOUNCE_MS = 400;
 

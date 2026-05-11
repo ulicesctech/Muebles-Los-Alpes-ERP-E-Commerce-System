@@ -10,7 +10,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import { actualizarPuesto, crearPuesto, eliminarPuesto, listarPuestos } from '../../services/authUsuarios/puestos';
+import { actualizarPuesto, crearPuesto, eliminarPuesto, listarPuestos } from '../../../services/authUsuarios/puestos';
 
 const CAFE = '#5C3A1E';
 const GOLD = '#C9973A';

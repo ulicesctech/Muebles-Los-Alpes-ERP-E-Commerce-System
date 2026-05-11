@@ -10,9 +10,9 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import { cerrarAscenso, crearAscenso, eliminarAscenso, listarAscensos } from '../../services/authUsuarios/ascensos';
-import { listarEmpleados } from '../../services/authUsuarios/empleados';
-import { listarPuestos } from '../../services/authUsuarios/puestos';
+import { cerrarAscenso, crearAscenso, eliminarAscenso, listarAscensos } from '../../../services/authUsuarios/ascensos';
+import { listarEmpleados } from '../../../services/authUsuarios/empleados';
+import { listarPuestos } from '../../../services/authUsuarios/puestos';
 
 const CAFE = '#5C3A1E';
 const GOLD = '#C9973A';

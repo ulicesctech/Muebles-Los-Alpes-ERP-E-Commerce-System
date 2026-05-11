@@ -17,7 +17,7 @@ import {
     crearCategoria,
     eliminarCategoria,
     getCategorias,
-} from "../../services/catalogoInventario/categorias";
+} from "../../../services/catalogoInventario/categorias";
 
 export default function CategoriasScreen() {
   const [categorias, setCategorias] = useState<Categoria[]>([]);

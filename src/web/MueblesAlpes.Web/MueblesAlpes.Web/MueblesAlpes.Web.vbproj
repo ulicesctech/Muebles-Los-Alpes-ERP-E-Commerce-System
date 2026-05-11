@@ -202,6 +202,9 @@
     <Content Include="ErrorLimite.aspx" />
     <Content Include="Global.asax" />
     <Content Include="favicon.ico" />
+    <Content Include="Handlers\Auth\AuthHandler.ashx" />
+    <Content Include="Handlers\VentasFacturacion\CarritoHandler.ashx" />
+    <Content Include="Handlers\VentasFacturacion\FacturaHandler.ashx" />
     <Content Include="Images\no-foto.png" />
     <Content Include="Modules\AuthUsuarios\Admin\GrupoUsuario.aspx" />
     <Content Include="Modules\AuthUsuarios\Admin\Permisos.aspx" />
@@ -246,6 +249,8 @@
     <Content Include="Handlers\CatalogoInventario\NichoHandler.ashx" />
     <Content Include="Handlers\CatalogoInventario\NicAlmHandler.ashx" />
     <Content Include="Handlers\CatalogoInventario\FotoProductoHandler.ashx" />
+    <Content Include="App_Data\seguridad.log" />
+    <Content Include="Handlers\VentasFacturacion\HistorialPrecioVentaHandler.ashx" />
     <None Include="Oracle.DataAccess.Common.Configuration.Section.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -492,6 +497,9 @@
     </Compile>
     <Compile Include="Global.asax.vb">
       <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Handlers\Auth\AuthHandler.ashx.vb">
+      <DependentUpon>AuthHandler.ashx</DependentUpon>
     </Compile>
     <Compile Include="Modules\AuthUsuarios\Admin\GrupoUsuario.aspx.designer.vb">
       <DependentUpon>GrupoUsuario.aspx</DependentUpon>
@@ -860,7 +868,6 @@
     <EmbeddedResource Include="obj\Debug\MueblesAlpes.Web.Resources.resources" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Handlers\Auth\AuthHandler.ashx" />
     <Content Include="Handlers\CatalogoInventario\AlmacenesHandler.ashx" />
     <Content Include="Handlers\CatalogoInventario\CategoriasHandler.ashx" />
     <Content Include="Handlers\CatalogoInventario\HistorialPreciosHandler.ashx" />
@@ -875,8 +882,6 @@
     <Content Include="Handlers\Reportes\ReporteComprasHandler.ashx" />
     <Content Include="Handlers\Reportes\ReporteStockHandler.ashx" />
     <Content Include="Handlers\Reportes\ReporteVentasHandler.ashx" />
-    <Content Include="Handlers\VentasFacturacion\CarritoHandler.ashx" />
-    <Content Include="Handlers\VentasFacturacion\FacturaHandler.ashx" />
     <Content Include="Handlers\ComprasProveedor\ProveedorHandler.ashx" />
     <Content Include="Handlers\ComprasProveedor\OrdenCompraHandler.ashx" />
     <Content Include="Content\bootstrap.rtl.min.css.map" />
@@ -917,9 +922,7 @@
     <Content Include="Web.config" />
     <Content Include="Web.config.example" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

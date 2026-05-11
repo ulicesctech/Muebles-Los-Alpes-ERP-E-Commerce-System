@@ -6,8 +6,8 @@ import {
     TouchableOpacity, View
 } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
-import { loginCliente } from '../services/authUsuarios/loginCliente';
-import { loginEmpleado } from '../services/authUsuarios/loginEmpleado';
+import { loginCliente } from '../../services/authUsuarios/loginCliente';
+import { loginEmpleado } from '../../services/authUsuarios/loginEmpleado';
 
 const CAFE = '#5C3A1E';
 const GOLD = '#C9973A';
@@ -110,7 +110,7 @@ export default function LoginScreen() {
     }
     setLoading(true);
     try {
-      const { registroCliente } = await import('../services/authUsuarios/loginCliente');
+      const { registroCliente } = await import('../../services/authUsuarios/loginCliente');
       const res = await registroCliente({
         tipodocumento: regTipoDoc,
         numdocumento: regNumDoc,

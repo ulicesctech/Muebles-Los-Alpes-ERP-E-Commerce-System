@@ -17,7 +17,7 @@ import {
   getHistorialPorMes,
   getHistorialTodos,
   HistorialPrecio,
-} from "../../services/catalogoInventario/precios";
+} from "../../../services/catalogoInventario/precios";
 
 // ─── mensajes de error amigables ─────────────────────────────────────────────
 function getMensajeError(e: any, contexto: string): string {

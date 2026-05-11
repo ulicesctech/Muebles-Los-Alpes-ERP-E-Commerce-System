@@ -10,7 +10,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import { actualizarCliente, crearCliente, eliminarCliente, listarClientes } from '../../services/authUsuarios/clientes';
+import { actualizarCliente, crearCliente, eliminarCliente, listarClientes } from '../../../services/authUsuarios/clientes';
 
 const CAFE = '#5C3A1E';
 const GOLD = '#C9973A';

@@ -9,7 +9,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import { actualizarPermiso, crearPermiso, eliminarPermiso, listarPermisos } from '../../../services/authUsuarios/admin/permisos';
+import { actualizarPermiso, crearPermiso, eliminarPermiso, listarPermisos } from '../../../../services/authUsuarios/admin/permisos';
 
 const CAFE = '#5C3A1E';
 const GOLD = '#C9973A';

@@ -10,8 +10,8 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import { actualizarGrupo, crearGrupo, eliminarGrupo, listarGrupos } from '../../../services/authUsuarios/admin/grupoUsuario';
-import { crearPermiso, listarPermisos } from '../../../services/authUsuarios/admin/permisos';
+import { actualizarGrupo, crearGrupo, eliminarGrupo, listarGrupos } from '../../../../services/authUsuarios/admin/grupoUsuario';
+import { crearPermiso, listarPermisos } from '../../../../services/authUsuarios/admin/permisos';
 
 const CAFE = '#5C3A1E';
 const GOLD = '#C9973A';
