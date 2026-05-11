@@ -159,7 +159,7 @@
             <Columns>
                 <asp:TemplateField HeaderText="ID">
                     <ItemTemplate>
-                        <span class="badge-id"><%# Eval("per_permisos") %></span>
+                        <span class="badge-id"><%#: Eval("per_permisos") %></span>
                     </ItemTemplate>
                 </asp:TemplateField>
                 <asp:TemplateField HeaderText="👑 Admin">
@@ -196,11 +196,11 @@
                     <ItemTemplate>
                         <div class="actions-cell">
                             <asp:LinkButton runat="server" Text="✏️" CommandName="EditarPermiso"
-                                CommandArgument='<%# Eval("per_permisos") %>' CssClass="btn-edit-t tiempoInhabilitado" />
+                                CommandArgument='<%#: Eval("per_permisos") %>' CssClass="btn-edit-t tiempoInhabilitado" />
                             <asp:LinkButton runat="server" Text="👥 Usar" CommandName="UsarPermiso"
-                                CommandArgument='<%# Eval("per_permisos") %>' CssClass="btn-usar-t tiempoInhabilitado" />
+                                CommandArgument='<%#: Eval("per_permisos") %>' CssClass="btn-usar-t tiempoInhabilitado" />
                             <asp:LinkButton runat="server" Text="🗑" CommandName="EliminarPermiso"
-                                CommandArgument='<%# Eval("per_permisos") %>' CssClass="btn-del-t tiempoInhabilitado"
+                                CommandArgument='<%#: Eval("per_permisos") %>' CssClass="btn-del-t tiempoInhabilitado"
                                 OnClientClick="return confirm('¿Eliminar este permiso?');" />
                         </div>
                     </ItemTemplate>
@@ -267,7 +267,7 @@
         <Columns>
             <asp:TemplateField HeaderText="ID">
                 <ItemTemplate>
-                    <span class="badge-id"><%# Eval("grupus_grupo_usuario") %></span>
+                    <span class="badge-id"><%#: Eval("grupus_grupo_usuario") %></span>
                 </ItemTemplate>
             </asp:TemplateField>
             <asp:BoundField DataField="grupus_descripcion" HeaderText="Grupo" />
@@ -276,9 +276,9 @@
                 <ItemTemplate>
                     <div class="actions-cell">
                         <asp:LinkButton runat="server" Text="✏️" CommandName="EditarGrupo"
-                            CommandArgument='<%# Eval("grupus_grupo_usuario") %>' CssClass="btn-edit-t tiempoInhabilitado" />
+                            CommandArgument='<%#: Eval("grupus_grupo_usuario") %>' CssClass="btn-edit-t tiempoInhabilitado" />
                         <asp:LinkButton runat="server" Text="🗑" CommandName="EliminarGrupo"
-                            CommandArgument='<%# Eval("grupus_grupo_usuario") %>' CssClass="btn-del-t tiempoInhabilitado"
+                            CommandArgument='<%#: Eval("grupus_grupo_usuario") %>' CssClass="btn-del-t tiempoInhabilitado"
                             OnClientClick="return confirm('¿Eliminar este grupo?');" />
                     </div>
                 </ItemTemplate>

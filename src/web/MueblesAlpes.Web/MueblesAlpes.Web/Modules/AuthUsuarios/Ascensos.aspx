@@ -93,7 +93,7 @@
         <Columns>
             <asp:TemplateField HeaderText="ID" ItemStyle-Width="70px">
                 <ItemTemplate>
-                    <span class="badge-id"><%# Eval("asc_ascenso") %></span>
+                    <span class="badge-id"><%#: Eval("asc_ascenso") %></span>
                 </ItemTemplate>
             </asp:TemplateField>
             <asp:BoundField DataField="em_nombre_completo" HeaderText="Empleado" />
@@ -110,11 +110,11 @@
                 <ItemTemplate>
                     <div class="actions-cell">
                         <asp:LinkButton runat="server" Text="🔒" CommandName="Cerrar"
-                            CommandArgument='<%# Eval("asc_ascenso") %>' CssClass="btn-edit-t tiempoInhabilitado"
+                            CommandArgument='<%#: Eval("asc_ascenso") %>' CssClass="btn-edit-t tiempoInhabilitado"
                             OnClientClick="return confirm('¿Cerrar este ascenso?');"
                             ToolTip="Cerrar ascenso" />
                         <asp:LinkButton runat="server" Text="🗑" CommandName="Eliminar"
-                            CommandArgument='<%# Eval("asc_ascenso") %>' CssClass="btn-del-t tiempoInhabilitado"
+                            CommandArgument='<%#: Eval("asc_ascenso") %>' CssClass="btn-del-t tiempoInhabilitado"
                             OnClientClick="return confirm('¿Eliminar este ascenso?');" />
                     </div>
                 </ItemTemplate>

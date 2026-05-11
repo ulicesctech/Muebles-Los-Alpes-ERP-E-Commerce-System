@@ -129,20 +129,20 @@
         <Columns>
             <%-- Solo ORC_ORDEN_COMPRA, sin ORC_CODIGO --%>
             <asp:TemplateField HeaderText="Orden de Compra">
-                <ItemTemplate><span class="badge-key"><%# Eval("ORC_ORDEN_COMPRA") %></span></ItemTemplate>
+                <ItemTemplate><span class="badge-key"><%#: Eval("ORC_ORDEN_COMPRA") %></span></ItemTemplate>
             </asp:TemplateField>
             <asp:TemplateField HeaderText="Cód. Factura">
-                <ItemTemplate><span class="badge-fac"><%# Eval("FACPRO_CODIGO_FACTURA") %></span></ItemTemplate>
+                <ItemTemplate><span class="badge-fac"><%#: Eval("FACPRO_CODIGO_FACTURA") %></span></ItemTemplate>
             </asp:TemplateField>
             <asp:BoundField DataField="FACPRO_FECHA" HeaderText="Fecha" DataFormatString="{0:dd/MM/yyyy}" ItemStyle-Width="110px" />
             <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="150px">
                 <ItemTemplate>
                     <div class="actions-cell">
                         <asp:LinkButton CommandName="Editar"
-                            CommandArgument='<%# Eval("ORC_ORDEN_COMPRA") %>'
+                            CommandArgument='<%#: Eval("ORC_ORDEN_COMPRA") %>'
                             runat="server" CssClass="btn-edit-t tiempoInhabilitado">Editar</asp:LinkButton>
                         <asp:LinkButton CommandName="Eliminar"
-                            CommandArgument='<%# Eval("ORC_ORDEN_COMPRA") %>'
+                            CommandArgument='<%#: Eval("ORC_ORDEN_COMPRA") %>'
                             runat="server" CssClass="btn-del-t tiempoInhabilitado"
                             OnClientClick="return confirm('¿Eliminar esta factura?');">Borrar</asp:LinkButton>
                     </div>

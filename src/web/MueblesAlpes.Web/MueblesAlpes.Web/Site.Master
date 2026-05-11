@@ -174,8 +174,8 @@
                                                  style="width:50px; height:50px; object-fit:cover; border-radius:6px; flex-shrink:0;"
                                                  onerror="this.style.display='none'" alt="" />
                                             <div style="flex:1; min-width:0;">
-                                                <div style="font-size:12px; font-weight:bold; color:#333; font-family:Arial,sans-serif; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><%# Eval("PRO_NOMBRE") %></div>
-                                                <div style="font-size:12px; color:#888; font-family:Arial,sans-serif;">Q <%# String.Format("{0:N2}", Eval("PRECIO_FINAL")) %> | Cant: <%# Eval("CANTIDAD") %></div>
+                                                <div style="font-size:12px; font-weight:bold; color:#333; font-family:Arial,sans-serif; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><%#: Eval("PRO_NOMBRE") %></div>
+                                                <div style="font-size:12px; color:#888; font-family:Arial,sans-serif;">Q <%# String.Format("{0:N2}", Eval("PRECIO_FINAL")) %> | Cant: <%#: Eval("CANTIDAD") %></div>
                                             </div>
                                             <div style="font-size:13px; font-weight:bold; color:#333; font-family:Arial,sans-serif; white-space:nowrap;">
                                                 Q <%# String.Format("{0:N2}", Convert.ToDecimal(Eval("PRECIO_FINAL")) * Convert.ToInt32(Eval("CANTIDAD"))) %>

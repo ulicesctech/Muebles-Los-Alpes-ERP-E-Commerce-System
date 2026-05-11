@@ -151,10 +151,10 @@
                     <asp:Repeater ID="rptCategorias" runat="server" OnItemCommand="rptCategorias_ItemCommand">
                         <ItemTemplate>
                             <asp:LinkButton CommandName="FiltrarCategoria"
-                                CommandArgument='<%# Eval("CAT_CATEGORIA") %>'
+                                CommandArgument='<%#: Eval("CAT_CATEGORIA") %>'
                                 runat="server"
                                 CssClass= '<%# If(Eval("CAT_CATEGORIA").ToString() = hfCatActiva.Value, "cat-item active tiempoInhabilitado", "cat-item tiempoInhabilitado") %>'> 
-                                <%# Eval("CAT_DESCRIPCION") %>
+                                <%#: Eval("CAT_DESCRIPCION") %>
                             </asp:LinkButton>
                         </ItemTemplate>
                     </asp:Repeater>
@@ -196,7 +196,7 @@
                         <div class="prod-card">
                             <div class="card-img-wrap">
                                 <img src='<%# ResolveUrl("~/Handlers/CatalogoInventario/FotoProductoHandler.ashx?ref=" & Eval("PRO_REFERENCIA").ToString()) %>'
-                                     alt='<%# Eval("PRO_NOMBRE") %>'
+                                     alt='<%#: Eval("PRO_NOMBRE") %>'
                                      onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
                                 <div class="card-img-placeholder" style="display:none;">🛋️</div>
                                 <%# If(Eval("PROM_PORCENTAJE") IsNot DBNull.Value,
@@ -206,9 +206,9 @@
                                     "<span class='badge-agotado'> Agotado</span>") %>
                             </div>
                             <div class="card-body">
-                                <div class="card-categoria"><%# Eval("CAT_DESCRIPCION") %></div>
-                                <div class="card-nombre"><%# Eval("PRO_NOMBRE") %></div>
-                                <div class="card-tipo"><%# Eval("TIP_DESCRIPCION") %> · <%# Eval("MAT_DESCRIPCION") %></div>
+                                <div class="card-categoria"><%#: Eval("CAT_DESCRIPCION") %></div>
+                                <div class="card-nombre"><%#: Eval("PRO_NOMBRE") %></div>
+                                <div class="card-tipo"><%#: Eval("TIP_DESCRIPCION") %> · <%#: Eval("MAT_DESCRIPCION") %></div>
                                 <div class="card-precio-wrap">
                                     <%# If(Eval("PROM_PORCENTAJE") IsNot DBNull.Value,
                                         "<div class='card-precio-original'>Q " & String.Format("{0:N2}", Eval("PRO_PRECIO")) & "</div>", "") %>
@@ -219,10 +219,10 @@
                             </div>
                             <div class="card-footer">
                                 <asp:LinkButton CommandName="VerDetalle"
-                                    CommandArgument='<%# Eval("PRO_REFERENCIA") %>'
+                                    CommandArgument='<%#: Eval("PRO_REFERENCIA") %>'
                                     runat="server" CssClass="btn-detalle tiempoInhabilitado"> Ver</asp:LinkButton>
                                 <asp:LinkButton CommandName="AgregarCarrito"
-                                    CommandArgument='<%# Eval("HV_HISTORIAL_PRECIO_VENTA") %>'
+                                    CommandArgument='<%#: Eval("HV_HISTORIAL_PRECIO_VENTA") %>'
                                     runat="server" CssClass="btn-carrito tiempoInhabilitado"
                                     Enabled='<%# Convert.ToInt32(Eval("STO_DISPONIBLE")) > 0 %>'>
                                     Agregar

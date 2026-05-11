@@ -161,23 +161,23 @@
                     <ItemTemplate>
                         <div class="acciones-carrito">
                             <asp:LinkButton CommandName="VerDetalle"
-                                CommandArgument='<%# Eval("PRE_CARRITO") %>'
+                                CommandArgument='<%#: Eval("PRE_CARRITO") %>'
                                 runat="server" CssClass="btn-ui btn-dorado tiempoInhabilitado">
                                 ➕ Agregar
                             </asp:LinkButton>
                             <asp:LinkButton CommandName="VerResumen"
-                                CommandArgument='<%# Eval("PRE_CARRITO") %>'
+                                CommandArgument='<%#: Eval("PRE_CARRITO") %>'
                                 runat="server" CssClass="btn-ui btn-principal tiempoInhabilitado">
                                 📋 Resumen
                             </asp:LinkButton>
                             <asp:LinkButton CommandName="Vaciar"
-                                CommandArgument='<%# Eval("PRE_CARRITO") %>'
+                                CommandArgument='<%#: Eval("PRE_CARRITO") %>'
                                 runat="server" CssClass="btn-ui btn-secundario tiempoInhabilitado"
                                 OnClientClick="return confirm('¿Vaciar este carrito?');">
                                 🗑️ Vaciar
                             </asp:LinkButton>
                             <asp:LinkButton CommandName="Eliminar"
-                                CommandArgument='<%# Eval("PRE_CARRITO") %>'
+                                CommandArgument='<%#: Eval("PRE_CARRITO") %>'
                                 runat="server" CssClass="btn-ui btn-peligro tiempoInhabilitado"
                                 OnClientClick="return confirm('¿Eliminar este carrito?');">
                                 ❌ Eliminar
@@ -244,7 +244,7 @@
                             <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="120px" ItemStyle-HorizontalAlign="Center">
                                 <ItemTemplate>
                                     <asp:LinkButton CommandName="EliminarDetalle"
-                                        CommandArgument='<%# Eval("DETCAR_DETALLE_CARRITO") %>'
+                                        CommandArgument='<%#: Eval("DETCAR_DETALLE_CARRITO") %>'
                                         runat="server" CssClass="btn-ui btn-peligro tiempoInhabilitado"
                                         OnClientClick="return confirm('¿Eliminar este producto?');">
                                         ❌ Eliminar

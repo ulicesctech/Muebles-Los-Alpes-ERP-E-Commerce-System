@@ -259,10 +259,10 @@
                 <ItemTemplate>
                     <div style="padding:10px 0; border-bottom:1px solid #f5ece0;">
                         <div style="font-size:13px; font-weight:bold; color:#3a2a1a; font-family:Georgia,serif; margin-bottom:4px;">
-                            <%# Eval("PRO_NOMBRE") %>
+                            <%#: Eval("PRO_NOMBRE") %>
                         </div>
                         <div style="font-size:11px; color:#888; font-family:Arial,sans-serif; margin-bottom:6px;">
-                            Cant: <%# Eval("CANTIDAD") %>
+                            Cant: <%#: Eval("CANTIDAD") %>
                         </div>
                         <%# If(Convert.ToDecimal(Eval("PRO_PRECIO")) > Convert.ToDecimal(Eval("PRECIO_FINAL")),
                             "<div style='display:flex; gap:5px; margin-bottom:4px; flex-wrap:wrap;'>" &

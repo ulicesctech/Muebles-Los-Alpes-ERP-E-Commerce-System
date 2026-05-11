@@ -88,7 +88,7 @@
         <Columns>
             <asp:TemplateField HeaderText="ID" ItemStyle-Width="70px">
                 <ItemTemplate>
-                    <span class="badge-id"><%# Eval("pue_puestos") %></span>
+                    <span class="badge-id"><%#: Eval("pue_puestos") %></span>
                 </ItemTemplate>
             </asp:TemplateField>
             <asp:BoundField DataField="pue_nombre"      HeaderText="Puesto / Rol" />
@@ -102,9 +102,9 @@
                 <ItemTemplate>
                     <div class="actions-cell">
                         <asp:LinkButton runat="server" Text="✏️" CommandName="Editar"
-                            CommandArgument='<%# Eval("pue_puestos") %>' CssClass="btn-edit-t tiempoInhabilitado" />
+                            CommandArgument='<%#: Eval("pue_puestos") %>' CssClass="btn-edit-t tiempoInhabilitado" />
                         <asp:LinkButton runat="server" Text="🗑" CommandName="Eliminar"
-                            CommandArgument='<%# Eval("pue_puestos") %>' CssClass="btn-del-t tiempoInhabilitado"
+                            CommandArgument='<%#: Eval("pue_puestos") %>' CssClass="btn-del-t tiempoInhabilitado"
                             OnClientClick="return confirm('¿Eliminar este puesto?');" />
                     </div>
                 </ItemTemplate>
