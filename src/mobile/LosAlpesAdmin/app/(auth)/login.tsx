@@ -13,8 +13,10 @@ const GOLD = '#C9973A';
 
 export default function LoginScreen() {
   const { login } = useAuth();
+
   const [tipo, setTipo] = useState<'empleado' | 'cliente'>('empleado');
   const [loading, setLoading] = useState(false);
+  const [mensajeError, setMensajeError] = useState('');
 
   const [dpi, setDpi] = useState('');
   const [passEmp, setPassEmp] = useState('');
@@ -39,13 +41,25 @@ export default function LoginScreen() {
   const [regCP, setRegCP] = useState('');
   const [regTipoCliente, setRegTipoCliente] = useState('');
 
+  const cambiarTipo = (nuevoTipo: 'empleado' | 'cliente') => {
+    setTipo(nuevoTipo);
+    setMensajeError('');
+  };
+
+  const cambiarTabCliente = (nuevoTab: 'login' | 'registro') => {
+    setTabCliente(nuevoTab);
+    setMensajeError('');
+  };
+
   const handleLoginEmpleado = async () => {
     if (!dpi || !passEmp) {
-      Alert.alert('Error', 'Completa todos los campos.');
+      setMensajeError('Completa todos los campos.');
       return;
     }
 
+    setMensajeError('');
     setLoading(true);
+
     try {
       const res = await loginEmpleado(dpi, passEmp);
 
@@ -58,10 +72,14 @@ export default function LoginScreen() {
           permisos: res.permisos,
         });
       } else {
-        Alert.alert('Error', res.mensaje || 'Credenciales incorrectas.');
+        setMensajeError(
+          res.mensaje || 'Credenciales invalidas. Verifica tu usuario y contrasena.'
+        );
       }
-    } catch {
-      Alert.alert('Error', 'No se pudo conectar al servidor.');
+    } catch (error: any) {
+      setMensajeError(
+        error?.message || 'No se pudo iniciar sesion.'
+      );
     } finally {
       setLoading(false);
     }
@@ -69,11 +87,13 @@ export default function LoginScreen() {
 
   const handleLoginCliente = async () => {
     if (!email || !passCli) {
-      Alert.alert('Error', 'Completa todos los campos.');
+      setMensajeError('Completa todos los campos.');
       return;
     }
 
+    setMensajeError('');
     setLoading(true);
+
     try {
       const res = await loginCliente(email, passCli);
 
@@ -85,10 +105,14 @@ export default function LoginScreen() {
           tipo: 'CLIENTE',
         });
       } else {
-        Alert.alert('Error', res.mensaje || 'Credenciales incorrectas.');
+        setMensajeError(
+          res.mensaje || 'Credenciales invalidas. Verifica tu usuario y contrasena.'
+        );
       }
-    } catch {
-      Alert.alert('Error', 'No se pudo conectar al servidor.');
+    } catch (error: any) {
+      setMensajeError(
+        error?.message || 'No se pudo iniciar sesion.'
+      );
     } finally {
       setLoading(false);
     }
@@ -110,16 +134,18 @@ export default function LoginScreen() {
       !regCP ||
       !regTipoCliente
     ) {
-      Alert.alert('Error', 'Completa todos los campos.');
+      setMensajeError('Completa todos los campos.');
       return;
     }
 
     if (regPassword !== regConfirm) {
-      Alert.alert('Error', 'Las contraseñas no coinciden.');
+      setMensajeError('Las contrasenas no coinciden.');
       return;
     }
 
+    setMensajeError('');
     setLoading(true);
+
     try {
       const { registroCliente } = await import('../../services/authUsuarios/loginCliente');
 
@@ -141,39 +167,47 @@ export default function LoginScreen() {
       });
 
       if (res.ok) {
-        Alert.alert('✅ Cuenta creada', 'Ya puedes iniciar sesión.', [
-          { text: 'OK', onPress: () => setTabCliente('login') }
+        setMensajeError('');
+        Alert.alert('Cuenta creada', 'Ya puedes iniciar sesion.', [
+          { text: 'OK', onPress: () => cambiarTabCliente('login') }
         ]);
       } else {
-        Alert.alert('Error', res.mensaje);
+        setMensajeError(
+          res.mensaje || 'No se pudo registrar la cuenta.'
+        );
       }
-    } catch {
-      Alert.alert('Error', 'No se pudo conectar al servidor.');
+    } catch (error: any) {
+      setMensajeError(
+        error?.message || 'No se pudo registrar la cuenta.'
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
 
         <View style={styles.tipoTabs}>
           <TouchableOpacity
             style={[styles.tipoTab, tipo === 'empleado' && styles.tipoTabActive]}
-            onPress={() => setTipo('empleado')}
+            onPress={() => cambiarTipo('empleado')}
           >
             <Text style={[styles.tipoTabText, tipo === 'empleado' && styles.tipoTabTextActive]}>
-              👨‍💼 Empleado
+              Empleado
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.tipoTab, tipo === 'cliente' && styles.tipoTabActive]}
-            onPress={() => setTipo('cliente')}
+            onPress={() => cambiarTipo('cliente')}
           >
             <Text style={[styles.tipoTabText, tipo === 'cliente' && styles.tipoTabTextActive]}>
-              🛒 Cliente
+              Cliente
             </Text>
           </TouchableOpacity>
         </View>
@@ -187,12 +221,21 @@ export default function LoginScreen() {
             </View>
 
             <View style={styles.cardBody}>
+              {mensajeError ? (
+                <View style={styles.errorBox}>
+                  <Text style={styles.errorText}>{mensajeError}</Text>
+                </View>
+              ) : null}
+
               <Text style={styles.label}>USUARIO (DPI)</Text>
               <TextInput
                 style={styles.input}
                 placeholder="Tu DPI de 13 dígitos"
                 value={dpi}
-                onChangeText={setDpi}
+                onChangeText={(value) => {
+                  setDpi(value);
+                  setMensajeError('');
+                }}
                 keyboardType="numeric"
                 autoCorrect={false}
               />
@@ -202,12 +245,19 @@ export default function LoginScreen() {
                 style={styles.input}
                 placeholder="Tu contraseña"
                 value={passEmp}
-                onChangeText={setPassEmp}
+                onChangeText={(value) => {
+                  setPassEmp(value);
+                  setMensajeError('');
+                }}
                 secureTextEntry
               />
 
               <TouchableOpacity style={styles.btnLogin} onPress={handleLoginEmpleado} disabled={loading}>
-                {loading ? <ActivityIndicator color="white" /> : <Text style={styles.btnLoginText}>Iniciar Sesión</Text>}
+                {loading ? (
+                  <ActivityIndicator color="white" />
+                ) : (
+                  <Text style={styles.btnLoginText}>Iniciar Sesión</Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>
@@ -226,31 +276,40 @@ export default function LoginScreen() {
             <View style={styles.tabs}>
               <TouchableOpacity
                 style={[styles.tab, tabCliente === 'login' && styles.tabActive]}
-                onPress={() => setTabCliente('login')}
+                onPress={() => cambiarTabCliente('login')}
               >
                 <Text style={[styles.tabText, tabCliente === 'login' && styles.tabTextActive]}>
-                  🔑 Iniciar Sesión
+                  Iniciar Sesión
                 </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={[styles.tab, tabCliente === 'registro' && styles.tabActive]}
-                onPress={() => setTabCliente('registro')}
+                onPress={() => cambiarTabCliente('registro')}
               >
                 <Text style={[styles.tabText, tabCliente === 'registro' && styles.tabTextActive]}>
-                  ✨ Registrarse
+                  Registrarse
                 </Text>
               </TouchableOpacity>
             </View>
 
             {tabCliente === 'login' && (
               <View style={styles.cardBody}>
+                {mensajeError ? (
+                  <View style={styles.errorBox}>
+                    <Text style={styles.errorText}>{mensajeError}</Text>
+                  </View>
+                ) : null}
+
                 <Text style={styles.label}>USUARIO O EMAIL</Text>
                 <TextInput
                   style={styles.input}
                   placeholder="Tu usuario o email"
                   value={email}
-                  onChangeText={setEmail}
+                  onChangeText={(value) => {
+                    setEmail(value);
+                    setMensajeError('');
+                  }}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoCorrect={false}
@@ -261,18 +320,31 @@ export default function LoginScreen() {
                   style={styles.input}
                   placeholder="Tu contraseña"
                   value={passCli}
-                  onChangeText={setPassCli}
+                  onChangeText={(value) => {
+                    setPassCli(value);
+                    setMensajeError('');
+                  }}
                   secureTextEntry
                 />
 
                 <TouchableOpacity style={styles.btnLogin} onPress={handleLoginCliente} disabled={loading}>
-                  {loading ? <ActivityIndicator color="white" /> : <Text style={styles.btnLoginText}>Iniciar Sesión</Text>}
+                  {loading ? (
+                    <ActivityIndicator color="white" />
+                  ) : (
+                    <Text style={styles.btnLoginText}>Iniciar Sesión</Text>
+                  )}
                 </TouchableOpacity>
               </View>
             )}
 
             {tabCliente === 'registro' && (
               <View style={styles.cardBody}>
+                {mensajeError ? (
+                  <View style={styles.errorBox}>
+                    <Text style={styles.errorText}>{mensajeError}</Text>
+                  </View>
+                ) : null}
+
                 <Text style={styles.label}>TIPO DOCUMENTO</Text>
                 <View style={styles.tipoDocRow}>
                   {['DPI', 'Pasaporte', 'NIT'].map(t => (
@@ -304,55 +376,143 @@ export default function LoginScreen() {
                 </View>
 
                 <Text style={styles.label}>NÚMERO DOCUMENTO *</Text>
-                <TextInput style={styles.input} placeholder="1234567890101" value={regNumDoc} onChangeText={setRegNumDoc} keyboardType="numeric" />
+                <TextInput
+                  style={styles.input}
+                  placeholder="1234567890101"
+                  value={regNumDoc}
+                  onChangeText={setRegNumDoc}
+                  keyboardType="numeric"
+                />
 
                 <Text style={styles.label}>PRIMER NOMBRE *</Text>
-                <TextInput style={styles.input} placeholder="Tu nombre" value={regNombre} onChangeText={setRegNombre} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Tu nombre"
+                  value={regNombre}
+                  onChangeText={setRegNombre}
+                />
 
                 <Text style={styles.label}>PRIMER APELLIDO *</Text>
-                <TextInput style={styles.input} placeholder="Tu apellido" value={regApellido} onChangeText={setRegApellido} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Tu apellido"
+                  value={regApellido}
+                  onChangeText={setRegApellido}
+                />
 
                 <Text style={styles.label}>EMAIL * (será tu usuario)</Text>
-                <TextInput style={styles.input} placeholder="tucorreo@email.com" value={regEmail} onChangeText={setRegEmail} keyboardType="email-address" autoCapitalize="none" />
+                <TextInput
+                  style={styles.input}
+                  placeholder="tucorreo@email.com"
+                  value={regEmail}
+                  onChangeText={setRegEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
 
                 <Text style={styles.label}>CONTRASEÑA *</Text>
-                <TextInput style={styles.input} placeholder="Mín. 8 caracteres" value={regPassword} onChangeText={setRegPassword} secureTextEntry />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Mín. 8 caracteres"
+                  value={regPassword}
+                  onChangeText={setRegPassword}
+                  secureTextEntry
+                />
 
                 <Text style={styles.label}>CONFIRMAR CONTRASEÑA *</Text>
-                <TextInput style={styles.input} placeholder="Repite tu contraseña" value={regConfirm} onChangeText={setRegConfirm} secureTextEntry />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Repite tu contraseña"
+                  value={regConfirm}
+                  onChangeText={setRegConfirm}
+                  secureTextEntry
+                />
 
                 <Text style={styles.label}>TELÉFONO *</Text>
-                <TextInput style={styles.input} placeholder="55551234" value={regTel} onChangeText={setRegTel} keyboardType="numeric" maxLength={8} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="55551234"
+                  value={regTel}
+                  onChangeText={setRegTel}
+                  keyboardType="numeric"
+                  maxLength={8}
+                />
 
                 <Text style={styles.label}>PAÍS *</Text>
-                <TextInput style={styles.input} placeholder="País" value={regPais} onChangeText={setRegPais} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="País"
+                  value={regPais}
+                  onChangeText={setRegPais}
+                />
 
                 <Text style={styles.label}>DEPARTAMENTO *</Text>
-                <TextInput style={styles.input} placeholder="Departamento" value={regDep} onChangeText={setRegDep} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Departamento"
+                  value={regDep}
+                  onChangeText={setRegDep}
+                />
 
                 <Text style={styles.label}>MUNICIPIO *</Text>
-                <TextInput style={styles.input} placeholder="Municipio" value={regMun} onChangeText={setRegMun} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Municipio"
+                  value={regMun}
+                  onChangeText={setRegMun}
+                />
 
                 <Text style={styles.label}>ZONA *</Text>
-                <TextInput style={styles.input} placeholder="Zona" value={regZona} onChangeText={setRegZona} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Zona"
+                  value={regZona}
+                  onChangeText={setRegZona}
+                />
 
                 <Text style={styles.label}>DIRECCIÓN *</Text>
-                <TextInput style={styles.input} placeholder="Dirección" value={regDir} onChangeText={setRegDir} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Dirección"
+                  value={regDir}
+                  onChangeText={setRegDir}
+                />
 
                 <Text style={styles.label}>CÓDIGO POSTAL *</Text>
-                <TextInput style={styles.input} placeholder="Código postal" value={regCP} onChangeText={setRegCP} keyboardType="numeric" />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Código postal"
+                  value={regCP}
+                  onChangeText={setRegCP}
+                  keyboardType="numeric"
+                />
 
                 <TouchableOpacity style={styles.btnLogin} onPress={handleRegistro} disabled={loading}>
-                  {loading ? <ActivityIndicator color="white" /> : <Text style={styles.btnLoginText}>Crear mi cuenta</Text>}
+                  {loading ? (
+                    <ActivityIndicator color="white" />
+                  ) : (
+                    <Text style={styles.btnLoginText}>Crear mi cuenta</Text>
+                  )}
                 </TouchableOpacity>
               </View>
             )}
 
             <View style={styles.cardFooter}>
-              {tabCliente === 'login'
-                ? <Text style={styles.footerText}>¿No tienes cuenta? <Text style={styles.footerLink} onPress={() => setTabCliente('registro')}>Regístrate aquí</Text></Text>
-                : <Text style={styles.footerText}>¿Ya tienes cuenta? <Text style={styles.footerLink} onPress={() => setTabCliente('login')}>Inicia sesión</Text></Text>
-              }
+              {tabCliente === 'login' ? (
+                <Text style={styles.footerText}>
+                  ¿No tienes cuenta?{' '}
+                  <Text style={styles.footerLink} onPress={() => cambiarTabCliente('registro')}>
+                    Regístrate aquí
+                  </Text>
+                </Text>
+              ) : (
+                <Text style={styles.footerText}>
+                  ¿Ya tienes cuenta?{' '}
+                  <Text style={styles.footerLink} onPress={() => cambiarTabCliente('login')}>
+                    Inicia sesión
+                  </Text>
+                </Text>
+              )}
             </View>
           </View>
         )}
@@ -392,4 +552,20 @@ const styles = StyleSheet.create({
   tipoDocBtnActive: { backgroundColor: GOLD, borderColor: GOLD },
   tipoDocText: { fontSize: 12, fontWeight: 'bold', color: '#888' },
   tipoDocTextActive: { color: '#1a1a1a' },
+
+  errorBox: {
+    backgroundColor: '#fff1f2',
+    borderLeftWidth: 4,
+    borderLeftColor: '#ef4444',
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    marginBottom: 16,
+  },
+
+  errorText: {
+    color: '#b91c1c',
+    fontSize: 13,
+    lineHeight: 18,
+  },
 });

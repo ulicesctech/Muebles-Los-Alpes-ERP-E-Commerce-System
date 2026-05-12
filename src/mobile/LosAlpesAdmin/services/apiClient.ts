@@ -24,6 +24,44 @@ export const limpiarSesionAPI = async () => {
   await AsyncStorage.removeItem(SESSION_KEY);
 };
 
+const obtenerMensajeError = (status: number, jsonResult: any) => {
+  const mensajeBackend =
+    jsonResult?.mensaje ||
+    jsonResult?.message ||
+    jsonResult?.error ||
+    "";
+
+  if (status === 400) {
+    return mensajeBackend || "La solicitud enviada no es valida.";
+  }
+
+  if (status === 401) {
+    return mensajeBackend || "Credenciales invalidas. Verifica tu usuario y contrasena.";
+  }
+
+  if (status === 403) {
+    return mensajeBackend || "No tienes permisos para realizar esta accion.";
+  }
+
+  if (status === 404) {
+    return "No se encontro el recurso solicitado.";
+  }
+
+  if (status === 405) {
+    return "Metodo no permitido para esta accion.";
+  }
+
+  if (status === 409) {
+    return mensajeBackend || "Ya existe un registro con esos datos.";
+  }
+
+  if (status >= 500) {
+    return mensajeBackend || "Ocurrio un error en el servidor. Intenta nuevamente.";
+  }
+
+  return mensajeBackend || "No se pudo procesar la solicitud.";
+};
+
 export const fetchAPI = async (
   handlerPath: string,
   action: string,
@@ -73,22 +111,12 @@ export const fetchAPI = async (
     }
 
     if (!response.ok) {
-      if (response.status === 401) {
-        throw new Error(jsonResult?.mensaje || "Sesion no valida.");
-      }
-
-      if (response.status === 403) {
-        throw new Error(jsonResult?.mensaje || "No tienes permisos para realizar esta accion.");
-      }
-
-      throw new Error(
-        jsonResult?.mensaje ||
-        `Error en el servidor (Codigo: ${response.status})`
-      );
+      const mensaje = obtenerMensajeError(response.status, jsonResult);
+      throw new Error(mensaje);
     }
 
     if (jsonResult?.status === "error") {
-      throw new Error(jsonResult.message);
+      throw new Error(jsonResult.message || "No se pudo procesar la solicitud.");
     }
 
     if (jsonResult?.ok === false) {
@@ -97,7 +125,18 @@ export const fetchAPI = async (
 
     return jsonResult;
   } catch (error: any) {
-    console.error("API Fetch Error:", error);
-    throw new Error(error.message || "No se pudo conectar con el servidor.");
+    console.log("API Fetch Error:", error);
+
+    const mensaje = error?.message || "";
+
+    if (
+      mensaje.includes("Network request failed") ||
+      mensaje.includes("Failed to fetch") ||
+      mensaje.includes("NetworkError")
+    ) {
+      throw new Error("No se pudo conectar con el servidor. Verifica que IIS este encendido.");
+    }
+
+    throw new Error(mensaje || "No se pudo procesar la solicitud.");
   }
 };

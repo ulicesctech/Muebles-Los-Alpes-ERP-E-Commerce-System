@@ -153,9 +153,17 @@ Public Class AuthHandler
 
         Catch ex As Exception
             context.Response.StatusCode = 500
+
+            Dim mensaje As String = "No se pudo procesar la solicitud."
+
+            If action = "login-cliente" OrElse action = "login-empleado" Then
+                context.Response.StatusCode = 401
+                mensaje = "Credenciales invalidas. Verifica tu usuario y contrasena."
+            End If
+
             context.Response.Write(JsonConvert.SerializeObject(New With {
                 .ok = False,
-                .mensaje = "No se pudo procesar la solicitud."
+                .mensaje = mensaje
             }))
         End Try
     End Sub
@@ -219,24 +227,51 @@ Public Class AuthHandler
     Private Sub LoginEmpleado(context As HttpContext)
         If context.Request.HttpMethod <> "POST" Then
             context.Response.StatusCode = 405
-            context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Use POST."}))
+            context.Response.Write(JsonConvert.SerializeObject(New With {
+                .ok = False,
+                .mensaje = "Metodo no permitido. Use POST."
+            }))
             Return
         End If
 
-        Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
-        Dim datos As Object = JsonConvert.DeserializeObject(body)
-        Dim usuario As String = ObtenerCampo(datos, "usuario")
-        Dim password As String = ObtenerCampo(datos, "password")
+        Try
+            Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
+            Dim datos As Object = JsonConvert.DeserializeObject(body)
 
-        If String.IsNullOrWhiteSpace(usuario) OrElse String.IsNullOrWhiteSpace(password) Then
-            context.Response.StatusCode = 400
-            context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "usuario y password son obligatorios."}))
-            Return
-        End If
+            Dim usuario As String = ObtenerCampo(datos, "usuario")
+            Dim password As String = ObtenerCampo(datos, "password")
 
-        Dim result As LoginEmpleadoResult = LoginEmpleadoService.Login(usuario, password)
+            If String.IsNullOrWhiteSpace(usuario) OrElse String.IsNullOrWhiteSpace(password) Then
+                context.Response.StatusCode = 400
+                context.Response.Write(JsonConvert.SerializeObject(New With {
+                    .ok = False,
+                    .mensaje = "Debe ingresar usuario y contrasena."
+                }))
+                Return
+            End If
 
-        If result.Resultado = 1 Then
+            Dim result As LoginEmpleadoResult = Nothing
+
+            Try
+                result = LoginEmpleadoService.Login(usuario, password)
+            Catch
+                context.Response.StatusCode = 401
+                context.Response.Write(JsonConvert.SerializeObject(New With {
+                    .ok = False,
+                    .mensaje = "Credenciales invalidas. Verifica tu usuario y contrasena."
+                }))
+                Return
+            End Try
+
+            If result Is Nothing OrElse result.Resultado <> 1 Then
+                context.Response.StatusCode = 401
+                context.Response.Write(JsonConvert.SerializeObject(New With {
+                    .ok = False,
+                    .mensaje = "Credenciales invalidas. Verifica tu usuario y contrasena."
+                }))
+                Return
+            End If
+
             context.Session("UsuarioTipo") = "EMPLEADO"
             context.Session("EmpleadoId") = result.EmpleadoId
             context.Session("EmpleadoNombre") = result.Nombre
@@ -264,38 +299,69 @@ Public Class AuthHandler
                     .promo = result.PerPromo
                 }
             }))
-        Else
-            context.Response.StatusCode = 401
-            context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Usuario o contrasena incorrectos."}))
-        End If
+
+        Catch ex As Exception
+            context.Response.StatusCode = 500
+            context.Response.Write(JsonConvert.SerializeObject(New With {
+                .ok = False,
+                .mensaje = "No se pudo iniciar sesion. Intenta nuevamente."
+            }))
+        End Try
     End Sub
 
     Private Sub LoginCliente(context As HttpContext)
         If context.Request.HttpMethod <> "POST" Then
             context.Response.StatusCode = 405
-            context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Use POST."}))
+            context.Response.Write(JsonConvert.SerializeObject(New With {
+                .ok = False,
+                .mensaje = "Metodo no permitido. Use POST."
+            }))
             Return
         End If
 
-        Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
-        Dim datos As Object = JsonConvert.DeserializeObject(body)
-        Dim usuario As String = ObtenerCampo(datos, "usuario")
-        Dim password As String = ObtenerCampo(datos, "password")
+        Try
+            Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
+            Dim datos As Object = JsonConvert.DeserializeObject(body)
 
-        If String.IsNullOrWhiteSpace(usuario) OrElse String.IsNullOrWhiteSpace(password) Then
-            context.Response.StatusCode = 400
-            context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "usuario y password son obligatorios."}))
-            Return
-        End If
+            Dim usuario As String = ObtenerCampo(datos, "usuario")
+            Dim password As String = ObtenerCampo(datos, "password")
 
-        Dim result As LoginClienteResult = LoginClienteService.Validar(usuario, password)
+            If String.IsNullOrWhiteSpace(usuario) OrElse String.IsNullOrWhiteSpace(password) Then
+                context.Response.StatusCode = 400
+                context.Response.Write(JsonConvert.SerializeObject(New With {
+                    .ok = False,
+                    .mensaje = "Debe ingresar usuario y contrasena."
+                }))
+                Return
+            End If
 
-        If result.Resultado = 1 Then
+            Dim result As LoginClienteResult = Nothing
+
+            Try
+                result = LoginClienteService.Validar(usuario, password)
+            Catch
+                context.Response.StatusCode = 401
+                context.Response.Write(JsonConvert.SerializeObject(New With {
+                    .ok = False,
+                    .mensaje = "Credenciales invalidas. Verifica tu usuario y contrasena."
+                }))
+                Return
+            End Try
+
+            If result Is Nothing OrElse result.Resultado <> 1 Then
+                context.Response.StatusCode = 401
+                context.Response.Write(JsonConvert.SerializeObject(New With {
+                    .ok = False,
+                    .mensaje = "Credenciales invalidas. Verifica tu usuario y contrasena."
+                }))
+                Return
+            End If
+
             Dim dt As System.Data.DataTable = ClienteService.BuscarPorId(result.ClienteId)
             Dim nombre As String = ""
             Dim email As String = ""
 
-            If dt.Rows.Count > 0 Then
+            If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
                 nombre = dt.Rows(0)("cli_primer_nombre").ToString() & " " & dt.Rows(0)("cli_primer_apellido").ToString()
                 email = dt.Rows(0)("cli_email").ToString()
             End If
@@ -313,10 +379,14 @@ Public Class AuthHandler
                 .email = email,
                 .sessionId = context.Session.SessionID
             }))
-        Else
-            context.Response.StatusCode = 401
-            context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Email o contrasena incorrectos."}))
-        End If
+
+        Catch ex As Exception
+            context.Response.StatusCode = 500
+            context.Response.Write(JsonConvert.SerializeObject(New With {
+                .ok = False,
+                .mensaje = "No se pudo iniciar sesion. Intenta nuevamente."
+            }))
+        End Try
     End Sub
 
     Private Sub RegistroCliente(context As HttpContext)
