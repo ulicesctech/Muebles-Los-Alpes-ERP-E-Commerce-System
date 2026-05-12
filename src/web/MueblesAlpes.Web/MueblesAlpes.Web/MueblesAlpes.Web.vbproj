@@ -203,6 +203,17 @@
     <Content Include="Global.asax" />
     <Content Include="favicon.ico" />
     <Content Include="Handlers\Auth\AuthHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\AlmacenesHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\CategoriasHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\FotoProductoHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\HistorialPreciosHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\MaterialesHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\NicAlmHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\NichoHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\NichosHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\ProductosHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\StockHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\TiposHandler.ashx" />
     <Content Include="Handlers\VentasFacturacion\CarritoHandler.ashx" />
     <Content Include="Handlers\VentasFacturacion\FacturaHandler.ashx" />
     <Content Include="Images\no-foto.png" />
@@ -246,11 +257,13 @@
     <Content Include="Handlers\ComprasProveedor\FacturaProveedorHandler.ashx" />
     <Content Include="Handlers\ComprasProveedor\OrdenDetallePedidoHandler.ashx" />
     <Content Include="Handlers\ComprasProveedor\ReclamoProveedorHandler.ashx" />
-    <Content Include="Handlers\CatalogoInventario\NichoHandler.ashx" />
-    <Content Include="Handlers\CatalogoInventario\NicAlmHandler.ashx" />
-    <Content Include="Handlers\CatalogoInventario\FotoProductoHandler.ashx" />
     <Content Include="App_Data\seguridad.log" />
     <Content Include="Handlers\VentasFacturacion\HistorialPrecioVentaHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\PromocionesHandler.ashx" />
+    <Content Include="Handlers\Cliente\CatalogoClienteHandler.ashx" />
+    <Content Include="Handlers\Cliente\CarritoClienteHandler.ashx" />
+    <Content Include="Handlers\Cliente\FacturaClienteHandler.ashx" />
+    <Content Include="Handlers\Cliente\PerfilClienteHandler.ashx" />
     <None Include="Oracle.DataAccess.Common.Configuration.Section.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -868,16 +881,6 @@
     <EmbeddedResource Include="obj\Debug\MueblesAlpes.Web.Resources.resources" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Handlers\CatalogoInventario\AlmacenesHandler.ashx" />
-    <Content Include="Handlers\CatalogoInventario\CategoriasHandler.ashx" />
-    <Content Include="Handlers\CatalogoInventario\HistorialPreciosHandler.ashx" />
-    <Content Include="Handlers\CatalogoInventario\MaterialesHandler.ashx" />
-    <Content Include="Handlers\CatalogoInventario\NichosHandler.ashx" />
-    <Content Include="Handlers\CatalogoInventario\ProductosHandler.ashx" />
-    <Content Include="Handlers\CatalogoInventario\PromocionesHandler.ashx" />
-    <Content Include="Handlers\CatalogoInventario\StockHandler.ashx" />
-    <Content Include="Handlers\CatalogoInventario\TiposHandler.ashx" />
-    <Content Include="Handlers\Cliente\CatalogoClienteHandler.ashx" />
     <Content Include="Handlers\Cliente\MisComprasHandler.ashx" />
     <Content Include="Handlers\Reportes\ReporteComprasHandler.ashx" />
     <Content Include="Handlers\Reportes\ReporteStockHandler.ashx" />

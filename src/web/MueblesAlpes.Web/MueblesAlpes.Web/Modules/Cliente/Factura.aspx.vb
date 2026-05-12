@@ -269,7 +269,5 @@ Namespace Modules.Cliente
             lblMsg.CssClass = "alert-err"
             pnlMsg.Visible = True
         End Sub
-
     End Class
-
 End Namespace

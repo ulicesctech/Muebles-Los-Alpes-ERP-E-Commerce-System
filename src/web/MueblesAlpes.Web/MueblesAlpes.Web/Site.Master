@@ -132,17 +132,10 @@
 
             <%-- HEADER --%>
             <div style="background:#111; padding:14px 30px; display:flex; align-items:center; gap:24px; border-bottom:3px solid #C9973A; min-height:85px;">
-<asp:HyperLink ID="lnkLogo" runat="server" style="flex-shrink:0; text-decoration:none;">
-    <img src='<%: ResolveUrl("~/Content/MueblesLosAlpes.png") %>' alt="Muebles Los Alpes" style="height:65px; width:auto; display:block;" />
-</asp:HyperLink>
-                <div style="flex:1; max-width:620px; margin:0 auto; height:52px; display:flex;">
-                    <input type="text" placeholder="Buscar en toda la tienda..."
-                           style="flex:1; min-width:0; height:52px; padding:0 22px; background:#1e1e1e; border:2px solid #C9973A; border-right:none; border-radius:6px 0 0 6px; color:#f0d9a0; font-size:14px; font-family:Arial,sans-serif; outline:none;" />
-                    <button type="button"
-                            style="height:52px; width:62px; background:#C9973A; border:2px solid #C9973A; border-left:none; border-radius:0 6px 6px 0; color:white; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;"
-                            onmouseover="this.style.background='#a87a2e';"
-                            onmouseout="this.style.background='#C9973A';">&#128269;</button>
-                </div>
+                <asp:HyperLink ID="lnkLogo" runat="server" style="flex-shrink:0; text-decoration:none;">
+                    <img src='<%: ResolveUrl("~/Content/MueblesLosAlpes.png") %>' alt="Muebles Los Alpes" style="height:65px; width:auto; display:block;" />
+                </asp:HyperLink>
+
                 <div style="display:flex; gap:4px; align-items:center; margin-left:auto; flex-shrink:0;">
                     <div class="carrito-drop-wrap" style="position:relative;">
                         <a href="/Modules/Cliente/Carrito.aspx"

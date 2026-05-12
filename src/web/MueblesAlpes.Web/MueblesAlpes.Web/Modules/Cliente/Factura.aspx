@@ -6,7 +6,7 @@
 <asp:Content ID="cBody" ContentPlaceHolderID="MainContent" runat="server">
 <style>
     * { box-sizing: border-box; }
-    .checkout-wrap { display: grid; grid-template-columns: 1fr 380px; gap: 24px; }
+    .checkout-wrap { display: grid; grid-template-columns: 1fr 380px; gap: 24px; align-items: start; }
     @media(max-width:768px) { .checkout-wrap { grid-template-columns: 1fr; } }
     .checkout-card { background: white; border-radius: 12px; border: 1px solid #e8d8c0;
         box-shadow: 0 2px 8px rgba(92,58,30,0.06); overflow: hidden; margin-bottom: 20px; }
@@ -23,7 +23,7 @@
     .f-group .form-control:focus { border-color: #C9973A; background: white; }
     .f-group .form-control[readonly] { background: #f0ebe0; color: #888; cursor: not-allowed; }
     .resumen-card { background: white; border-radius: 12px; border: 1px solid #e8d8c0;
-        box-shadow: 0 2px 8px rgba(92,58,30,0.06); overflow: hidden; position: sticky; top: 20px; }
+        box-shadow: 0 2px 8px rgba(92,58,30,0.06); overflow: hidden; position: sticky; top: 20px; align-self: start; }
     .resumen-head { background: linear-gradient(135deg,#5C3A1E,#8B5E3C); padding: 14px 20px; }
     .resumen-head span { color: #f0d9a0; font-size: 14px; font-weight: bold; font-family: Arial,sans-serif; }
     .resumen-body { padding: 20px; }

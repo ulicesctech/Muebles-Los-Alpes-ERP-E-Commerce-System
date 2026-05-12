@@ -74,7 +74,7 @@ Namespace Modules.Cliente
                 lblPeso.Text = fila("PRO_PESO").ToString()
 
                 ' HIP ID para carrito
-                hfHipId.Value = fila("HIP_HISTORIAL_PRECIO").ToString()
+                hfHipId.Value = If(fila("HV_HISTORIAL_PRECIO_VENTA") Is DBNull.Value, "", fila("HV_HISTORIAL_PRECIO_VENTA").ToString())
 
                 pnlProducto.Visible = True
 
