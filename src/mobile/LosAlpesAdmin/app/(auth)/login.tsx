@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
   ActivityIndicator, Alert, KeyboardAvoidingView,
@@ -17,15 +16,12 @@ export default function LoginScreen() {
   const [tipo, setTipo] = useState<'empleado' | 'cliente'>('empleado');
   const [loading, setLoading] = useState(false);
 
-  // Empleado
   const [dpi, setDpi] = useState('');
   const [passEmp, setPassEmp] = useState('');
 
-  // Cliente
   const [email, setEmail] = useState('');
   const [passCli, setPassCli] = useState('');
 
-  // Registro cliente
   const [tabCliente, setTabCliente] = useState<'login' | 'registro'>('login');
   const [regNombre, setRegNombre] = useState('');
   const [regApellido, setRegApellido] = useState('');
@@ -35,61 +31,115 @@ export default function LoginScreen() {
   const [regTipoDoc, setRegTipoDoc] = useState('DPI');
   const [regNumDoc, setRegNumDoc] = useState('');
   const [regTel, setRegTel] = useState('');
+  const [regPais, setRegPais] = useState('');
   const [regDep, setRegDep] = useState('');
   const [regMun, setRegMun] = useState('');
   const [regZona, setRegZona] = useState('');
   const [regDir, setRegDir] = useState('');
   const [regCP, setRegCP] = useState('');
+  const [regTipoCliente, setRegTipoCliente] = useState('');
 
   const handleLoginEmpleado = async () => {
-    if (!dpi || !passEmp) { Alert.alert('Error', 'Completa todos los campos.'); return; }
-    setLoading(true);
-    try {
-      const res = await loginEmpleado(dpi, passEmp);
-      if (res.ok) {
-        await login({ id: res.em_empleado, nombre: res.nombre, grupo: res.grupo, tipo: 'EMPLEADO', permisos: res.permisos });
-        router.replace('/');
-      } else {
-        Alert.alert('Error', res.mensaje || 'Credenciales incorrectas.');
-      }
-    } catch {
-      Alert.alert('Error', 'No se pudo conectar al servidor.');
-    } finally { setLoading(false); }
-  };
-
-  const handleLoginCliente = async () => {
-    if (!email || !passCli) { Alert.alert('Error', 'Completa todos los campos.'); return; }
-    setLoading(true);
-    try {
-      const res = await loginCliente(email, passCli);
-      if (res.ok) {
-        await login({ id: res.cli_cliente, nombre: res.nombre, grupo: 0, tipo: 'CLIENTE' });
-        router.replace('/');
-      } else {
-        Alert.alert('Error', res.mensaje || 'Credenciales incorrectas.');
-      }
-    } catch {
-      Alert.alert('Error', 'No se pudo conectar al servidor.');
-    } finally { setLoading(false); }
-  };
-
-  const handleRegistro = async () => {
-    if (!regNombre || !regApellido || !regEmail || !regPassword || !regNumDoc || !regTel || !regDep || !regMun || !regZona || !regDir || !regCP) {
+    if (!dpi || !passEmp) {
       Alert.alert('Error', 'Completa todos los campos.');
       return;
     }
-    if (regPassword !== regConfirm) { Alert.alert('Error', 'Las contraseñas no coinciden.'); return; }
+
+    setLoading(true);
+    try {
+      const res = await loginEmpleado(dpi, passEmp);
+
+      if (res.ok) {
+        await login({
+          id: res.em_empleado,
+          nombre: res.nombre,
+          grupo: res.grupo,
+          tipo: 'EMPLEADO',
+          permisos: res.permisos,
+        });
+      } else {
+        Alert.alert('Error', res.mensaje || 'Credenciales incorrectas.');
+      }
+    } catch {
+      Alert.alert('Error', 'No se pudo conectar al servidor.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLoginCliente = async () => {
+    if (!email || !passCli) {
+      Alert.alert('Error', 'Completa todos los campos.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await loginCliente(email, passCli);
+
+      if (res.ok) {
+        await login({
+          id: res.cli_cliente,
+          nombre: res.nombre,
+          grupo: 0,
+          tipo: 'CLIENTE',
+        });
+      } else {
+        Alert.alert('Error', res.mensaje || 'Credenciales incorrectas.');
+      }
+    } catch {
+      Alert.alert('Error', 'No se pudo conectar al servidor.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRegistro = async () => {
+    if (
+      !regNombre ||
+      !regApellido ||
+      !regEmail ||
+      !regPassword ||
+      !regNumDoc ||
+      !regTel ||
+      !regPais ||
+      !regDep ||
+      !regMun ||
+      !regZona ||
+      !regDir ||
+      !regCP ||
+      !regTipoCliente
+    ) {
+      Alert.alert('Error', 'Completa todos los campos.');
+      return;
+    }
+
+    if (regPassword !== regConfirm) {
+      Alert.alert('Error', 'Las contraseñas no coinciden.');
+      return;
+    }
+
     setLoading(true);
     try {
       const { registroCliente } = await import('../../services/authUsuarios/loginCliente');
+
       const res = await registroCliente({
-        tipodocumento: regTipoDoc, numdocumento: regNumDoc,
-        primer_nombre: regNombre, primer_apellido: regApellido,
-        email: regEmail, primer_telefono: regTel,
-        pais: 'Guatemala', departamento: regDep, municipio: regMun,
-        zona: regZona, direccion: regDir, codigo_postal: regCP,
-        tipocliente: 'NATURAL', password: regPassword,
+        tipodocumento: regTipoDoc,
+        numdocumento: regNumDoc,
+        primer_nombre: regNombre,
+        primer_apellido: regApellido,
+        email: regEmail,
+        primer_telefono: regTel,
+        pais: regPais,
+        departamento: regDep,
+        municipio: regMun,
+        zona: regZona,
+        direccion: regDir,
+        codigo_postal: regCP,
+        tipocliente: regTipoCliente,
+        password: regPassword,
       });
+
       if (res.ok) {
         Alert.alert('✅ Cuenta creada', 'Ya puedes iniciar sesión.', [
           { text: 'OK', onPress: () => setTabCliente('login') }
@@ -99,28 +149,35 @@ export default function LoginScreen() {
       }
     } catch {
       Alert.alert('Error', 'No se pudo conectar al servidor.');
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
 
-        {/* TABS TIPO */}
         <View style={styles.tipoTabs}>
           <TouchableOpacity
             style={[styles.tipoTab, tipo === 'empleado' && styles.tipoTabActive]}
-            onPress={() => setTipo('empleado')}>
-            <Text style={[styles.tipoTabText, tipo === 'empleado' && styles.tipoTabTextActive]}>👨‍💼 Empleado</Text>
+            onPress={() => setTipo('empleado')}
+          >
+            <Text style={[styles.tipoTabText, tipo === 'empleado' && styles.tipoTabTextActive]}>
+              👨‍💼 Empleado
+            </Text>
           </TouchableOpacity>
+
           <TouchableOpacity
             style={[styles.tipoTab, tipo === 'cliente' && styles.tipoTabActive]}
-            onPress={() => setTipo('cliente')}>
-            <Text style={[styles.tipoTabText, tipo === 'cliente' && styles.tipoTabTextActive]}>🛒 Cliente</Text>
+            onPress={() => setTipo('cliente')}
+          >
+            <Text style={[styles.tipoTabText, tipo === 'cliente' && styles.tipoTabTextActive]}>
+              🛒 Cliente
+            </Text>
           </TouchableOpacity>
         </View>
 
-        {/* LOGIN EMPLEADO */}
         {tipo === 'empleado' && (
           <View style={styles.card}>
             <View style={styles.cardHead}>
@@ -128,11 +185,27 @@ export default function LoginScreen() {
               <Text style={styles.cardTitle}>Muebles Los Alpes</Text>
               <Text style={styles.cardSub}>Inicia sesión en tu cuenta</Text>
             </View>
+
             <View style={styles.cardBody}>
               <Text style={styles.label}>USUARIO (DPI)</Text>
-              <TextInput style={styles.input} placeholder="Tu DPI de 13 dígitos" value={dpi} onChangeText={setDpi} keyboardType="numeric" autoCorrect={false} />
+              <TextInput
+                style={styles.input}
+                placeholder="Tu DPI de 13 dígitos"
+                value={dpi}
+                onChangeText={setDpi}
+                keyboardType="numeric"
+                autoCorrect={false}
+              />
+
               <Text style={styles.label}>CONTRASEÑA</Text>
-              <TextInput style={styles.input} placeholder="Tu contraseña" value={passEmp} onChangeText={setPassEmp} secureTextEntry />
+              <TextInput
+                style={styles.input}
+                placeholder="Tu contraseña"
+                value={passEmp}
+                onChangeText={setPassEmp}
+                secureTextEntry
+              />
+
               <TouchableOpacity style={styles.btnLogin} onPress={handleLoginEmpleado} disabled={loading}>
                 {loading ? <ActivityIndicator color="white" /> : <Text style={styles.btnLoginText}>Iniciar Sesión</Text>}
               </TouchableOpacity>
@@ -140,7 +213,6 @@ export default function LoginScreen() {
           </View>
         )}
 
-        {/* LOGIN / REGISTRO CLIENTE */}
         {tipo === 'cliente' && (
           <View style={styles.card}>
             <View style={styles.cardHead}>
@@ -152,20 +224,47 @@ export default function LoginScreen() {
             </View>
 
             <View style={styles.tabs}>
-              <TouchableOpacity style={[styles.tab, tabCliente === 'login' && styles.tabActive]} onPress={() => setTabCliente('login')}>
-                <Text style={[styles.tabText, tabCliente === 'login' && styles.tabTextActive]}>🔑 Iniciar Sesión</Text>
+              <TouchableOpacity
+                style={[styles.tab, tabCliente === 'login' && styles.tabActive]}
+                onPress={() => setTabCliente('login')}
+              >
+                <Text style={[styles.tabText, tabCliente === 'login' && styles.tabTextActive]}>
+                  🔑 Iniciar Sesión
+                </Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.tab, tabCliente === 'registro' && styles.tabActive]} onPress={() => setTabCliente('registro')}>
-                <Text style={[styles.tabText, tabCliente === 'registro' && styles.tabTextActive]}>✨ Registrarse</Text>
+
+              <TouchableOpacity
+                style={[styles.tab, tabCliente === 'registro' && styles.tabActive]}
+                onPress={() => setTabCliente('registro')}
+              >
+                <Text style={[styles.tabText, tabCliente === 'registro' && styles.tabTextActive]}>
+                  ✨ Registrarse
+                </Text>
               </TouchableOpacity>
             </View>
 
             {tabCliente === 'login' && (
               <View style={styles.cardBody}>
                 <Text style={styles.label}>USUARIO O EMAIL</Text>
-                <TextInput style={styles.input} placeholder="Tu usuario o email" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" autoCorrect={false} />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Tu usuario o email"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+
                 <Text style={styles.label}>CONTRASEÑA</Text>
-                <TextInput style={styles.input} placeholder="Tu contraseña" value={passCli} onChangeText={setPassCli} secureTextEntry />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Tu contraseña"
+                  value={passCli}
+                  onChangeText={setPassCli}
+                  secureTextEntry
+                />
+
                 <TouchableOpacity style={styles.btnLogin} onPress={handleLoginCliente} disabled={loading}>
                   {loading ? <ActivityIndicator color="white" /> : <Text style={styles.btnLoginText}>Iniciar Sesión</Text>}
                 </TouchableOpacity>
@@ -177,35 +276,72 @@ export default function LoginScreen() {
                 <Text style={styles.label}>TIPO DOCUMENTO</Text>
                 <View style={styles.tipoDocRow}>
                   {['DPI', 'Pasaporte', 'NIT'].map(t => (
-                    <TouchableOpacity key={t} style={[styles.tipoDocBtn, regTipoDoc === t && styles.tipoDocBtnActive]} onPress={() => setRegTipoDoc(t)}>
-                      <Text style={[styles.tipoDocText, regTipoDoc === t && styles.tipoDocTextActive]}>{t}</Text>
+                    <TouchableOpacity
+                      key={t}
+                      style={[styles.tipoDocBtn, regTipoDoc === t && styles.tipoDocBtnActive]}
+                      onPress={() => setRegTipoDoc(t)}
+                    >
+                      <Text style={[styles.tipoDocText, regTipoDoc === t && styles.tipoDocTextActive]}>
+                        {t}
+                      </Text>
                     </TouchableOpacity>
                   ))}
                 </View>
+
+                <Text style={styles.label}>TIPO CLIENTE *</Text>
+                <View style={styles.tipoDocRow}>
+                  {['NATURAL', 'JURIDICO'].map(t => (
+                    <TouchableOpacity
+                      key={t}
+                      style={[styles.tipoDocBtn, regTipoCliente === t && styles.tipoDocBtnActive]}
+                      onPress={() => setRegTipoCliente(t)}
+                    >
+                      <Text style={[styles.tipoDocText, regTipoCliente === t && styles.tipoDocTextActive]}>
+                        {t}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
                 <Text style={styles.label}>NÚMERO DOCUMENTO *</Text>
                 <TextInput style={styles.input} placeholder="1234567890101" value={regNumDoc} onChangeText={setRegNumDoc} keyboardType="numeric" />
+
                 <Text style={styles.label}>PRIMER NOMBRE *</Text>
                 <TextInput style={styles.input} placeholder="Tu nombre" value={regNombre} onChangeText={setRegNombre} />
+
                 <Text style={styles.label}>PRIMER APELLIDO *</Text>
                 <TextInput style={styles.input} placeholder="Tu apellido" value={regApellido} onChangeText={setRegApellido} />
+
                 <Text style={styles.label}>EMAIL * (será tu usuario)</Text>
                 <TextInput style={styles.input} placeholder="tucorreo@email.com" value={regEmail} onChangeText={setRegEmail} keyboardType="email-address" autoCapitalize="none" />
+
                 <Text style={styles.label}>CONTRASEÑA *</Text>
                 <TextInput style={styles.input} placeholder="Mín. 8 caracteres" value={regPassword} onChangeText={setRegPassword} secureTextEntry />
+
                 <Text style={styles.label}>CONFIRMAR CONTRASEÑA *</Text>
                 <TextInput style={styles.input} placeholder="Repite tu contraseña" value={regConfirm} onChangeText={setRegConfirm} secureTextEntry />
+
                 <Text style={styles.label}>TELÉFONO *</Text>
                 <TextInput style={styles.input} placeholder="55551234" value={regTel} onChangeText={setRegTel} keyboardType="numeric" maxLength={8} />
+
+                <Text style={styles.label}>PAÍS *</Text>
+                <TextInput style={styles.input} placeholder="País" value={regPais} onChangeText={setRegPais} />
+
                 <Text style={styles.label}>DEPARTAMENTO *</Text>
-                <TextInput style={styles.input} placeholder="Guatemala" value={regDep} onChangeText={setRegDep} />
+                <TextInput style={styles.input} placeholder="Departamento" value={regDep} onChangeText={setRegDep} />
+
                 <Text style={styles.label}>MUNICIPIO *</Text>
-                <TextInput style={styles.input} placeholder="Guatemala" value={regMun} onChangeText={setRegMun} />
+                <TextInput style={styles.input} placeholder="Municipio" value={regMun} onChangeText={setRegMun} />
+
                 <Text style={styles.label}>ZONA *</Text>
-                <TextInput style={styles.input} placeholder="Zona 1" value={regZona} onChangeText={setRegZona} />
+                <TextInput style={styles.input} placeholder="Zona" value={regZona} onChangeText={setRegZona} />
+
                 <Text style={styles.label}>DIRECCIÓN *</Text>
-                <TextInput style={styles.input} placeholder="1 Calle 1-23" value={regDir} onChangeText={setRegDir} />
+                <TextInput style={styles.input} placeholder="Dirección" value={regDir} onChangeText={setRegDir} />
+
                 <Text style={styles.label}>CÓDIGO POSTAL *</Text>
-                <TextInput style={styles.input} placeholder="01001" value={regCP} onChangeText={setRegCP} keyboardType="numeric" />
+                <TextInput style={styles.input} placeholder="Código postal" value={regCP} onChangeText={setRegCP} keyboardType="numeric" />
+
                 <TouchableOpacity style={styles.btnLogin} onPress={handleRegistro} disabled={loading}>
                   {loading ? <ActivityIndicator color="white" /> : <Text style={styles.btnLoginText}>Crear mi cuenta</Text>}
                 </TouchableOpacity>
@@ -234,7 +370,7 @@ const styles = StyleSheet.create({
   tipoTabText: { fontSize: 13, fontWeight: 'bold', color: '#888' },
   tipoTabTextActive: { color: '#f0d9a0' },
   card: { backgroundColor: 'white', borderRadius: 16, borderWidth: 1, borderColor: '#e8d8c0', overflow: 'hidden', elevation: 4 },
-  cardHead: { background: CAFE, backgroundColor: CAFE, padding: 30, alignItems: 'center' },
+  cardHead: { backgroundColor: CAFE, padding: 30, alignItems: 'center' },
   cardLogo: { fontSize: 48, marginBottom: 8 },
   cardTitle: { color: '#f0d9a0', fontSize: 20, fontWeight: 'bold', fontFamily: 'serif' },
   cardSub: { color: '#d4b896', fontSize: 13, marginTop: 4 },
