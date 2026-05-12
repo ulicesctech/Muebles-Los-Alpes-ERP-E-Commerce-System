@@ -1,7 +1,7 @@
 <%@ WebHandler Language="VB" Class="HistorialPrecioHandler" %>
 
-Imports System ' <--- Esta línea soluciona los errores de 'Exception' y 'Convert'
-Imports Microsoft.VisualBasic ' <--- Esta línea soluciona el error de 'vbCrLf'
+Imports System
+Imports Microsoft.VisualBasic
 Imports System.Web
 Imports System.Data
 Imports Newtonsoft.Json
@@ -13,13 +13,11 @@ Public Class HistorialPrecioHandler
     Implements IHttpHandler
 
     Public Sub ProcessRequest(ByVal context As HttpContext) Implements IHttpHandler.ProcessRequest
-        ' Configuración vital de CORS para React Native
         context.Response.ContentType = "application/json"
         context.Response.AddHeader("Access-Control-Allow-Origin", "*")
         context.Response.AddHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
         context.Response.AddHeader("Access-Control-Allow-Headers", "Content-Type")
 
-        ' Preflight de CORS
         If context.Request.HttpMethod = "OPTIONS" Then
             context.Response.StatusCode = 200
             Return
@@ -35,6 +33,8 @@ Public Class HistorialPrecioHandler
                     ListarPorProducto(context)
                 Case "listar_por_mes"
                     ListarPorMes(context)
+                Case "obtener_anios"
+                    ObtenerAnios(context)
                 Case "vigente"
                     Vigente(context)
                 Case "registrar"
@@ -82,6 +82,13 @@ Public Class HistorialPrecioHandler
         Dim mes As Integer = Convert.ToInt32(context.Request("mes"))
         Dim anio As Integer = Convert.ToInt32(context.Request("anio"))
         Dim dt As DataTable = HistorialPrecioService.ListarPorMes(mes, anio)
+        context.Response.Write(JsonConvert.SerializeObject(dt))
+    End Sub
+
+    ' Devuelve los años distintos que existen en el historial.
+    ' Llama a PKG_BOD_HISTORIAL_PRECIO.OBTENER_ANIOS vía el service.
+    Private Sub ObtenerAnios(context As HttpContext)
+        Dim dt As DataTable = HistorialPrecioService.ObtenerAniosDT()
         context.Response.Write(JsonConvert.SerializeObject(dt))
     End Sub
 
@@ -162,7 +169,6 @@ Public Class HistorialPrecioHandler
         context.Response.Write("{""mensaje"": ""Semilla cerrada con éxito""}")
     End Sub
 
-    ' Propiedad requerida por IHttpHandler
     Public ReadOnly Property IsReusable() As Boolean Implements IHttpHandler.IsReusable
         Get
             Return False

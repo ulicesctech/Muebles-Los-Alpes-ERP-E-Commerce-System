@@ -144,28 +144,28 @@
                     <%-- Imagen --%>
                     <div class="cart-item-img-wrap">
                         <img src='<%# ResolveUrl("~/Handlers/CatalogoInventario/FotoProductoHandler.ashx?ref=" & Eval("PRO_REFERENCIA").ToString()) %>'
-                             alt='<%# Eval("PRO_NOMBRE") %>'
+                             alt='<%#: Eval("PRO_NOMBRE") %>'
                              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
                         <div class="cart-item-img-placeholder" style="display:none;">🛋️</div>
                     </div>
 
                     <%-- Centro --%>
                     <div class="cart-item-center">
-                        <div class="cart-item-nombre"><%# Eval("PRO_NOMBRE") %></div>
+                        <div class="cart-item-nombre"><%#: Eval("PRO_NOMBRE") %></div>
                         <div class="cart-item-disponible">✓ En stock</div>
                         <div class="cart-item-specs">
-                            Cant: <%# Eval("CANTIDAD") %>
+                            Cant: <%#: Eval("CANTIDAD") %>
                         </div>
                         <div class="cart-item-actions">
                             <div class="qty-wrap">
-                                <asp:LinkButton CommandName="Restar" CommandArgument='<%# Eval("HIP_ID") %>'
+                                <asp:LinkButton CommandName="Restar" CommandArgument='<%#: Eval("HIP_ID") %>'
                                     runat="server" CssClass="qty-btn tiempoInhabilitado">−</asp:LinkButton>
-                                <span class="qty-val"><%# Eval("CANTIDAD") %></span>
-                                <asp:LinkButton CommandName="Sumar" CommandArgument='<%# Eval("HIP_ID") %>'
+                                <span class="qty-val"><%#: Eval("CANTIDAD") %></span>
+                                <asp:LinkButton CommandName="Sumar" CommandArgument='<%#: Eval("HIP_ID") %>'
                                     runat="server" CssClass="qty-btn tiempoInhabilitado">+</asp:LinkButton>
                             </div>
                             <span class="btn-sep">|</span>
-                            <asp:LinkButton CommandName="Quitar" CommandArgument='<%# Eval("HIP_ID") %>'
+                            <asp:LinkButton CommandName="Quitar" CommandArgument='<%#: Eval("HIP_ID") %>'
                                 runat="server" CssClass="btn-del-item tiempoInhabilitado">Eliminar</asp:LinkButton>
                         </div>
                     </div>

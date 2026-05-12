@@ -1,208 +1,114 @@
 <%@ WebHandler Language="VB" Class="DetallePedidoHandler" %>
-
-Imports System
-Imports System.Data
 Imports System.Web
-Imports System.Text
+Imports System.Data
+Imports System.IO
+Imports Newtonsoft.Json
 
 ' ============================================================
 ' RUTA: Handlers/ComprasProveedor/DetallePedidoHandler.ashx
-' Service: DetallePedidoService (PKG_BOD_DETALLE_PEDIDO)
-'
-' GET  ?action=listar-por-pedido&id=1       → DetallePedidoService.ListarPorPedido(pedidoId)
-' GET  ?action=listar-productos             → DetallePedidoService.ListarProductos()
-' GET  ?action=listar-productos-base        → DetallePedidoService.ListarProductosBase()
-' GET  ?action=listar-todos-productos       → DetallePedidoService.ListarTodosProductos()
-' POST ?action=insertar                     → DetallePedidoService.Insertar(ped_id, hip_id, pro_referencia, cantidad)
-' POST ?action=actualizar                   → DetallePedidoService.Actualizar(detpe_id, cant_solicitada, cant_recibida)
-' POST ?action=actualizar-historial         → DetallePedidoService.ActualizarHistorial(detpe_id, hip_id)
-' POST ?action=actualizar-semilla           → DetallePedidoService.ActualizarSemilla(hip_id, nic_nicho, precio, fecha_inicio)
-' POST ?action=eliminar                     → DetallePedidoService.Eliminar(detpe_id)
 ' ============================================================
 Public Class DetallePedidoHandler
     Implements IHttpHandler
 
-    Public Sub ProcessRequest(context As HttpContext) Implements IHttpHandler.ProcessRequest
+    Public Sub ProcessRequest(ByVal context As HttpContext) Implements IHttpHandler.ProcessRequest
         context.Response.ContentType = "application/json"
-        context.Response.Charset = "utf-8"
+        context.Response.AddHeader("Access-Control-Allow-Origin", "*")
+        context.Response.AddHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+        context.Response.AddHeader("Access-Control-Allow-Headers", "Content-Type")
 
-        Dim method As String = context.Request.HttpMethod.ToUpper()
-        Dim action As String = If(context.Request.QueryString("action"), "").ToLower().Trim()
+        If context.Request.HttpMethod = "OPTIONS" Then
+            context.Response.StatusCode = 200
+            Return
+        End If
+
+        Dim action As String = context.Request("action")
 
         Try
-            Select Case method
-                Case "GET"
-                    Select Case action
-                        Case "listar-por-pedido"      : ListarPorPedido(context)
-                        Case "listar-productos"        : ListarProductos(context)
-                        Case "listar-productos-base"   : ListarProductosBase(context)
-                        Case "listar-todos-productos"  : ListarTodosProductos(context)
-                        Case Else
-                            Responder(context, 400, "action GET invalida. Opciones: listar-por-pedido, listar-productos, listar-productos-base, listar-todos-productos")
-                    End Select
-                Case "POST"
-                    Select Case action
-                        Case "insertar"             : Insertar(context)
-                        Case "actualizar"           : Actualizar(context)
-                        Case "actualizar-historial" : ActualizarHistorial(context)
-                        Case "actualizar-semilla"   : ActualizarSemilla(context)
-                        Case "eliminar"             : Eliminar(context)
-                        Case Else
-                            Responder(context, 400, "action POST invalida. Opciones: insertar, actualizar, actualizar-historial, actualizar-semilla, eliminar")
-                    End Select
+            Select Case action
+                Case "listarPorPedido"     : ListarPorPedido(context)
+                Case "listarProductos"     : ListarProductos(context)
+                Case "listarProductosBase" : ListarProductosBase(context)
+                Case "listarTodosProductos": ListarTodosProductos(context)
+                Case "insertar"            : InsertarDetalle(context)
+                Case "actualizar"          : ActualizarDetalle(context)
+                Case "eliminar"            : EliminarDetalle(context)
                 Case Else
-                    Responder(context, 405, "Metodo HTTP no permitido.")
+                    context.Response.StatusCode = 400
+                    context.Response.Write("{""error"": ""Acción no válida.""}")
             End Select
         Catch ex As Exception
-            Responder(context, 500, "Error interno: " & ex.Message)
+            context.Response.StatusCode = 500
+            Dim msg As String = ex.Message.Replace("""", "\""").Replace(vbCrLf, " ")
+            context.Response.Write("{""error"": """ & msg & """}")
         End Try
     End Sub
 
-    ' GET — listar-por-pedido&id=1
-    Private Sub ListarPorPedido(context As HttpContext)
-        Dim idStr As String = context.Request.QueryString("id")
-        If String.IsNullOrEmpty(idStr) Then
-            Responder(context, 400, "Parametro 'id' requerido.") : Return
-        End If
-        context.Response.Write(DataTableToJson(DetallePedidoService.ListarPorPedido(Convert.ToInt32(idStr))))
-    End Sub
-
-    ' GET — listar-productos
-    Private Sub ListarProductos(context As HttpContext)
-        context.Response.Write(DataTableToJson(DetallePedidoService.ListarProductos()))
-    End Sub
-
-    ' GET — listar-productos-base
-    Private Sub ListarProductosBase(context As HttpContext)
-        context.Response.Write(DataTableToJson(DetallePedidoService.ListarProductosBase()))
-    End Sub
-
-    ' GET — listar-todos-productos
-    Private Sub ListarTodosProductos(context As HttpContext)
-        context.Response.Write(DataTableToJson(DetallePedidoService.ListarTodosProductos()))
-    End Sub
-
-    ' POST — insertar
-    ' Body: ped_id, hip_id, pro_referencia, cantidad
-    Private Sub Insertar(context As HttpContext)
-        Dim pedIdStr As String = context.Request.Form("ped_id")
-        Dim hipIdStr As String = context.Request.Form("hip_id")
-        Dim proRef   As String = context.Request.Form("pro_referencia")
-        Dim cantStr  As String = context.Request.Form("cantidad")
-
-        If String.IsNullOrEmpty(pedIdStr) OrElse String.IsNullOrEmpty(hipIdStr) OrElse
-           String.IsNullOrEmpty(proRef)   OrElse String.IsNullOrEmpty(cantStr) Then
-            Responder(context, 400, "Campos requeridos: ped_id, hip_id, pro_referencia, cantidad") : Return
-        End If
-
-        DetallePedidoService.Insertar(Convert.ToInt32(pedIdStr), Convert.ToInt32(hipIdStr),
-                                      proRef.Trim(), Convert.ToInt32(cantStr))
-        context.Response.Write("{""ok"":true}")
-    End Sub
-
-    ' POST — actualizar
-    ' Body: detpe_id, cant_solicitada, cant_recibida
-    Private Sub Actualizar(context As HttpContext)
-        Dim detpeIdStr As String = context.Request.Form("detpe_id")
-        Dim cantSolStr As String = context.Request.Form("cant_solicitada")
-        Dim cantRecStr As String = context.Request.Form("cant_recibida")
-
-        If String.IsNullOrEmpty(detpeIdStr) OrElse String.IsNullOrEmpty(cantSolStr) OrElse
-           String.IsNullOrEmpty(cantRecStr) Then
-            Responder(context, 400, "Campos requeridos: detpe_id, cant_solicitada, cant_recibida") : Return
-        End If
-
-        DetallePedidoService.Actualizar(Convert.ToInt32(detpeIdStr),
-                                        Convert.ToInt32(cantSolStr),
-                                        Convert.ToInt32(cantRecStr))
-        context.Response.Write("{""ok"":true}")
-    End Sub
-
-    ' POST — actualizar-historial
-    ' Body: detpe_id, hip_id
-    Private Sub ActualizarHistorial(context As HttpContext)
-        Dim detpeIdStr As String = context.Request.Form("detpe_id")
-        Dim hipIdStr   As String = context.Request.Form("hip_id")
-
-        If String.IsNullOrEmpty(detpeIdStr) OrElse String.IsNullOrEmpty(hipIdStr) Then
-            Responder(context, 400, "Campos requeridos: detpe_id, hip_id") : Return
-        End If
-
-        DetallePedidoService.ActualizarHistorial(Convert.ToInt32(detpeIdStr), Convert.ToInt32(hipIdStr))
-        context.Response.Write("{""ok"":true}")
-    End Sub
-
-    ' POST — actualizar-semilla
-    ' Body: hip_id, nic_nicho, precio, fecha_inicio (yyyy-MM-dd)
-    Private Sub ActualizarSemilla(context As HttpContext)
-        Dim hipIdStr As String = context.Request.Form("hip_id")
-        Dim nicStr   As String = context.Request.Form("nic_nicho")
-        Dim precStr  As String = context.Request.Form("precio")
-        Dim fechaStr As String = context.Request.Form("fecha_inicio")
-
-        If String.IsNullOrEmpty(hipIdStr) OrElse String.IsNullOrEmpty(nicStr) OrElse
-           String.IsNullOrEmpty(precStr)  OrElse String.IsNullOrEmpty(fechaStr) Then
-            Responder(context, 400, "Campos requeridos: hip_id, nic_nicho, precio, fecha_inicio (yyyy-MM-dd)") : Return
-        End If
-
-        Dim fechaInicio As Date
-        If Not Date.TryParse(fechaStr, fechaInicio) Then
-            Responder(context, 400, "Formato de fecha invalido. Use yyyy-MM-dd.") : Return
-        End If
-
-        DetallePedidoService.ActualizarSemilla(Convert.ToDecimal(hipIdStr),
-                                               Convert.ToDecimal(nicStr),
-                                               Convert.ToDecimal(precStr),
-                                               fechaInicio)
-        context.Response.Write("{""ok"":true}")
-    End Sub
-
-    ' POST — eliminar
-    ' Body: detpe_id
-    Private Sub Eliminar(context As HttpContext)
-        Dim detpeIdStr As String = context.Request.Form("detpe_id")
-        If String.IsNullOrEmpty(detpeIdStr) Then
-            Responder(context, 400, "Campo 'detpe_id' requerido.") : Return
-        End If
-        DetallePedidoService.Eliminar(Convert.ToInt32(detpeIdStr))
-        context.Response.Write("{""ok"":true}")
-    End Sub
-
-    Private Sub Responder(context As HttpContext, statusCode As Integer, mensaje As String)
-        context.Response.StatusCode = statusCode
-        context.Response.Write("{""ok"":false,""error"":""" & mensaje.Replace("\", "\\").Replace("""", "\""") & """}")
-    End Sub
-
-    Private Function DataTableToJson(dt As DataTable) As String
-        If dt Is Nothing OrElse dt.Rows.Count = 0 Then Return "[]"
-        Dim sb As New StringBuilder
-        sb.Append("[")
-        For i As Integer = 0 To dt.Rows.Count - 1
-            If i > 0 Then sb.Append(",")
-            sb.Append("{")
-            For j As Integer = 0 To dt.Columns.Count - 1
-                If j > 0 Then sb.Append(",")
-                Dim col As String = dt.Columns(j).ColumnName
-                Dim val As Object = dt.Rows(i)(j)
-                sb.Append("""" & col & """:")
-                If IsDBNull(val) Then
-                    sb.Append("null")
-                ElseIf TypeOf val Is Boolean Then
-                    sb.Append(If(CBool(val), "true", "false"))
-                ElseIf TypeOf val Is Date Then
-                    sb.Append("""" & CDate(val).ToString("yyyy-MM-dd") & """")
-                ElseIf TypeOf val Is Decimal OrElse TypeOf val Is Integer OrElse
-                       TypeOf val Is Long    OrElse TypeOf val Is Double Then
-                    sb.Append(val.ToString())
-                Else
-                    sb.Append("""" & val.ToString().Replace("\", "\\").Replace("""", "\""").Replace(vbCr, "").Replace(vbLf, " ") & """")
-                End If
-            Next
-            sb.Append("}")
-        Next
-        sb.Append("]")
-        Return sb.ToString()
+    ' ── Helpers para leer JSON body ───────────────────────────────────────────
+    Private Function LeerBody(context As HttpContext) As Dictionary(Of String, Object)
+        Dim json As String = New StreamReader(context.Request.InputStream).ReadToEnd()
+        If String.IsNullOrWhiteSpace(json) Then Return New Dictionary(Of String, Object)
+        Return JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(json)
     End Function
+
+    Private Function Str(data As Dictionary(Of String, Object), key As String) As String
+        If data.ContainsKey(key) AndAlso data(key) IsNot Nothing Then Return data(key).ToString()
+        Return ""
+    End Function
+
+    Private Function Int_(data As Dictionary(Of String, Object), key As String) As Integer
+        If data.ContainsKey(key) AndAlso data(key) IsNot Nothing Then Return Convert.ToInt32(data(key))
+        Return 0
+    End Function
+
+    ' ── GET ──────────────────────────────────────────────────────────────────
+    Private Sub ListarPorPedido(context As HttpContext)
+        Dim pedidoId As Integer = Convert.ToInt32(context.Request("pedido_id"))
+        context.Response.Write(JsonConvert.SerializeObject(DetallePedidoService.ListarPorPedido(pedidoId)))
+    End Sub
+
+    Private Sub ListarProductos(context As HttpContext)
+        context.Response.Write(JsonConvert.SerializeObject(DetallePedidoService.ListarProductos()))
+    End Sub
+
+    Private Sub ListarProductosBase(context As HttpContext)
+        context.Response.Write(JsonConvert.SerializeObject(DetallePedidoService.ListarProductosBase()))
+    End Sub
+
+    Private Sub ListarTodosProductos(context As HttpContext)
+        context.Response.Write(JsonConvert.SerializeObject(DetallePedidoService.ListarTodosProductos()))
+    End Sub
+
+    ' ── POST — leen JSON body ─────────────────────────────────────────────────
+    Private Sub InsertarDetalle(context As HttpContext)
+        Dim d As Dictionary(Of String, Object) = LeerBody(context)
+        Dim pedidoId As Integer = Int_(d, "pedido_id")
+        Dim proReferencia As String = Str(d, "pro_referencia")
+        Dim cantidad As Integer = Int_(d, "cantidad")
+
+        If String.IsNullOrEmpty(proReferencia) Then Throw New Exception("La referencia del producto es obligatoria.")
+        If cantidad <= 0 Then Throw New Exception("La cantidad debe ser mayor a 0.")
+
+        Dim hipSemilla As Decimal = HistorialPrecioService.RegistrarSemilla(proReferencia)
+        DetallePedidoService.Insertar(pedidoId, CInt(hipSemilla), proReferencia, cantidad)
+        context.Response.Write("{""mensaje"": ""Detalle agregado con éxito""}")
+    End Sub
+
+    Private Sub ActualizarDetalle(context As HttpContext)
+        Dim d As Dictionary(Of String, Object) = LeerBody(context)
+        Dim detalleId As Integer = Int_(d, "detalle_id")
+        Dim cantSolicitada As Integer = Int_(d, "cant_solicitada")
+        Dim cantRecibida As Integer = Int_(d, "cant_recibida")
+
+        DetallePedidoService.Actualizar(detalleId, cantSolicitada, cantRecibida)
+        context.Response.Write("{""mensaje"": ""Detalle actualizado con éxito""}")
+    End Sub
+
+    Private Sub EliminarDetalle(context As HttpContext)
+        Dim d As Dictionary(Of String, Object) = LeerBody(context)
+        Dim detalleId As Integer = Int_(d, "detalle_id")
+        DetallePedidoService.Eliminar(detalleId)
+        context.Response.Write("{""mensaje"": ""Detalle eliminado con éxito""}")
+    End Sub
 
     Public ReadOnly Property IsReusable() As Boolean Implements IHttpHandler.IsReusable
         Get

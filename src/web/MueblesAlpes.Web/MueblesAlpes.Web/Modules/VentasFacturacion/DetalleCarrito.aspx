@@ -89,7 +89,7 @@
 
                     <asp:TemplateField HeaderText="Total" ItemStyle-Width="120px" ItemStyle-HorizontalAlign="Center">
                         <ItemTemplate>
-                            <span class="badge-total">Q <%# Eval("PRE_TOTAL", "{0:N2}") %></span>
+                            <span class="badge-total">Q <%#: Eval("PRE_TOTAL", "{0:N2}") %></span>
                         </ItemTemplate>
                     </asp:TemplateField>
                 </Columns>

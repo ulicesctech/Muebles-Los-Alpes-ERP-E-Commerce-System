@@ -4,9 +4,9 @@ import {
   ActivityIndicator, Alert, FlatList, ScrollView,
 } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { fetchAPI } from '../../services/apiClient';
-import { crearFactura } from '../../services/facturaService';
-import { Carrito, listarCarritos } from '../../services/carritoService';
+import { fetchAPI } from '../../../services/apiClient';
+import { crearFactura } from '../../../services/facturaService';
+import { Carrito, listarCarritos } from '../../../services/carritoService';
 
 interface Factura {
   FACLI_CODIGO_FACTURA: string;

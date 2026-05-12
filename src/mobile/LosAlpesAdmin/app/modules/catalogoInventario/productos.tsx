@@ -19,20 +19,20 @@ import {
     eliminarProducto,
     getProductos,
     Producto,
-} from "../../services/catalogoInventario/productos";
+} from "../../../services/catalogoInventario/productos";
 // Dependencias para los combos
 import {
     Categoria,
     getCategorias,
-} from "../../services/catalogoInventario/categorias";
+} from "../../../services/catalogoInventario/categorias";
 import {
     getMateriales,
     Material,
-} from "../../services/catalogoInventario/materiales";
+} from "../../../services/catalogoInventario/materiales";
 import {
     getTiposPorCategoria,
     Tipo,
-} from "../../services/catalogoInventario/tipos";
+} from "../../../services/catalogoInventario/tipos";
 
 export default function ProductosScreen() {
   const [productos, setProductos] = useState<Producto[]>([]);

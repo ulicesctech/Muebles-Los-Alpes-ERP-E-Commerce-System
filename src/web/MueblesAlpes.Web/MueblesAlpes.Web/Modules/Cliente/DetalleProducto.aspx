@@ -7,9 +7,28 @@
     * { box-sizing: border-box; }
     .det-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
     @media(max-width:768px) { .det-wrap { grid-template-columns: 1fr; } }
-    .det-img-card { background: white; border-radius: 14px; border: 1px solid #e8d8c0;
-        overflow: hidden; box-shadow: 0 2px 10px rgba(92,58,30,0.07); }
-    .det-img { width: 100%; height: 400px; object-fit: cover; display: block; }
+
+    .det-img-card {
+        background: white;
+        border-radius: 14px;
+        border: 1px solid #e8d8c0;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(92,58,30,0.07);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 400px;
+    }
+
+    .det-img {
+        width: 100%;
+        height: 400px;
+        object-fit: contain;
+        object-position: center center;
+        display: block;
+        background: #fdf8f3;
+    }
+
     .det-img-placeholder { width: 100%; height: 400px; display: flex; align-items: center;
         justify-content: center; font-size: 100px; color: #e8d8c0; background: #fdf8f3; }
     .det-info-card { background: white; border-radius: 14px; border: 1px solid #e8d8c0;

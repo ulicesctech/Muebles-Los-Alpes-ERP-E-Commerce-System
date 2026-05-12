@@ -13,9 +13,11 @@
     <webopt:bundlereference runat="server" path="~/Content/css" />
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" />
+
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: Arial, sans-serif; background: #f0ebe0; color: #333; }
+
         .nav-main { background: #1a0e05; padding: 0 30px; border-bottom: 2px solid #C9973A; }
         .nav-main > ul { list-style: none; display: flex; margin: 0; padding: 0; }
         .nav-main > ul > li { position: relative; }
@@ -28,13 +30,16 @@
         .nav-main > ul > li > a:hover {
             color: #C9973A; border-bottom-color: #C9973A; background: rgba(201,151,58,0.06);
         }
+
         .nav-main > ul > li:hover .dropdown-nav { display: block; }
+
         .dropdown-nav {
             display: none; position: absolute; top: 100%; left: 0; background: #1a0e05;
             min-width: 230px; border-radius: 0 0 12px 12px;
             box-shadow: 0 12px 32px rgba(0,0,0,0.5); z-index: 9999;
             border-top: 3px solid #C9973A; overflow: hidden;
         }
+
         .dropdown-nav a {
             color: rgba(240,217,160,0.75) !important; padding: 11px 20px !important;
             font-size: 13px !important; font-weight: normal !important;
@@ -42,108 +47,164 @@
             background: #1a0e05 !important; transition: all 0.15s;
             text-decoration: none; font-family: Arial, sans-serif;
         }
+
         .dropdown-nav a:hover {
             background: #2a1a0a !important; color: #C9973A !important; padding-left: 26px !important;
         }
+
         .dropdown-header-nav {
             padding: 8px 20px; font-size: 10px; font-weight: bold; color: #C9973A;
             background: #0d0703; text-transform: uppercase; letter-spacing: 2px;
             display: block; border-bottom: 1px solid rgba(201,151,58,0.15);
         }
+
         .content-wrapper {
             max-width: 1200px; margin: 0 auto; padding: 28px 15px;
-            min-height: calc(100vh - 380px);
+            min-height: calc(100vh - 260px);
         }
+
         .panel { border-radius: 12px; border-color: #e0d0b8; box-shadow: 0 2px 8px rgba(92,58,30,0.08); }
         .panel-default > .panel-heading {
             background: linear-gradient(135deg, #5C3A1E, #7a4f2a);
             color: #f0d9a0; border-color: #5C3A1E; border-radius: 12px 12px 0 0;
         }
+
         .page-header { border-bottom: 3px solid #C9973A; margin-bottom: 24px; padding-bottom: 12px; }
         .page-header h2 { color: #3a1f0a; font-family: Georgia, serif; font-size: 24px; }
+
         .table > thead > tr > th {
             background: linear-gradient(135deg, #5C3A1E, #7a4f2a); color: #f0d9a0;
             border-color: #5C3A1E; font-size: 12px; letter-spacing: 0.5px; text-transform: uppercase;
         }
         .table-striped > tbody > tr:nth-of-type(odd) { background-color: #fdf6ec; }
         .table > tbody > tr > td { vertical-align: middle; }
-        .footer-main {
-            background: #0d0703; color: #f0d9a0; padding: 40px 30px;
-            margin-top: 40px; border-top: 3px solid #C9973A;
-        }
-        .footer-inner {
-            max-width: 1200px; margin: 0 auto; display: flex;
-            justify-content: space-between; flex-wrap: wrap; gap: 30px;
-        }
-        .footer-main h5 {
-            color: #C9973A; margin-bottom: 14px; font-size: 11px; text-transform: uppercase;
-            letter-spacing: 2px; padding-bottom: 8px; border-bottom: 1px solid rgba(201,151,58,0.2);
-        }
-        .footer-main p {
-            font-size: 13px; color: rgba(240,217,160,0.45); line-height: 1.9;
-            max-width: 200px; margin-top: 12px;
-        }
-        .footer-main a {
-            color: rgba(240,217,160,0.55); text-decoration: none; font-size: 13px;
-            display: block; margin-bottom: 9px; transition: color 0.2s;
-        }
-        .footer-main a:hover { color: #C9973A; }
-        .footer-bottom {
-            background: #050300; color: rgba(240,217,160,0.25); text-align: center;
-            padding: 14px; font-size: 12px; letter-spacing: 0.3px;
-        }
+
         .carrito-drop {
             display: none; position: absolute; top: 100%; right: 0; width: 320px;
             background: white; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);
             z-index: 99999; overflow: hidden;
         }
         .carrito-drop-wrap:hover .carrito-drop { display: block; }
+
         .bloqueo-total {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255,255,255,0.1); z-index: 99999; display: none; cursor: wait;
         }
+
+        .footer-cliente {
+            background: #0d0703;
+            color: #f0d9a0;
+            border-top: 3px solid #C9973A;
+            margin-top: 40px;
+            padding: 34px 30px 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .footer-cliente-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.4fr 1fr 1fr 1.3fr;
+            gap: 42px;
+            padding-bottom: 32px;
+        }
+
+        .footer-col h5 {
+            color: #C9973A;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .footer-col p {
+            color: rgba(240,217,160,0.55);
+            font-size: 13px;
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .footer-col a {
+            display: block;
+            color: rgba(240,217,160,0.65);
+            font-size: 13px;
+            text-decoration: none;
+            margin-bottom: 8px;
+        }
+
+        .footer-col a:hover {
+            color: #C9973A;
+            text-decoration: none;
+        }
+
+        .footer-cliente-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            border-top: 1px solid rgba(201,151,58,0.2);
+            padding: 16px 0;
+            color: rgba(240,217,160,0.35);
+            font-size: 12px;
+        }
+
+        @media(max-width:768px) {
+            .footer-cliente-inner {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .nav-main {
+                padding: 0 10px;
+                overflow-x: auto;
+            }
+
+            .nav-main > ul {
+                flex-wrap: nowrap;
+            }
+
+            .content-wrapper {
+                padding: 20px 12px;
+            }
+        }
     </style>
 </head>
+
 <body>
 <div id="capaBloqueo" class="bloqueo-total"></div>
-    <form runat="server">
-        <asp:ScriptManager runat="server">
-            <Scripts>
-                <asp:ScriptReference Name="MsAjaxBundle" />
-                <asp:ScriptReference Name="jquery" />
-                <asp:ScriptReference Name="WebForms.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebForms.js" />
-                <asp:ScriptReference Name="WebUIValidation.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebUIValidation.js" />
-                <asp:ScriptReference Name="MenuStandards.js" Assembly="System.Web" Path="~/Scripts/WebForms/MenuStandards.js" />
-                <asp:ScriptReference Name="GridView.js" Assembly="System.Web" Path="~/Scripts/WebForms/GridView.js" />
-                <asp:ScriptReference Name="DetailsView.js" Assembly="System.Web" Path="~/Scripts/WebForms/DetailsView.js" />
-                <asp:ScriptReference Name="TreeView.js" Assembly="System.Web" Path="~/Scripts/WebForms/TreeView.js" />
-                <asp:ScriptReference Name="WebParts.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebParts.js" />
-                <asp:ScriptReference Name="Focus.js" Assembly="System.Web" Path="~/Scripts/WebForms/Focus.js" />
-                <asp:ScriptReference Name="WebFormsBundle" />
-            </Scripts>
-        </asp:ScriptManager>
 
-        <asp:Panel ID="pnlHeader" runat="server">
+<form runat="server">
+    <asp:ScriptManager runat="server">
+        <Scripts>
+            <asp:ScriptReference Name="MsAjaxBundle" />
+            <asp:ScriptReference Name="jquery" />
+            <asp:ScriptReference Name="WebForms.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebForms.js" />
+            <asp:ScriptReference Name="WebUIValidation.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebUIValidation.js" />
+            <asp:ScriptReference Name="MenuStandards.js" Assembly="System.Web" Path="~/Scripts/WebForms/MenuStandards.js" />
+            <asp:ScriptReference Name="GridView.js" Assembly="System.Web" Path="~/Scripts/WebForms/GridView.js" />
+            <asp:ScriptReference Name="DetailsView.js" Assembly="System.Web" Path="~/Scripts/WebForms/DetailsView.js" />
+            <asp:ScriptReference Name="TreeView.js" Assembly="System.Web" Path="~/Scripts/WebForms/TreeView.js" />
+            <asp:ScriptReference Name="WebParts.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebParts.js" />
+            <asp:ScriptReference Name="Focus.js" Assembly="System.Web" Path="~/Scripts/WebForms/Focus.js" />
+            <asp:ScriptReference Name="WebFormsBundle" />
+        </Scripts>
+    </asp:ScriptManager>
 
-            <%-- TOP BAR --%>
-            <div style="background:#3a1f0a; color:rgba(240,217,160,0.7); text-align:center; padding:7px 30px; font-size:12px; font-family:Arial,sans-serif; letter-spacing:0.5px; border-bottom:1px solid rgba(201,151,58,0.2);">
-                Envios a todo Guatemala &nbsp;&nbsp;|&nbsp;&nbsp; Tel: +502 5568 8472 &nbsp;&nbsp;|&nbsp;&nbsp; Santos &amp; Familia — Desde 1978
-            </div>
+    <asp:Panel ID="pnlHeader" runat="server">
 
-            <%-- HEADER --%>
-            <div style="background:#111; padding:14px 30px; display:flex; align-items:center; gap:24px; border-bottom:3px solid #C9973A; min-height:85px;">
-<asp:HyperLink ID="lnkLogo" runat="server" style="flex-shrink:0; text-decoration:none;">
-    <img src='<%: ResolveUrl("~/Content/MueblesLosAlpes.png") %>' alt="Muebles Los Alpes" style="height:65px; width:auto; display:block;" />
-</asp:HyperLink>
-                <div style="flex:1; max-width:620px; margin:0 auto; height:52px; display:flex;">
-                    <input type="text" placeholder="Buscar en toda la tienda..."
-                           style="flex:1; min-width:0; height:52px; padding:0 22px; background:#1e1e1e; border:2px solid #C9973A; border-right:none; border-radius:6px 0 0 6px; color:#f0d9a0; font-size:14px; font-family:Arial,sans-serif; outline:none;" />
-                    <button type="button"
-                            style="height:52px; width:62px; background:#C9973A; border:2px solid #C9973A; border-left:none; border-radius:0 6px 6px 0; color:white; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;"
-                            onmouseover="this.style.background='#a87a2e';"
-                            onmouseout="this.style.background='#C9973A';">&#128269;</button>
-                </div>
-                <div style="display:flex; gap:4px; align-items:center; margin-left:auto; flex-shrink:0;">
+        <%-- TOP BAR --%>
+        <div style="background:#3a1f0a; color:rgba(240,217,160,0.7); text-align:center; padding:7px 30px; font-size:12px; font-family:Arial,sans-serif; letter-spacing:0.5px; border-bottom:1px solid rgba(201,151,58,0.2);">
+            Envios a todo Guatemala &nbsp;&nbsp;|&nbsp;&nbsp; Tel: +502 5568 8472 &nbsp;&nbsp;|&nbsp;&nbsp; Santos &amp; Familia — Desde 1978
+        </div>
+
+        <%-- HEADER --%>
+        <div style="background:#111; padding:14px 30px; display:flex; align-items:center; gap:24px; border-bottom:3px solid #C9973A; min-height:85px;">
+            <asp:HyperLink ID="lnkLogo" runat="server" style="flex-shrink:0; text-decoration:none;">
+                <img src='<%: ResolveUrl("~/Content/MueblesLosAlpes.png") %>' alt="Muebles Los Alpes" style="height:65px; width:auto; display:block;" />
+            </asp:HyperLink>
+
+            <div style="display:flex; gap:4px; align-items:center; margin-left:auto; flex-shrink:0;">
+
+                <asp:Panel ID="pnlCarritoHeader" runat="server" Visible="false">
                     <div class="carrito-drop-wrap" style="position:relative;">
                         <a href="/Modules/Cliente/Carrito.aspx"
                            style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 16px; border-radius:8px; text-decoration:none; color:rgba(240,217,160,0.75); font-size:11px; font-family:Arial,sans-serif;"
@@ -160,12 +221,14 @@
                             </div>
                             <span>Carrito</span>
                         </a>
+
                         <div class="carrito-drop">
                             <div style="background:#f5f5f5; padding:12px 16px; border-bottom:1px solid #e0e0e0;">
                                 <span style="font-size:13px; font-weight:bold; color:#333; font-family:Arial,sans-serif;">
                                     <asp:Label ID="lblDropCartCount" runat="server" Text="0" /> producto(s)
                                 </span>
                             </div>
+
                             <div style="max-height:240px; overflow-y:auto; padding:8px 0;">
                                 <asp:Repeater ID="rptDropCarrito" runat="server">
                                     <ItemTemplate>
@@ -174,8 +237,12 @@
                                                  style="width:50px; height:50px; object-fit:cover; border-radius:6px; flex-shrink:0;"
                                                  onerror="this.style.display='none'" alt="" />
                                             <div style="flex:1; min-width:0;">
-                                                <div style="font-size:12px; font-weight:bold; color:#333; font-family:Arial,sans-serif; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><%# Eval("PRO_NOMBRE") %></div>
-                                                <div style="font-size:12px; color:#888; font-family:Arial,sans-serif;">Q <%# String.Format("{0:N2}", Eval("PRECIO_FINAL")) %> | Cant: <%# Eval("CANTIDAD") %></div>
+                                                <div style="font-size:12px; font-weight:bold; color:#333; font-family:Arial,sans-serif; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                                    <%#: Eval("PRO_NOMBRE") %>
+                                                </div>
+                                                <div style="font-size:12px; color:#888; font-family:Arial,sans-serif;">
+                                                    Q <%# String.Format("{0:N2}", Eval("PRECIO_FINAL")) %> | Cant: <%#: Eval("CANTIDAD") %>
+                                                </div>
                                             </div>
                                             <div style="font-size:13px; font-weight:bold; color:#333; font-family:Arial,sans-serif; white-space:nowrap;">
                                                 Q <%# String.Format("{0:N2}", Convert.ToDecimal(Eval("PRECIO_FINAL")) * Convert.ToInt32(Eval("CANTIDAD"))) %>
@@ -183,14 +250,18 @@
                                         </div>
                                     </ItemTemplate>
                                 </asp:Repeater>
+
                                 <asp:Panel ID="pnlDropVacio" runat="server" Visible="false">
                                     <div style="text-align:center; padding:20px; color:#aaa; font-family:Arial,sans-serif; font-size:13px;">Tu carrito está vacío</div>
                                 </asp:Panel>
                             </div>
+
                             <div style="padding:12px 16px; border-top:1px solid #e0e0e0; background:#f9f9f9;">
                                 <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
                                     <span style="font-size:13px; color:#333; font-family:Arial,sans-serif;">Subtotal:</span>
-                                    <span style="font-size:15px; font-weight:bold; color:#333; font-family:Arial,sans-serif;">Q <asp:Label ID="lblDropTotal" runat="server" Text="0.00" /></span>
+                                    <span style="font-size:15px; font-weight:bold; color:#333; font-family:Arial,sans-serif;">
+                                        Q <asp:Label ID="lblDropTotal" runat="server" Text="0.00" />
+                                    </span>
                                 </div>
                                 <a href="/Modules/Cliente/Factura.aspx"
                                    style="display:block; width:100%; background:#C9973A; color:white; text-align:center;
@@ -205,177 +276,219 @@
                             </div>
                         </div>
                     </div>
+                </asp:Panel>
 
-                    <asp:Panel ID="pnlNoLogueado" runat="server">
-                        <asp:HyperLink ID="lnkLogin" runat="server"
-                           style="display:flex; align-items:center; gap:8px; padding:12px 24px; background:#C9973A; color:#1a0e05; border-radius:8px; text-decoration:none; font-size:13px; font-weight:bold; font-family:Arial,sans-serif; margin-left:8px;"
-                           onmouseover="this.style.background='#a87a2e'; this.style.color='white';"
-                           onmouseout="this.style.background='#C9973A'; this.style.color='#1a0e05';">
-                            Iniciar Sesión
-                        </asp:HyperLink>
-                    </asp:Panel>
+                <asp:Panel ID="pnlNoLogueado" runat="server">
+                    <asp:HyperLink ID="lnkLogin" runat="server"
+                       style="display:flex; align-items:center; gap:8px; padding:12px 24px; background:#C9973A; color:#1a0e05; border-radius:8px; text-decoration:none; font-size:13px; font-weight:bold; font-family:Arial,sans-serif; margin-left:8px;"
+                       onmouseover="this.style.background='#a87a2e'; this.style.color='white';"
+                       onmouseout="this.style.background='#C9973A'; this.style.color='#1a0e05';">
+                        Iniciar Sesión
+                    </asp:HyperLink>
+                </asp:Panel>
 
-                    <asp:Panel ID="pnlLogueado" runat="server" Visible="false">
-                        <div style="display:flex; flex-direction:column; align-items:center; gap:4px; margin-left:8px;">
-                            <asp:LinkButton ID="btnCerrarSesion" runat="server"
-                                OnClick="btnCerrarSesion_Click"
-                                style="color:#e53e3e; font-size:11px; font-family:Arial,sans-serif; background:none; border:none; cursor:pointer; padding:0;">
-                                Cerrar sesión
-                            </asp:LinkButton>
-                            <span style="color:rgba(240,217,160,0.85); font-size:12px; font-family:Arial,sans-serif; font-weight:bold;">
-                                Hola, <asp:Label ID="lblNombreCliente" runat="server" />
-                            </span>
-                        </div>
-                    </asp:Panel>
-                </div>
-            </div>
-
-            <%-- NAV ADMIN --%>
-            <asp:Panel ID="pnlNavAdmin" runat="server">
-            <nav class="nav-main">
-                <ul>
-                    <li><a runat="server" href="~/">Inicio</a></li>
-                    <li>
-                        <a href="#">Catalogo &amp; Inventario &#9660;</a>
-                        <div class="dropdown-nav">
-                            <span class="dropdown-header-nav">Catalogo</span>
-                            <a runat="server" href="~/Modules/CatalogoInventario/Index.aspx">Dashboard</a>
-                            <a runat="server" href="~/Modules/CatalogoInventario/Categorias.aspx">Categorias</a>
-                            <a runat="server" href="~/Modules/CatalogoInventario/Materiales.aspx">Materiales</a>
-                            <a runat="server" href="~/Modules/CatalogoInventario/Tipos.aspx">Tipos</a>
-                            <a runat="server" href="~/Modules/CatalogoInventario/Productos.aspx">Productos</a>
-                            <a runat="server" href="~/Modules/CatalogoInventario/Precios.aspx">Precios</a>
-                            <span class="dropdown-header-nav">Bodega</span>
-                            <a runat="server" href="~/Modules/CatalogoInventario/Almacenes.aspx">Almacenes</a>
-                            <a runat="server" href="~/Modules/CatalogoInventario/Nichos.aspx">Nichos</a>
-                            <a runat="server" href="~/Modules/CatalogoInventario/Stock.aspx">Stock</a>
-                        </div>
-                    </li>
-                    <li>
-                        <a href="#">Auth &amp; Usuarios &#9660;</a>
-                        <div class="dropdown-nav">
-                            <a runat="server" href="~/Modules/AuthUsuarios/Index.aspx">Dashboard</a>
-                            <a runat="server" href="~/Modules/AuthUsuarios/LoginEmpleado.aspx">Login Empleado</a>
-                            <a runat="server" href="~/Modules/AuthUsuarios/LoginCliente.aspx">Login Cliente</a>
-                        </div>
-                    </li>
-                    <li>
-                        <a href="#">Compras &amp; Proveedor &#9660;</a>
-                        <div class="dropdown-nav">
-                            <a runat="server" href="~/Modules/ComprasProveedor/Index.aspx">Dashboard</a>
-                            <a runat="server" href="~/Modules/ComprasProveedor/Proveedores.aspx">Proveedores</a>
-                            <a runat="server" href="~/Modules/ComprasProveedor/OrdenesCompra.aspx">Ordenes de Compra</a>
-                            <a runat="server" href="~/Modules/ComprasProveedor/Pedidos.aspx">Pedidos</a>
-                            <a runat="server" href="~/Modules/ComprasProveedor/FacturasProveedor.aspx">Facturas</a>
-                            <a runat="server" href="~/Modules/ComprasProveedor/ReclamosProveedor.aspx">Reclamos</a>
-                        </div>
-                    </li>
-                    <li>
-                        <a href="#">Ventas &amp; Facturacion &#9660;</a>
-                        <div class="dropdown-nav">
-                            <a runat="server" href="~/Modules/VentasFacturacion/Index.aspx">Dashboard</a>
-                            <a runat="server" href="~/Modules/VentasFacturacion/Carrito.aspx">Carrito</a>
-                            <a runat="server" href="~/Modules/VentasFacturacion/DetalleCarrito.aspx">Detalle Carrito</a>
-                            <a runat="server" href="~/Modules/VentasFacturacion/Factura.aspx">Factura</a>
-                            <a runat="server" href="~/Modules/VentasFacturacion/HistorialPrecioVenta.aspx">Precios de Venta</a>
-                        </div>
-                    </li>
-                </ul>
-            </nav>
-            </asp:Panel>
-
-            <%-- NAV CLIENTE --%>
-            <asp:Panel ID="pnlNavCliente" runat="server" Visible="false">
-            <nav class="nav-main" style="display:flex; justify-content:space-between; align-items:center;">
-                <ul>
-                    <li><a href="/Modules/Cliente/Catalogo.aspx">Productos</a></li>
-                    <li><a href="/Modules/Cliente/Tiendas.aspx">Tiendas</a></li>
-                    <li><a href="/Modules/Cliente/Promociones.aspx">Promociones</a></li>
-                    <li id="liMisCompras" runat="server" visible="false">
-                        <a href="/Modules/Cliente/MisCompras.aspx">Mis Compras</a>
-                    </li>
-                </ul>
-                <asp:Panel ID="pnlNavLogueado" runat="server" Visible="false">
-                    <div style="position:relative; margin-right:10px;"
-                         onmouseover="document.getElementById('cuentaDropdown').style.display='block';"
-                         onmouseout="document.getElementById('cuentaDropdown').style.display='none';">
-                        <div style="color:rgba(240,217,160,0.85); font-size:13px; font-weight:bold;
-                                    font-family:Arial,sans-serif; padding:14px 18px; cursor:pointer;
-                                    display:flex; align-items:center; gap:6px;">
-                            Hola, <asp:Label ID="lblNavNombre" runat="server" /> ▾
-                        </div>
-                        <div id="cuentaDropdown"
-                             style="display:none; position:absolute; top:100%; right:0; min-width:200px;
-                                    background:white; border-radius:0 0 10px 10px;
-                                    box-shadow:0 8px 24px rgba(0,0,0,0.15); z-index:99999;
-                                    border-top:3px solid #C9973A; overflow:hidden;">
-                            <a href="/Modules/Cliente/MisCompras.aspx"
-                               style="display:flex; align-items:center; gap:10px; padding:12px 18px;
-                                      font-size:13px; font-family:Arial,sans-serif; color:#3a2a1a;
-                                      text-decoration:none; border-bottom:1px solid #f5ece0;">
-                                📦 Mis Pedidos
-                            </a>
-                            <a href="/Modules/Cliente/MiPerfil.aspx"
-                               style="display:flex; align-items:center; gap:10px; padding:12px 18px;
-                                      font-size:13px; font-family:Arial,sans-serif; color:#3a2a1a;
-                                      text-decoration:none; border-bottom:1px solid #f5ece0;">
-                                👤 Mi Información
-                            </a>
-                            <asp:LinkButton ID="btnNavCerrarSesion" runat="server"
-                                OnClick="btnCerrarSesion_Click"
-                                CssClass="tiempoInhabilitado"
-                                style="display:flex; align-items:center; gap:10px; padding:12px 18px;
-                                       font-size:13px; font-family:Arial,sans-serif; color:#e53e3e;
-                                       text-decoration:none; width:100%; background:none; border:none;
-                                       cursor:pointer; text-align:left;">
-                                🚪 Cerrar sesión
-                            </asp:LinkButton>
-                        </div>
+                <asp:Panel ID="pnlLogueado" runat="server" Visible="false">
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:4px; margin-left:8px;">
+                        <asp:LinkButton ID="btnCerrarSesion" runat="server"
+                            OnClick="btnCerrarSesion_Click"
+                            style="color:#e53e3e; font-size:11px; font-family:Arial,sans-serif; background:none; border:none; cursor:pointer; padding:0;">
+                            Cerrar sesión
+                        </asp:LinkButton>
+                        <span style="color:rgba(240,217,160,0.85); font-size:12px; font-family:Arial,sans-serif; font-weight:bold;">
+                            Hola, <asp:Label ID="lblNombreCliente" runat="server" />
+                        </span>
                     </div>
                 </asp:Panel>
-                <asp:Panel ID="pnlNavNoLogueado" runat="server" Visible="false" />
-            </nav>
-            </asp:Panel>
-
-        </asp:Panel><%-- fin pnlHeader --%>
-
-        <%-- CONTENIDO --%>
-        <div class="content-wrapper">
-            <asp:ContentPlaceHolder ID="MainContent" runat="server">
-            </asp:ContentPlaceHolder>
-        </div>
-
-        <%-- FOOTER --%>
-        <div class="footer-main">
-            <div class="footer-inner">
-                <div>
-                    <img src='<%: ResolveUrl("~/Content/MueblesLosAlpes.png") %>' alt="Muebles Los Alpes" style="height:65px; width:auto; display:block; opacity:0.9;" />
-                    <p>Santos &amp; Familia — Desde 1978.<br />Diseno &amp; Confort Hogareno.<br />Guatemala</p>
-                </div>
-                <div>
-                    <h5>Modulos</h5>
-                    <a runat="server" href="~/Modules/CatalogoInventario/Index.aspx">Catalogo &amp; Inventario</a>
-                    <a runat="server" href="~/Modules/AuthUsuarios/Index.aspx">Auth &amp; Usuarios</a>
-                    <a runat="server" href="~/Modules/ComprasProveedor/Index.aspx">Compras &amp; Proveedor</a>
-                    <a runat="server" href="~/Modules/VentasFacturacion/Index.aspx">Ventas &amp; Facturacion</a>
-                </div>
-                <div>
-                    <h5>Tecnologia</h5>
-                    <a href="#">ASP.NET Web Forms VB.NET</a>
-                    <a href="#">Oracle 21c</a>
-                    <a href="#">Oracle Data Guard</a>
-                    <a href="#">ODP.NET Managed Driver</a>
-                </div>
             </div>
         </div>
-        <div class="footer-bottom">
-            &copy; <%: DateTime.Now.Year %> — Muebles Los Alpes ERP &nbsp;|&nbsp; Santos &amp; Familia &nbsp;|&nbsp; Guatemala
+
+        <%-- NAV ADMIN --%>
+        <asp:Panel ID="pnlNavAdmin" runat="server">
+        <nav class="nav-main">
+            <ul>
+                <li><a runat="server" href="~/">Inicio</a></li>
+
+                <li>
+                    <a href="#">Catalogo &amp; Inventario &#9660;</a>
+                    <div class="dropdown-nav">
+                        <span class="dropdown-header-nav">Catalogo</span>
+                        <a runat="server" href="~/Modules/CatalogoInventario/Index.aspx">Dashboard</a>
+                        <a runat="server" href="~/Modules/CatalogoInventario/Categorias.aspx">Categorias</a>
+                        <a runat="server" href="~/Modules/CatalogoInventario/Materiales.aspx">Materiales</a>
+                        <a runat="server" href="~/Modules/CatalogoInventario/Tipos.aspx">Tipos</a>
+                        <a runat="server" href="~/Modules/CatalogoInventario/Productos.aspx">Productos</a>
+                        <a runat="server" href="~/Modules/CatalogoInventario/Precios.aspx">Precios</a>
+                        <span class="dropdown-header-nav">Bodega</span>
+                        <a runat="server" href="~/Modules/CatalogoInventario/Almacenes.aspx">Almacenes</a>
+                        <a runat="server" href="~/Modules/CatalogoInventario/Nichos.aspx">Nichos</a>
+                        <a runat="server" href="~/Modules/CatalogoInventario/Stock.aspx">Stock</a>
+                    </div>
+                </li>
+
+                <li>
+                    <a href="#">Auth &amp; Usuarios &#9660;</a>
+                    <div class="dropdown-nav">
+                        <a runat="server" href="~/Modules/AuthUsuarios/Index.aspx">Dashboard</a>
+                        <a runat="server" href="~/Modules/AuthUsuarios/LoginEmpleado.aspx">Login Empleado</a>
+                        <a runat="server" href="~/Modules/AuthUsuarios/LoginCliente.aspx">Login Cliente</a>
+                        <a runat="server" href="~/Modules/AuthUsuarios/Puestos.aspx">Puestos</a>
+                        <a runat="server" href="~/Modules/AuthUsuarios/Admin/GrupoUsuario.aspx">Grupo Usuario</a>
+                        <a runat="server" href="~/Modules/AuthUsuarios/Admin/Permisos.aspx">Permisos</a>
+                    </div>
+                </li>
+
+                <li>
+                    <a href="#">Ventas &amp; Facturacion &#9660;</a>
+                    <div class="dropdown-nav">
+                        <a runat="server" href="~/Modules/VentasFacturacion/Index.aspx">Dashboard</a>
+                        <a runat="server" href="~/Modules/VentasFacturacion/Carrito.aspx">Carrito</a>
+                        <a runat="server" href="~/Modules/VentasFacturacion/DetalleCarrito.aspx">Detalle Carrito</a>
+                        <a runat="server" href="~/Modules/VentasFacturacion/Factura.aspx">Factura</a>
+                        <a runat="server" href="~/Modules/VentasFacturacion/HistorialPrecioVenta.aspx">Precios de Venta</a>
+                    </div>
+                </li>
+
+                <li>
+                    <a href="#">Compras &amp; Proveedor &#9660;</a>
+                    <div class="dropdown-nav">
+                        <a runat="server" href="~/Modules/ComprasProveedor/Index.aspx">Dashboard</a>
+                        <a runat="server" href="~/Modules/ComprasProveedor/Proveedores.aspx">Proveedores</a>
+                        <a runat="server" href="~/Modules/ComprasProveedor/OrdenesCompra.aspx">Ordenes de Compra</a>
+                        <a runat="server" href="~/Modules/ComprasProveedor/Pedidos.aspx">Pedidos</a>
+                        <a runat="server" href="~/Modules/ComprasProveedor/FacturasProveedor.aspx">Facturas</a>
+                        <a runat="server" href="~/Modules/ComprasProveedor/ReclamosProveedor.aspx">Reclamos</a>
+                    </div>
+                </li>
+
+                <li>
+                    <a href="#">Reporteria Gerencial&#9660;</a>
+                    <div class="dropdown-nav">
+                        <a runat="server" href="~/Modules/Reporteria/Gerencial/ReporteVentas.aspx">Ventas</a>
+                        <a runat="server" href="~/Modules/Reporteria/Gerencial/ReporteInventario.aspx">Inventario</a>
+                    </div>
+                </li>
+
+                <li>
+                    <a href="#">Reporteria Marketing&#9660;</a>
+                    <div class="dropdown-nav">
+                        <a runat="server" href="~/Modules/Reporteria/Marketing/ReporteMarketing.aspx">Marketing</a>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+        </asp:Panel>
+
+        <%-- NAV CLIENTE --%>
+        <asp:Panel ID="pnlNavCliente" runat="server" Visible="false">
+        <nav class="nav-main" style="display:flex; justify-content:space-between; align-items:center;">
+            <ul>
+                <li><a href="/Modules/Cliente/Catalogo.aspx">Productos</a></li>
+                <li><a href="/Modules/Cliente/Tiendas.aspx">Tiendas</a></li>
+                <li><a href="/Modules/Cliente/Promociones.aspx">Promociones</a></li>
+                <li id="liMisCompras" runat="server" visible="false">
+                    <a href="/Modules/Cliente/MisCompras.aspx">Mis Compras</a>
+                </li>
+            </ul>
+
+            <asp:Panel ID="pnlNavLogueado" runat="server" Visible="false">
+                <div style="position:relative; margin-right:10px;"
+                     onmouseover="document.getElementById('cuentaDropdown').style.display='block';"
+                     onmouseout="document.getElementById('cuentaDropdown').style.display='none';">
+                    <div style="color:rgba(240,217,160,0.85); font-size:13px; font-weight:bold;
+                                font-family:Arial,sans-serif; padding:14px 18px; cursor:pointer;
+                                display:flex; align-items:center; gap:6px;">
+                        Hola, <asp:Label ID="lblNavNombre" runat="server" /> ▾
+                    </div>
+
+                    <div id="cuentaDropdown"
+                         style="display:none; position:absolute; top:100%; right:0; min-width:200px;
+                                background:white; border-radius:0 0 10px 10px;
+                                box-shadow:0 8px 24px rgba(0,0,0,0.15); z-index:99999;
+                                border-top:3px solid #C9973A; overflow:hidden;">
+                        <a href="/Modules/Cliente/MisCompras.aspx"
+                           style="display:flex; align-items:center; gap:10px; padding:12px 18px;
+                                  font-size:13px; font-family:Arial,sans-serif; color:#3a2a1a;
+                                  text-decoration:none; border-bottom:1px solid #f5ece0;">
+                             Mis Pedidos
+                        </a>
+
+                        <a href="/Modules/Cliente/MiPerfil.aspx"
+                           style="display:flex; align-items:center; gap:10px; padding:12px 18px;
+                                  font-size:13px; font-family:Arial,sans-serif; color:#3a2a1a;
+                                  text-decoration:none; border-bottom:1px solid #f5ece0;">
+                             Mi Información
+                        </a>
+
+                        <asp:LinkButton ID="btnNavCerrarSesion" runat="server"
+                            OnClick="btnCerrarSesion_Click"
+                            CssClass="tiempoInhabilitado"
+                            style="display:flex; align-items:center; gap:10px; padding:12px 18px;
+                                   font-size:13px; font-family:Arial,sans-serif; color:#e53e3e;
+                                   text-decoration:none; width:100%; background:none; border:none;
+                                   cursor:pointer; text-align:left;">
+                            Cerrar sesión
+                        </asp:LinkButton>
+                    </div>
+                </div>
+            </asp:Panel>
+
+            <asp:Panel ID="pnlNavNoLogueado" runat="server" Visible="false" />
+        </nav>
+        </asp:Panel>
+
+    </asp:Panel>
+
+    <%-- CONTENIDO --%>
+    <div class="content-wrapper">
+        <asp:ContentPlaceHolder ID="MainContent" runat="server">
+        </asp:ContentPlaceHolder>
+    </div>
+
+    <%-- FOOTER CLIENTE --%>
+    <div class="footer-cliente">
+        <div class="footer-cliente-inner">
+
+            <div class="footer-col">
+                <h5>Muebles Los Alpes</h5>
+                <p>Santos &amp; Familia — Desde 1978.</p>
+                <p>Diseno &amp; Confort Hogareno.</p>
+                <p>Guatemala</p>
+            </div>
+
+            <div class="footer-col">
+                <h5>Tienda</h5>
+                <a href="/Modules/Cliente/Catalogo.aspx">Productos</a>
+                <a href="/Modules/Cliente/Tiendas.aspx">Tiendas</a>
+                <a href="/Modules/Cliente/Promociones.aspx">Promociones</a>
+            </div>
+
+            <div class="footer-col">
+                <h5>Cliente</h5>
+                <a href="/Modules/Cliente/Carrito.aspx">Carrito</a>
+                <a href="/Modules/Cliente/Login.aspx">Iniciar Sesión</a>
+                <a href="/Modules/Cliente/MisCompras.aspx">Mis Compras</a>
+            </div>
+
+            <div class="footer-col">
+                <h5>Compra segura</h5>
+                <p>Consulta productos, promociones y disponibilidad desde nuestro catálogo.</p>
+                <p>Gestiona tus pedidos desde tu cuenta de cliente.</p>
+            </div>
+
         </div>
 
-    </form>
-    <asp:PlaceHolder runat="server">
-        <%: Scripts.Render("~/Scripts/bootstrap.js") %>
-    </asp:PlaceHolder>
-    <script src="<%: ResolveUrl("~/Scripts/global-buttons.js") %>"></script>
+        <div class="footer-cliente-bottom">
+            &copy; <%: DateTime.Now.Year %> — Muebles Los Alpes ERP &nbsp;|&nbsp; Santos &amp; Familia &nbsp;|&nbsp; Guatemala
+        </div>
+    </div>
+
+</form>
+
+<asp:PlaceHolder runat="server">
+    <%: Scripts.Render("~/Scripts/bootstrap.js") %>
+</asp:PlaceHolder>
+
+<script src="<%: ResolveUrl("~/Scripts/global-buttons.js") %>"></script>
+
 </body>
 </html>

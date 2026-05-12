@@ -1,6 +1,6 @@
 ﻿Namespace Modules.ComprasProveedor
     Partial Public Class Index
-        Inherits System.Web.UI.Page
+        Inherits BasePage
 
         Protected Sub Page_Load(ByVal sender As Object, ByVal e As EventArgs)
             ' AutoEventWireup="true" maneja el enlace automáticamente

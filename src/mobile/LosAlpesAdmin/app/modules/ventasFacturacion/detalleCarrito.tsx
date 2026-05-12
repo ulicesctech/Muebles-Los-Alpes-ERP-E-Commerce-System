@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Alert, FlatList } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { fetchAPI } from '../../services/apiClient';
-import { listarCarritos, Carrito } from '../../services/carritoService';
+import { fetchAPI } from '../../../services/apiClient';
+import { listarCarritos, Carrito } from '../../../services/carritoService';
 
 export default function DetalleCarritoScreen() {
   const { carritoId } = useLocalSearchParams();

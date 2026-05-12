@@ -79,7 +79,7 @@
     <div class="compra-card">
         <div class="compra-head">
             <div>
-                <div class="compra-codigo"> <%# Eval("FACLI_CODIGO_FACTURA") %></div>
+                <div class="compra-codigo"> <%#: Eval("FACLI_CODIGO_FACTURA") %></div>
                 <div class="compra-fecha"><%# String.Format("{0:dd/MM/yyyy HH:mm}", Eval("FACLI_FECHA")) %></div>
             </div>
             <div style="text-align:right;">
@@ -90,13 +90,13 @@
                         " Envío a domicilio") %>
                 </div>
                 <div style="font-size:11px; color:#888; font-family:Arial,sans-serif;">
-                    💳 <%# Eval("FACLI_FORMA_PAGO") %>
+                    💳 <%#: Eval("FACLI_FORMA_PAGO") %>
                 </div>
             </div>
         </div>
         <div class="compra-body">
             <div style="font-size:12px; color:#555; font-family:Arial,sans-serif; line-height:1.8;">
-                <%# Eval("PRODUCTOS") %>
+                <%#: Eval("PRODUCTOS") %>
             </div>
         </div>
     </div>

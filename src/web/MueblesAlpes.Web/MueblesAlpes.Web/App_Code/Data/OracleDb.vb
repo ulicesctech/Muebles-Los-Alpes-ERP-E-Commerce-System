@@ -1,6 +1,7 @@
 Imports Oracle.ManagedDataAccess.Client
 Imports System.Data
 
+
 Public NotInheritable Class OracleDb
 
     Private Sub New()

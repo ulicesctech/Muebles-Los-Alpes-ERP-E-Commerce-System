@@ -103,7 +103,7 @@
     <asp:GridView ID="gvProveedores" runat="server" AutoGenerateColumns="false" CssClass="table" OnRowCommand="gvProveedores_RowCommand" GridLines="None">
         <Columns>
             <asp:TemplateField HeaderText="ID" ItemStyle-Width="70px">
-                <ItemTemplate><span class="badge-id"><%# Eval("PROV_PROVEEDOR") %></span></ItemTemplate>
+                <ItemTemplate><span class="badge-id"><%#: Eval("PROV_PROVEEDOR") %></span></ItemTemplate>
             </asp:TemplateField>
             <asp:BoundField DataField="PROV_NIT" HeaderText="NIT" />
             <asp:BoundField DataField="PROV_NOMBRE" HeaderText="Nombre" />
@@ -114,8 +114,8 @@
             <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="180px">
                 <ItemTemplate>
                     <div class="actions-cell">
-                        <asp:LinkButton CommandName="Editar" CommandArgument='<%# Eval("PROV_PROVEEDOR") %>' runat="server" CssClass="btn-edit-t tiempoInhabilitado">✏️ Editar</asp:LinkButton>
-                        <asp:LinkButton CommandName="Eliminar" CommandArgument='<%# Eval("PROV_PROVEEDOR") %>' runat="server" CssClass="btn-del-t tiempoInhabilitado" OnClientClick="return confirm('¿Eliminar?');">🗑 Eliminar</asp:LinkButton>
+                        <asp:LinkButton CommandName="Editar" CommandArgument='<%#: Eval("PROV_PROVEEDOR") %>' runat="server" CssClass="btn-edit-t tiempoInhabilitado">✏️ Editar</asp:LinkButton>
+                        <asp:LinkButton CommandName="Eliminar" CommandArgument='<%#: Eval("PROV_PROVEEDOR") %>' runat="server" CssClass="btn-del-t tiempoInhabilitado" OnClientClick="return confirm('¿Eliminar?');">🗑 Eliminar</asp:LinkButton>
                     </div>
                 </ItemTemplate>
             </asp:TemplateField>

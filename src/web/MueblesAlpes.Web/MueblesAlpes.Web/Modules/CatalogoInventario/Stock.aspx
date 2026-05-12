@@ -221,7 +221,7 @@
                 <asp:Button ID="btnCancelarLimites" runat="server" Text="Cancelar edicion" CssClass="btn-outline tiempoInhabilitado" OnClick="btnCancelarLimites_Click" CausesValidation="false" />
             </asp:Panel>
             <asp:Button ID="btnCancelar" runat="server" Text="Cancelar" CssClass="btn-outline tiempoInhabilitado" OnClick="btnCancelar_Click" CausesValidation="false" />
-        </asp:Panel><%-- fin pnlStockActual --%>
+        </asp:Panel>
 
         <asp:Panel ID="pnlSinStock" runat="server" Visible="false">
             <div class="aviso-precio" style="margin-bottom:14px;">
@@ -288,16 +288,16 @@
         EmptyDataText="No hay stock que coincida con los filtros." style="width:100%;">
         <Columns>
             <asp:TemplateField HeaderText="Producto">
-                <ItemTemplate><%# Eval("PRO_NOMBRE") %></ItemTemplate>
+                <ItemTemplate><%#: Eval("PRO_NOMBRE") %></ItemTemplate>
             </asp:TemplateField>
             <asp:TemplateField HeaderText="Almacen" ItemStyle-Width="130px">
-                <ItemTemplate><%# Eval("ALM_NOMBRE") %></ItemTemplate>
+                <ItemTemplate><%#: Eval("ALM_NOMBRE") %></ItemTemplate>
             </asp:TemplateField>
             <asp:TemplateField HeaderText="Nicho" ItemStyle-Width="70px">
-                <ItemTemplate><%# Eval("NIC_NUMERO") %></ItemTemplate>
+                <ItemTemplate><%#: Eval("NIC_NUMERO") %></ItemTemplate>
             </asp:TemplateField>
             <asp:TemplateField HeaderText="Caracteristica">
-                <ItemTemplate><%# Eval("NIC_CARACTERISTICA") %></ItemTemplate>
+                <ItemTemplate><%#: Eval("NIC_CARACTERISTICA") %></ItemTemplate>
             </asp:TemplateField>
             <asp:TemplateField HeaderText="Precio" ItemStyle-Width="100px">
                 <ItemTemplate>Q <%# String.Format("{0:N2}", Eval("HIP_PRECIO")) %></ItemTemplate>
@@ -305,20 +305,20 @@
             </asp:TemplateField>
             <asp:TemplateField HeaderText="Disponible" ItemStyle-Width="85px">
                 <ItemTemplate>
-                    <asp:Label ID="lblGvDisponible" runat="server" Text='<%# Eval("STO_DISPONIBLE") %>' />
+                    <asp:Label ID="lblGvDisponible" runat="server" Text='<%#: Eval("STO_DISPONIBLE") %>' />
                 </ItemTemplate>
             </asp:TemplateField>
             <asp:TemplateField HeaderText="Minimo" ItemStyle-Width="90px">
-                <ItemTemplate><%# Eval("STO_MINIMO") %></ItemTemplate>
+                <ItemTemplate><%#: Eval("STO_MINIMO") %></ItemTemplate>
                 <EditItemTemplate>
-                    <asp:TextBox ID="txtGvMinimo" runat="server" Text='<%# Eval("STO_MINIMO") %>'
+                    <asp:TextBox ID="txtGvMinimo" runat="server" Text='<%#: Eval("STO_MINIMO") %>'
                         style="width:65px;padding:4px 6px;border:1.5px solid #C9973A;border-radius:6px;font-size:13px;" />
                 </EditItemTemplate>
             </asp:TemplateField>
             <asp:TemplateField HeaderText="Maximo" ItemStyle-Width="90px">
-                <ItemTemplate><%# Eval("STO_MAXIMO") %></ItemTemplate>
+                <ItemTemplate><%#: Eval("STO_MAXIMO") %></ItemTemplate>
                 <EditItemTemplate>
-                    <asp:TextBox ID="txtGvMaximo" runat="server" Text='<%# Eval("STO_MAXIMO") %>'
+                    <asp:TextBox ID="txtGvMaximo" runat="server" Text='<%#: Eval("STO_MAXIMO") %>'
                         style="width:65px;padding:4px 6px;border:1.5px solid #C9973A;border-radius:6px;font-size:13px;" />
                 </EditItemTemplate>
             </asp:TemplateField>

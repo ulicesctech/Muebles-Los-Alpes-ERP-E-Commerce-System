@@ -80,15 +80,15 @@
     <asp:GridView ID="gvTipos" runat="server" AutoGenerateColumns="false" CssClass="table" OnRowCommand="gvTipos_RowCommand" GridLines="None">
         <Columns>
             <asp:TemplateField HeaderText="ID" ItemStyle-Width="90px">
-                <ItemTemplate><span class="badge-id"><%# Eval("TIP_TIPO") %></span></ItemTemplate>
+                <ItemTemplate><span class="badge-id"><%#: Eval("TIP_TIPO") %></span></ItemTemplate>
             </asp:TemplateField>
             <asp:BoundField DataField="TIP_DESCRIPCION" HeaderText="Tipo" />
             <asp:BoundField DataField="CATEGORIA"       HeaderText="Categoría" />
             <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="200px">
                 <ItemTemplate>
                     <div class="actions-cell">
-                        <asp:LinkButton CommandName="Editar"   CommandArgument='<%# Eval("TIP_TIPO") %>' runat="server" CssClass="btn-edit-t tiempoInhabilitado">✏️ Editar</asp:LinkButton>
-                        <asp:LinkButton CommandName="Eliminar" CommandArgument='<%# Eval("TIP_TIPO") %>' runat="server" CssClass="btn-del-t tiempoInhabilitado" OnClientClick="return confirm('¿Eliminar este tipo?');">🗑 Eliminar</asp:LinkButton>
+                        <asp:LinkButton CommandName="Editar"   CommandArgument='<%#: Eval("TIP_TIPO") %>' runat="server" CssClass="btn-edit-t tiempoInhabilitado">✏️ Editar</asp:LinkButton>
+                        <asp:LinkButton CommandName="Eliminar" CommandArgument='<%#: Eval("TIP_TIPO") %>' runat="server" CssClass="btn-del-t tiempoInhabilitado" OnClientClick="return confirm('¿Eliminar este tipo?');">🗑 Eliminar</asp:LinkButton>
                     </div>
                 </ItemTemplate>
             </asp:TemplateField>
