@@ -1,7 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  View, Text, StyleSheet, FlatList, TouchableOpacity,
-  TextInput, ActivityIndicator, Alert, ScrollView,
+  ActivityIndicator, Alert,
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { fetchAPI } from '../../../services/apiClient';
 
@@ -14,7 +20,8 @@ interface HistorialPrecio {
 }
 
 interface Producto {
-  PRO_CODIGO: number;
+  PRO_REFERENCIA: string;
+  PRO_CODIGO?: number;
   PRO_NOMBRE: string;
 }
 
@@ -22,20 +29,23 @@ export default function HistorialPrecioVentaScreen() {
   const [historial, setHistorial] = useState<HistorialPrecio[]>([]);
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
-  const [proReferencia, setProReferencia] = useState<number | null>(null);
+  const [proReferencia, setProReferencia] = useState<string | null>(null);
   const [porcentaje, setPorcentaje] = useState('');
   const [registrando, setRegistrando] = useState(false);
 
   const cargarDatos = async () => {
     try {
       setLoading(true);
+
       const [resHistorial, resProductos] = await Promise.all([
         fetchAPI('Handlers/VentasFacturacion/HistorialPrecioVentaHandler.ashx', 'listar', 'GET'),
         fetchAPI('Handlers/VentasFacturacion/CarritoHandler.ashx', 'productos', 'GET'),
       ]);
-      setHistorial(resHistorial);
-      setProductos(resProductos);
-      if (resProductos.length > 0) {
+
+      setHistorial(resHistorial || []);
+      setProductos(resProductos || []);
+
+      if (resProductos && resProductos.length > 0) {
         setProReferencia(resProductos[0].PRO_REFERENCIA);
         console.log('Productos:', JSON.stringify(resProductos[0]));
       }
@@ -52,23 +62,29 @@ export default function HistorialPrecioVentaScreen() {
 
   const handleRegistrar = async () => {
     const pct = parseFloat(porcentaje);
+
     if (!proReferencia) {
       Alert.alert('Error', 'Selecciona un producto.');
       return;
     }
+
     if (isNaN(pct) || pct <= 0) {
       Alert.alert('Error', 'Ingresa un porcentaje válido.');
       return;
     }
+
     try {
       setRegistrando(true);
-      const action = `registrar&proReferencia=${proReferencia}&porcetaje=${pct}`;
+
+      const action = `registrar&proReferencia=${encodeURIComponent(proReferencia)}&porcetaje=${pct}`;
       console.log('[HistorialPrecioVenta] POST action:', action);
+
       await fetchAPI(
         'Handlers/VentasFacturacion/HistorialPrecioVentaHandler.ashx',
         action,
         'POST'
       );
+
       setPorcentaje('');
       await cargarDatos();
     } catch {
@@ -89,27 +105,38 @@ export default function HistorialPrecioVentaScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Formulario nuevo precio */}
       <View style={styles.formulario}>
         <Text style={styles.formTitulo}>Registrar Precio</Text>
+
         <Text style={styles.label}>Producto</Text>
+
         <ScrollView style={styles.pickerWrapper} nestedScrollEnabled>
           {productos.map((p, i) => (
             <TouchableOpacity
-              key={p.PRO_CODIGO != null ? String(p.PRO_CODIGO) : String(i)}
-              style={[styles.opcionItem, proReferencia === p.PRO_REFERENCIA && styles.opcionItemSelected]}
+              key={`${p.PRO_REFERENCIA}-${i}`}
+              style={[
+                styles.opcionItem,
+                proReferencia === p.PRO_REFERENCIA && styles.opcionItemSelected,
+              ]}
               onPress={() => {
-                const productoSeleccionado = p;
-                console.log('Producto seleccionado:', JSON.stringify(productoSeleccionado));
+                console.log('Producto seleccionado:', JSON.stringify(p));
                 setProReferencia(p.PRO_REFERENCIA);
-              }}>
-              <Text style={[styles.opcionText, proReferencia === p.PRO_REFERENCIA && styles.opcionTextSelected]}>
+              }}
+            >
+              <Text
+                style={[
+                  styles.opcionText,
+                  proReferencia === p.PRO_REFERENCIA && styles.opcionTextSelected,
+                ]}
+              >
                 {p.PRO_NOMBRE}
               </Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
+
         <Text style={styles.label}>Porcentaje (%)</Text>
+
         <TextInput
           style={styles.input}
           placeholder="Ej: 30"
@@ -118,11 +145,15 @@ export default function HistorialPrecioVentaScreen() {
           value={porcentaje}
           onChangeText={setPorcentaje}
         />
+
         <TouchableOpacity
           style={[styles.btnRegistrar, registrando && styles.btnDisabled]}
           onPress={handleRegistrar}
-          disabled={registrando}>
-          <Text style={styles.btnTexto}>{registrando ? 'Registrando...' : 'Registrar'}</Text>
+          disabled={registrando}
+        >
+          <Text style={styles.btnTexto}>
+            {registrando ? 'Registrando...' : 'Registrar'}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -131,21 +162,28 @@ export default function HistorialPrecioVentaScreen() {
       <FlatList
         style={styles.flatList}
         data={historial}
-        keyExtractor={(item) => item.HV_HISTORIAL_PRECIO_VENTA.toString()}
+        keyExtractor={(item, index) => `${item.HV_HISTORIAL_PRECIO_VENTA}-${index}`}
         renderItem={({ item }) => (
           <View style={styles.card}>
             <Text style={styles.cardNombre}>{item.PRO_NOMBRE}</Text>
+
             <View style={styles.cardFila}>
               <Text style={styles.cardLabel}>Precio compra</Text>
-              <Text style={styles.cardValor}>Q {parseFloat(String(item.PRECIO_COMPRA || '0')).toFixed(2)}</Text>
+              <Text style={styles.cardValor}>
+                Q {parseFloat(String(item.PRECIO_COMPRA || '0')).toFixed(2)}
+              </Text>
             </View>
+
             <View style={styles.cardFila}>
               <Text style={styles.cardLabel}>Porcentaje</Text>
               <Text style={styles.cardValor}>{item.HV_PORCETAJE}%</Text>
             </View>
+
             <View style={styles.cardFila}>
               <Text style={styles.cardLabel}>Precio venta</Text>
-              <Text style={[styles.cardValor, styles.cardPrecioVenta]}>Q {parseFloat(String(item.HV_PRECIO_FINAL || '0')).toFixed(2)}</Text>
+              <Text style={[styles.cardValor, styles.cardPrecioVenta]}>
+                Q {parseFloat(String(item.HV_PRECIO_FINAL || '0')).toFixed(2)}
+              </Text>
             </View>
           </View>
         )}
@@ -159,43 +197,137 @@ export default function HistorialPrecioVentaScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f8f3eb', padding: 16 },
-  loadingContainer: { flex: 1, backgroundColor: '#f8f3eb', justifyContent: 'center', alignItems: 'center' },
-  loadingTexto: { marginTop: 12, color: '#5c3a1e', fontSize: 15 },
+
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: '#f8f3eb',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingTexto: {
+    marginTop: 12,
+    color: '#5c3a1e',
+    fontSize: 15,
+  },
+
   formulario: {
-    backgroundColor: '#fff', borderRadius: 12, padding: 12,
-    marginBottom: 12, borderWidth: 1, borderColor: '#dcc29a', elevation: 3,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#dcc29a',
+    elevation: 3,
   },
-  formTitulo: { fontSize: 14, fontWeight: 'bold', color: '#5c3a1e', marginBottom: 8 },
-  label: { fontSize: 12, fontWeight: 'bold', color: '#5c3a1e', marginBottom: 4 },
+  formTitulo: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#5c3a1e',
+    marginBottom: 8,
+  },
+  label: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#5c3a1e',
+    marginBottom: 4,
+  },
   pickerWrapper: {
-    maxHeight: 120, borderWidth: 1, borderColor: '#dcc29a', borderRadius: 8,
-    backgroundColor: '#f8f3eb', marginBottom: 6,
+    maxHeight: 120,
+    borderWidth: 1,
+    borderColor: '#dcc29a',
+    borderRadius: 8,
+    backgroundColor: '#f8f3eb',
+    marginBottom: 6,
   },
-  opcionItem: { padding: 8, borderBottomWidth: 1, borderBottomColor: '#f0e8d8' },
-  opcionItemSelected: { backgroundColor: '#c9973a' },
-  opcionText: { fontSize: 12, color: '#3a281b' },
-  opcionTextSelected: { color: '#fff', fontWeight: 'bold' },
+  opcionItem: {
+    padding: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0e8d8',
+  },
+  opcionItemSelected: {
+    backgroundColor: '#c9973a',
+  },
+  opcionText: {
+    fontSize: 12,
+    color: '#3a281b',
+  },
+  opcionTextSelected: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+
   input: {
-    borderWidth: 1, borderColor: '#dcc29a', borderRadius: 8,
-    padding: 8, backgroundColor: '#f8f3eb', color: '#3a281b',
-    fontSize: 13, marginBottom: 6,
+    borderWidth: 1,
+    borderColor: '#dcc29a',
+    borderRadius: 8,
+    padding: 8,
+    backgroundColor: '#f8f3eb',
+    color: '#3a281b',
+    fontSize: 13,
+    marginBottom: 6,
   },
   btnRegistrar: {
-    backgroundColor: '#5c3a1e', paddingVertical: 10, paddingHorizontal: 14,
-    borderRadius: 10, alignItems: 'center',
+    backgroundColor: '#5c3a1e',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    alignItems: 'center',
   },
-  btnDisabled: { opacity: 0.6 },
-  btnTexto: { color: '#f7deb0', fontWeight: 'bold', fontSize: 13 },
-  flatList: { flex: 1 },
-  listaTitulo: { fontSize: 14, fontWeight: 'bold', color: '#5c3a1e', marginBottom: 10, textTransform: 'uppercase' },
+  btnDisabled: {
+    opacity: 0.6,
+  },
+  btnTexto: {
+    color: '#f7deb0',
+    fontWeight: 'bold',
+    fontSize: 13,
+  },
+
+  flatList: {
+    flex: 1,
+  },
+  listaTitulo: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#5c3a1e',
+    marginBottom: 10,
+    textTransform: 'uppercase',
+  },
   card: {
-    backgroundColor: '#fff', borderRadius: 12, padding: 16,
-    marginBottom: 12, borderWidth: 1, borderColor: '#dcc29a', elevation: 3,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#dcc29a',
+    elevation: 3,
   },
-  cardNombre: { fontSize: 15, fontWeight: 'bold', color: '#3a1f0a', marginBottom: 10 },
-  cardFila: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
-  cardLabel: { fontSize: 13, color: '#7a6652' },
-  cardValor: { fontSize: 13, fontWeight: 'bold', color: '#3a281b' },
-  cardPrecioVenta: { color: '#c9973a' },
-  vacio: { textAlign: 'center', color: '#999', marginTop: 24, fontSize: 14 },
+  cardNombre: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#3a1f0a',
+    marginBottom: 10,
+  },
+  cardFila: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  cardLabel: {
+    fontSize: 13,
+    color: '#7a6652',
+  },
+  cardValor: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#3a281b',
+  },
+  cardPrecioVenta: {
+    color: '#c9973a',
+  },
+  vacio: {
+    textAlign: 'center',
+    color: '#999',
+    marginTop: 24,
+    fontSize: 14,
+  },
 });

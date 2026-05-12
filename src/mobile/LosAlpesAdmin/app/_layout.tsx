@@ -118,6 +118,12 @@ function NavAdmin() {
               <Text style={styles.navText}>Ventas</Text>
             </TouchableOpacity>
           </Link>
+
+          <Link href={"/modules/reporteria" as any} asChild>
+            <TouchableOpacity style={styles.navItem}>
+              <Text style={styles.navText}> Reportes</Text>
+            </TouchableOpacity>
+          </Link>
         </ScrollView>
       </View>
 

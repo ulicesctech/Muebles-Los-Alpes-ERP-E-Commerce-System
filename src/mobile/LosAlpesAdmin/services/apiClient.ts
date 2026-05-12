@@ -1,27 +1,54 @@
 // app/services/apiClient.ts
 
-// URL Base centralizada. ¡Cámbiala aquí y afectará a toda la app!
-const BASE_URL = "http://10.0.2.2:61850";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-/**
- * Función genérica para hacer peticiones al servidor.
- * Maneja los errores de conexión por defecto y límites de peticiones.
- */
+const BASE_URL = "http://10.0.2.2:61850";
+const SESSION_KEY = "ASP_NET_SESSION_COOKIE";
+
+let sessionCookie: string | null = null;
+
+const cargarCookieSesion = async () => {
+  if (!sessionCookie) {
+    sessionCookie = await AsyncStorage.getItem(SESSION_KEY);
+  }
+};
+
+const guardarCookieSesion = async (sessionId: string) => {
+  sessionCookie = `ASP.NET_SessionId=${sessionId}`;
+  await AsyncStorage.setItem(SESSION_KEY, sessionCookie);
+  console.log("Sesion ASP.NET guardada:", sessionCookie);
+};
+
+export const limpiarSesionAPI = async () => {
+  sessionCookie = null;
+  await AsyncStorage.removeItem(SESSION_KEY);
+};
+
 export const fetchAPI = async (
   handlerPath: string,
   action: string,
   method: string = "GET",
   bodyData: any = null,
 ) => {
-  // Ajuste para evitar dobles barras en la URL si BASE_URL terminaba en "/"
+  await cargarCookieSesion();
+
   const url = `${BASE_URL.replace(/\/$/, "")}/${handlerPath}?action=${action}`;
 
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  };
+
+  if (sessionCookie) {
+    headers.Cookie = sessionCookie;
+  }
+
+  console.log("Cookie enviada:", sessionCookie);
+
   const options: RequestInit = {
-    method: method,
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
+    method,
+    credentials: "include",
+    headers,
   };
 
   if (bodyData && (method === "POST" || method === "PUT")) {
@@ -31,36 +58,46 @@ export const fetchAPI = async (
   try {
     const response = await fetch(url, options);
 
-    // 1. INTERCEPTAR ERRORES HTTP (Ej. El bloqueo de IIS)
-    if (!response.ok) {
-      // Si IIS bloqueó la IP, el status será 403
-      if (response.status === 403) {
-        // Leemos tu archivo error_limite.json
-        const errorData = await response.json();
-        // Lanzamos el error con el mensaje de tu JSON
-        throw new Error(
-          errorData.message ||
-            "Demasiadas peticiones. Por favor, espere un momento.",
-        );
-      }
+    let jsonResult: any = null;
 
-      // Manejo para otros errores del servidor (500, 404, etc.)
-      throw new Error(`Error en el servidor (Código: ${response.status})`);
+    try {
+      jsonResult = await response.json();
+    } catch {
+      jsonResult = null;
     }
 
-    // 2. SI TODO ESTÁ BIEN (Código 200)
-    const jsonResult = await response.json();
+    console.log("RESPUESTA API:", handlerPath, action, jsonResult);
 
-    // 3. Evaluar si tu VB.NET devolvió un error controlado (status: "error")
-    if (jsonResult.status === "error") {
+    if (jsonResult?.sessionId) {
+      await guardarCookieSesion(jsonResult.sessionId);
+    }
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error(jsonResult?.mensaje || "Sesion no valida.");
+      }
+
+      if (response.status === 403) {
+        throw new Error(jsonResult?.mensaje || "No tienes permisos para realizar esta accion.");
+      }
+
+      throw new Error(
+        jsonResult?.mensaje ||
+        `Error en el servidor (Codigo: ${response.status})`
+      );
+    }
+
+    if (jsonResult?.status === "error") {
       throw new Error(jsonResult.message);
+    }
+
+    if (jsonResult?.ok === false) {
+      throw new Error(jsonResult.mensaje || "No se pudo procesar la solicitud.");
     }
 
     return jsonResult;
   } catch (error: any) {
     console.error("API Fetch Error:", error);
-    // Lanzamos el mensaje exacto del error que capturamos arriba.
-    // Si es un error de red (sin internet), usamos tu mensaje por defecto.
     throw new Error(error.message || "No se pudo conectar con el servidor.");
   }
 };
