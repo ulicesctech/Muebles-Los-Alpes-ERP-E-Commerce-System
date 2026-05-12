@@ -23,6 +23,8 @@ Partial Public Class SiteMaster
         pnlNavAdmin.Visible = Not esVistaCliente AndAlso Not esPaginaLogin
         pnlNavCliente.Visible = esVistaCliente AndAlso Not esPaginaLogin
 
+        pnlCarritoHeader.Visible = esVistaCliente
+
         If esVistaCliente Then
             If Session("CLI_CLIENTE") IsNot Nothing Then
                 pnlNoLogueado.Visible = False
