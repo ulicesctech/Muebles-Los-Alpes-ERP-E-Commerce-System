@@ -33,9 +33,9 @@ const menuOptions = [
 export default function ReporteriaDashboard() {
   const renderHeader = () => (
     <View style={styles.headerArea}>
-      <Text style={styles.title}>Módulo de Reportería</Text>
+      <Text style={styles.title}>Reportería</Text>
       <Text style={styles.subtitle}>
-        Visualización de datos y análisis de Muebles Los Alpes
+        Visualización de métricas y rendimiento comercial
       </Text>
     </View>
   );
