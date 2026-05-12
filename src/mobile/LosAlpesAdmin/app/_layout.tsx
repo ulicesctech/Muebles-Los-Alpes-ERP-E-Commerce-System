@@ -68,9 +68,9 @@ export default function RootLayout() {
               <Text style={styles.navText}>Ventas</Text>
             </TouchableOpacity>
           </Link>
-          <Link href="/modules/reporteria/Gerencial/inventario" asChild>
+          <Link href="/modules/reporteria" asChild>
             <TouchableOpacity style={styles.navItem}>
-              <Text style={styles.navText}>Reporte Inventario</Text>
+              <Text style={styles.navText}>Reporteria</Text>
             </TouchableOpacity>
           </Link>
         </ScrollView>
