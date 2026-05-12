@@ -2,7 +2,7 @@ Imports System.Data
 
 Namespace Modules.VentasFacturacion
     Public Class DetalleCarrito
-        Inherits System.Web.UI.Page
+        Inherits BasePage
 
         Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
             If Not IsPostBack Then

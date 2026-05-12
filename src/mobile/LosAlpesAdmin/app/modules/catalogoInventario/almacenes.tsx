@@ -11,7 +11,7 @@ import {
 } from "react-native";
 
 // Importamos el servicio centralizado (Asegúrate de que la ruta sea correcta según tu árbol de carpetas)
-import { AlmacenService } from "../../services/catalogoInventario/almacenService";
+import { AlmacenService } from "../../../services/catalogoInventario/almacenService";
 
 export default function AlmacenesScreen() {
   const [almacenes, setAlmacenes] = useState([]);

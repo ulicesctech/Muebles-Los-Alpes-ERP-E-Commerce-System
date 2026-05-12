@@ -30,6 +30,11 @@ const salesOptions = [
     route: "/modules/ventasFacturacion/factura",
     icon: "🧾",
   },
+  {
+    title: "Historial Precio Venta",
+    route: "/modules/ventasFacturacion/historialPrecioVenta",
+    icon: "💰",
+  },
 ];
 
 export default function VentasIndex() {

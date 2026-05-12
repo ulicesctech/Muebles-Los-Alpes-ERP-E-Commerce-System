@@ -136,4 +136,11 @@ Public Class ProductoService
         Return OracleDb.ExecRefCursor(PKG & ".OBTENER", ps, "p_data")
     End Function
 
+    Public Shared Function ListarPorCategoria(categoriaId As Integer) As DataTable
+        Dim ps As New List(Of OracleParameter) From {
+            New OracleParameter("p_categoria", OracleDbType.Decimal, categoriaId, ParameterDirection.Input)
+        }
+        Return OracleDb.ExecRefCursor(PKG & ".LISTAR_POR_CATEGORIA", ps, "p_data")
+    End Function
+
 End Class

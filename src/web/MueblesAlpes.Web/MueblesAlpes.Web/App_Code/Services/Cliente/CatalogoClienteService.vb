@@ -23,7 +23,21 @@ Public Class CatalogoClienteService
         }
         Return OracleDb.ExecRefCursor(PKG & ".BUSCAR", ps, "p_data")
     End Function
-
+    Public Shared Function BuscarPorReferencia(referencia As String) As DataTable
+        Dim ps As New List(Of OracleParameter) From {
+        New OracleParameter("p_texto", OracleDbType.Varchar2, referencia, ParameterDirection.Input),
+        New OracleParameter("p_categoria", OracleDbType.Decimal, 0, ParameterDirection.Input)
+    }
+        Dim dt As DataTable = OracleDb.ExecRefCursor("PKG_CLI_CATALOGO.BUSCAR", ps, "p_data")
+        ' Filtrar por referencia exacta
+        Dim resultado As DataTable = dt.Clone()
+        For Each row As DataRow In dt.Rows
+            If row("PRO_REFERENCIA").ToString().ToUpper() = referencia.ToUpper() Then
+                resultado.ImportRow(row)
+            End If
+        Next
+        Return resultado
+    End Function
     Public Shared Function ListarCategorias() As DataTable
         Return OracleDb.ExecRefCursor(PKG & ".LISTAR_CATEGORIAS", Nothing, "p_data")
     End Function

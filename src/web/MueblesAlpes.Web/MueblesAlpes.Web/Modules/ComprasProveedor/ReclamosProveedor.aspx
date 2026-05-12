@@ -219,7 +219,7 @@
                   OnRowCommand="gvReclamos_RowCommand" GridLines="None">
         <Columns>
             <asp:TemplateField HeaderText="ID" ItemStyle-Width="70px">
-                <ItemTemplate><span class="badge-id"><%# Eval("REP_RECLAMO_PROVEEDOR") %></span></ItemTemplate>
+                <ItemTemplate><span class="badge-id"><%#: Eval("REP_RECLAMO_PROVEEDOR") %></span></ItemTemplate>
             </asp:TemplateField>
             <asp:BoundField DataField="ORC_ORDEN_COMPRA" HeaderText="Orden Compra" />
             <asp:BoundField DataField="REP_DESCRIPCION"  HeaderText="Descripcion" />
@@ -232,7 +232,7 @@
             </asp:TemplateField>
             <asp:TemplateField HeaderText="Estado" ItemStyle-Width="110px">
                 <ItemTemplate>
-                    <span class='badge-estado estado-<%# Eval("REP_ESTADO") %>'><%# Eval("REP_ESTADO") %></span>
+                    <span class='badge-estado estado-<%#: Eval("REP_ESTADO") %>'><%#: Eval("REP_ESTADO") %></span>
                 </ItemTemplate>
             </asp:TemplateField>
             <asp:BoundField DataField="REP_FECHA_INICIO" HeaderText="Inicio" DataFormatString="{0:dd/MM/yyyy}" ItemStyle-Width="90px" />
@@ -248,24 +248,24 @@
                     <div class="actions-cell">
                         <%-- Editar descripcion: solo INICIADO o PENDIENTE --%>
                         <asp:LinkButton CommandName="Editar"
-                            CommandArgument='<%# Eval("REP_RECLAMO_PROVEEDOR") %>'
+                            CommandArgument='<%#: Eval("REP_RECLAMO_PROVEEDOR") %>'
                             runat="server"
                             CssClass='<%# If(Eval("REP_ESTADO").ToString() = "RESUELTO" OrElse Eval("REP_ESTADO").ToString() = "RECHAZADO", "btn-disabled-t tiempoInhabilitado", "btn-edit-t tiempoInhabilitado") %>'
-                            Enabled='<%# Eval("REP_ESTADO").ToString() <> "RESUELTO" AndAlso Eval("REP_ESTADO").ToString() <> "RECHAZADO" %>'>✏️ Desc.</asp:LinkButton>
+                            Enabled='<%#: Eval("REP_ESTADO").ToString() <> "RESUELTO" AndAlso Eval("REP_ESTADO").ToString() <> "RECHAZADO" %>'>✏️ Desc.</asp:LinkButton>
                         <%-- Cambiar estado: solo INICIADO o PENDIENTE --%>
                         <asp:LinkButton CommandName="CambiarEstado"
-                            CommandArgument='<%# Eval("REP_RECLAMO_PROVEEDOR") %>'
+                            CommandArgument='<%#: Eval("REP_RECLAMO_PROVEEDOR") %>'
                             runat="server"
                             CssClass='<%# If(Eval("REP_ESTADO").ToString() = "RESUELTO" OrElse Eval("REP_ESTADO").ToString() = "RECHAZADO", "btn-disabled-t tiempoInhabilitado", "btn-estado-t tiempoInhabilitado") %>'
-                            Enabled='<%# Eval("REP_ESTADO").ToString() <> "RESUELTO" AndAlso Eval("REP_ESTADO").ToString() <> "RECHAZADO" %>'>🔄 Estado</asp:LinkButton>
+                            Enabled='<%#: Eval("REP_ESTADO").ToString() <> "RESUELTO" AndAlso Eval("REP_ESTADO").ToString() <> "RECHAZADO" %>'>🔄 Estado</asp:LinkButton>
                         <%-- Editar comentarios: solo RESUELTO o RECHAZADO --%>
                         <asp:LinkButton CommandName="EditarComentarios"
-                            CommandArgument='<%# Eval("REP_RECLAMO_PROVEEDOR") %>'
+                            CommandArgument='<%#: Eval("REP_RECLAMO_PROVEEDOR") %>'
                             runat="server"
                             CssClass='<%# If(Eval("REP_ESTADO").ToString() = "RESUELTO" OrElse Eval("REP_ESTADO").ToString() = "RECHAZADO", "btn-coment-t tiempoInhabilitado", "btn-disabled-t tiempoInhabilitado") %>'
-                            Enabled='<%# Eval("REP_ESTADO").ToString() = "RESUELTO" OrElse Eval("REP_ESTADO").ToString() = "RECHAZADO" %>'>💬 Coment.</asp:LinkButton>
+                            Enabled='<%#: Eval("REP_ESTADO").ToString() = "RESUELTO" OrElse Eval("REP_ESTADO").ToString() = "RECHAZADO" %>'>💬 Coment.</asp:LinkButton>
                         <asp:LinkButton CommandName="Eliminar"
-                            CommandArgument='<%# Eval("REP_RECLAMO_PROVEEDOR") %>'
+                            CommandArgument='<%#: Eval("REP_RECLAMO_PROVEEDOR") %>'
                             runat="server" CssClass="btn-del-t tiempoInhabilitado"
                             OnClientClick="return confirm('¿Eliminar este reclamo?');">🗑</asp:LinkButton>
                     </div>

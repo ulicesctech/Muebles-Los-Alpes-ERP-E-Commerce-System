@@ -128,7 +128,7 @@
         <Columns>
             <asp:TemplateField HeaderText="ID" ItemStyle-Width="60px">
                 <ItemTemplate>
-                    <span class="badge-id"><%# Eval("per_permisos") %></span>
+                    <span class="badge-id"><%#: Eval("per_permisos") %></span>
                 </ItemTemplate>
             </asp:TemplateField>
             <asp:TemplateField HeaderText="👑 Admin">
@@ -165,9 +165,9 @@
                 <ItemTemplate>
                     <div class="actions-cell">
                         <asp:LinkButton runat="server" Text="✏️" CommandName="Editar"
-                            CommandArgument='<%# Eval("per_permisos") %>' CssClass="btn-edit-t tiempoInhabilitado" />
+                            CommandArgument='<%#: Eval("per_permisos") %>' CssClass="btn-edit-t tiempoInhabilitado" />
                         <asp:LinkButton runat="server" Text="🗑" CommandName="Eliminar"
-                            CommandArgument='<%# Eval("per_permisos") %>' CssClass="btn-del-t tiempoInhabilitado"
+                            CommandArgument='<%#: Eval("per_permisos") %>' CssClass="btn-del-t tiempoInhabilitado"
                             OnClientClick="return confirm('¿Eliminar este permiso?');" />
                     </div>
                 </ItemTemplate>

@@ -36,7 +36,7 @@ Namespace Modules.Cliente
                     Dim hipId As String = e.CommandArgument.ToString()
 
                     Dim dtCatalogo As DataTable = CatalogoClienteService.ListarPromociones()
-                    Dim filas As DataRow() = dtCatalogo.Select("HIP_HISTORIAL_PRECIO = " & hipId)
+                    Dim filas As DataRow() = dtCatalogo.Select("HV_HISTORIAL_PRECIO_VENTA = " & hipId)
                     Dim nombreProducto As String = "Producto"
                     If filas.Length > 0 Then
                         nombreProducto = filas(0)("PRO_NOMBRE").ToString()

@@ -154,7 +154,7 @@
                 <asp:BoundField DataField="HV_PORCETAJE"    HeaderText="Porcentaje (%)"    ItemStyle-Width="110px" DataFormatString="{0:N2}" />
                 <asp:TemplateField HeaderText="Precio de venta" ItemStyle-Width="130px" ItemStyle-HorizontalAlign="Center">
                     <ItemTemplate>
-                        <span class="badge-precio">Q <%# Eval("HV_PRECIO_FINAL", "{0:N2}") %></span>
+                        <span class="badge-precio">Q <%#: Eval("HV_PRECIO_FINAL", "{0:N2}") %></span>
                     </ItemTemplate>
                 </asp:TemplateField>
                 <asp:BoundField DataField="HV_FECHA_INICIO" HeaderText="Desde"            ItemStyle-Width="110px" DataFormatString="{0:dd/MM/yyyy}" />

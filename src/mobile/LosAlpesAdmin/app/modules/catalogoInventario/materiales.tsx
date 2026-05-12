@@ -17,7 +17,7 @@ import {
     eliminarMaterial,
     getMateriales,
     Material,
-} from "../../services/catalogoInventario/materiales";
+} from "../../../services/catalogoInventario/materiales";
 
 export default function MaterialesScreen() {
   const [materiales, setMateriales] = useState<Material[]>([]);

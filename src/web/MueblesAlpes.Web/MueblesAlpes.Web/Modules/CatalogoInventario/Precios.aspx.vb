@@ -5,7 +5,7 @@
 Namespace Modules.CatalogoInventario
 
     Partial Public Class Precios
-        Inherits System.Web.UI.Page
+        Inherits BasePage
 
         Protected Sub Page_Load(sender As Object, e As EventArgs) Handles Me.Load
             If Not IsPostBack Then
@@ -34,9 +34,9 @@ Namespace Modules.CatalogoInventario
             ddlMes.Items.Add(New ListItem("Diciembre", "12"))
 
             ddlAnio.Items.Clear()
-            Dim anioActual As Integer = DateTime.Now.Year
-            For i As Integer = anioActual To 2023 Step -1
-                ddlAnio.Items.Add(New ListItem(i.ToString(), i.ToString()))
+            Dim anios As List(Of Integer) = HistorialPrecioService.ObtenerAnios()
+            For Each anio As Integer In anios
+                ddlAnio.Items.Add(New ListItem(anio.ToString(), anio.ToString()))
             Next
         End Sub
 

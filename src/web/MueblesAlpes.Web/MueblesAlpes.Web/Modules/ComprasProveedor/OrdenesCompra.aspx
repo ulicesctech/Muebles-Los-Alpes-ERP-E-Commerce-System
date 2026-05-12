@@ -104,7 +104,7 @@
                 OnRowDataBound="gvOrdenes_RowDataBound">
                 <Columns>
                     <asp:TemplateField HeaderText="ID Orden" ItemStyle-Width="120px">
-                        <ItemTemplate><span class="badge-id"><%# Eval("ORC_KEY") %></span></ItemTemplate>
+                        <ItemTemplate><span class="badge-id"><%#: Eval("ORC_KEY") %></span></ItemTemplate>
                     </asp:TemplateField>
                     <asp:BoundField DataField="CODIGO"    HeaderText="Codigo" />
                     <asp:BoundField DataField="PROVEEDOR" HeaderText="Proveedor" />
@@ -122,7 +122,7 @@
                                         <asp:BoundField DataField="ODP_PRODUCTO" HeaderText="Producto" />
                                         <asp:BoundField DataField="ODP_MATERIAL" HeaderText="Material" />
                                         <asp:TemplateField HeaderText="Forma Pago" ItemStyle-Width="90px">
-                                            <ItemTemplate><span class="badge-pago"><%# Eval("PED_FORMA_PAGO") %></span></ItemTemplate>
+                                            <ItemTemplate><span class="badge-pago"><%#: Eval("PED_FORMA_PAGO") %></span></ItemTemplate>
                                         </asp:TemplateField>
                                         <asp:TemplateField HeaderText="Precio" ItemStyle-Width="80px">
                                             <ItemTemplate>Q <%# String.Format("{0:N2}", Eval("ODP_PRECIO")) %></ItemTemplate>
@@ -143,10 +143,10 @@
                         <ItemTemplate>
                             <div class="actions-cell">
                                 <asp:LinkButton CommandName="VerDetalle"
-                                    CommandArgument='<%# Eval("ORC_KEY") %>'
+                                    CommandArgument='<%#: Eval("ORC_KEY") %>'
                                     runat="server" CssClass="btn-edit-t tiempoInhabilitado">&#128230; Ver</asp:LinkButton>
                                 <asp:LinkButton CommandName="Delete"
-                                    CommandArgument='<%# Eval("ORC_KEY") %>'
+                                    CommandArgument='<%#: Eval("ORC_KEY") %>'
                                     runat="server" CssClass="btn-del-t tiempoInhabilitado"
                                     OnClientClick="return confirm('Eliminar esta orden y todos sus items?');">&#128465;</asp:LinkButton>
                             </div>
@@ -208,14 +208,14 @@
                         OnRowCommand="gvBuscarPedidos_RowCommand">
                         <Columns>
                             <asp:TemplateField HeaderText="ID" ItemStyle-Width="70px">
-                                <ItemTemplate><span class="badge-id"><%# Eval("PED_PEDIDO") %></span></ItemTemplate>
+                                <ItemTemplate><span class="badge-id"><%#: Eval("PED_PEDIDO") %></span></ItemTemplate>
                             </asp:TemplateField>
                             <asp:BoundField DataField="PED_CODIGO" HeaderText="Codigo" />
                             <asp:TemplateField HeaderText="Fecha" ItemStyle-Width="110px">
                                 <ItemTemplate><%# String.Format("{0:dd/MM/yyyy}", Eval("PED_FECHA")) %></ItemTemplate>
                             </asp:TemplateField>
                             <asp:TemplateField HeaderText="Forma Pago" ItemStyle-Width="110px">
-                                <ItemTemplate><span class="badge-pago"><%# Eval("PED_FORMA_PAGO") %></span></ItemTemplate>
+                                <ItemTemplate><span class="badge-pago"><%#: Eval("PED_FORMA_PAGO") %></span></ItemTemplate>
                             </asp:TemplateField>
                             <asp:TemplateField HeaderText="Productos / Items">
                                 <ItemTemplate>
@@ -227,7 +227,7 @@
                                             <asp:BoundField DataField="PRODUCTO_NOMBRE" HeaderText="Producto" />
                                             <asp:BoundField DataField="MATERIAL"        HeaderText="Material" />
                                             <asp:TemplateField HeaderText="Cant." ItemStyle-Width="55px">
-                                                <ItemTemplate><%# Eval("CANTIDAD") %></ItemTemplate>
+                                                <ItemTemplate><%#: Eval("CANTIDAD") %></ItemTemplate>
                                             </asp:TemplateField>
                                         </Columns>
                                         <EmptyDataTemplate><span style="color:#aaa;font-size:11px;">Sin items</span></EmptyDataTemplate>
@@ -237,7 +237,7 @@
                             <asp:TemplateField HeaderText="" ItemStyle-Width="130px" ItemStyle-VerticalAlign="Top">
                                 <ItemTemplate>
                                     <asp:LinkButton ID="lnkSeleccionar" CommandName="VerItemsPedido"
-                                        CommandArgument='<%# Eval("PED_PEDIDO") & "|" & Eval("PED_CODIGO") & "|" & Eval("PED_FORMA_PAGO") %>'
+                                        CommandArgument='<%#: Eval("PED_PEDIDO") & "|" & Eval("PED_CODIGO") & "|" & Eval("PED_FORMA_PAGO") %>'
                                         runat="server" CssClass="btn-edit-t tiempoInhabilitado"
                                         CausesValidation="false">&#10003; Seleccionar</asp:LinkButton>
                                 </ItemTemplate>
@@ -278,19 +278,19 @@
                             <asp:BoundField DataField="PRODUCTO_NOMBRE" HeaderText="Producto" />
                             <asp:BoundField DataField="MATERIAL"        HeaderText="Material" />
                             <asp:TemplateField HeaderText="Forma Pago" ItemStyle-Width="100px">
-                                <ItemTemplate><span class="badge-pago"><%# Eval("PED_FORMA_PAGO") %></span></ItemTemplate>
+                                <ItemTemplate><span class="badge-pago"><%#: Eval("PED_FORMA_PAGO") %></span></ItemTemplate>
                             </asp:TemplateField>
                             <asp:TemplateField HeaderText="Cantidad" ItemStyle-Width="80px">
-                                <ItemTemplate><%# Eval("CANTIDAD") %></ItemTemplate>
+                                <ItemTemplate><%#: Eval("CANTIDAD") %></ItemTemplate>
                             </asp:TemplateField>
                             <asp:TemplateField HeaderText="Precio unitario (Q) *" ItemStyle-Width="160px">
                                 <ItemTemplate>
                                     <asp:TextBox ID="txtPrecioItem" runat="server"
                                         CssClass="precio-input" placeholder="0.00" Text="" />
-                                    <asp:HiddenField ID="hfDetpeId"  runat="server" Value='<%# Eval("DETPE_DETALLE_PEDIDO") %>' />
-                                    <asp:HiddenField ID="hfMaterial" runat="server" Value='<%# Eval("MATERIAL") %>' />
-                                    <asp:HiddenField ID="hfProducto" runat="server" Value='<%# Eval("PRODUCTO_NOMBRE") %>' />
-                                    <asp:HiddenField ID="hfCantidad" runat="server" Value='<%# Eval("CANTIDAD") %>' />
+                                    <asp:HiddenField ID="hfDetpeId"  runat="server" Value='<%#: Eval("DETPE_DETALLE_PEDIDO") %>' />
+                                    <asp:HiddenField ID="hfMaterial" runat="server" Value='<%#: Eval("MATERIAL") %>' />
+                                    <asp:HiddenField ID="hfProducto" runat="server" Value='<%#: Eval("PRODUCTO_NOMBRE") %>' />
+                                    <asp:HiddenField ID="hfCantidad" runat="server" Value='<%#: Eval("CANTIDAD") %>' />
                                 </ItemTemplate>
                             </asp:TemplateField>
                         </Columns>
@@ -331,22 +331,22 @@
                 GridLines="None">
                 <Columns>
                     <asp:TemplateField HeaderText="Pedido" ItemStyle-Width="80px">
-                        <ItemTemplate><span class="badge-id"><%# Eval("PED_CODIGO") %></span></ItemTemplate>
+                        <ItemTemplate><span class="badge-id"><%#: Eval("PED_CODIGO") %></span></ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Producto">
-                        <ItemTemplate><%# Eval("PRO_NOMBRE") %></ItemTemplate>
+                        <ItemTemplate><%#: Eval("PRO_NOMBRE") %></ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Material">
-                        <ItemTemplate><%# Eval("ODP_MATERIAL") %></ItemTemplate>
+                        <ItemTemplate><%#: Eval("ODP_MATERIAL") %></ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Forma Pago" ItemStyle-Width="110px">
-                        <ItemTemplate><span class="badge-pago"><%# Eval("PED_FORMA_PAGO") %></span></ItemTemplate>
+                        <ItemTemplate><span class="badge-pago"><%#: Eval("PED_FORMA_PAGO") %></span></ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Precio" ItemStyle-Width="110px">
                         <ItemTemplate>Q <%# String.Format("{0:N2}", Eval("ODP_PRECIO")) %></ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Cantidad" ItemStyle-Width="80px">
-                        <ItemTemplate><%# Eval("ODP_CANTIDAD") %></ItemTemplate>
+                        <ItemTemplate><%#: Eval("ODP_CANTIDAD") %></ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Subtotal" ItemStyle-Width="110px">
                         <ItemTemplate>Q <%# String.Format("{0:N2}", Convert.ToDecimal(Eval("ODP_PRECIO")) * Convert.ToDecimal(Eval("ODP_CANTIDAD"))) %></ItemTemplate>

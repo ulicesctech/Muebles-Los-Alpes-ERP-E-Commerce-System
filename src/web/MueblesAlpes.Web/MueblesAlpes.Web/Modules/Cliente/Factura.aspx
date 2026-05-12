@@ -6,7 +6,7 @@
 <asp:Content ID="cBody" ContentPlaceHolderID="MainContent" runat="server">
 <style>
     * { box-sizing: border-box; }
-    .checkout-wrap { display: grid; grid-template-columns: 1fr 380px; gap: 24px; }
+    .checkout-wrap { display: grid; grid-template-columns: 1fr 380px; gap: 24px; align-items: start; }
     @media(max-width:768px) { .checkout-wrap { grid-template-columns: 1fr; } }
     .checkout-card { background: white; border-radius: 12px; border: 1px solid #e8d8c0;
         box-shadow: 0 2px 8px rgba(92,58,30,0.06); overflow: hidden; margin-bottom: 20px; }
@@ -21,18 +21,12 @@
         border-radius: 8px; font-size: 14px; background: #fdf8f3; outline: none;
         width: 100%; font-family: Arial,sans-serif; color: #333; }
     .f-group .form-control:focus { border-color: #C9973A; background: white; }
+    .f-group .form-control[readonly] { background: #f0ebe0; color: #888; cursor: not-allowed; }
     .resumen-card { background: white; border-radius: 12px; border: 1px solid #e8d8c0;
-        box-shadow: 0 2px 8px rgba(92,58,30,0.06); overflow: hidden; position: sticky; top: 20px; }
+        box-shadow: 0 2px 8px rgba(92,58,30,0.06); overflow: hidden; position: sticky; top: 20px; align-self: start; }
     .resumen-head { background: linear-gradient(135deg,#5C3A1E,#8B5E3C); padding: 14px 20px; }
     .resumen-head span { color: #f0d9a0; font-size: 14px; font-weight: bold; font-family: Arial,sans-serif; }
     .resumen-body { padding: 20px; }
-    .resumen-item { display: flex; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid #f5ece0; }
-    .resumen-item:last-child { border-bottom: none; }
-    .resumen-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; background: #fdf8f3; }
-    .resumen-item-info { flex: 1; }
-    .resumen-item-nombre { font-size: 13px; font-weight: bold; color: #3a2a1a; font-family: Arial,sans-serif; }
-    .resumen-item-precio { font-size: 12px; color: #888; font-family: Arial,sans-serif; }
-    .resumen-item-total { font-size: 14px; font-weight: bold; color: #5C3A1E; font-family: Georgia,serif; white-space: nowrap; }
     .resumen-totales { border-top: 2px solid #e8d8c0; margin-top: 12px; padding-top: 12px; }
     .resumen-row { display: flex; justify-content: space-between; padding: 6px 0; font-family: Arial,sans-serif; font-size: 14px; color: #555; }
     .resumen-row.total { font-size: 18px; font-weight: bold; color: #3a2a1a; border-top: 1px solid #e8d8c0; margin-top: 6px; padding-top: 12px; }
@@ -66,6 +60,26 @@
     .btn-seguir-comprando { display: inline-block; padding: 12px 32px; background: #C9973A;
         color: white; border-radius: 8px; text-decoration: none; font-weight: bold;
         font-family: Arial,sans-serif; font-size: 14px; }
+    .tarjeta-panel { background: #fdf8f3; border-radius: 10px; border: 1px solid #e8d8c0;
+        padding: 16px; margin-top: 12px; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+
+    /* Toggle entrega */
+    .entrega-toggle { display: flex; gap: 12px; margin-bottom: 20px; }
+    .entrega-btn { flex: 1; padding: 14px; border: 2px solid #e8d8c0; border-radius: 10px;
+        background: white; cursor: pointer; text-align: center; font-family: Arial,sans-serif;
+        font-size: 13px; font-weight: bold; color: #5C3A1E; transition: all 0.2s; }
+    .entrega-btn:hover { border-color: #C9973A; }
+    .entrega-btn.active { border-color: #C9973A; background: #fdf6ec; color: #C9973A; }
+    .entrega-btn .ei { font-size: 24px; display: block; margin-bottom: 6px; }
+    .sucursal-panel { background: #fdf8f3; border: 1px solid #e8d8c0; border-radius: 10px;
+        padding: 16px; margin-bottom: 16px; animation: fadeIn 0.3s ease; }
+    .sucursal-panel label { font-size: 11px; font-weight: bold; color: #5C3A1E;
+        text-transform: uppercase; letter-spacing: 0.4px; font-family: Arial,sans-serif;
+        display: block; margin-bottom: 6px; }
+    .entrega-info { background: #f0fff4; border: 1px solid #9ae6b4; border-radius: 8px;
+        padding: 10px 14px; font-size: 13px; font-family: Arial,sans-serif; color: #276749;
+        margin-top: 8px; }
 </style>
 
 <div class="steps-bar">
@@ -80,29 +94,64 @@
     <asp:Label ID="lblMsg" runat="server" />
 </asp:Panel>
 
+<asp:HiddenField ID="hfTipoEntrega" runat="server" Value="DOMICILIO" />
+
 <asp:Panel ID="pnlCheckout" runat="server">
 <div class="checkout-wrap">
 
-<%-- Izquierda: datos --%>
+    <%-- Izquierda: datos --%>
     <div>
+        <%-- Toggle tipo de entrega --%>
         <div class="checkout-card">
-            <div class="checkout-card-head"><span>👤 Datos de entrega</span></div>
+            <div class="checkout-card-head"><span>Tipo de entrega</span></div>
             <div class="checkout-card-body">
-                <div class="f-row">
-                    <div class="f-group">
-                        <label>Tipo de documento</label>
-                        <asp:DropDownList ID="ddlTipoDoc" runat="server" CssClass="form-control">
-                            <asp:ListItem Text="DPI" Value="DPI" />
-                            <asp:ListItem Text="Cédula de vecindad" Value="CEDULA" />
-                            <asp:ListItem Text="Pasaporte" Value="PASAPORTE" />
-                            <asp:ListItem Text="NIT" Value="NIT" />
-                        </asp:DropDownList>
+                <div class="entrega-toggle">
+                    <div class="entrega-btn active" id="btnDomicilio" onclick="toggleEntrega('DOMICILIO')">
+                        <span class="ei"></span>
+                        Envío a domicilio
                     </div>
-                    <div class="f-group">
-                        <label>Número de documento</label>
-                        <asp:TextBox ID="txtNumDoc" runat="server" CssClass="form-control" placeholder="Tu número de documento" />
+                    <div class="entrega-btn" id="btnSucursal" onclick="toggleEntrega('SUCURSAL')">
+                        <span class="ei"></span>
+                        Recoger en sucursal
                     </div>
                 </div>
+
+                <%-- Panel sucursal --%>
+                <div id="panelSucursal" style="display:none;" class="sucursal-panel">
+                    <label>Selecciona la sucursal</label>
+                    <asp:DropDownList ID="ddlSucursal" runat="server" CssClass="form-control" />
+                    <div class="entrega-info" style="margin-top:10px;">
+                        ✓ Solo se muestran sucursales con stock disponible para todos tus productos.
+                    </div>
+                </div>
+
+                <%-- Panel domicilio info --%>
+                <div id="panelDomicilioInfo" class="entrega-info">
+                    Te enviaremos el pedido a tu dirección registrada. Entrega gratis.
+                </div>
+            </div>
+        </div>
+
+        <div class="checkout-card">
+            <div class="checkout-card-head"><span>Datos de entrega</span></div>
+            <div class="checkout-card-body">
+                <asp:Panel ID="pnlDocumento" runat="server">
+                    <div class="f-row">
+                        <div class="f-group">
+                            <label>Tipo de documento</label>
+                            <asp:DropDownList ID="ddlTipoDoc" runat="server" CssClass="form-control">
+                                <asp:ListItem Text="DPI" Value="DPI" />
+                                <asp:ListItem Text="Cédula de vecindad" Value="CEDULA" />
+                                <asp:ListItem Text="Pasaporte" Value="PASAPORTE" />
+                                <asp:ListItem Text="NIT" Value="NIT" />
+                            </asp:DropDownList>
+                        </div>
+                        <div class="f-group">
+                            <label>Número de documento</label>
+                            <asp:TextBox ID="txtNumDoc" runat="server" CssClass="form-control" placeholder="Tu número de documento" />
+                        </div>
+                    </div>
+                </asp:Panel>
                 <div class="f-row">
                     <div class="f-group">
                         <label>Nombre completo</label>
@@ -119,44 +168,77 @@
                         <asp:TextBox ID="txtTelefono" runat="server" CssClass="form-control" placeholder="Ej. 5555-1234" />
                     </div>
                 </div>
-                <div class="f-row">
-                    <div class="f-group">
-                        <label>Dirección</label>
-                        <asp:TextBox ID="txtDireccion" runat="server" CssClass="form-control" placeholder="Calle, número, colonia" />
+
+                <%-- Dirección solo para domicilio --%>
+                <div id="panelDireccion">
+                    <div class="f-row">
+                        <div class="f-group">
+                            <label>Dirección</label>
+                            <asp:TextBox ID="txtDireccion" runat="server" CssClass="form-control" placeholder="Calle, número, colonia" />
+                        </div>
                     </div>
-                </div>
-                <div class="f-row">
-                    <div class="f-group">
-                        <label>Municipio</label>
-                        <asp:TextBox ID="txtMunicipio" runat="server" CssClass="form-control" placeholder="Municipio" />
-                    </div>
-                    <div class="f-group">
-                        <label>Departamento</label>
-                        <asp:TextBox ID="txtDepartamento" runat="server" CssClass="form-control" placeholder="Departamento" />
-                    </div>
-                    <div class="f-group" style="max-width:120px;">
-                        <label>Zona</label>
-                        <asp:TextBox ID="txtZona" runat="server" CssClass="form-control" placeholder="Zona" />
-                    </div>
-                    <div class="f-group" style="max-width:120px;">
-                        <label>Código Postal</label>
-                        <asp:TextBox ID="txtCodigoPostal" runat="server" CssClass="form-control" placeholder="01001" />
+                    <div class="f-row">
+                        <div class="f-group">
+                            <label>Municipio</label>
+                            <asp:TextBox ID="txtMunicipio" runat="server" CssClass="form-control" placeholder="Municipio" />
+                        </div>
+                        <div class="f-group">
+                            <label>Departamento</label>
+                            <asp:TextBox ID="txtDepartamento" runat="server" CssClass="form-control" placeholder="Departamento" />
+                        </div>
+                        <div class="f-group" style="max-width:120px;">
+                            <label>Zona</label>
+                            <asp:TextBox ID="txtZona" runat="server" CssClass="form-control" placeholder="Zona" />
+                        </div>
+                        <div class="f-group" style="max-width:120px;">
+                            <label>Código Postal</label>
+                            <asp:TextBox ID="txtCodigoPostal" runat="server" CssClass="form-control" placeholder="01001" />
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="checkout-card">
-            <div class="checkout-card-head"><span>💳 Método de pago</span></div>
+            <div class="checkout-card-head"><span>Método de pago</span></div>
             <div class="checkout-card-body">
                 <div class="f-row">
                     <div class="f-group">
                         <label>Forma de pago</label>
-                        <asp:DropDownList ID="ddlFormaPago" runat="server" CssClass="form-control">
-                            <asp:ListItem Text="Efectivo al recibir" Value="EFECTIVO" />
-                            <asp:ListItem Text="Tarjeta de crédito" Value="TARJETA" />
-                            <asp:ListItem Text="Transferencia bancaria" Value="TRANSFERENCIA" />
-                        </asp:DropDownList>
+                        <select id="ddlFormaPagoHtml" class="form-control" onchange="toggleTarjeta(this.value)">
+                            <option value="EFECTIVO">Efectivo al recibir</option>
+                            <option value="TARJETA">Tarjeta de crédito</option>
+                            <option value="TRANSFERENCIA">Transferencia bancaria</option>
+                        </select>
+                        <asp:HiddenField ID="hfFormaPago" runat="server" Value="EFECTIVO" />
+                    </div>
+                </div>
+                <div id="pnlTarjeta" style="display:none;" class="tarjeta-panel">
+                    <div class="f-row">
+                        <div class="f-group">
+                            <label>Número de tarjeta</label>
+                            <input type="text" id="txtNumTarjeta" class="form-control"
+                                   placeholder="**** **** **** ****" maxlength="19"
+                                   oninput="formatTarjeta(this)" />
+                        </div>
+                    </div>
+                    <div class="f-row">
+                        <div class="f-group">
+                            <label>Nombre en la tarjeta</label>
+                            <input type="text" id="txtNombreTarjeta" class="form-control"
+                                   placeholder="Como aparece en la tarjeta" />
+                        </div>
+                        <div class="f-group" style="max-width:140px;">
+                            <label>Vencimiento</label>
+                            <input type="text" id="txtVencimiento" class="form-control"
+                                   placeholder="MM/AA" maxlength="5"
+                                   oninput="formatVencimiento(this)" />
+                        </div>
+                        <div class="f-group" style="max-width:100px;">
+                            <label>CVV</label>
+                            <input type="password" id="txtCvv" class="form-control"
+                                   placeholder="***" maxlength="4" />
+                        </div>
                     </div>
                 </div>
                 <div class="f-row">
@@ -171,28 +253,31 @@
 
     <%-- Derecha: resumen --%>
     <div class="resumen-card">
-        <div class="resumen-head"><span>📦 Resumen del pedido</span></div>
+        <div class="resumen-head"><span>Resumen del pedido</span></div>
         <div class="resumen-body">
             <asp:Repeater ID="rptResumen" runat="server">
                 <ItemTemplate>
-                    <div class="resumen-item">
-                        <img src='<%# ResolveUrl("~/Handlers/CatalogoInventario/FotoProductoHandler.ashx?ref=" & Eval("PRO_REFERENCIA").ToString()) %>'
-                             onerror="this.style.display='none'" alt="" />
-                        <div class="resumen-item-info">
-                            <div class="resumen-item-nombre"><%# Eval("PRO_NOMBRE") %></div>
-                            <div class="resumen-item-precio">Q <%# String.Format("{0:N2}", Eval("PRECIO_FINAL")) %> × <%# Eval("CANTIDAD") %></div>
+                    <div style="padding:10px 0; border-bottom:1px solid #f5ece0;">
+                        <div style="font-size:13px; font-weight:bold; color:#3a2a1a; font-family:Georgia,serif; margin-bottom:4px;">
+                            <%#: Eval("PRO_NOMBRE") %>
                         </div>
-                        <div class="resumen-item-total">
-                            Q <%# String.Format("{0:N2}", Convert.ToDecimal(Eval("PRECIO_FINAL")) * Convert.ToInt32(Eval("CANTIDAD"))) %>
+                        <div style="font-size:11px; color:#888; font-family:Arial,sans-serif; margin-bottom:6px;">
+                            Cant: <%#: Eval("CANTIDAD") %>
                         </div>
+                        <%# If(Convert.ToDecimal(Eval("PRO_PRECIO")) > Convert.ToDecimal(Eval("PRECIO_FINAL")),
+                            "<div style='display:flex; gap:5px; margin-bottom:4px; flex-wrap:wrap;'>" &
+                            "<span style='background:#e53e3e; color:white; font-size:10px; font-weight:bold; padding:2px 7px; border-radius:4px; font-family:Arial,sans-serif;'>-" &
+                            Math.Round((1 - Convert.ToDecimal(Eval("PRECIO_FINAL")) / Convert.ToDecimal(Eval("PRO_PRECIO"))) * 100).ToString() & "%</span>" &
+                            "<span style='background:#fff3cd; color:#856404; font-size:10px; font-weight:bold; padding:2px 7px; border-radius:4px; font-family:Arial,sans-serif;'>🛍️ " & Eval("CAMP_NOMBRE").ToString() & "</span>" &
+                            "</div>" &
+                            "<div style='font-size:18px; font-weight:bold; color:#B12704; font-family:Georgia,serif;'>Q " & String.Format("{0:N2}", Convert.ToDecimal(Eval("PRECIO_FINAL")) * Convert.ToInt32(Eval("CANTIDAD"))) & "</div>" &
+                            "<div style='font-size:11px; color:#888; font-family:Arial,sans-serif;'>Precio recomendado:</div>" &
+                            "<div style='font-size:12px; color:#aaa; text-decoration:line-through; font-family:Arial,sans-serif;'>Q " & String.Format("{0:N2}", Eval("PRO_PRECIO")) & "</div>",
+                            "<div style='font-size:18px; font-weight:bold; color:#5C3A1E; font-family:Georgia,serif;'>Q " & String.Format("{0:N2}", Convert.ToDecimal(Eval("PRECIO_FINAL")) * Convert.ToInt32(Eval("CANTIDAD"))) & "</div>") %>
                     </div>
                 </ItemTemplate>
             </asp:Repeater>
             <div class="resumen-totales">
-                <div class="resumen-row">
-                    <span>Subtotal</span>
-                    <span>Q <asp:Label ID="lblSubtotal" runat="server" Text="0.00" /></span>
-                </div>
                 <div class="resumen-row">
                     <span>Envío</span>
                     <span style="color:#276749; font-weight:bold;">Gratis</span>
@@ -213,11 +298,14 @@
 
 <asp:Panel ID="pnlConfirmacion" runat="server" Visible="false">
     <div class="confirmacion-wrap">
-        <div class="confirmacion-icon">🎉</div>
+        <div class="confirmacion-icon"></div>
         <div class="confirmacion-titulo">¡Pedido confirmado!</div>
         <div class="confirmacion-sub">Gracias por tu compra. Tu pedido ha sido registrado exitosamente.</div>
         <div class="confirmacion-codigo">
             Código: <asp:Label ID="lblCodigoFactura" runat="server" />
+        </div>
+        <div style="font-size:14px; font-family:Arial,sans-serif; color:#555; margin-bottom:20px;">
+            <asp:Label ID="lblTipoEntregaConfirmacion" runat="server" />
         </div>
         <br />
         <asp:Panel ID="pnlCrearCuenta" runat="server" Visible="false">
@@ -249,12 +337,13 @@
         </asp:Panel>
     </div>
 </asp:Panel>
-    <%-- Modal de stock insuficiente --%>
+
+<%-- Modal stock insuficiente --%>
 <div id="modalStock" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
      background:rgba(0,0,0,0.5); z-index:99999; align-items:center; justify-content:center;">
     <div style="background:white; border-radius:16px; padding:36px; max-width:420px; width:90%;
                 text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3); animation:popIn 0.3s ease;">
-        <div style="font-size:64px; margin-bottom:12px;">😔</div>
+        <div style="font-size:64px; margin-bottom:12px;"></div>
         <div style="font-size:20px; font-weight:bold; color:#3a2a1a; font-family:Georgia,serif;
                     margin-bottom:10px;">Stock insuficiente</div>
         <div id="modalStockMsg" style="font-size:14px; color:#666; font-family:Arial,sans-serif;
@@ -272,6 +361,52 @@
         </button>
     </div>
 </div>
+
+<script>
+    function toggleEntrega(tipo) {
+        var hf = document.getElementById('<%= hfTipoEntrega.ClientID %>');
+        var panelSuc = document.getElementById('panelSucursal');
+        var panelDom = document.getElementById('panelDomicilioInfo');
+        var panelDir = document.getElementById('panelDireccion');
+        var btnDom = document.getElementById('btnDomicilio');
+        var btnSuc = document.getElementById('btnSucursal');
+
+        hf.value = tipo;
+
+        if (tipo === 'SUCURSAL') {
+            panelSuc.style.display = 'block';
+            panelDom.style.display = 'none';
+            panelDir.style.display = 'none';
+            btnDom.classList.remove('active');
+            btnSuc.classList.add('active');
+        } else {
+            panelSuc.style.display = 'none';
+            panelDom.style.display = 'block';
+            panelDir.style.display = 'block';
+            btnDom.classList.add('active');
+            btnSuc.classList.remove('active');
+        }
+    }
+
+    function toggleTarjeta(valor) {
+        var panel = document.getElementById('pnlTarjeta');
+        var hf = document.getElementById('<%= hfFormaPago.ClientID %>');
+        panel.style.display = (valor === 'TARJETA') ? 'block' : 'none';
+        hf.value = valor;
+    }
+
+    function formatTarjeta(input) {
+        var val = input.value.replace(/\D/g, '').substring(0, 16);
+        input.value = val.replace(/(.{4})/g, '$1 ').trim();
+    }
+
+    function formatVencimiento(input) {
+        var val = input.value.replace(/\D/g, '').substring(0, 4);
+        if (val.length >= 3) val = val.substring(0, 2) + '/' + val.substring(2);
+        input.value = val;
+    }
+</script>
+
 <style>
 @keyframes popIn {
     from { transform: scale(0.8); opacity: 0; }

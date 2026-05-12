@@ -1,9 +1,8 @@
 ﻿Imports System.Data
-Imports VentasFacturacion
 
 Namespace Modules.VentasFacturacion
     Public Class Carrito
-        Inherits System.Web.UI.Page
+        Inherits BasePage
 
         Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
             If Not IsPostBack Then

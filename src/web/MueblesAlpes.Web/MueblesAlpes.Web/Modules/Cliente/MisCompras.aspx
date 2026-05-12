@@ -47,14 +47,14 @@
 </style>
 
 <div class="hero">
-    <div class="hero-title">📦 Mis Compras</div>
+    <div class="hero-title">Mis Compras</div>
     <div class="hero-sub">Historial de todos tus pedidos</div>
 </div>
 
 <%-- Sin login --%>
 <asp:Panel ID="pnlNoLogin" runat="server" Visible="false">
     <div class="no-login">
-        <div class="icon">🔒</div>
+        <div class="icon"></div>
         <p>Debes iniciar sesión para ver tus compras.</p>
         <a href="/Modules/Cliente/Login.aspx?returnUrl=/Modules/Cliente/MisCompras.aspx"
            class="btn-login">Iniciar sesión</a>
@@ -64,7 +64,7 @@
 <%-- Sin compras --%>
 <asp:Panel ID="pnlVacio" runat="server" Visible="false">
     <div class="empty-wrap">
-        <div class="empty-icon">📦</div>
+        <div class="empty-icon"></div>
         <p>Aún no has realizado ninguna compra.</p>
         <a href="/Modules/Cliente/Catalogo.aspx" class="btn-catalogo">
             Ver Catálogo
@@ -75,19 +75,32 @@
 <%-- Lista de compras --%>
 <asp:Panel ID="pnlCompras" runat="server" Visible="false">
     <asp:Repeater ID="rptCompras" runat="server">
-        <ItemTemplate>
-            <div class="compra-card">
-                <div class="compra-head">
-                    <div>
-                        <div class="compra-codigo"><%# Eval("FACLI_CODIGO_FACTURA") %></div>
-                        <div class="compra-fecha"><%# String.Format("{0:dd/MM/yyyy}", Eval("FACLI_FECHA")) %></div>
-                    </div>
-                    <div class="compra-total">
-                        Q <%# String.Format("{0:N2}", Eval("PRE_TOTAL")) %>
-                    </div>
+<ItemTemplate>
+    <div class="compra-card">
+        <div class="compra-head">
+            <div>
+                <div class="compra-codigo"> <%#: Eval("FACLI_CODIGO_FACTURA") %></div>
+                <div class="compra-fecha"><%# String.Format("{0:dd/MM/yyyy HH:mm}", Eval("FACLI_FECHA")) %></div>
+            </div>
+            <div style="text-align:right;">
+                <div class="compra-total">Q <%# String.Format("{0:N2}", Eval("TOTAL_REAL")) %></div>
+                <div style="font-size:11px; color:#888; font-family:Arial,sans-serif; margin-top:2px;">
+                    <%# If(Eval("FACLI_TIPO_ENTREGA").ToString() = "SUCURSAL",
+                        " Recoger en: " & Eval("NOMBRE_ALMACEN").ToString(),
+                        " Envío a domicilio") %>
+                </div>
+                <div style="font-size:11px; color:#888; font-family:Arial,sans-serif;">
+                    💳 <%#: Eval("FACLI_FORMA_PAGO") %>
                 </div>
             </div>
-        </ItemTemplate>
+        </div>
+        <div class="compra-body">
+            <div style="font-size:12px; color:#555; font-family:Arial,sans-serif; line-height:1.8;">
+                <%#: Eval("PRODUCTOS") %>
+            </div>
+        </div>
+    </div>
+</ItemTemplate>
     </asp:Repeater>
 </asp:Panel>
 

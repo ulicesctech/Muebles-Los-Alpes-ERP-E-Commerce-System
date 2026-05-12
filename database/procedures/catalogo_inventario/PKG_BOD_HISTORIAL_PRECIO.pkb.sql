@@ -303,7 +303,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_HISTORIAL_PRECIO AS
   --
   -- Ambas condiciones se combinan con OR para traer los dos tipos.
   -- ------------------------------------------------------------
-  PROCEDURE LISTAR_POR_MES(p_mes IN NUMBER, p_anio IN NUMBER, p_data OUT SYS_REFCURSOR) IS
+ PROCEDURE LISTAR_POR_MES(p_mes IN NUMBER, p_anio IN NUMBER, p_data OUT SYS_REFCURSOR) IS
     v_inicio DATE;
     v_fin    DATE;
   BEGIN
@@ -333,15 +333,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_HISTORIAL_PRECIO AS
         JOIN BOD_NICHO            n  ON n.nic_nicho      = h.nic_nicho
         JOIN BOD_NIC_ALM          na ON na.nic_nicho     = n.nic_nicho
         JOIN BOD_ALMACEN          a  ON a.alm_almacen    = na.alm_almacen
-       WHERE h.hip_precio IS NOT NULL
-         AND h.hip_fecha_inicio <= v_fin
-         AND (
-               -- Historico: se solapo con el mes
-               (h.hip_fecha_final IS NOT NULL AND h.hip_fecha_final >= v_inicio)
-               OR
-               -- Vigente: inicio antes/durante el mes y aun abierto
-               h.hip_fecha_final IS NULL
-             )
+       WHERE h.hip_precio      IS NOT NULL
+         AND h.hip_fecha_inicio >= v_inicio   -- ← iniciaron en el mes
+         AND h.hip_fecha_inicio <= v_fin      -- ← iniciaron en el mes
        ORDER BY p.pro_nombre, h.hip_fecha_inicio DESC;
   END;
 
@@ -376,6 +370,15 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_HISTORIAL_PRECIO AS
   EXCEPTION
     WHEN OTHERS THEN ROLLBACK; RAISE;
   END ACTUALIZAR_SEMILLA;
+
+  PROCEDURE OBTENER_ANIOS(p_data OUT SYS_REFCURSOR) IS
+BEGIN
+    OPEN p_data FOR
+        SELECT DISTINCT EXTRACT(YEAR FROM hip_fecha_inicio) AS anio
+          FROM BOD_HISTORIAL_PRECIO
+         WHERE hip_precio IS NOT NULL
+         ORDER BY 1 DESC;
+END;
 
 END PKG_BOD_HISTORIAL_PRECIO;
 /

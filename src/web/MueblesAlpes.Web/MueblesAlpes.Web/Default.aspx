@@ -167,7 +167,7 @@
 <div class="welcome-banner">
     <div>
         <h2>Panel Administrativo</h2>
-        <p>Muebles Los Alpes — Santos &amp; Familia, Desde 1978</p>
+        <p>Muebles Los Alpes , Santos &amp; Familia, Desde 1978</p>
         
     </div>
     <div class="big-num">ERP</div>

@@ -144,38 +144,38 @@
                     <%-- Imagen --%>
                     <div class="cart-item-img-wrap">
                         <img src='<%# ResolveUrl("~/Handlers/CatalogoInventario/FotoProductoHandler.ashx?ref=" & Eval("PRO_REFERENCIA").ToString()) %>'
-                             alt='<%# Eval("PRO_NOMBRE") %>'
+                             alt='<%#: Eval("PRO_NOMBRE") %>'
                              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
                         <div class="cart-item-img-placeholder" style="display:none;">🛋️</div>
                     </div>
 
                     <%-- Centro --%>
                     <div class="cart-item-center">
-                        <div class="cart-item-nombre"><%# Eval("PRO_NOMBRE") %></div>
+                        <div class="cart-item-nombre"><%#: Eval("PRO_NOMBRE") %></div>
                         <div class="cart-item-disponible">✓ En stock</div>
                         <div class="cart-item-specs">
-                            Cant: <%# Eval("CANTIDAD") %>
+                            Cant: <%#: Eval("CANTIDAD") %>
                         </div>
                         <div class="cart-item-actions">
                             <div class="qty-wrap">
-                                <asp:LinkButton CommandName="Restar" CommandArgument='<%# Eval("HIP_ID") %>'
+                                <asp:LinkButton CommandName="Restar" CommandArgument='<%#: Eval("HIP_ID") %>'
                                     runat="server" CssClass="qty-btn tiempoInhabilitado">−</asp:LinkButton>
-                                <span class="qty-val"><%# Eval("CANTIDAD") %></span>
-                                <asp:LinkButton CommandName="Sumar" CommandArgument='<%# Eval("HIP_ID") %>'
+                                <span class="qty-val"><%#: Eval("CANTIDAD") %></span>
+                                <asp:LinkButton CommandName="Sumar" CommandArgument='<%#: Eval("HIP_ID") %>'
                                     runat="server" CssClass="qty-btn tiempoInhabilitado">+</asp:LinkButton>
                             </div>
                             <span class="btn-sep">|</span>
-                            <asp:LinkButton CommandName="Quitar" CommandArgument='<%# Eval("HIP_ID") %>'
+                            <asp:LinkButton CommandName="Quitar" CommandArgument='<%#: Eval("HIP_ID") %>'
                                 runat="server" CssClass="btn-del-item tiempoInhabilitado">Eliminar</asp:LinkButton>
                         </div>
                     </div>
 
                     <%-- Precio --%>
                     <div class="cart-item-price">
-                        <%# If(Convert.ToDecimal(Eval("PRO_PRECIO")) > Convert.ToDecimal(Eval("PRECIO_FINAL")),
+                       <%# If(Convert.ToDecimal(Eval("PRO_PRECIO")) > Convert.ToDecimal(Eval("PRECIO_FINAL")),
                                         "<div class='price-badge-wrap'>" &
                                         "<span class='price-badge-pct'>-" & Math.Round((1 - Convert.ToDecimal(Eval("PRECIO_FINAL")) / Convert.ToDecimal(Eval("PRO_PRECIO"))) * 100).ToString() & "%</span>" &
-                                        "<span class='price-badge-promo'> Oferta Relámpago</span>" &
+                                        "<span class='price-badge-promo'> " & Eval("CAMP_NOMBRE") & "</span>" &
                                         "</div>" &
                                         "<div class='price-final promo'>Q " & String.Format("{0:N2}", Eval("PRECIO_FINAL")) & "</div>" &
                                         "<div class='price-recomendado-label'>Precio recomendado:</div>" &
@@ -196,17 +196,17 @@
             <asp:Repeater ID="rptResumenPrecios" runat="server">
                 <ItemTemplate>
                     <%# If(Convert.ToDecimal(Eval("PRO_PRECIO")) > Convert.ToDecimal(Eval("PRECIO_FINAL")),
-                                    "<div style='margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid #f5ece0;'>" &
-                                    "<div style='display:flex; gap:5px; margin-bottom:4px; flex-wrap:wrap;'>" &
-                                    "<span style='background:#e53e3e; color:white; font-size:10px; font-weight:bold; padding:2px 7px; border-radius:4px; font-family:Arial,sans-serif;'>-" &
-                                    Math.Round((1 - Convert.ToDecimal(Eval("PRECIO_FINAL")) / Convert.ToDecimal(Eval("PRO_PRECIO"))) * 100).ToString() & "%</span>" &
-                                    "<span style='background:#fff3cd; color:#856404; font-size:10px; font-weight:bold; padding:2px 7px; border-radius:4px; font-family:Arial,sans-serif;'> Oferta Relámpago</span>" &
-                                    "</div>" &
-                                    "<div style='font-size:20px; font-weight:bold; color:#B12704; font-family:Georgia,serif;'>Q " & String.Format("{0:N2}", Eval("PRECIO_FINAL")) & "</div>" &
-                                    "<div style='font-size:11px; color:#888; font-family:Arial,sans-serif;'>Precio recomendado:</div>" &
-                                    "<div style='font-size:12px; color:#aaa; text-decoration:line-through; font-family:Arial,sans-serif;'>Q " & String.Format("{0:N2}", Eval("PRO_PRECIO")) & "</div>" &
-                                    "</div>",
-                                    "<div style='font-size:20px; font-weight:bold; color:#5C3A1E; font-family:Georgia,serif; margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid #f5ece0;'>Q " & String.Format("{0:N2}", Eval("PRECIO_FINAL")) & "</div>") %>
+                                                "<div style='margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid #f5ece0;'>" &
+                                                "<div style='display:flex; gap:5px; margin-bottom:4px; flex-wrap:wrap;'>" &
+                                                "<span style='background:#e53e3e; color:white; font-size:10px; font-weight:bold; padding:2px 7px; border-radius:4px; font-family:Arial,sans-serif;'>-" &
+                                                Math.Round((1 - Convert.ToDecimal(Eval("PRECIO_FINAL")) / Convert.ToDecimal(Eval("PRO_PRECIO"))) * 100).ToString() & "%</span>" &
+                                                "<span style='background:#fff3cd; color:#856404; font-size:10px; font-weight:bold; padding:2px 7px; border-radius:4px; font-family:Arial,sans-serif;'>🛍️ " & Eval("CAMP_NOMBRE") & "</span>" &
+                                                "</div>" &
+                                                "<div style='font-size:20px; font-weight:bold; color:#B12704; font-family:Georgia,serif;'>Q " & String.Format("{0:N2}", Eval("PRECIO_FINAL")) & "</div>" &
+                                                "<div style='font-size:11px; color:#888; font-family:Arial,sans-serif;'>Precio recomendado:</div>" &
+                                                "<div style='font-size:12px; color:#aaa; text-decoration:line-through; font-family:Arial,sans-serif;'>Q " & String.Format("{0:N2}", Eval("PRO_PRECIO")) & "</div>" &
+                                                "</div>",
+                                                "<div style='font-size:20px; font-weight:bold; color:#5C3A1E; font-family:Georgia,serif; margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid #f5ece0;'>Q " & String.Format("{0:N2}", Eval("PRECIO_FINAL")) & "</div>") %>
                 </ItemTemplate>
             </asp:Repeater>
 

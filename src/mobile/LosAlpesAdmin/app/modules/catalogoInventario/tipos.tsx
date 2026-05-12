@@ -14,7 +14,7 @@ import {
 import {
     Categoria,
     getCategorias,
-} from "../../services/catalogoInventario/categorias";
+} from "../../../services/catalogoInventario/categorias";
 import {
     actualizarTipo,
     crearTipo,
@@ -22,7 +22,7 @@ import {
     getTipos,
     getTiposPorCategoria,
     Tipo,
-} from "../../services/catalogoInventario/tipos";
+} from "../../../services/catalogoInventario/tipos";
 
 export default function TiposScreen() {
   const [tipos, setTipos] = useState<Tipo[]>([]);

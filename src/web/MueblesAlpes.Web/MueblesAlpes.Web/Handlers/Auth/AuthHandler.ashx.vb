@@ -1,5 +1,4 @@
-﻿<%@ WebHandler Language="VB" Class="MueblesAlpes.Web.Handlers.Auth.AuthHandler" %>
-
+﻿
 Imports System.Web
 Imports System.Web.SessionState
 Imports System.IO
@@ -528,12 +527,32 @@ Namespace MueblesAlpes.Web.Handlers.Auth
                 context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Use POST."}))
                 Return
             End If
+
             Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
             Dim datos As Object = JsonConvert.DeserializeObject(body)
+
             Try
+                Dim fechaInicioTexto As String = ObtenerCampo(datos, "fecha_inicio")
+                Dim fechaFinalTexto As String = ObtenerCampo(datos, "fecha_final")
+
+                Dim fechaInicio As Date
+                If String.IsNullOrWhiteSpace(fechaInicioTexto) Then
+                    fechaInicio = Date.Today
+                Else
+                    fechaInicio = Convert.ToDateTime(fechaInicioTexto)
+                End If
+
+                Dim fechaFinal As Date? = Nothing
+                If Not String.IsNullOrWhiteSpace(fechaFinalTexto) Then
+                    fechaFinal = Convert.ToDateTime(fechaFinalTexto)
+                End If
+
                 Dim nuevoId As Integer = AscensoService.Crear(
-                    Convert.ToInt32(ObtenerCampo(datos, "pue_puestos")),
-                    Convert.ToInt32(ObtenerCampo(datos, "em_empleado")))
+            Convert.ToInt32(ObtenerCampo(datos, "pue_puestos")),
+            Convert.ToInt32(ObtenerCampo(datos, "em_empleado")),
+            fechaInicio,
+            fechaFinal)
+
                 context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .asc_ascenso = nuevoId}))
             Catch ex As Exception
                 context.Response.StatusCode = 500
@@ -542,20 +561,11 @@ Namespace MueblesAlpes.Web.Handlers.Auth
         End Sub
 
         Private Sub CerrarAscenso(context As HttpContext)
-            If context.Request.HttpMethod <> "POST" Then
-                context.Response.StatusCode = 405
-                context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Use POST."}))
-                Return
-            End If
-            Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
-            Dim datos As Object = JsonConvert.DeserializeObject(body)
-            Try
-                AscensoService.Cerrar(Convert.ToInt32(ObtenerCampo(datos, "asc_ascenso")))
-                context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .mensaje = "Ascenso cerrado."}))
-            Catch ex As Exception
-                context.Response.StatusCode = 500
-                context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = ex.Message}))
-            End Try
+            context.Response.StatusCode = 400
+            context.Response.Write(JsonConvert.SerializeObject(New With {
+        .ok = False,
+        .mensaje = "La accion cerrar-ascenso no esta disponible en AscensoService."
+    }))
         End Sub
 
         Private Sub EliminarAscenso(context As HttpContext)

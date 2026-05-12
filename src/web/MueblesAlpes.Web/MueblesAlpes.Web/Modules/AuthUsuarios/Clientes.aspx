@@ -54,18 +54,18 @@
 </style>
 
 <div class="breadcrumb-mod">
-    <a href='<%: ResolveUrl("~/Modules/AuthUsuarios/Index.aspx") %>'>🏠 Auth & Usuarios</a> /
+    <a href='<%: ResolveUrl("~/Modules/AuthUsuarios/Index.aspx") %>'> Auth & Usuarios</a> /
     <strong style="color:#5C3A1E;">Clientes</strong>
 </div>
 
-<div class="page-title">🛒 Gestión de Clientes</div>
+<div class="page-title"> Gestión de Clientes</div>
 
 <asp:Label ID="lblMensaje" runat="server" CssClass="alert-ok"  Visible="false" />
 <asp:Label ID="lblError"   runat="server" CssClass="alert-err" Visible="false" />
 
 <div class="form-card" id="formCard">
     <div class="form-card-head" id="formCardHead" onclick="toggleForm()">
-        <span id="formCardTitle">➕ Nuevo Cliente — clic para desplegar</span>
+        <span id="formCardTitle"> Nuevo Cliente — clic para desplegar</span>
         <span class="toggle-icon" id="toggleIcon">+</span>
     </div>
     <div class="form-card-body" id="formCardBody">
@@ -75,7 +75,7 @@
             ✏️ <strong>Modo edición</strong> — Los campos en morado serán modificados al guardar.
         </div>
 
-        <div class="section-title">📄 Documento</div>
+        <div class="section-title"> Documento</div>
         <div class="form-row">
             <div class="form-group">
                 <label>Tipo Documento *</label>
@@ -110,7 +110,7 @@
             </div>
         </div>
 
-        <div class="section-title">👤 Datos Personales</div>
+        <div class="section-title">Datos Personales</div>
         <div class="form-row">
             <div class="form-group">
                 <label>Primer Nombre *</label>
@@ -148,20 +148,20 @@
             </div>
         </div>
 
-        <div class="section-title">🔐 Acceso</div>
+        <div class="section-title">Acceso</div>
         <div class="form-row">
             <div class="form-group">
-                <label>🔑 Contraseña <small style="color:#888;">(obligatoria al crear, opcional al editar)</small></label>
+                <label>Contraseña <small style="color:#888;">(obligatoria al crear, opcional al editar)</small></label>
                 <asp:TextBox ID="txtPassword" runat="server" CssClass="form-control"
                     TextMode="Password" placeholder="Contraseña..." autocomplete="new-password" />
                 <div class="pass-rules">
-                    🔒 Mínimo 8 caracteres — mayúscula, minúscula y número.<br/>
+                     Mínimo 8 caracteres — mayúscula, minúscula y número.<br/>
                     Al editar, solo llena este campo si deseas cambiar la contraseña.
                 </div>
             </div>
         </div>
 
-        <div class="section-title">📞 Contacto</div>
+        <div class="section-title">Contacto</div>
         <div class="form-row">
             <div class="form-group">
                 <label>Teléfono Principal * <small style="color:#888;">(8 dígitos)</small></label>
@@ -175,7 +175,7 @@
             </div>
         </div>
 
-        <div class="section-title">📍 Dirección</div>
+        <div class="section-title">Dirección</div>
         <div class="form-row-3">
             <div class="form-group">
                 <label>País *</label>
@@ -212,9 +212,9 @@
         </div>
 
         <div style="display:flex; gap:10px; margin-top:8px;">
-            <asp:Button ID="btnGuardar" runat="server" Text="💾 Guardar"
+            <asp:Button ID="btnGuardar" runat="server" Text="Guardar"
                 CssClass="btn-gold tiempoInhabilitado" OnClick="btnGuardar_Click" />
-            <asp:Button ID="btnNuevo" runat="server" Text="❌ Cancelar"
+            <asp:Button ID="btnNuevo" runat="server" Text="Cancelar"
                 CssClass="btn-outline tiempoInhabilitado" OnClick="btnNuevo_Click" />
         </div>
     </div>
@@ -222,18 +222,18 @@
 
 <div class="search-bar">
     <div class="form-group">
-        <label>🔍 Buscar por Email</label>
+        <label>Buscar por Email</label>
         <asp:TextBox ID="txtBuscarEmail" runat="server" CssClass="form-control"
             placeholder="Email..." autocomplete="off" />
     </div>
     <div class="form-group">
-        <label>🔍 Buscar por Documento</label>
+        <label>Buscar por Documento</label>
         <asp:TextBox ID="txtBuscarDoc" runat="server" CssClass="form-control"
             placeholder="Número documento..." autocomplete="off" />
     </div>
-    <asp:Button ID="btnBuscar" runat="server" Text="🔍 Buscar"
+    <asp:Button ID="btnBuscar" runat="server" Text="Buscar"
         CssClass="btn-gold tiempoInhabilitado" OnClick="btnBuscar_Click" />
-    <asp:Button ID="btnVerTodos" runat="server" Text="📋 Ver Todos"
+    <asp:Button ID="btnVerTodos" runat="server" Text="Ver Todos"
         CssClass="btn-outline tiempoInhabilitado" OnClick="btnVerTodos_Click" />
 </div>
 
@@ -243,14 +243,14 @@
         <Columns>
             <asp:TemplateField HeaderText="ID" ItemStyle-Width="70px">
                 <ItemTemplate>
-                    <span class="badge-id"><%# Eval("cli_cliente") %></span>
+                    <span class="badge-id"><%#: Eval("cli_cliente") %></span>
                 </ItemTemplate>
             </asp:TemplateField>
             <asp:BoundField DataField="cli_tipodocumento"   HeaderText="Tipo Doc" />
             <asp:BoundField DataField="cli_numdocumento"    HeaderText="Documento" />
             <asp:TemplateField HeaderText="Nombre">
                 <ItemTemplate>
-                    <%# Eval("cli_primer_nombre").ToString().Trim() & " " & Eval("cli_primer_apellido").ToString().Trim() %>
+                    <%#: Eval("cli_primer_nombre").ToString().Trim() & " " & Eval("cli_primer_apellido").ToString().Trim() %>
                 </ItemTemplate>
             </asp:TemplateField>
             <asp:BoundField DataField="cli_email"           HeaderText="Email" />
@@ -267,9 +267,9 @@
                 <ItemTemplate>
                     <div class="actions-cell">
                         <asp:LinkButton runat="server" Text="✏️" CommandName="Editar"
-                            CommandArgument='<%# Eval("cli_cliente") %>' CssClass="btn-edit-t tiempoInhabilitado" />
+                            CommandArgument='<%#: Eval("cli_cliente") %>' CssClass="btn-edit-t tiempoInhabilitado" />
                         <asp:LinkButton runat="server" Text="🗑" CommandName="Eliminar"
-                            CommandArgument='<%# Eval("cli_cliente") %>' CssClass="btn-del-t tiempoInhabilitado"
+                            CommandArgument='<%#: Eval("cli_cliente") %>' CssClass="btn-del-t tiempoInhabilitado"
                             OnClientClick="return confirm('¿Eliminar este cliente?');" />
                     </div>
                 </ItemTemplate>
@@ -277,7 +277,7 @@
         </Columns>
         <EmptyDataTemplate>
             <div class="empty-state">
-                <div style="font-size:40px;">🛒</div>
+                <div style="font-size:40px;"></div>
                 <p>No hay clientes registrados.</p>
             </div>
         </EmptyDataTemplate>
@@ -298,14 +298,14 @@
         if (body.classList.contains('open')) {
             body.classList.remove('open');
             head.classList.remove('open');
-            icon.textContent  = '+';
-            title.textContent = '➕ Nuevo Cliente — clic para desplegar';
+            icon.textContent  = '';
+            title.textContent = ' Nuevo Cliente  clic para desplegar';
             hf.value = 'false';
         } else {
             body.classList.add('open');
             head.classList.add('open');
-            icon.textContent  = '×';
-            title.textContent = '➕ Nuevo Cliente';
+            icon.textContent  = '';
+            title.textContent = ' Nuevo Cliente';
             hf.value = 'true';
         }
     }
@@ -329,13 +329,13 @@
         if (hfOpen && hfOpen.value === 'true') {
             body.classList.add('open');
             head.classList.add('open');
-            icon.textContent = '×';
+            icon.textContent = '';
         }
         if (hfEditing && hfEditing.value === 'true') {
             body.classList.add('editing');
             badge.style.display = 'flex';
-            title.textContent = '✏️ Editando Cliente';
-            icon.textContent = '×';
+            title.textContent = 'Editando Cliente';
+            icon.textContent = '';
         }
     };
 </script>

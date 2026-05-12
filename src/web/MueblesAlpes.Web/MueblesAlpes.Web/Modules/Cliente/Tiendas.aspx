@@ -43,21 +43,21 @@
             <div class="tienda-card">
                 <div class="tienda-card-head">
                     <div class="tienda-icon">🏬</div>
-                    <div class="tienda-nombre"><%# Eval("ALM_NOMBRE") %></div>
+                    <div class="tienda-nombre"><%#: Eval("ALM_NOMBRE") %></div>
                 </div>
                 <div class="tienda-card-body">
                     <div class="tienda-info-row">
                         <span class="tienda-info-icon"></span>
                         <div>
                             <div class="tienda-info-label">País</div>
-                            <div class="tienda-info-val"><%# Eval("ALM_PAIS") %></div>
+                            <div class="tienda-info-val"><%#: Eval("ALM_PAIS") %></div>
                         </div>
                     </div>
                     <div class="tienda-info-row">
                         <span class="tienda-info-icon">📍</span>
                         <div>
                             <div class="tienda-info-label">Ubicación</div>
-                            <div class="tienda-info-val"><%# Eval("ALM_UBICACION") %></div>
+                            <div class="tienda-info-val"><%#: Eval("ALM_UBICACION") %></div>
                         </div>
                     </div>
                 </div>

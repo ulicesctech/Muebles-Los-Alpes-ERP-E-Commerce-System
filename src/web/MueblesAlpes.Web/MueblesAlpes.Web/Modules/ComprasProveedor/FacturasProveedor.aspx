@@ -48,11 +48,11 @@
 </style>
 
 <div class="breadcrumb-mod">
-    <a href='<%: ResolveUrl("~/") %>'>🏠 Inicio</a> /
-    <a href='<%: ResolveUrl("~/Modules/ComprasProveedor/Index.aspx") %>'>💳 Cuentas por Pagar</a> /
+    <a href='<%: ResolveUrl("~/") %>'>Inicio</a> /
+    <a href='<%: ResolveUrl("~/Modules/ComprasProveedor/Index.aspx") %>'>Cuentas por Pagar</a> /
     <strong style="color:#5C3A1E;">Facturas de Proveedor</strong>
 </div>
-<div class="page-title">🧾 Gestión de Facturas de Proveedor</div>
+<div class="page-title">Gestión de Facturas de Proveedor</div>
 
 <asp:Panel ID="pnlMsg" runat="server" Visible="false">
     <asp:Label ID="lblMsg" runat="server"></asp:Label>
@@ -92,8 +92,8 @@
         </div>
 
         <div class="f-row" style="margin-top:16px; justify-content:flex-end;">
-            <asp:Button ID="btnGuardar"  runat="server" Text="💾 Guardar"  CssClass="btn-gold tiempoInhabilitado"    OnClick="btnGuardar_Click tiempoInhabilitado" />
-            <asp:Button ID="btnCancelar" runat="server" Text="✕ Cancelar" CssClass="btn-outline tiempoInhabilitado" OnClick="btnCancelar_Click tiempoInhabilitado" CausesValidation="false" />
+            <asp:Button ID="btnGuardar"  runat="server" Text="💾 Guardar"  CssClass="btn-gold tiempoInhabilitado"    OnClick="btnGuardar_Click " />
+            <asp:Button ID="btnCancelar" runat="server" Text="✕ Cancelar" CssClass="btn-outline tiempoInhabilitado" OnClick="btnCancelar_Click " CausesValidation="false" />
         </div>
     </div>
 </div>
@@ -104,7 +104,7 @@
         <div style="display:flex; flex-direction:column; gap:4px; flex:3; min-width:200px;">
             <label class="flabel">Buscar</label>
             <div class="search-wrap">
-                <span class="search-icon-abs">🔍</span>
+                <span class="search-icon-abs"></span>
                 <asp:TextBox ID="txtBuscar" runat="server" placeholder="Codigo factura u orden de compra..." />
             </div>
         </div>
@@ -129,22 +129,22 @@
         <Columns>
             <%-- Solo ORC_ORDEN_COMPRA, sin ORC_CODIGO --%>
             <asp:TemplateField HeaderText="Orden de Compra">
-                <ItemTemplate><span class="badge-key"><%# Eval("ORC_ORDEN_COMPRA") %></span></ItemTemplate>
+                <ItemTemplate><span class="badge-key"><%#: Eval("ORC_ORDEN_COMPRA") %></span></ItemTemplate>
             </asp:TemplateField>
             <asp:TemplateField HeaderText="Cód. Factura">
-                <ItemTemplate><span class="badge-fac"><%# Eval("FACPRO_CODIGO_FACTURA") %></span></ItemTemplate>
+                <ItemTemplate><span class="badge-fac"><%#: Eval("FACPRO_CODIGO_FACTURA") %></span></ItemTemplate>
             </asp:TemplateField>
             <asp:BoundField DataField="FACPRO_FECHA" HeaderText="Fecha" DataFormatString="{0:dd/MM/yyyy}" ItemStyle-Width="110px" />
             <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="150px">
                 <ItemTemplate>
                     <div class="actions-cell">
                         <asp:LinkButton CommandName="Editar"
-                            CommandArgument='<%# Eval("ORC_ORDEN_COMPRA") %>'
-                            runat="server" CssClass="btn-edit-t tiempoInhabilitado">✏️ Editar</asp:LinkButton>
+                            CommandArgument='<%#: Eval("ORC_ORDEN_COMPRA") %>'
+                            runat="server" CssClass="btn-edit-t tiempoInhabilitado">Editar</asp:LinkButton>
                         <asp:LinkButton CommandName="Eliminar"
-                            CommandArgument='<%# Eval("ORC_ORDEN_COMPRA") %>'
+                            CommandArgument='<%#: Eval("ORC_ORDEN_COMPRA") %>'
                             runat="server" CssClass="btn-del-t tiempoInhabilitado"
-                            OnClientClick="return confirm('¿Eliminar esta factura?');">🗑 Borrar</asp:LinkButton>
+                            OnClientClick="return confirm('¿Eliminar esta factura?');">Borrar</asp:LinkButton>
                     </div>
                 </ItemTemplate>
             </asp:TemplateField>

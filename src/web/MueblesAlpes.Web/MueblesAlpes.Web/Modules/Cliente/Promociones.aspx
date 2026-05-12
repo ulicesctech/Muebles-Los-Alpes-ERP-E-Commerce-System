@@ -102,18 +102,18 @@
                 <div class="prod-card">
                     <div class="card-img-wrap">
                         <img src='<%# ResolveUrl("~/Handlers/CatalogoInventario/FotoProductoHandler.ashx?ref=" & Eval("PRO_REFERENCIA").ToString()) %>'
-                             alt='<%# Eval("PRO_NOMBRE") %>'
+                             alt='<%#: Eval("PRO_NOMBRE") %>'
                              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
                         <div class="card-img-placeholder" style="display:none;"></div>
-                        <span class="badge-promo">-<%# Eval("PROM_PORCENTAJE") %>%</span>
+                        <span class="badge-promo">-<%#: Eval("PROM_PORCENTAJE") %>%</span>
                         <%# If(Convert.ToInt32(Eval("STO_DISPONIBLE")) > 0,
                             "<span class='badge-disponible'>✓ Disponible</span>",
                             "<span class='badge-agotado'>✗ Agotado</span>") %>
                     </div>
                     <div class="card-body">
-                        <div class="card-categoria"><%# Eval("CAT_DESCRIPCION") %></div>
-                        <div class="card-nombre"><%# Eval("PRO_NOMBRE") %></div>
-                        <div class="card-tipo"><%# Eval("TIP_DESCRIPCION") %> · <%# Eval("MAT_DESCRIPCION") %></div>
+                        <div class="card-categoria"><%#: Eval("CAT_DESCRIPCION") %></div>
+                        <div class="card-nombre"><%#: Eval("PRO_NOMBRE") %></div>
+                        <div class="card-tipo"><%#: Eval("TIP_DESCRIPCION") %> · <%#: Eval("MAT_DESCRIPCION") %></div>
                         <div class="card-precio-wrap">
                             <div class="card-precio-original">Q <%# String.Format("{0:N2}", Eval("PRO_PRECIO")) %></div>
                             <div class="card-precio-final">Q <%# String.Format("{0:N2}", Eval("PRECIO_FINAL")) %></div>
@@ -121,13 +121,13 @@
                     </div>
                     <div class="card-footer">
                         <asp:LinkButton CommandName="VerDetalle"
-                            CommandArgument='<%# Eval("PRO_REFERENCIA") %>'
+                            CommandArgument='<%#: Eval("PRO_REFERENCIA") %>'
                             runat="server" CssClass="btn-detalle tiempoInhabilitado">  Ver</asp:LinkButton>
                         <asp:LinkButton CommandName="AgregarCarrito"
-                            CommandArgument='<%# Eval("HIP_HISTORIAL_PRECIO") %>'
+                            CommandArgument='<%#: Eval("HV_HISTORIAL_PRECIO_VENTA") %>'
                             runat="server" CssClass="btn-carrito tiempoInhabilitado"
                             Enabled='<%# Convert.ToInt32(Eval("STO_DISPONIBLE")) > 0 %>'>
-                            🛒 Agregar
+                            Agregar
                         </asp:LinkButton>
                     </div>
                 </div>

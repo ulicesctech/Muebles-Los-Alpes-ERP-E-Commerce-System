@@ -1,6 +1,6 @@
 ﻿Namespace Modules.VentasFacturacion
     Partial Public Class Index
-        Inherits System.Web.UI.Page
+        Inherits BasePage
 
     End Class
 End Namespace

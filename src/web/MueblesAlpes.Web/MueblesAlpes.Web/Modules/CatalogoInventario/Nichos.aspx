@@ -89,7 +89,7 @@
     <asp:GridView ID="gvNichos" runat="server" AutoGenerateColumns="false" OnRowCommand="gvNichos_RowCommand" GridLines="None">
         <Columns>
             <asp:TemplateField HeaderText="ID" ItemStyle-Width="80px">
-                <ItemTemplate><span class="badge-id"><%# Eval("NIC_NICHO") %></span></ItemTemplate>
+                <ItemTemplate><span class="badge-id"><%#: Eval("NIC_NICHO") %></span></ItemTemplate>
             </asp:TemplateField>
             <asp:BoundField DataField="NIC_NUMERO"         HeaderText="Numero"         ItemStyle-Width="100px" />
             <asp:BoundField DataField="NIC_ZONA"           HeaderText="Zona"           ItemStyle-Width="150px" />
@@ -98,8 +98,8 @@
             <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="160px">
                 <ItemTemplate>
                     <div class="actions-cell">
-                        <asp:LinkButton CommandName="Editar"   CommandArgument='<%# Eval("NIC_NICHO") %>' runat="server" CssClass="btn-edit-t tiempoInhabilitado">Editar</asp:LinkButton>
-                        <asp:LinkButton CommandName="Eliminar" CommandArgument='<%# Eval("NIC_NICHO") %>' runat="server" CssClass="btn-del-t tiempoInhabilitado" OnClientClick="return confirm('Desea eliminar este nicho?');">Eliminar</asp:LinkButton>
+                        <asp:LinkButton CommandName="Editar"   CommandArgument='<%#: Eval("NIC_NICHO") %>' runat="server" CssClass="btn-edit-t tiempoInhabilitado">Editar</asp:LinkButton>
+                        <asp:LinkButton CommandName="Eliminar" CommandArgument='<%#: Eval("NIC_NICHO") %>' runat="server" CssClass="btn-del-t tiempoInhabilitado" OnClientClick="return confirm('Desea eliminar este nicho?');">Eliminar</asp:LinkButton>
                     </div>
                 </ItemTemplate>
             </asp:TemplateField>

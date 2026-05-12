@@ -78,14 +78,14 @@
     <asp:GridView ID="gvMateriales" runat="server" AutoGenerateColumns="false" CssClass="table" OnRowCommand="gvMateriales_RowCommand" GridLines="None">
         <Columns>
             <asp:TemplateField HeaderText="ID" ItemStyle-Width="90px">
-                <ItemTemplate><span class="badge-id"><%# Eval("MAT_MATERIAL") %></span></ItemTemplate>
+                <ItemTemplate><span class="badge-id"><%#: Eval("MAT_MATERIAL") %></span></ItemTemplate>
             </asp:TemplateField>
             <asp:BoundField DataField="MAT_DESCRIPCION" HeaderText="Descripción" />
             <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="200px">
                 <ItemTemplate>
                     <div class="actions-cell">
-                        <asp:LinkButton CommandName="Editar"   CommandArgument='<%# Eval("MAT_MATERIAL") %>' runat="server" CssClass="btn-edit-t tiempoInhabilitado">✏️ Editar</asp:LinkButton>
-                        <asp:LinkButton CommandName="Eliminar" CommandArgument='<%# Eval("MAT_MATERIAL") %>' runat="server" CssClass="btn-del-t tiempoInhabilitado" OnClientClick="return confirm('¿Eliminar este material?');">🗑 Eliminar</asp:LinkButton>
+                        <asp:LinkButton CommandName="Editar"   CommandArgument='<%#: Eval("MAT_MATERIAL") %>' runat="server" CssClass="btn-edit-t tiempoInhabilitado">✏️ Editar</asp:LinkButton>
+                        <asp:LinkButton CommandName="Eliminar" CommandArgument='<%#: Eval("MAT_MATERIAL") %>' runat="server" CssClass="btn-del-t tiempoInhabilitado" OnClientClick="return confirm('¿Eliminar este material?');">🗑 Eliminar</asp:LinkButton>
                     </div>
                 </ItemTemplate>
             </asp:TemplateField>

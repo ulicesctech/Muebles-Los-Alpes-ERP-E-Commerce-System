@@ -1,72 +1,126 @@
 ﻿Imports System
 Imports System.Data
+Imports System.Text.RegularExpressions
 
 Namespace MueblesAlpes.Web.Modules.AuthUsuarios
 
     Partial Public Class LoginClientePage
-        Inherits System.Web.UI.Page
+        Inherits BasePage
+
+        Private Const MAX_INTENTOS As Integer = 5
+        Private Const BLOQUEO_MINUTOS As Integer = 15
 
         Protected Sub Page_Load(sender As Object, e As EventArgs) Handles Me.Load
             If Not IsPostBack Then
-                If Session("UsuarioId") IsNot Nothing Then
-                    Response.Redirect("~/Modules/AuthUsuarios/Index.aspx")
+                If Session("CLI_CLIENTE") IsNot Nothing Then
+                    Response.Redirect("~/Modules/Cliente/Catalogo.aspx")
                 End If
             End If
         End Sub
 
+        Private Function ObtenerClaveIP() As String
+            Return "LoginClienteIntentos_" & Request.UserHostAddress
+        End Function
+
+        Private Function EstaBloqueado() As Boolean
+            Dim clave As String = ObtenerClaveIP()
+            Dim intentos As Integer = If(Session(clave & "_count") IsNot Nothing, CInt(Session(clave & "_count")), 0)
+            Dim ultimoIntento As DateTime = If(Session(clave & "_time") IsNot Nothing, CDate(Session(clave & "_time")), DateTime.MinValue)
+
+            If intentos >= MAX_INTENTOS Then
+                If DateTime.Now.Subtract(ultimoIntento).TotalMinutes < BLOQUEO_MINUTOS Then
+                    Dim minutosRestantes As Integer = BLOQUEO_MINUTOS - CInt(DateTime.Now.Subtract(ultimoIntento).TotalMinutes)
+                    lblError.Text = "Demasiados intentos fallidos. Intenta en " & minutosRestantes & " minuto(s)."
+                    lblError.Visible = True
+                    Return True
+                Else
+                    Session(clave & "_count") = 0
+                End If
+            End If
+            Return False
+        End Function
+
+        Private Sub RegistrarIntentoFallido()
+            Dim clave As String = ObtenerClaveIP()
+            Dim intentos As Integer = If(Session(clave & "_count") IsNot Nothing, CInt(Session(clave & "_count")), 0)
+            Session(clave & "_count") = intentos + 1
+            Session(clave & "_time") = DateTime.Now
+        End Sub
+
+        Private Sub LimpiarIntentos()
+            Dim clave As String = ObtenerClaveIP()
+            Session(clave & "_count") = 0
+            Session(clave & "_time") = Nothing
+        End Sub
+
         Private Function ValidarPassword(pass As String) As String
             If String.IsNullOrWhiteSpace(pass) Then
-                Return "⚠️ La contraseña es obligatoria."
+                Return "La contrasena es obligatoria."
             End If
             If pass.Length < 8 Then
-                Return "⚠️ La contraseña debe tener mínimo 8 caracteres."
+                Return "La contrasena debe tener minimo 8 caracteres."
             End If
             If Not Regex.IsMatch(pass, "[A-Z]") Then
-                Return "⚠️ La contraseña debe tener al menos una letra mayúscula."
+                Return "La contrasena debe tener al menos una letra mayuscula."
             End If
             If Not Regex.IsMatch(pass, "[a-z]") Then
-                Return "⚠️ La contraseña debe tener al menos una letra minúscula."
+                Return "La contrasena debe tener al menos una letra minuscula."
             End If
             If Not Regex.IsMatch(pass, "[0-9]") Then
-                Return "⚠️ La contraseña debe tener al menos un número."
+                Return "La contrasena debe tener al menos un numero."
             End If
             Return ""
         End Function
 
         Protected Sub btnLogin_Click(sender As Object, e As EventArgs)
+            lblError.Visible = False
+
+            If EstaBloqueado() Then Return
+
             If String.IsNullOrWhiteSpace(txtEmail.Text) OrElse
                String.IsNullOrWhiteSpace(txtPassword.Text) Then
-                lblError.Text = "⚠️ Ingrese email y contraseña."
+                lblError.Text = "Ingrese email y contrasena."
                 lblError.Visible = True
                 Return
             End If
+
             Try
                 Dim result As LoginClienteResult = LoginClienteService.Validar(
                     txtEmail.Text.Trim(), txtPassword.Text.Trim())
+
                 If result.Resultado = 1 Then
-                    Dim dt As System.Data.DataTable = ClienteService.BuscarPorId(result.ClienteId)
+                    LimpiarIntentos()
+                    SecurityLogger.LogLoginExitoso(txtEmail.Text.Trim(), Request.UserHostAddress)
+                    Dim dt As DataTable = ClienteService.BuscarPorId(result.ClienteId)
                     Dim nombre As String = ""
                     If dt.Rows.Count > 0 Then
                         nombre = dt.Rows(0)("cli_primer_nombre").ToString() & " " &
                                  dt.Rows(0)("cli_primer_apellido").ToString()
                     End If
-                    Session("UsuarioId") = result.ClienteId
-                    Session("UsuarioNombre") = nombre
-                    Session("UsuarioGrupo") = "Cliente"
-                    Session("UsuarioTipo") = "CLIENTE"
-                    Session("PerAdmin") = False
-                    Session("PerRH") = False
-                    Session("PerFac") = False
-                    Session("PerCli") = False
-                    Session("PerBod") = False
-                    Session("PerPromo") = False
-                    Response.Redirect("~/Modules/AuthUsuarios/Index.aspx")
+                    Session("CLI_CLIENTE") = result.ClienteId
+                    Session("CLI_NOMBRE") = nombre
+                    Session("CLI_EMAIL") = txtEmail.Text.Trim()
+                    Response.Redirect("~/Modules/Cliente/Catalogo.aspx")
                 Else
-                    lblError.Text = "❌ Email o contraseña incorrectos."
+                    RegistrarIntentoFallido()
+                    SecurityLogger.LogLoginFallido(txtEmail.Text.Trim(), Request.UserHostAddress)
+                    Dim intentos As Integer = CInt(Session(ObtenerClaveIP() & "_count"))
+                    Dim restantes As Integer = MAX_INTENTOS - intentos
+                    If restantes > 0 Then
+                        lblError.Text = "Email o contrasena incorrectos. Intentos restantes: " & restantes
+                    Else
+                        SecurityLogger.LogCuentaBloqueada(Request.UserHostAddress)
+                        lblError.Text = "Cuenta bloqueada por " & BLOQUEO_MINUTOS & " minutos."
+                    End If
                     lblError.Visible = True
                 End If
             Catch ex As Exception
-                lblError.Text = "Error: " & ex.Message
+                RegistrarIntentoFallido()
+                If ex.Message.Contains("20007") Then
+                    lblError.Text = "Email o contrasena incorrectos."
+                Else
+                    lblError.Text = "Error al iniciar sesion. Intenta de nuevo."
+                End If
                 lblError.Visible = True
             End Try
         End Sub
@@ -87,7 +141,7 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
                String.IsNullOrWhiteSpace(txtDireccion.Text) OrElse
                String.IsNullOrWhiteSpace(txtCodigoPostal.Text) OrElse
                ddlTipoClienteReg.SelectedValue = "" Then
-                lblError.Text = "⚠️ Los campos marcados con * son obligatorios."
+                lblError.Text = "Los campos marcados con * son obligatorios."
                 lblError.Visible = True
                 Return
             End If
@@ -95,7 +149,7 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
             If ddlTipoDoc.SelectedValue = "DPI" Then
                 If txtNumDoc.Text.Trim().Length <> 13 OrElse
                    Not txtNumDoc.Text.Trim().All(Function(c) Char.IsDigit(c)) Then
-                    lblError.Text = "⚠️ DPI debe tener exactamente 13 dígitos."
+                    lblError.Text = "DPI debe tener exactamente 13 digitos."
                     lblError.Visible = True
                     Return
                 End If
@@ -103,7 +157,7 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
 
             If txtTelefono.Text.Trim().Length <> 8 OrElse
                Not txtTelefono.Text.Trim().All(Function(c) Char.IsDigit(c)) Then
-                lblError.Text = "⚠️ Teléfono debe tener exactamente 8 dígitos."
+                lblError.Text = "Telefono debe tener exactamente 8 digitos."
                 lblError.Visible = True
                 Return
             End If
@@ -116,7 +170,7 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
             End If
 
             If txtRegPassword.Text <> txtConfirmPassword.Text Then
-                lblError.Text = "⚠️ Las contraseñas no coinciden."
+                lblError.Text = "Las contrasenas no coinciden."
                 lblError.Visible = True
                 Return
             End If
@@ -143,13 +197,13 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
                     ddlTipoClienteReg.SelectedValue,
                     txtRegPassword.Text.Trim())
 
-                lblMensaje.Text = "✅ Cuenta creada exitosamente. Ya puedes iniciar sesión con tu email."
+                lblMensaje.Text = "Cuenta creada exitosamente. Ya puedes iniciar sesion con tu email."
                 lblMensaje.Visible = True
                 lblError.Visible = False
                 LimpiarRegistro()
             Catch ex As Exception
                 If ex.Message.Contains("20006") Then
-                    lblError.Text = "❌ El email o documento ya está registrado."
+                    lblError.Text = "El email o documento ya esta registrado."
                 Else
                     lblError.Text = "Error: " & ex.Message
                 End If

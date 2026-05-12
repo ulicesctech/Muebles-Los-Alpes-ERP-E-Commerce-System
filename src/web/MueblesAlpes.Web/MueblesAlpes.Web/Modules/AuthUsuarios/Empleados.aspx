@@ -191,7 +191,7 @@
         <Columns>
             <asp:TemplateField HeaderText="ID" ItemStyle-Width="70px">
                 <ItemTemplate>
-                    <span class="badge-id"><%# Eval("em_empleado") %></span>
+                    <span class="badge-id"><%#: Eval("em_empleado") %></span>
                 </ItemTemplate>
             </asp:TemplateField>
             <asp:BoundField DataField="em_DPI"             HeaderText="DPI" />
@@ -203,9 +203,9 @@
                 <ItemTemplate>
                     <div class="actions-cell">
                         <asp:LinkButton runat="server" Text="✏️" CommandName="Editar" 
-                            CommandArgument='<%# Eval("em_empleado") %>' CssClass="btn-edit-t tiempoInhabilitado" />
+                            CommandArgument='<%#: Eval("em_empleado") %>' CssClass="btn-edit-t tiempoInhabilitado" />
                         <asp:LinkButton runat="server" Text="🗑" CommandName="Eliminar"
-                            CommandArgument='<%# Eval("em_empleado") %>' CssClass="btn-del-t tiempoInhabilitado"
+                            CommandArgument='<%#: Eval("em_empleado") %>' CssClass="btn-del-t tiempoInhabilitado"
                             OnClientClick="return confirm('¿Eliminar este empleado?');"
                             Visible='<%# Convert.ToInt32(Eval("em_empleado")) <> Convert.ToInt32(Session("UsuarioId")) %>' />
                         <%# If(Convert.ToInt32(Eval("em_empleado")) = Convert.ToInt32(Session("UsuarioId")),
