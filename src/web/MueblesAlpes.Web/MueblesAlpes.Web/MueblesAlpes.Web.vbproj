@@ -202,7 +202,6 @@
     <Content Include="ErrorLimite.aspx" />
     <Content Include="Global.asax" />
     <Content Include="favicon.ico" />
-    <Content Include="Handlers\Auth\AuthHandler.ashx" />
     <Content Include="Handlers\CatalogoInventario\AlmacenesHandler.ashx" />
     <Content Include="Handlers\CatalogoInventario\CategoriasHandler.ashx" />
     <Content Include="Handlers\CatalogoInventario\FotoProductoHandler.ashx" />
@@ -264,6 +263,7 @@
     <Content Include="Handlers\Cliente\CarritoClienteHandler.ashx" />
     <Content Include="Handlers\Cliente\FacturaClienteHandler.ashx" />
     <Content Include="Handlers\Cliente\PerfilClienteHandler.ashx" />
+    <Content Include="Handlers\Auth\AuthHandler.ashx" />
     <None Include="Oracle.DataAccess.Common.Configuration.Section.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -441,6 +441,7 @@
   <ItemGroup>
     <!-- SERVICES -->
     <Compile Include="App_Code\Data\OracleDb.vb" />
+    <Content Include="App_Code\Segurity\SecurityGuard.vb" />
     <Compile Include="App_Code\Services\AuthUsuarios\AscensoService.vb" />
     <Compile Include="App_Code\Services\AuthUsuarios\ClienteService.vb" />
     <Compile Include="App_Code\Services\AuthUsuarios\EmpleadoService.vb" />
@@ -510,9 +511,6 @@
     </Compile>
     <Compile Include="Global.asax.vb">
       <DependentUpon>Global.asax</DependentUpon>
-    </Compile>
-    <Compile Include="Handlers\Auth\AuthHandler.ashx.vb">
-      <DependentUpon>AuthHandler.ashx</DependentUpon>
     </Compile>
     <Compile Include="Modules\AuthUsuarios\Admin\GrupoUsuario.aspx.designer.vb">
       <DependentUpon>GrupoUsuario.aspx</DependentUpon>
