@@ -108,7 +108,7 @@
                 OnRowDataBound="gvPedidos_RowDataBound">
                 <Columns>
                     <asp:TemplateField HeaderText="ID" ItemStyle-Width="75px">
-                        <ItemTemplate><span class="badge-id"><%# Eval("PED_PEDIDO") %></span></ItemTemplate>
+                        <ItemTemplate><span class="badge-id"><%#: Eval("PED_PEDIDO") %></span></ItemTemplate>
                     </asp:TemplateField>
                     <asp:BoundField DataField="PED_CODIGO" HeaderText="Codigo" />
                     <asp:TemplateField HeaderText="Fecha" ItemStyle-Width="110px">
@@ -117,7 +117,7 @@
                     <%-- Forma de pago: valor directo de Oracle, sin comparar ni condicionar --%>
                     <asp:TemplateField HeaderText="Forma Pago" ItemStyle-Width="110px">
                         <ItemTemplate>
-                            <span class="badge-pago"><%# Eval("PED_FORMA_PAGO") %></span>
+                            <span class="badge-pago"><%#: Eval("PED_FORMA_PAGO") %></span>
                         </ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Productos / Items">
@@ -136,10 +136,10 @@
                                         </ItemTemplate>
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Sol." ItemStyle-Width="55px">
-                                        <ItemTemplate><%# Eval("DETPE_CANTIDAD_SOLICITADA") %></ItemTemplate>
+                                        <ItemTemplate><%#: Eval("DETPE_CANTIDAD_SOLICITADA") %></ItemTemplate>
                                     </asp:TemplateField>
                                     <asp:TemplateField HeaderText="Rec." ItemStyle-Width="55px">
-                                        <ItemTemplate><%# Eval("DETPE_CANTIDAD_RECIBIDA") %></ItemTemplate>
+                                        <ItemTemplate><%#: Eval("DETPE_CANTIDAD_RECIBIDA") %></ItemTemplate>
                                     </asp:TemplateField>
                                 </Columns>
                                 <EmptyDataTemplate>
@@ -152,10 +152,10 @@
                         <ItemTemplate>
                             <div class="actions-cell">
                                 <asp:LinkButton CommandName="VerDetalle"
-                                    CommandArgument='<%# Eval("PED_PEDIDO") %>'
+                                    CommandArgument='<%#: Eval("PED_PEDIDO") %>'
                                     runat="server" CssClass="btn-edit-t tiempoInhabilitado">&#9999; Editar</asp:LinkButton>
                                 <asp:LinkButton CommandName="Eliminar"
-                                    CommandArgument='<%# Eval("PED_PEDIDO") %>'
+                                    CommandArgument='<%#: Eval("PED_PEDIDO") %>'
                                     runat="server" CssClass="btn-del-t tiempoInhabilitado"
                                     OnClientClick="return confirm('Eliminar este pedido?');">&#128465;</asp:LinkButton>
                             </div>
@@ -264,8 +264,8 @@
                 OnRowDataBound="gvDetalles_RowDataBound">
                 <Columns>
                     <asp:TemplateField HeaderText="Producto">
-                        <ItemTemplate><%# Eval("PRO_NOMBRE") %></ItemTemplate>
-                        <EditItemTemplate><%# Eval("PRO_NOMBRE") %></EditItemTemplate>
+                        <ItemTemplate><%#: Eval("PRO_NOMBRE") %></ItemTemplate>
+                        <EditItemTemplate><%#: Eval("PRO_NOMBRE") %></EditItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Material">
                         <ItemTemplate>
@@ -278,22 +278,22 @@
                         </EditItemTemplate>
                     </asp:TemplateField>
 
-                    <%-- *** UNICO CAMBIO: Text='<%# Eval("DETPE_CANTIDAD_SOLICITADA") %>'      ***
+                    <%-- *** UNICO CAMBIO: Text='<%#: Eval("DETPE_CANTIDAD_SOLICITADA") %>'      ***
                          Antes era Text="" lo que vaciaba el campo al entrar en modo edicion.
                          Con Eval() el TextBox pre-carga el valor guardado en Oracle y el usuario
                          lo ve de inmediato sin necesidad de un segundo clic.                    --%>
                     <asp:TemplateField HeaderText="Solicitado" ItemStyle-Width="100px">
-                        <ItemTemplate><%# Eval("DETPE_CANTIDAD_SOLICITADA") %></ItemTemplate>
+                        <ItemTemplate><%#: Eval("DETPE_CANTIDAD_SOLICITADA") %></ItemTemplate>
                         <EditItemTemplate>
                             <asp:TextBox ID="txtESolicitada" runat="server"
-                                Text='<%# Eval("DETPE_CANTIDAD_SOLICITADA") %>'
+                                Text='<%#: Eval("DETPE_CANTIDAD_SOLICITADA") %>'
                                 CssClass="edit-input" style="width:70px;" />
                         </EditItemTemplate>
                     </asp:TemplateField>
 
                     <asp:TemplateField HeaderText="Recibido" ItemStyle-Width="320px">
                         <ItemTemplate>
-                            <%# Eval("DETPE_CANTIDAD_RECIBIDA") %>
+                            <%#: Eval("DETPE_CANTIDAD_RECIBIDA") %>
                             <asp:Panel ID="pnlRecibir" runat="server" Visible="false">
                                 <div class="recibir-box">
                                     <div class="recibir-fila">
@@ -301,7 +301,7 @@
                                             <label>Ya recibido</label>
                                             <asp:TextBox ID="txtYaRecibido" runat="server"
                                                 CssClass="recibir-readonly" ReadOnly="true"
-                                                Text='<%# Eval("DETPE_CANTIDAD_RECIBIDA") %>' />
+                                                Text='<%#: Eval("DETPE_CANTIDAD_RECIBIDA") %>' />
                                         </div>
                                         <div class="recibir-suma">+</div>
                                         <div class="recibir-campo">
@@ -320,16 +320,16 @@
                                     </div>
                                     <div class="actions-cell">
                                         <asp:LinkButton CommandName="ConfirmarRecibido"
-                                            CommandArgument='<%# Eval("DETPE_DETALLE_PEDIDO") & "|" & Eval("PRO_REFERENCIA") & "|" & Eval("DETPE_CANTIDAD_SOLICITADA") & "|" & Eval("DETPE_CANTIDAD_RECIBIDA") %>'
+                                            CommandArgument='<%#: Eval("DETPE_DETALLE_PEDIDO") & "|" & Eval("PRO_REFERENCIA") & "|" & Eval("DETPE_CANTIDAD_SOLICITADA") & "|" & Eval("DETPE_CANTIDAD_RECIBIDA") %>'
                                             runat="server" CssClass="btn-save-t tiempoInhabilitado" CausesValidation="false">&#10003; Confirmar</asp:LinkButton>
                                         <asp:LinkButton CommandName="CancelarRecibido"
-                                            CommandArgument='<%# Eval("DETPE_DETALLE_PEDIDO") %>'
+                                            CommandArgument='<%#: Eval("DETPE_DETALLE_PEDIDO") %>'
                                             runat="server" CssClass="btn-cancel-t tiempoInhabilitado" CausesValidation="false">&#10005; Cancelar</asp:LinkButton>
                                     </div>
                                 </div>
                             </asp:Panel>
                         </ItemTemplate>
-                        <EditItemTemplate><%# Eval("DETPE_CANTIDAD_RECIBIDA") %></EditItemTemplate>
+                        <EditItemTemplate><%#: Eval("DETPE_CANTIDAD_RECIBIDA") %></EditItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="220px">
                         <ItemTemplate>
@@ -338,11 +338,11 @@
                                 <asp:LinkButton ID="btnEditarItem" CommandName="Edit"
                                     runat="server" CssClass="btn-edit-t tiempoInhabilitado" CausesValidation="false">&#9999; Editar</asp:LinkButton>
                                 <asp:LinkButton CommandName="MarcarRecibido"
-                                    CommandArgument='<%# Eval("DETPE_DETALLE_PEDIDO") %>'
+                                    CommandArgument='<%#: Eval("DETPE_DETALLE_PEDIDO") %>'
                                     runat="server" CssClass="btn-precio-t tiempoInhabilitado" CausesValidation="false">&#10003; Recibido</asp:LinkButton>
                                 <%-- ID requerido para que gvDetalles_RowDataBound pueda ocultarlo cuando hay OC --%>
                                 <asp:LinkButton ID="btnBorrarItem" CommandName="BorrarItem"
-                                    CommandArgument='<%# Eval("DETPE_DETALLE_PEDIDO") %>'
+                                    CommandArgument='<%#: Eval("DETPE_DETALLE_PEDIDO") %>'
                                     runat="server" CssClass="btn-del-t tiempoInhabilitado"
                                     OnClientClick="return confirm('Eliminar este producto?');">&#128465;</asp:LinkButton>
                             </div>

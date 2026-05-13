@@ -4,7 +4,7 @@ Imports Oracle.ManagedDataAccess.Client
 Namespace Modules.CatalogoInventario
 
     Partial Public Class Productos
-        Inherits System.Web.UI.Page
+        Inherits BasePage
 
         Protected Sub Page_Load(sender As Object, e As EventArgs)
             If Not IsPostBack Then

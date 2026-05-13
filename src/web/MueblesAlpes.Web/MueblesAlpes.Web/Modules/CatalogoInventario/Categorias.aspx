@@ -78,14 +78,14 @@
     <asp:GridView ID="gvCategorias" runat="server" AutoGenerateColumns="false" CssClass="table" OnRowCommand="gvCategorias_RowCommand" GridLines="None">
         <Columns>
             <asp:TemplateField HeaderText="ID" ItemStyle-Width="90px">
-                <ItemTemplate><span class="badge-id"><%# Eval("CAT_CATEGORIA") %></span></ItemTemplate>
+                <ItemTemplate><span class="badge-id"><%#: Eval("CAT_CATEGORIA") %></span></ItemTemplate>
             </asp:TemplateField>
             <asp:BoundField DataField="CAT_DESCRIPCION" HeaderText="Descripción" />
             <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="200px">
                 <ItemTemplate>
                     <div class="actions-cell">
-                        <asp:LinkButton CommandName="Editar"   CommandArgument='<%# Eval("CAT_CATEGORIA") %>' runat="server" CssClass="btn-edit-t tiempoInhabilitado">✏️ Editar</asp:LinkButton>
-                        <asp:LinkButton CommandName="Eliminar" CommandArgument='<%# Eval("CAT_CATEGORIA") %>' runat="server" CssClass="btn-del-t tiempoInhabilitado" OnClientClick="return confirm('¿Eliminar esta categoría?');">🗑 Eliminar</asp:LinkButton>
+                        <asp:LinkButton CommandName="Editar"   CommandArgument='<%#: Eval("CAT_CATEGORIA") %>' runat="server" CssClass="btn-edit-t tiempoInhabilitado">✏️ Editar</asp:LinkButton>
+                        <asp:LinkButton CommandName="Eliminar" CommandArgument='<%#: Eval("CAT_CATEGORIA") %>' runat="server" CssClass="btn-del-t tiempoInhabilitado" OnClientClick="return confirm('¿Eliminar esta categoría?');">🗑 Eliminar</asp:LinkButton>
                     </div>
                 </ItemTemplate>
             </asp:TemplateField>

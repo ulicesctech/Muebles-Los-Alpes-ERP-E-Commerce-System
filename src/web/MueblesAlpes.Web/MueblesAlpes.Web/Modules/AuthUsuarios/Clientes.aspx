@@ -243,14 +243,14 @@
         <Columns>
             <asp:TemplateField HeaderText="ID" ItemStyle-Width="70px">
                 <ItemTemplate>
-                    <span class="badge-id"><%# Eval("cli_cliente") %></span>
+                    <span class="badge-id"><%#: Eval("cli_cliente") %></span>
                 </ItemTemplate>
             </asp:TemplateField>
             <asp:BoundField DataField="cli_tipodocumento"   HeaderText="Tipo Doc" />
             <asp:BoundField DataField="cli_numdocumento"    HeaderText="Documento" />
             <asp:TemplateField HeaderText="Nombre">
                 <ItemTemplate>
-                    <%# Eval("cli_primer_nombre").ToString().Trim() & " " & Eval("cli_primer_apellido").ToString().Trim() %>
+                    <%#: Eval("cli_primer_nombre").ToString().Trim() & " " & Eval("cli_primer_apellido").ToString().Trim() %>
                 </ItemTemplate>
             </asp:TemplateField>
             <asp:BoundField DataField="cli_email"           HeaderText="Email" />
@@ -267,9 +267,9 @@
                 <ItemTemplate>
                     <div class="actions-cell">
                         <asp:LinkButton runat="server" Text="✏️" CommandName="Editar"
-                            CommandArgument='<%# Eval("cli_cliente") %>' CssClass="btn-edit-t tiempoInhabilitado" />
+                            CommandArgument='<%#: Eval("cli_cliente") %>' CssClass="btn-edit-t tiempoInhabilitado" />
                         <asp:LinkButton runat="server" Text="🗑" CommandName="Eliminar"
-                            CommandArgument='<%# Eval("cli_cliente") %>' CssClass="btn-del-t tiempoInhabilitado"
+                            CommandArgument='<%#: Eval("cli_cliente") %>' CssClass="btn-del-t tiempoInhabilitado"
                             OnClientClick="return confirm('¿Eliminar este cliente?');" />
                     </div>
                 </ItemTemplate>

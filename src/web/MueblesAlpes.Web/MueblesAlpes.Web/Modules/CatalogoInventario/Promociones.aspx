@@ -115,25 +115,25 @@
     <ItemTemplate>
         <div style="display:flex; gap:6px; flex-wrap:wrap;">
             <asp:LinkButton runat="server" CommandName="VerDetalle"
-                CommandArgument='<%# Eval("CAMP_CAMPANA") %>'
+                CommandArgument='<%#: Eval("CAMP_CAMPANA") %>'
                 CssClass="btn-sm tiempoInhabilitado"
                 style="background:#C9973A; color:white; padding:6px 12px; border-radius:6px; font-size:11px; font-family:Arial,sans-serif; border:none; cursor:pointer; text-decoration:none;">
                 Productos
             </asp:LinkButton>
             <asp:LinkButton runat="server" CommandName="Activar"
-                CommandArgument='<%# Eval("CAMP_CAMPANA") & "|" & Eval("CAMP_NOMBRE") & "|" & Eval("CAMP_DESCRIPCION") & "|" & Eval("CAMP_FECHA_INICIO") & "|" & Eval("CAMP_FECHA_FINAL") %>'
+                CommandArgument='<%#: Eval("CAMP_CAMPANA") & "|" & Eval("CAMP_NOMBRE") & "|" & Eval("CAMP_DESCRIPCION") & "|" & Eval("CAMP_FECHA_INICIO") & "|" & Eval("CAMP_FECHA_FINAL") %>'
                 CssClass="btn-sm tiempoInhabilitado"
                 style="background:#276749; color:white; padding:6px 12px; border-radius:6px; font-size:11px; font-family:Arial,sans-serif; border:none; cursor:pointer; text-decoration:none;">
                 Activar
             </asp:LinkButton>
             <asp:LinkButton runat="server" CommandName="Desactivar"
-                CommandArgument='<%# Eval("CAMP_CAMPANA") & "|" & Eval("CAMP_NOMBRE") & "|" & Eval("CAMP_DESCRIPCION") & "|" & Eval("CAMP_FECHA_INICIO") & "|" & Eval("CAMP_FECHA_FINAL") %>'
+                CommandArgument='<%#: Eval("CAMP_CAMPANA") & "|" & Eval("CAMP_NOMBRE") & "|" & Eval("CAMP_DESCRIPCION") & "|" & Eval("CAMP_FECHA_INICIO") & "|" & Eval("CAMP_FECHA_FINAL") %>'
                 CssClass="btn-sm tiempoInhabilitado"
                 style="background:#b7791f; color:white; padding:6px 12px; border-radius:6px; font-size:11px; font-family:Arial,sans-serif; border:none; cursor:pointer; text-decoration:none;">
                 Desactivar
             </asp:LinkButton>
             <asp:LinkButton runat="server" CommandName="EliminarCampana"
-                CommandArgument='<%# Eval("CAMP_CAMPANA") %>'
+                CommandArgument='<%#: Eval("CAMP_CAMPANA") %>'
                 CssClass="btn-danger tiempoInhabilitado"
                 style="padding:6px 12px; border-radius:6px; font-size:11px; font-family:Arial,sans-serif;"
                 OnClientClick="return confirm('¿Eliminar esta campaña y sus productos?');">
@@ -208,7 +208,7 @@
                 <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="100px">
                     <ItemTemplate>
                         <asp:LinkButton runat="server" CommandName="EliminarDetalle"
-                            CommandArgument='<%# Eval("PROM_PROMOCION") %>'
+                            CommandArgument='<%#: Eval("PROM_PROMOCION") %>'
                             CssClass="btn-danger tiempoInhabilitado"
                             OnClientClick="return confirm('¿Eliminar este producto de la campaña?');">
                             Eliminar

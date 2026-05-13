@@ -114,7 +114,7 @@
                     <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="100px">
                         <ItemTemplate>
                             <asp:LinkButton CommandName="EliminarNicho"
-                                CommandArgument='<%# Eval("NIC_NICHO") %>'
+                                CommandArgument='<%#: Eval("NIC_NICHO") %>'
                                 runat="server" CssClass="btn-del-t tiempoInhabilitado"
                                 OnClientClick="return confirm('Desea eliminar este nicho?');">
                                 Eliminar
@@ -134,7 +134,7 @@
     <asp:GridView ID="gvAlmacenes" runat="server" AutoGenerateColumns="false" OnRowCommand="gvAlmacenes_RowCommand" GridLines="None">
         <Columns>
             <asp:TemplateField HeaderText="ID" ItemStyle-Width="80px">
-                <ItemTemplate><span class="badge-id"><%# Eval("ALM_ALMACEN") %></span></ItemTemplate>
+                <ItemTemplate><span class="badge-id"><%#: Eval("ALM_ALMACEN") %></span></ItemTemplate>
             </asp:TemplateField>
             <asp:BoundField DataField="ALM_NOMBRE"    HeaderText="Nombre" />
             <asp:BoundField DataField="ALM_PAIS"      HeaderText="Pais"   ItemStyle-Width="120px" />
@@ -142,8 +142,8 @@
             <asp:TemplateField HeaderText="Acciones" ItemStyle-Width="200px">
                 <ItemTemplate>
                     <div class="actions-cell">
-                        <asp:LinkButton CommandName="Editar"   CommandArgument='<%# Eval("ALM_ALMACEN") %>' runat="server" CssClass="btn-edit-t tiempoInhabilitado">Editar</asp:LinkButton>
-                        <asp:LinkButton CommandName="Eliminar" CommandArgument='<%# Eval("ALM_ALMACEN") %>' runat="server" CssClass="btn-del-t tiempoInhabilitado" OnClientClick="return confirm('Desea eliminar este almacen?');">Eliminar</asp:LinkButton>
+                        <asp:LinkButton CommandName="Editar"   CommandArgument='<%#: Eval("ALM_ALMACEN") %>' runat="server" CssClass="btn-edit-t tiempoInhabilitado">Editar</asp:LinkButton>
+                        <asp:LinkButton CommandName="Eliminar" CommandArgument='<%#: Eval("ALM_ALMACEN") %>' runat="server" CssClass="btn-del-t tiempoInhabilitado" OnClientClick="return confirm('Desea eliminar este almacen?');">Eliminar</asp:LinkButton>
                     </div>
                 </ItemTemplate>
             </asp:TemplateField>

@@ -202,6 +202,19 @@
     <Content Include="ErrorLimite.aspx" />
     <Content Include="Global.asax" />
     <Content Include="favicon.ico" />
+    <Content Include="Handlers\CatalogoInventario\AlmacenesHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\CategoriasHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\FotoProductoHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\HistorialPreciosHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\MaterialesHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\NicAlmHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\NichoHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\NichosHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\ProductosHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\StockHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\TiposHandler.ashx" />
+    <Content Include="Handlers\VentasFacturacion\CarritoHandler.ashx" />
+    <Content Include="Handlers\VentasFacturacion\FacturaHandler.ashx" />
     <Content Include="Images\no-foto.png" />
     <Content Include="Modules\AuthUsuarios\Admin\GrupoUsuario.aspx" />
     <Content Include="Modules\AuthUsuarios\Admin\Permisos.aspx" />
@@ -224,6 +237,11 @@
     <Content Include="Modules\Cliente\Promociones.aspx" />
     <Content Include="Modules\Cliente\Registro.aspx" />
     <Content Include="Modules\Cliente\Tiendas.aspx" />
+    <Content Include="Modules\Marketing\Campana.aspx" />
+    <Content Include="Modules\Marketing\CostosADS.aspx" />
+    <Content Include="Modules\Reporteria\Gerencial\ReporteInventario.aspx" />
+    <Content Include="Modules\Reporteria\Gerencial\ReporteVentas.aspx" />
+    <Content Include="Modules\Reporteria\Marketing\ReporteMarketing.aspx" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
@@ -238,9 +256,14 @@
     <Content Include="Handlers\ComprasProveedor\FacturaProveedorHandler.ashx" />
     <Content Include="Handlers\ComprasProveedor\OrdenDetallePedidoHandler.ashx" />
     <Content Include="Handlers\ComprasProveedor\ReclamoProveedorHandler.ashx" />
-    <Content Include="Handlers\CatalogoInventario\NichoHandler.ashx" />
-    <Content Include="Handlers\CatalogoInventario\NicAlmHandler.ashx" />
-    <Content Include="Handlers\CatalogoInventario\FotoProductoHandler.ashx" />
+    <Content Include="App_Data\seguridad.log" />
+    <Content Include="Handlers\VentasFacturacion\HistorialPrecioVentaHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\PromocionesHandler.ashx" />
+    <Content Include="Handlers\Cliente\CatalogoClienteHandler.ashx" />
+    <Content Include="Handlers\Cliente\CarritoClienteHandler.ashx" />
+    <Content Include="Handlers\Cliente\FacturaClienteHandler.ashx" />
+    <Content Include="Handlers\Cliente\PerfilClienteHandler.ashx" />
+    <Content Include="Handlers\Auth\AuthHandler.ashx" />
     <None Include="Oracle.DataAccess.Common.Configuration.Section.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -418,6 +441,7 @@
   <ItemGroup>
     <!-- SERVICES -->
     <Compile Include="App_Code\Data\OracleDb.vb" />
+    <Content Include="App_Code\Segurity\SecurityGuard.vb" />
     <Compile Include="App_Code\Services\AuthUsuarios\AscensoService.vb" />
     <Compile Include="App_Code\Services\AuthUsuarios\ClienteService.vb" />
     <Compile Include="App_Code\Services\AuthUsuarios\EmpleadoService.vb" />
@@ -460,6 +484,9 @@
     <Compile Include="About.aspx.vb">
       <DependentUpon>About.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="BasePage.vb">
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Contact.aspx.designer.vb">
       <DependentUpon>Contact.aspx</DependentUpon>
@@ -632,6 +659,42 @@
       <DependentUpon>Tiendas.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="Modules\Marketing\Campana.aspx.designer.vb">
+      <DependentUpon>Campana.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Marketing\Campana.aspx.vb">
+      <DependentUpon>Campana.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Marketing\CostosADS.aspx.designer.vb">
+      <DependentUpon>CostosADS.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Marketing\CostosADS.aspx.vb">
+      <DependentUpon>CostosADS.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reporteria\Gerencial\ReporteInventario.aspx.designer.vb">
+      <DependentUpon>ReporteInventario.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reporteria\Gerencial\ReporteInventario.aspx.vb">
+      <DependentUpon>ReporteInventario.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reporteria\Gerencial\ReporteVentas.aspx.designer.vb">
+      <DependentUpon>ReporteVentas.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reporteria\Gerencial\ReporteVentas.aspx.vb">
+      <DependentUpon>ReporteVentas.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reporteria\Marketing\ReporteMarketing.aspx.designer.vb">
+      <DependentUpon>ReporteMarketing.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reporteria\Marketing\ReporteMarketing.aspx.vb">
+      <DependentUpon>ReporteMarketing.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="SecurityLogger.vb" />
     <Compile Include="Site.Master.designer.vb">
       <DependentUpon>Site.Master</DependentUpon>
     </Compile>
@@ -816,23 +879,10 @@
     <EmbeddedResource Include="obj\Debug\MueblesAlpes.Web.Resources.resources" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Handlers\Auth\AuthHandler.ashx" />
-    <Content Include="Handlers\CatalogoInventario\AlmacenesHandler.ashx" />
-    <Content Include="Handlers\CatalogoInventario\CategoriasHandler.ashx" />
-    <Content Include="Handlers\CatalogoInventario\HistorialPreciosHandler.ashx" />
-    <Content Include="Handlers\CatalogoInventario\MaterialesHandler.ashx" />
-    <Content Include="Handlers\CatalogoInventario\NichosHandler.ashx" />
-    <Content Include="Handlers\CatalogoInventario\ProductosHandler.ashx" />
-    <Content Include="Handlers\CatalogoInventario\PromocionesHandler.ashx" />
-    <Content Include="Handlers\CatalogoInventario\StockHandler.ashx" />
-    <Content Include="Handlers\CatalogoInventario\TiposHandler.ashx" />
-    <Content Include="Handlers\Cliente\CatalogoClienteHandler.ashx" />
     <Content Include="Handlers\Cliente\MisComprasHandler.ashx" />
     <Content Include="Handlers\Reportes\ReporteComprasHandler.ashx" />
     <Content Include="Handlers\Reportes\ReporteStockHandler.ashx" />
     <Content Include="Handlers\Reportes\ReporteVentasHandler.ashx" />
-    <Content Include="Handlers\VentasFacturacion\CarritoHandler.ashx" />
-    <Content Include="Handlers\VentasFacturacion\FacturaHandler.ashx" />
     <Content Include="Handlers\ComprasProveedor\ProveedorHandler.ashx" />
     <Content Include="Handlers\ComprasProveedor\OrdenCompraHandler.ashx" />
     <Content Include="Content\bootstrap.rtl.min.css.map" />
@@ -873,9 +923,7 @@
     <Content Include="Web.config" />
     <Content Include="Web.config.example" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
