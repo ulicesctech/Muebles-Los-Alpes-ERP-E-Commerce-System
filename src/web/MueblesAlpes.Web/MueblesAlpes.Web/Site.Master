@@ -288,12 +288,12 @@
             <asp:Panel ID="pnlNavCliente" runat="server" Visible="false">
             <nav class="nav-main" style="display:flex; justify-content:space-between; align-items:center;">
                 <ul>
-                    <li><a href="/Modules/Cliente/Catalogo.aspx">Productos</a></li>
-                    <li><a href="/Modules/Cliente/Tiendas.aspx">Tiendas</a></li>
-                    <li><a href="/Modules/Cliente/Promociones.aspx">Promociones</a></li>
-                    <li id="liMisCompras" runat="server" visible="false">
-                        <a href="/Modules/Cliente/MisCompras.aspx">Mis Compras</a>
-                    </li>
+                   <li><a runat="server" href="~/Modules/Cliente/Catalogo.aspx">Productos</a></li>
+<li><a runat="server" href="~/Modules/Cliente/Tiendas.aspx">Tiendas</a></li>
+<li><a runat="server" href="~/Modules/Cliente/Promociones.aspx">Promociones</a></li>
+<li id="liMisCompras" runat="server" visible="false">
+    <a runat="server" href="~/Modules/Cliente/MisCompras.aspx">Mis Compras</a>
+</li>
                 </ul>
                 <asp:Panel ID="pnlNavLogueado" runat="server" Visible="false">
                     <div style="position:relative; margin-right:10px;"
