@@ -1,27 +1,27 @@
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    FlatList,
-    Modal,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Modal,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import {
-    Categoria,
-    getCategorias,
+  Categoria,
+  getCategorias,
 } from "../../../services/catalogoInventario/categorias";
 import {
-    actualizarTipo,
-    crearTipo,
-    eliminarTipo,
-    getTipos,
-    getTiposPorCategoria,
-    Tipo,
+  actualizarTipo,
+  crearTipo,
+  eliminarTipo,
+  getTipos,
+  getTiposPorCategoria,
+  Tipo,
 } from "../../../services/catalogoInventario/tipos";
 
 export default function TiposScreen() {
@@ -149,35 +149,6 @@ export default function TiposScreen() {
   };
 
   // --- ENCABEZADO DE LA LISTA ---
-  const renderHeader = () => (
-    <View>
-      <View style={styles.searchContainer}>
-        <TouchableOpacity
-          style={styles.filterDropdown}
-          onPress={() => setModalFiltroVisible(true)}
-        >
-          <Text style={styles.filterText}>
-            🏷️ Filtro:{" "}
-            {filtroCategoria
-              ? getNombreCategoriaSeleccionada(filtroCategoria)
-              : "Todas las Categorías"}
-          </Text>
-        </TouchableOpacity>
-        {filtroCategoria !== null && (
-          <TouchableOpacity
-            style={styles.btnClearFilter}
-            onPress={() => setFiltroCategoria(null)}
-          >
-            <Text style={styles.btnTextRed}>✕</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      <TouchableOpacity style={styles.btnAdd} onPress={() => abrirModal()}>
-        <Text style={styles.btnTextWhite}>📋 + Nuevo Tipo</Text>
-      </TouchableOpacity>
-    </View>
-  );
 
   const renderItem = ({ item }: { item: Tipo }) => (
     <View style={styles.card}>
@@ -207,11 +178,37 @@ export default function TiposScreen() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.headerContainer}>
+        <View style={styles.searchContainer}>
+          <TouchableOpacity
+            style={styles.filterDropdown}
+            onPress={() => setModalFiltroVisible(true)}
+          >
+            <Text style={styles.filterText}>
+              🏷️ Filtro:{" "}
+              {filtroCategoria
+                ? getNombreCategoriaSeleccionada(filtroCategoria)
+                : "Todas las Categorías"}
+            </Text>
+          </TouchableOpacity>
+          {filtroCategoria !== null && (
+            <TouchableOpacity
+              style={styles.btnClearFilter}
+              onPress={() => setFiltroCategoria(null)}
+            >
+              <Text style={styles.btnTextRed}>✕</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <TouchableOpacity style={styles.btnAdd} onPress={() => abrirModal()}>
+          <Text style={styles.btnTextWhite}>📋 + Nuevo Tipo</Text>
+        </TouchableOpacity>
+      </View>
       <FlatList
         data={tipos}
         keyExtractor={(item) => item.TIP_TIPO.toString()}
         renderItem={renderItem}
-        ListHeaderComponent={renderHeader}
         contentContainerStyle={{ paddingBottom: 20 }}
         ListEmptyComponent={
           loading ? (
@@ -323,6 +320,7 @@ export default function TiposScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fdf8f3", padding: 16 },
+  headerContainer: { marginBottom: 10 },
   searchContainer: { flexDirection: "row", marginBottom: 12, gap: 8 },
   filterDropdown: {
     flex: 1,

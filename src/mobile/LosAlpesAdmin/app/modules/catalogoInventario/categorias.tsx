@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    FlatList,
-    Modal,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Modal,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import {
-    actualizarCategoria,
-    buscarCategorias,
-    Categoria,
-    crearCategoria,
-    eliminarCategoria,
-    getCategorias,
+  actualizarCategoria,
+  buscarCategorias,
+  Categoria,
+  crearCategoria,
+  eliminarCategoria,
+  getCategorias,
 } from "../../../services/catalogoInventario/categorias";
 
 export default function CategoriasScreen() {
@@ -118,27 +118,6 @@ export default function CategoriasScreen() {
     setDescripcion("");
   };
 
-  // --- ENCABEZADO DE LA LISTA ---
-  const renderHeader = () => (
-    <View>
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Buscar categoría..."
-          value={search}
-          onChangeText={setSearch}
-        />
-        <TouchableOpacity style={styles.btnSearch} onPress={handleBuscar}>
-          <Text style={styles.btnTextWhite}>Buscar</Text>
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity style={styles.btnAdd} onPress={() => abrirModal()}>
-        <Text style={styles.btnTextWhite}>+ Nueva Categoría</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
   const renderItem = ({ item }: { item: Categoria }) => (
     <View style={styles.card}>
       <View style={styles.cardInfo}>
@@ -164,11 +143,29 @@ export default function CategoriasScreen() {
 
   return (
     <View style={styles.container}>
+      {/* EL ENCABEZADO AHORA ESTÁ FUERA DEL FLATLIST */}
+      <View style={styles.headerContainer}>
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Buscar categoría..."
+            value={search}
+            onChangeText={setSearch}
+          />
+          <TouchableOpacity style={styles.btnSearch} onPress={handleBuscar}>
+            <Text style={styles.btnTextWhite}>Buscar</Text>
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity style={styles.btnAdd} onPress={() => abrirModal()}>
+          <Text style={styles.btnTextWhite}>+ Nueva Categoría</Text>
+        </TouchableOpacity>
+      </View>
+
       <FlatList
         data={categorias}
         keyExtractor={(item) => item.CAT_CATEGORIA.toString()}
         renderItem={renderItem}
-        ListHeaderComponent={renderHeader}
         contentContainerStyle={{ paddingBottom: 20 }}
         ListEmptyComponent={
           loading ? (
@@ -215,6 +212,7 @@ export default function CategoriasScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fdf8f3", padding: 16 },
+  headerContainer: { marginBottom: 10 }, // Nuevo estilo para agrupar el buscador fijo
   searchContainer: { flexDirection: "row", marginBottom: 10, gap: 8 },
   searchInput: {
     flex: 1,
@@ -236,7 +234,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     alignItems: "center",
-    marginBottom: 16,
+    marginBottom: 6,
   },
   btnTextWhite: { color: "white", fontWeight: "bold" },
   card: {
@@ -260,6 +258,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     alignSelf: "flex-start",
     marginBottom: 4,
+    overflow: "hidden", // Añadido por seguridad visual
   },
   title: { fontSize: 16, color: "#444", fontWeight: "bold" },
   actions: { flexDirection: "row", gap: 8 },
