@@ -1,13 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import {
-    ActivityIndicator, Alert, ScrollView, StyleSheet,
-    Text, TextInput, TouchableOpacity, View
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { Categoria, getCategorias } from '../../../services/catalogoInventario/categorias';
 import { getProductos, Producto } from '../../../services/catalogoInventario/productos';
 import {
-    actualizarCampana, crearCampana, crearPromo,
-    eliminarCampana, eliminarPromo, listarCampanas, listarPorCampana
+  actualizarCampana, crearCampana, crearPromo,
+  eliminarCampana, eliminarPromo, listarCampanas, listarPorCampana
 } from '../../../services/catalogoInventario/promociones';
 
 const CAFE = '#5C3A1E';
@@ -176,126 +184,146 @@ export default function PromocionesScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.titulo}>Promociones</Text>
+    <KeyboardAvoidingView
+      style={styles.keyboardContainer}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <ScrollView
+        style={styles.container}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="none"
+      >
+        <Text style={styles.titulo}>Promociones</Text>
 
-      {/* CREAR CAMPAÑA */}
-      <View style={styles.card}>
-        <Text style={styles.cardTitulo}>Nueva Campaña</Text>
-        <TextInput style={styles.input} placeholder="Nombre *" value={nombre} onChangeText={setNombre} />
-        <TextInput style={styles.input} placeholder="Descripción" value={descripcion} onChangeText={setDescripcion} />
-        <TextInput style={styles.input} placeholder="Fecha inicio (YYYY-MM-DD)" value={fechaInicio} onChangeText={setFechaInicio} />
-        <TextInput style={styles.input} placeholder="Fecha final (YYYY-MM-DD)" value={fechaFinal} onChangeText={setFechaFinal} />
-        <TouchableOpacity style={styles.btn} onPress={handleCrearCampana}>
-          <Text style={styles.btnText}>Crear Campaña</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* LISTA CAMPAÑAS */}
-      <Text style={styles.seccion}>Campañas</Text>
-      {loading ? <ActivityIndicator color={CAFE} /> : campanas.map(c => (
-        <View key={c.CAMP_CAMPANA} style={styles.item}>
-          <TouchableOpacity onPress={() => verDetalle(c)} style={styles.itemInfo}>
-            <Text style={styles.itemNombre}>{c.CAMP_NOMBRE}</Text>
-            <Text style={styles.itemSub}>{c.CAMP_FECHA_INICIO} → {c.CAMP_FECHA_FINAL}</Text>
-            <Text style={[styles.badge, c.CAMP_ESTADO === 'ACTIVA' ? styles.badgeOk : styles.badgeOff]}>
-              {c.CAMP_ESTADO}
-            </Text>
-          </TouchableOpacity>
-          <View style={styles.itemBtns}>
-            <TouchableOpacity style={styles.btnToggle} onPress={() => handleToggleEstado(c)}>
-              <Text style={styles.btnToggleText}>{c.CAMP_ESTADO === 'ACTIVA' ? '⏸' : '▶'}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.btnDel} onPress={() => handleEliminarCampana(c.CAMP_CAMPANA)}>
-              <Text style={styles.btnDelText}>🗑</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      ))}
-
-      {/* DETALLE CAMPAÑA */}
-      {campanaActiva && (
+        {/* CREAR CAMPAÑA */}
         <View style={styles.card}>
-          <Text style={styles.cardTitulo}> {campanaActiva.CAMP_NOMBRE}</Text>
+          <Text style={styles.cardTitulo}>Nueva Campaña</Text>
+          <TextInput style={styles.input} placeholder="Nombre *" value={nombre} onChangeText={setNombre} />
+          <TextInput style={styles.input} placeholder="Descripción" value={descripcion} onChangeText={setDescripcion} />
+          <TextInput style={styles.input} placeholder="Fecha inicio (YYYY-MM-DD)" value={fechaInicio} onChangeText={setFechaInicio} />
+          <TextInput style={styles.input} placeholder="Fecha final (YYYY-MM-DD)" value={fechaFinal} onChangeText={setFechaFinal} />
+          <TouchableOpacity style={styles.btn} onPress={handleCrearCampana}>
+            <Text style={styles.btnText}>Crear Campaña</Text>
+          </TouchableOpacity>
+        </View>
 
-          {/* POR CATEGORÍA */}
-          <Text style={styles.label}>CATEGORÍA</Text>
-          <ScrollView style={styles.selectorBox} nestedScrollEnabled>
-            <TouchableOpacity
-              style={[styles.selectorItem, categoriaSeleccionada === 0 && styles.selectorItemActive]}
-              onPress={() => setCategoriaSeleccionada(0)}>
-              <Text style={[styles.selectorText, categoriaSeleccionada === 0 && styles.selectorTextActive]}>
-                Todas las categorías
+        {/* LISTA CAMPAÑAS */}
+        <Text style={styles.seccion}>Campañas</Text>
+        {loading ? <ActivityIndicator color={CAFE} /> : campanas.map(c => (
+          <View key={c.CAMP_CAMPANA} style={styles.item}>
+            <TouchableOpacity onPress={() => verDetalle(c)} style={styles.itemInfo}>
+              <Text style={styles.itemNombre}>{c.CAMP_NOMBRE}</Text>
+              <Text style={styles.itemSub}>{c.CAMP_FECHA_INICIO} → {c.CAMP_FECHA_FINAL}</Text>
+              <Text style={[styles.badge, c.CAMP_ESTADO === 'ACTIVA' ? styles.badgeOk : styles.badgeOff]}>
+                {c.CAMP_ESTADO}
               </Text>
             </TouchableOpacity>
-            {categorias.map(c => (
-              <TouchableOpacity
-                key={c.CAT_CATEGORIA}
-                style={[styles.selectorItem, categoriaSeleccionada === c.CAT_CATEGORIA && styles.selectorItemActive]}
-                onPress={() => setCategoriaSeleccionada(c.CAT_CATEGORIA)}>
-                <Text style={[styles.selectorText, categoriaSeleccionada === c.CAT_CATEGORIA && styles.selectorTextActive]}>
-                  {c.CAT_DESCRIPCION}
-                </Text>
+            <View style={styles.itemBtns}>
+              <TouchableOpacity style={styles.btnToggle} onPress={() => handleToggleEstado(c)}>
+                <Text style={styles.btnToggleText}>{c.CAMP_ESTADO === 'ACTIVA' ? '⏸' : '▶'}</Text>
               </TouchableOpacity>
-            ))}
-          </ScrollView>
-
-          <TextInput
-            style={styles.input}
-            placeholder="Porcentaje categoría (%)"
-            value={porcentajeCategoria}
-            onChangeText={setPorcentajeCategoria}
-            keyboardType="numeric"
-          />
-
-          <TouchableOpacity
-            style={[styles.btn, { backgroundColor: GOLD, marginBottom: 16 }]}
-            onPress={handleAgregarPorCategoria}>
-            <Text style={styles.btnText}>Agregar por Categoría</Text>
-          </TouchableOpacity>
-
-          <Text style={styles.label}>PRODUCTO</Text>
-          <ScrollView style={styles.selectorBox} nestedScrollEnabled>
-            {productos.map(p => (
-              <TouchableOpacity
-                key={p.PRO_REFERENCIA}
-                style={[styles.selectorItem, productoSeleccionado === p.PRO_REFERENCIA && styles.selectorItemActive]}
-                onPress={() => setProductoSeleccionado(p.PRO_REFERENCIA)}>
-                <Text style={[styles.selectorText, productoSeleccionado === p.PRO_REFERENCIA && styles.selectorTextActive]}>
-                  {p.PRO_NOMBRE}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-
-          <TextInput
-            style={styles.input}
-            placeholder="Porcentaje (%)"
-            value={porcentaje}
-            onChangeText={setPorcentaje}
-            keyboardType="numeric"
-          />
-
-          <TouchableOpacity style={styles.btn} onPress={handleAgregarPromo}>
-            <Text style={styles.btnText}>Agregar Producto</Text>
-          </TouchableOpacity>
-
-          {detalle.map(d => (
-            <View key={d.PROM_PROMOCION} style={styles.detalleItem}>
-              <Text style={styles.detalleNombre}>{d.PRO_NOMBRE}</Text>
-              <Text style={styles.detalleSub}>{d.PROM_PORCENTAJE}% descuento</Text>
-              <TouchableOpacity onPress={() => handleEliminarPromo(d.PROM_PROMOCION)}>
-                <Text style={styles.btnDelText}></Text>
+              <TouchableOpacity style={styles.btnDel} onPress={() => handleEliminarCampana(c.CAMP_CAMPANA)}>
+                <Text style={styles.btnDelText}>🗑</Text>
               </TouchableOpacity>
             </View>
-          ))}
-        </View>
-      )}
-    </ScrollView>
+          </View>
+        ))}
+
+        {/* DETALLE CAMPAÑA */}
+        {campanaActiva && (
+          <View style={styles.card}>
+            <Text style={styles.cardTitulo}> {campanaActiva.CAMP_NOMBRE}</Text>
+
+            {/* POR CATEGORÍA */}
+            <Text style={styles.label}>CATEGORÍA</Text>
+            <ScrollView
+              style={styles.selectorBox}
+              nestedScrollEnabled
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="none"
+            >
+              <TouchableOpacity
+                style={[styles.selectorItem, categoriaSeleccionada === 0 && styles.selectorItemActive]}
+                onPress={() => setCategoriaSeleccionada(0)}>
+                <Text style={[styles.selectorText, categoriaSeleccionada === 0 && styles.selectorTextActive]}>
+                  Todas las categorías
+                </Text>
+              </TouchableOpacity>
+              {categorias.map(c => (
+                <TouchableOpacity
+                  key={c.CAT_CATEGORIA}
+                  style={[styles.selectorItem, categoriaSeleccionada === c.CAT_CATEGORIA && styles.selectorItemActive]}
+                  onPress={() => setCategoriaSeleccionada(c.CAT_CATEGORIA)}>
+                  <Text style={[styles.selectorText, categoriaSeleccionada === c.CAT_CATEGORIA && styles.selectorTextActive]}>
+                    {c.CAT_DESCRIPCION}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
+            <TextInput
+              style={styles.input}
+              placeholder="Porcentaje categoría (%)"
+              value={porcentajeCategoria}
+              onChangeText={setPorcentajeCategoria}
+              keyboardType="numeric"
+            />
+
+            <TouchableOpacity
+              style={[styles.btn, { backgroundColor: GOLD, marginBottom: 16 }]}
+              onPress={handleAgregarPorCategoria}>
+              <Text style={styles.btnText}>Agregar por Categoría</Text>
+            </TouchableOpacity>
+
+            <Text style={styles.label}>PRODUCTO</Text>
+            <ScrollView
+              style={styles.selectorBox}
+              nestedScrollEnabled
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="none"
+            >
+              {productos.map(p => (
+                <TouchableOpacity
+                  key={p.PRO_REFERENCIA}
+                  style={[styles.selectorItem, productoSeleccionado === p.PRO_REFERENCIA && styles.selectorItemActive]}
+                  onPress={() => setProductoSeleccionado(p.PRO_REFERENCIA)}>
+                  <Text style={[styles.selectorText, productoSeleccionado === p.PRO_REFERENCIA && styles.selectorTextActive]}>
+                    {p.PRO_NOMBRE}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
+            <TextInput
+              style={styles.input}
+              placeholder="Porcentaje (%)"
+              value={porcentaje}
+              onChangeText={setPorcentaje}
+              keyboardType="numeric"
+            />
+
+            <TouchableOpacity style={styles.btn} onPress={handleAgregarPromo}>
+              <Text style={styles.btnText}>Agregar Producto</Text>
+            </TouchableOpacity>
+
+            {detalle.map(d => (
+              <View key={d.PROM_PROMOCION} style={styles.detalleItem}>
+                <Text style={styles.detalleNombre}>{d.PRO_NOMBRE}</Text>
+                <Text style={styles.detalleSub}>{d.PROM_PORCENTAJE}% descuento</Text>
+                <TouchableOpacity onPress={() => handleEliminarPromo(d.PROM_PROMOCION)}>
+                  <Text style={styles.btnDelText}></Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        )}
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
+  keyboardContainer: { flex: 1 },
   container: { flex: 1, backgroundColor: '#f5ece0', padding: 16 },
   titulo: { fontSize: 22, fontWeight: 'bold', color: CAFE, marginBottom: 16 },
   card: { backgroundColor: 'white', borderRadius: 12, padding: 16, marginBottom: 16, elevation: 2 },

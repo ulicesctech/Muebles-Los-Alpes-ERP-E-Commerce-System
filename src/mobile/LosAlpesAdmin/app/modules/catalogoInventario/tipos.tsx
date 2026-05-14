@@ -1,27 +1,30 @@
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    FlatList,
-    Modal,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import {
-    Categoria,
-    getCategorias,
+  Categoria,
+  getCategorias,
 } from "../../../services/catalogoInventario/categorias";
 import {
-    actualizarTipo,
-    crearTipo,
-    eliminarTipo,
-    getTipos,
-    getTiposPorCategoria,
-    Tipo,
+  actualizarTipo,
+  crearTipo,
+  eliminarTipo,
+  getTipos,
+  getTiposPorCategoria,
+  Tipo,
 } from "../../../services/catalogoInventario/tipos";
 
 export default function TiposScreen() {
@@ -232,45 +235,62 @@ export default function TiposScreen() {
       {/* Modal Formulario */}
       <Modal visible={modalVisible} animationType="slide" transparent={true}>
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
-              {currentId ? "Editar Tipo" : "Nuevo Tipo"}
-            </Text>
-
-            <Text style={styles.label}>Descripción *</Text>
-            <TextInput
-              style={styles.input}
-              value={descripcion}
-              onChangeText={setDescripcion}
-              placeholder="Ej: Sofá, Mesa, Silla..."
-              maxLength={200}
-            />
-
-            <Text style={styles.label}>Categoría *</Text>
-            <TouchableOpacity
-              style={styles.selectorInput}
-              onPress={() => setModalSelectorVisible(true)}
+          <KeyboardAvoidingView
+            style={styles.keyboardContainer}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+          >
+            <ScrollView
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="none"
+              showsVerticalScrollIndicator={false}
             >
-              <Text
-                style={
-                  selectedCategoria
-                    ? styles.selectorText
-                    : styles.selectorPlaceholder
-                }
-              >
-                {getNombreCategoriaSeleccionada(selectedCategoria)}
-              </Text>
-            </TouchableOpacity>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>
+                  {currentId ? "Editar Tipo" : "Nuevo Tipo"}
+                </Text>
 
-            <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.btnCancel} onPress={cerrarModal}>
-                <Text style={styles.btnTextDark}>Cancelar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.btnSave} onPress={handleGuardar}>
-                <Text style={styles.btnTextWhite}>💾 Guardar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+                <Text style={styles.label}>Descripción *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={descripcion}
+                  onChangeText={setDescripcion}
+                  placeholder="Ej: Sofá, Mesa, Silla..."
+                  maxLength={200}
+                />
+
+                <Text style={styles.label}>Categoría *</Text>
+                <TouchableOpacity
+                  style={styles.selectorInput}
+                  onPress={() => setModalSelectorVisible(true)}
+                >
+                  <Text
+                    style={
+                      selectedCategoria
+                        ? styles.selectorText
+                        : styles.selectorPlaceholder
+                    }
+                  >
+                    {getNombreCategoriaSeleccionada(selectedCategoria)}
+                  </Text>
+                </TouchableOpacity>
+
+                <View style={styles.modalActions}>
+                  <TouchableOpacity
+                    style={styles.btnCancel}
+                    onPress={cerrarModal}
+                  >
+                    <Text style={styles.btnTextDark}>Cancelar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.btnSave}
+                    onPress={handleGuardar}
+                  >
+                    <Text style={styles.btnTextWhite}>💾 Guardar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
         </View>
       </Modal>
 
@@ -410,6 +430,9 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "center",
     padding: 20,
+  },
+  keyboardContainer: {
+    width: "100%",
   },
   modalContent: { backgroundColor: "white", padding: 20, borderRadius: 12 },
   modalTitle: {
