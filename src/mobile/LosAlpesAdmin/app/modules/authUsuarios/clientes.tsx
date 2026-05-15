@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  ActivityIndicator,
+  Alert,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { actualizarCliente, crearCliente, eliminarCliente, listarClientes } from '../../../services/authUsuarios/clientes';
 
@@ -163,10 +163,10 @@ export default function ClientesScreen() {
               <Text style={styles.cardTipo}>{c.cli_tipocliente} — {c.cli_pais}</Text>
               <View style={styles.actions}>
                 <TouchableOpacity style={styles.btnEdit} onPress={() => abrirModal(c)}>
-                  <Text style={styles.btnEditText}>✏️ Editar</Text>
+                  <Text style={styles.btnEditText}>Editar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.btnDel} onPress={() => eliminar(c)}>
-                  <Text style={styles.btnDelText}>🗑️ Eliminar</Text>
+                  <Text style={styles.btnDelText}>Eliminar</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -193,7 +193,7 @@ export default function ClientesScreen() {
 
               <Text style={styles.label}>Tipo Documento</Text>
               <View style={styles.tipoRow}>
-                {['DPI', 'Pasaporte', 'NIT'].map(t => (
+                {['DPI', 'NIT'].map(t => (
                   <TouchableOpacity key={t}
                     style={[styles.tipoBtn, tipoDoc === t && styles.tipoBtnActive]}
                     onPress={() => setTipoDoc(t)}>

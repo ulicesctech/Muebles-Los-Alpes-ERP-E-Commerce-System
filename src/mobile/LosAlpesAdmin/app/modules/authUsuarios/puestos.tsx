@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  ActivityIndicator,
+  Alert,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { actualizarPuesto, crearPuesto, eliminarPuesto, listarPuestos } from '../../../services/authUsuarios/puestos';
 
@@ -119,10 +119,10 @@ export default function PuestosScreen() {
               <Text style={styles.cardDesc}>{p.pue_descripcion}</Text>
               <View style={styles.actions}>
                 <TouchableOpacity style={styles.btnEdit} onPress={() => abrirModal(p)}>
-                  <Text style={styles.btnEditText}>✏️ Editar</Text>
+                  <Text style={styles.btnEditText}>Editar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.btnDel} onPress={() => eliminar(p)}>
-                  <Text style={styles.btnDelText}>🗑️ Eliminar</Text>
+                  <Text style={styles.btnDelText}>Eliminar</Text>
                 </TouchableOpacity>
               </View>
             </View>

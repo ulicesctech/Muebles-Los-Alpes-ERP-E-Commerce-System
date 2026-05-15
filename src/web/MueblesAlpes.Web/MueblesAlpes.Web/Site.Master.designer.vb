@@ -32,16 +32,16 @@ Partial Public Class SiteMaster
     Protected WithEvents lnkLogo As Global.System.Web.UI.WebControls.HyperLink
 
     '''<summary>
-    '''pnlCarritoHeader control.
+    '''Control pnlCarritoHeader.
     '''</summary>
     '''<remarks>
-    '''Auto-generated field.
-    '''To modify move field declaration from designer file to code-behind file.
+    '''Campo generado automáticamente.
+    '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
     '''</remarks>
     Protected WithEvents pnlCarritoHeader As Global.System.Web.UI.WebControls.Panel
 
     '''<summary>
-    '''lblCartCount control.
+    '''Control lblCartCount.
     '''</summary>
     '''<remarks>
     '''Campo generado automáticamente.
