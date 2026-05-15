@@ -33,7 +33,7 @@ Namespace Modules.Cliente
                 Page.Title = fila("PRO_NOMBRE").ToString()
 
                 ' Foto
-                imgProducto.ImageUrl = ResolveUrl("~/Handlers/CatalogoInventario/FotoProductoHandler.ashx?ref=" & ref)
+                imgProducto.ImageUrl = ResolveUrl("~/Handlers/CatalogoInventario/FotoProductoHandler.ashx?ref=" & ref & "&t=" & DateTime.Now.Ticks.ToString())
                 imgProducto.AlternateText = fila("PRO_NOMBRE").ToString()
 
                 ' Info

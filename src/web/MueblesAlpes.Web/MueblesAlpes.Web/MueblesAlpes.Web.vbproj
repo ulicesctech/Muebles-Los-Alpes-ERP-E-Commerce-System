@@ -210,7 +210,6 @@
     <Content Include="Handlers\CatalogoInventario\MaterialesHandler.ashx" />
     <Content Include="Handlers\CatalogoInventario\NicAlmHandler.ashx" />
     <Content Include="Handlers\CatalogoInventario\NichoHandler.ashx" />
-    <Content Include="Handlers\CatalogoInventario\NichosHandler.ashx" />
     <Content Include="Handlers\CatalogoInventario\ProductosHandler.ashx" />
     <Content Include="Handlers\CatalogoInventario\StockHandler.ashx" />
     <Content Include="Handlers\CatalogoInventario\TiposHandler.ashx" />

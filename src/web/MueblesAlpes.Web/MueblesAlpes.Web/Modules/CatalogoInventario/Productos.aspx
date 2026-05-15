@@ -131,9 +131,20 @@
 <div class="table-card">
     <asp:GridView ID="gvProductos" runat="server" AutoGenerateColumns="false" CssClass="table" OnRowCommand="gvProductos_RowCommand" GridLines="None">
         <Columns>
-            <asp:TemplateField HeaderText="Ref" ItemStyle-Width="100px">
-                <ItemTemplate><span class="badge-id"><%#: Eval("PRO_REFERENCIA") %></span></ItemTemplate>
-            </asp:TemplateField>
+<asp:TemplateField HeaderText="Ref" ItemStyle-Width="100px">
+    <ItemTemplate>
+        <span class="badge-id"><%#: Eval("PRO_REFERENCIA") %></span>
+    </ItemTemplate>
+</asp:TemplateField>
+
+<asp:TemplateField HeaderText="Foto" ItemStyle-Width="90px">
+    <ItemTemplate>
+        <img src='<%# ResolveUrl("~/Handlers/CatalogoInventario/FotoProductoHandler.ashx?ref=" & Eval("PRO_REFERENCIA").ToString() & "&t=" & DateTime.Now.Ticks.ToString()) %>'
+             style="width:64px; height:64px; object-fit:cover; border-radius:8px; border:1px solid #e8d8c0; background:#fdf8f3;"
+             alt="Foto producto"
+             onerror="this.style.display='none';" />
+    </ItemTemplate>
+</asp:TemplateField>
             <asp:BoundField DataField="PRO_NOMBRE"      HeaderText="Nombre"   />
             <asp:BoundField DataField="TIP_DESCRIPCION" HeaderText="Tipo"     ItemStyle-Width="120px" />
             <asp:BoundField DataField="MAT_DESCRIPCION" HeaderText="Material" ItemStyle-Width="120px" />

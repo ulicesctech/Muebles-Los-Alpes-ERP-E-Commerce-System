@@ -1,9 +1,14 @@
+import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   FlatList,
+  Image,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -20,6 +25,7 @@ import {
   getProductos,
   Producto,
 } from "../../../services/catalogoInventario/productos";
+
 // Dependencias para los combos
 import {
   Categoria,
@@ -57,6 +63,7 @@ export default function ProductosScreen() {
   const [alto, setAlto] = useState("");
   const [ancho, setAncho] = useState("");
   const [profundidad, setProfundidad] = useState("");
+  const [fotoUri, setFotoUri] = useState<string | null>(null);
 
   const [categoriaId, setCategoriaId] = useState<number | null>(null);
   const [tipoId, setTipoId] = useState<number | null>(null);
@@ -125,6 +132,26 @@ export default function ProductosScreen() {
     }
   };
 
+  const seleccionarFoto = async () => {
+    const permiso = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permiso.granted) {
+      Alert.alert("Permiso requerido", "Necesitamos acceso a tu galería.");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setFotoUri(result.assets[0].uri);
+    }
+  };
+
   const handleGuardar = async () => {
     if (
       !referencia.trim() ||
@@ -153,6 +180,7 @@ export default function ProductosScreen() {
         ancho,
         profundidad,
         peso,
+        fotoUri,
       };
 
       if (isEditing) {
@@ -162,6 +190,7 @@ export default function ProductosScreen() {
         await crearProducto(payload);
         Alert.alert("Éxito", "Producto creado");
       }
+
       cerrarModal();
       handleBuscar();
     } catch (error) {
@@ -208,9 +237,8 @@ export default function ProductosScreen() {
       setAlto(prod.PRO_ALTO_CM?.toString() || "");
       setAncho(prod.PRO_ANCHO_CM?.toString() || "");
       setProfundidad(prod.PRO_PROFUNDIDAD_CM?.toString() || "");
-      // Nota: Si el backend no te devuelve CAT_CATEGORIA directamente en el producto,
-      // el usuario tendrá que re-seleccionar la categoría al editar el tipo.
       setTipoId(prod.TIP_TIPO || null);
+      setFotoUri(null);
     } else {
       setIsEditing(false);
       setReferencia("");
@@ -224,7 +252,9 @@ export default function ProductosScreen() {
       setAlto("");
       setAncho("");
       setProfundidad("");
+      setFotoUri(null);
     }
+
     setModalVisible(true);
   };
 
@@ -235,26 +265,32 @@ export default function ProductosScreen() {
   // --- LÓGICA DEL SELECTOR GENÉRICO ---
   const abrirSelector = (tipo: "categoria" | "tipo" | "material") => {
     let rawData: { id: number; nombre: string }[] = [];
-    if (tipo === "categoria")
+
+    if (tipo === "categoria") {
       rawData = categorias.map((c) => ({
         id: c.CAT_CATEGORIA,
         nombre: c.CAT_DESCRIPCION,
       }));
+    }
+
     if (tipo === "tipo") {
       if (!categoriaId) {
         Alert.alert("Atención", "Primero selecciona una categoría");
         return;
       }
+
       rawData = tipos.map((t) => ({
         id: t.TIP_TIPO,
         nombre: t.TIP_DESCRIPCION,
       }));
     }
-    if (tipo === "material")
+
+    if (tipo === "material") {
       rawData = materiales.map((m) => ({
         id: m.MAT_MATERIAL,
         nombre: m.MAT_DESCRIPCION,
       }));
+    }
 
     setSelectorData(rawData);
     setSelectorType(tipo);
@@ -266,8 +302,10 @@ export default function ProductosScreen() {
       setCategoriaId(id);
       setTipoId(null);
     }
+
     if (selectorType === "tipo") setTipoId(id);
     if (selectorType === "material") setMaterialId(id);
+
     setModalSelectorVisible(false);
   };
 
@@ -276,19 +314,25 @@ export default function ProductosScreen() {
     id: number | null,
   ) => {
     if (!id) return `Seleccione ${tipo}...`;
-    if (tipo === "categoria")
+
+    if (tipo === "categoria") {
       return (
         categorias.find((c) => c.CAT_CATEGORIA === id)?.CAT_DESCRIPCION || ""
       );
-    if (tipo === "tipo")
+    }
+
+    if (tipo === "tipo") {
       return (
         tipos.find((t) => t.TIP_TIPO === id)?.TIP_DESCRIPCION ||
         "Tipo previo (Seleccione Cat)"
       );
-    if (tipo === "material")
+    }
+
+    if (tipo === "material") {
       return (
         materiales.find((m) => m.MAT_MATERIAL === id)?.MAT_DESCRIPCION || ""
       );
+    }
   };
 
   // --- ENCABEZADOS Y RENDER DE LISTA ---
@@ -305,6 +349,7 @@ export default function ProductosScreen() {
           <Text style={styles.btnTextWhite}>Buscar</Text>
         </TouchableOpacity>
       </View>
+
       <TouchableOpacity style={styles.btnAdd} onPress={() => abrirModal()}>
         <Text style={styles.btnTextWhite}>🛋️ + Nuevo Producto</Text>
       </TouchableOpacity>
@@ -316,6 +361,7 @@ export default function ProductosScreen() {
       <View style={styles.cardInfo}>
         <Text style={styles.badgeId}>Ref: {item.PRO_REFERENCIA}</Text>
         <Text style={styles.title}>{item.PRO_NOMBRE}</Text>
+
         <View style={styles.detailsRow}>
           <Text style={styles.detailPill}>
             🏷️ {item.TIP_DESCRIPCION || "N/A"}
@@ -324,6 +370,7 @@ export default function ProductosScreen() {
             🧱 {item.MAT_DESCRIPCION || "N/A"}
           </Text>
         </View>
+
         <View style={styles.detailsRow}>
           <Text style={styles.detailSub}>
             🎨 Color: {item.PRO_COLOR || "N/A"}
@@ -332,10 +379,12 @@ export default function ProductosScreen() {
             ⚖️ Peso: {item.PRO_PESO ? `${item.PRO_PESO} kg` : "N/A"}
           </Text>
         </View>
+
         <Text style={styles.price}>
           Q {item.PRO_PRECIO ? Number(item.PRO_PRECIO).toFixed(2) : "0.00"}
         </Text>
       </View>
+
       <View style={styles.actions}>
         <TouchableOpacity
           style={styles.btnEdit}
@@ -343,6 +392,7 @@ export default function ProductosScreen() {
         >
           <Text style={styles.btnTextGold}>✏️ Editar</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.btnDelete}
           onPress={() => handleEliminar(item.PRO_REFERENCIA)}
@@ -353,7 +403,6 @@ export default function ProductosScreen() {
     </View>
   );
 
-  // Formulario Renderizado como ListHeaderComponent para scroll natural sin <ScrollView>
   const renderFormulario = () => (
     <View style={styles.modalContent}>
       <Text style={styles.modalTitle}>
@@ -406,6 +455,7 @@ export default function ProductosScreen() {
             </Text>
           </TouchableOpacity>
         </View>
+
         <View style={{ flex: 1, marginLeft: 5 }}>
           <Text style={styles.label}>Material *</Text>
           <TouchableOpacity
@@ -432,6 +482,7 @@ export default function ProductosScreen() {
             onChangeText={setColor}
           />
         </View>
+
         <View style={{ flex: 1, marginLeft: 5 }}>
           <Text style={styles.label}>Peso (kg)</Text>
           <TextInput
@@ -453,6 +504,7 @@ export default function ProductosScreen() {
             keyboardType="numeric"
           />
         </View>
+
         <View style={{ flex: 1, marginHorizontal: 4 }}>
           <Text style={styles.label}>Ancho</Text>
           <TextInput
@@ -462,6 +514,7 @@ export default function ProductosScreen() {
             keyboardType="numeric"
           />
         </View>
+
         <View style={{ flex: 1, marginLeft: 4 }}>
           <Text style={styles.label}>Prof.</Text>
           <TextInput
@@ -473,10 +526,27 @@ export default function ProductosScreen() {
         </View>
       </View>
 
+      <Text style={styles.label}>Foto del producto</Text>
+      <TouchableOpacity style={styles.fotoBtn} onPress={seleccionarFoto}>
+        {fotoUri ? (
+          <Image
+            source={{ uri: fotoUri }}
+            style={styles.fotoPreview}
+            resizeMode="cover"
+          />
+        ) : (
+          <View style={styles.fotoPlaceholder}>
+            <Text style={styles.fotoPlaceholderIcon}>📷</Text>
+            <Text style={styles.fotoPlaceholderText}>Seleccionar foto</Text>
+          </View>
+        )}
+      </TouchableOpacity>
+
       <View style={styles.modalActions}>
         <TouchableOpacity style={styles.btnCancel} onPress={cerrarModal}>
           <Text style={styles.btnTextDark}>Cancelar</Text>
         </TouchableOpacity>
+
         <TouchableOpacity style={styles.btnSave} onPress={handleGuardar}>
           <Text style={styles.btnTextWhite}>💾 Guardar</Text>
         </TouchableOpacity>
@@ -510,17 +580,23 @@ export default function ProductosScreen() {
         }
       />
 
-      {/* Modal Principal del Formulario con truco FlatList */}
+      {/* Modal Principal del Formulario */}
       <Modal visible={modalVisible} animationType="slide" transparent={true}>
         <View style={styles.modalOverlay}>
-          <View style={styles.formContainer}>
-            <FlatList
-              data={[]}
-              renderItem={() => null}
-              ListHeaderComponent={renderFormulario}
-              showsVerticalScrollIndicator={false}
-            />
-          </View>
+          <KeyboardAvoidingView
+            style={styles.keyboardContainer}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+          >
+            <View style={styles.formContainer}>
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+                keyboardDismissMode="none"
+              >
+                {renderFormulario()}
+              </ScrollView>
+            </View>
+          </KeyboardAvoidingView>
         </View>
       </Modal>
 
@@ -551,6 +627,7 @@ export default function ProductosScreen() {
                 </Text>
               }
             />
+
             <TouchableOpacity
               style={styles.btnCancelSelector}
               onPress={() => setModalSelectorVisible(false)}
@@ -657,6 +734,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 16,
   },
+  keyboardContainer: {
+    width: "100%",
+    maxHeight: "90%",
+  },
   formContainer: {
     backgroundColor: "white",
     borderRadius: 12,
@@ -733,4 +814,32 @@ const styles = StyleSheet.create({
   },
   btnSave: { backgroundColor: "#C9973A", padding: 10, borderRadius: 8 },
   btnTextDark: { color: "#5C3A1E", fontWeight: "bold" },
+
+  fotoBtn: {
+    marginBottom: 12,
+    borderRadius: 8,
+    overflow: "hidden",
+    borderWidth: 1.5,
+    borderColor: "#e8d8c0",
+    borderStyle: "dashed",
+  },
+  fotoPreview: {
+    width: "100%",
+    height: 180,
+  },
+  fotoPlaceholder: {
+    height: 120,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#fdf8f3",
+  },
+  fotoPlaceholderIcon: {
+    fontSize: 32,
+    marginBottom: 6,
+  },
+  fotoPlaceholderText: {
+    fontSize: 13,
+    color: "#aaa",
+    fontWeight: "bold",
+  },
 });

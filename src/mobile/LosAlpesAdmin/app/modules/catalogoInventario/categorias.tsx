@@ -1,22 +1,25 @@
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    FlatList,
-    Modal,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import {
-    actualizarCategoria,
-    buscarCategorias,
-    Categoria,
-    crearCategoria,
-    eliminarCategoria,
-    getCategorias,
+  actualizarCategoria,
+  buscarCategorias,
+  Categoria,
+  crearCategoria,
+  eliminarCategoria,
+  getCategorias,
 } from "../../../services/catalogoInventario/categorias";
 
 export default function CategoriasScreen() {
@@ -185,28 +188,45 @@ export default function CategoriasScreen() {
 
       <Modal visible={modalVisible} animationType="slide" transparent={true}>
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
-              {currentId ? "Editar Categoría" : "Nueva Categoría"}
-            </Text>
+          <KeyboardAvoidingView
+            style={styles.keyboardContainer}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+          >
+            <ScrollView
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="none"
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>
+                  {currentId ? "Editar Categoría" : "Nueva Categoría"}
+                </Text>
 
-            <Text style={styles.label}>Descripción *</Text>
-            <TextInput
-              style={styles.input}
-              value={descripcion}
-              onChangeText={setDescripcion}
-              placeholder="Ej: Sala, Dormitorio..."
-            />
+                <Text style={styles.label}>Descripción *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={descripcion}
+                  onChangeText={setDescripcion}
+                  placeholder="Ej: Sala, Dormitorio..."
+                />
 
-            <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.btnCancel} onPress={cerrarModal}>
-                <Text style={styles.btnTextDark}>Cancelar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.btnSave} onPress={handleGuardar}>
-                <Text style={styles.btnTextWhite}>💾 Guardar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+                <View style={styles.modalActions}>
+                  <TouchableOpacity
+                    style={styles.btnCancel}
+                    onPress={cerrarModal}
+                  >
+                    <Text style={styles.btnTextDark}>Cancelar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.btnSave}
+                    onPress={handleGuardar}
+                  >
+                    <Text style={styles.btnTextWhite}>💾 Guardar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
         </View>
       </Modal>
     </View>
@@ -285,6 +305,9 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "center",
     padding: 20,
+  },
+  keyboardContainer: {
+    width: "100%",
   },
   modalContent: { backgroundColor: "white", padding: 20, borderRadius: 12 },
   modalTitle: {

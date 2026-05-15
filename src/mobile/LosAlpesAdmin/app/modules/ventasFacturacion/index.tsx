@@ -12,7 +12,7 @@ import {
 const salesOptions = [
   {
     title: "Dashboard Ventas",
-    route: "/modules/ventasFacturacion",
+    route: "/modules/ventasFacturacion/index",
     icon: "📊",
   },
   {

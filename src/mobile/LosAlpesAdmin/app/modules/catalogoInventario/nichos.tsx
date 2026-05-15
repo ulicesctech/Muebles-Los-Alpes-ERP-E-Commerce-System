@@ -1,21 +1,24 @@
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    FlatList,
-    Modal,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import {
-    actualizarNicho,
-    eliminarNicho,
-    getNichos,
-    Nicho,
+  actualizarNicho,
+  eliminarNicho,
+  getNichos,
+  Nicho,
 } from "../../../services/catalogoInventario/nichos";
 
 export default function NichosScreen() {
@@ -174,48 +177,62 @@ export default function NichosScreen() {
 
       <Modal visible={modalVisible} animationType="slide" transparent={true}>
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>✏️ Editar Nicho</Text>
+          <KeyboardAvoidingView
+            style={styles.keyboardContainer}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+          >
+            <ScrollView
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="none"
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>✏️ Editar Nicho</Text>
 
-            <Text style={styles.label}>Número *</Text>
-            <TextInput
-              style={styles.input}
-              value={numero}
-              onChangeText={setNumero}
-              placeholder="Ej: A-001"
-              maxLength={50}
-            />
+                <Text style={styles.label}>Número *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={numero}
+                  onChangeText={setNumero}
+                  placeholder="Ej: A-001"
+                  maxLength={50}
+                />
 
-            <Text style={styles.label}>Zona *</Text>
-            <TextInput
-              style={styles.input}
-              value={zona}
-              onChangeText={setZona}
-              placeholder="Ej: Zona Norte"
-              maxLength={100}
-            />
+                <Text style={styles.label}>Zona *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={zona}
+                  onChangeText={setZona}
+                  placeholder="Ej: Zona Norte"
+                  maxLength={100}
+                />
 
-            <Text style={styles.label}>Característica *</Text>
-            <TextInput
-              style={styles.input}
-              value={caracteristica}
-              onChangeText={setCaracteristica}
-              placeholder="Ej: Alta capacidad"
-              maxLength={300}
-            />
+                <Text style={styles.label}>Característica *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={caracteristica}
+                  onChangeText={setCaracteristica}
+                  placeholder="Ej: Alta capacidad"
+                  maxLength={300}
+                />
 
-            <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.btnCancel} onPress={cerrarModal}>
-                <Text style={styles.btnTextDark}>Cancelar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.btnSave}
-                onPress={handleActualizar}
-              >
-                <Text style={styles.btnTextWhite}>💾 Actualizar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+                <View style={styles.modalActions}>
+                  <TouchableOpacity
+                    style={styles.btnCancel}
+                    onPress={cerrarModal}
+                  >
+                    <Text style={styles.btnTextDark}>Cancelar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.btnSave}
+                    onPress={handleActualizar}
+                  >
+                    <Text style={styles.btnTextWhite}>💾 Actualizar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
         </View>
       </Modal>
     </View>
@@ -297,6 +314,9 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "center",
     padding: 20,
+  },
+  keyboardContainer: {
+    width: "100%",
   },
   modalContent: { backgroundColor: "white", padding: 20, borderRadius: 12 },
   modalTitle: {

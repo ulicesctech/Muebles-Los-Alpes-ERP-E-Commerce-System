@@ -3,6 +3,8 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -263,34 +265,41 @@ export default function AlmacenesScreen() {
   // --------------------------------------------------------
   return (
     <View style={styles.mainWrapper}>
-      <FlatList
-        data={almacenes}
-        keyExtractor={(item) => item.ALM_ALMACEN.toString()}
-        renderItem={renderItem}
-        ListHeaderComponent={renderHeader}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={styles.container}
-        ListEmptyComponent={
-          loading ? (
-            <ActivityIndicator
-              size="large"
-              color="#C9973A"
-              style={{ marginTop: 20 }}
-            />
-          ) : (
-            <Text style={styles.emptyState}>
-              No hay almacenes registrados en la base de datos.
-            </Text>
-          )
-        }
-        ListFooterComponent={<View style={{ height: 40 }} />}
-      />
+      <KeyboardAvoidingView
+        style={styles.keyboardContainer}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <FlatList
+          data={almacenes}
+          keyExtractor={(item) => item.ALM_ALMACEN.toString()}
+          renderItem={renderItem}
+          ListHeaderComponent={renderHeader()}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="none"
+          contentContainerStyle={styles.container}
+          ListEmptyComponent={
+            loading ? (
+              <ActivityIndicator
+                size="large"
+                color="#C9973A"
+                style={{ marginTop: 20 }}
+              />
+            ) : (
+              <Text style={styles.emptyState}>
+                No hay almacenes registrados en la base de datos.
+              </Text>
+            )
+          }
+          ListFooterComponent={<View style={{ height: 40 }} />}
+        />
+      </KeyboardAvoidingView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   mainWrapper: { flex: 1, backgroundColor: "#f0ebe0" },
+  keyboardContainer: { flex: 1 },
   container: { padding: 15 },
   pageTitle: {
     fontSize: 22,

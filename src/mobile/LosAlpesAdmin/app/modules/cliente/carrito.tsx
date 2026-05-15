@@ -49,7 +49,7 @@ export default function CarritoScreen() {
             return (
               <View key={item.hvId} style={styles.cartItem}>
                 <Image
-                  source={{ uri: `${BASE}/Handlers/CatalogoInventario/FotoProductoHandler.ashx?ref=${item.proReferencia}` }}
+                  source={{ uri: `${BASE}/Handlers/CatalogoInventario/FotoProductoHandler.ashx?ref=${item.proReferencia}&t=${Date.now()}` }}
                   style={styles.itemImg}
                   resizeMode="cover"
                 />

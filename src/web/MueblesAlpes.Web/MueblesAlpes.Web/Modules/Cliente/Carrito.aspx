@@ -143,7 +143,7 @@
                 <div class="cart-item">
                     <%-- Imagen --%>
                     <div class="cart-item-img-wrap">
-                        <img src='<%# ResolveUrl("~/Handlers/CatalogoInventario/FotoProductoHandler.ashx?ref=" & Eval("PRO_REFERENCIA").ToString()) %>'
+                        <img src='<%# ResolveUrl("~/Handlers/CatalogoInventario/FotoProductoHandler.ashx?ref=" & Eval("PRO_REFERENCIA").ToString() & "&t=" & DateTime.Now.Ticks.ToString()) %>'
                              alt='<%#: Eval("PRO_NOMBRE") %>'
                              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
                         <div class="cart-item-img-placeholder" style="display:none;">🛋️</div>

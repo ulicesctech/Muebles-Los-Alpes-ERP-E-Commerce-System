@@ -42,12 +42,19 @@ export default function HistorialPrecioVentaScreen() {
         fetchAPI('Handlers/VentasFacturacion/CarritoHandler.ashx', 'productos', 'GET'),
       ]);
 
-      setHistorial(resHistorial || []);
-      setProductos(resProductos || []);
+      const vistos = new Set<string>();
+      const unicos: Producto[] = (resProductos || []).filter((p: Producto) => {
+        if (vistos.has(p.PRO_REFERENCIA)) return false;
+        vistos.add(p.PRO_REFERENCIA);
+        return true;
+      });
 
-      if (resProductos && resProductos.length > 0) {
-        setProReferencia(resProductos[0].PRO_REFERENCIA);
-        console.log('Productos:', JSON.stringify(resProductos[0]));
+      setHistorial(resHistorial || []);
+      setProductos(unicos);
+
+      if (unicos.length > 0) {
+        setProReferencia(unicos[0].PRO_REFERENCIA);
+        console.log('Productos:', JSON.stringify(unicos[0]));
       }
     } catch {
       Alert.alert('Error', 'No se pudieron cargar los datos.');
