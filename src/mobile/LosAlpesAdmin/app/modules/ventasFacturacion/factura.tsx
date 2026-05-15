@@ -159,7 +159,7 @@ export default function FacturaScreen() {
       ) : (
         <FlatList
           data={facturas}
-          keyExtractor={(item) => item.FACLI_CODIGO_FACTURA}
+          keyExtractor={(item, index) => item.FACLI_CODIGO_FACTURA ?? String(index)}
           renderItem={({ item }) => (
             <View style={styles.card}>
               <View style={styles.cardHeader}>

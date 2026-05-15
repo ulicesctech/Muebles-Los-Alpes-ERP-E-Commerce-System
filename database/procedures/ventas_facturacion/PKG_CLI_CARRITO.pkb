@@ -31,8 +31,15 @@ CREATE OR REPLACE PACKAGE BODY PKG_CLI_CARRITO AS
     END;
 
     PROCEDURE CARRITO_ELIMINAR(p_id IN NUMBER) IS
+        v_facturado NUMBER;
     BEGIN
         assert_id(p_id, 'Carrito: ID obligatorio.');
+        SELECT COUNT(1) INTO v_facturado
+        FROM FAC_FACTURA_CLIENTE
+        WHERE pre_carrito = p_id;
+        IF v_facturado > 0 THEN
+            RAISE_APPLICATION_ERROR(-20014, 'No se puede eliminar un carrito que ya fue facturado.');
+        END IF;
         DELETE FROM CLI_DETALLE_CARRITO WHERE pre_carrito = p_id;
         DELETE FROM CLI_CARRITO WHERE pre_carrito = p_id;
     END;
@@ -158,13 +165,15 @@ CREATE OR REPLACE PACKAGE BODY PKG_CLI_CARRITO AS
 
     PROCEDURE CARRITO_FACTURAR(p_carrito IN NUMBER) IS
         CURSOR c_detalles IS
-          SELECT hv_historial_precio_venta, detpre_cantidad
-            FROM CLI_DETALLE_CARRITO
-           WHERE pre_carrito = p_carrito;
+            SELECT cd.detpre_cantidad, bh.hip_historial_precio
+            FROM CLI_DETALLE_CARRITO cd
+            JOIN BOD_HISTORIAL_PRECIO_VENTA hv ON hv.hv_historial_precio_venta = cd.hv_historial_precio_venta
+            JOIN BOD_HISTORIAL_PRECIO bh ON bh.pro_referencia = hv.pro_referencia AND bh.hip_fecha_final IS NULL
+            WHERE cd.pre_carrito = p_carrito;
     BEGIN
         assert_id(p_carrito, 'Carrito: ID obligatorio.');
         FOR r IN c_detalles LOOP
-            PKG_BOD_STOCK.SALIDA(r.hv_historial_precio_venta, r.detpre_cantidad);
+            PKG_BOD_STOCK.SALIDA(r.hip_historial_precio, r.detpre_cantidad);
         END LOOP;
     END;
 
