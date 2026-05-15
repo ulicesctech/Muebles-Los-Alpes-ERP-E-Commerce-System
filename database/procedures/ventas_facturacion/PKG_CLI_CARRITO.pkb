@@ -1,3 +1,20 @@
+CREATE OR REPLACE PACKAGE PKG_CLI_CARRITO AS
+    PROCEDURE CARRITO_CREAR(p_cliente IN NUMBER, p_id OUT NUMBER);
+    PROCEDURE CARRITO_AGREGAR_DETALLE(p_carrito IN NUMBER, p_hv_precio IN NUMBER, p_cantidad IN NUMBER, p_id OUT NUMBER);
+    PROCEDURE CARRITO_ELIMINAR_DETALLE(p_id IN NUMBER);
+    PROCEDURE CARRITO_ELIMINAR(p_id IN NUMBER);
+    PROCEDURE CARRITO_LISTAR(p_data OUT SYS_REFCURSOR);
+    PROCEDURE CARRITO_VACIAR(p_carrito IN NUMBER);
+    PROCEDURE CARRITO_BUSCAR(p_cliente IN NUMBER, p_data OUT SYS_REFCURSOR);
+    PROCEDURE CARRITO_LISTAR_DETALLE(p_carrito IN NUMBER, p_data OUT SYS_REFCURSOR);
+    PROCEDURE CARRITO_PRODUCTOS_DISPONIBLES(p_data OUT SYS_REFCURSOR);
+    PROCEDURE CARRITO_RESUMEN(p_carrito IN NUMBER, p_data OUT SYS_REFCURSOR);
+    PROCEDURE CARRITO_RESUMEN_TODOS(p_data OUT SYS_REFCURSOR);
+    PROCEDURE CARRITO_FACTURAR(p_carrito IN NUMBER);
+    PROCEDURE ALMACENES_CON_STOCK(p_hv_ids IN VARCHAR2, p_data OUT SYS_REFCURSOR);
+END PKG_CLI_CARRITO;
+/
+
 CREATE OR REPLACE PACKAGE BODY PKG_CLI_CARRITO AS
 
     PROCEDURE assert_id(p_id IN NUMBER, p_msg IN VARCHAR2) IS
@@ -122,9 +139,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_CLI_CARRITO AS
                    p.pro_nombre,
                    hv.hv_precio_final,
                    d.detpre_cantidad,
-                   hv.hv_precio_final * d.detpre_cantidad             AS subtotal,
+                   hv.hv_precio_final * d.detpre_cantidad AS subtotal,
                    SUM(hv.hv_precio_final * d.detpre_cantidad)
-                       OVER (PARTITION BY c.pre_carrito)               AS total
+                       OVER (PARTITION BY c.pre_carrito) AS total
               FROM CLI_CARRITO             c
               JOIN CLI_CLIENTE             cl ON cl.cli_cliente               = c.cli_cliente
               JOIN CLI_DETALLE_CARRITO     d  ON d.pre_carrito                = c.pre_carrito
@@ -145,9 +162,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_CLI_CARRITO AS
                    p.pro_nombre,
                    hv.hv_precio_final,
                    d.detpre_cantidad,
-                   hv.hv_precio_final * d.detpre_cantidad             AS subtotal,
+                   hv.hv_precio_final * d.detpre_cantidad AS subtotal,
                    SUM(hv.hv_precio_final * d.detpre_cantidad)
-                       OVER (PARTITION BY c.pre_carrito)               AS total
+                       OVER (PARTITION BY c.pre_carrito) AS total
               FROM CLI_CARRITO             c
               JOIN CLI_CLIENTE             cl ON cl.cli_cliente               = c.cli_cliente
               JOIN CLI_DETALLE_CARRITO     d  ON d.pre_carrito                = c.pre_carrito
@@ -156,17 +173,68 @@ CREATE OR REPLACE PACKAGE BODY PKG_CLI_CARRITO AS
              ORDER BY c.pre_carrito, d.detcar_detalle_carrito;
     END;
 
-    PROCEDURE CARRITO_FACTURAR(p_carrito IN NUMBER) IS
-        CURSOR c_detalles IS
-          SELECT hv_historial_precio_venta, detpre_cantidad
-            FROM CLI_DETALLE_CARRITO
-           WHERE pre_carrito = p_carrito;
-    BEGIN
-        assert_id(p_carrito, 'Carrito: ID obligatorio.');
-        FOR r IN c_detalles LOOP
-            PKG_BOD_STOCK.SALIDA(r.hv_historial_precio_venta, r.detpre_cantidad);
-        END LOOP;
-    END;
+PROCEDURE CARRITO_FACTURAR(p_carrito IN NUMBER) IS
+    CURSOR c_detalles IS
+        SELECT d.detpre_cantidad,
+               h.hip_historial_precio
+          FROM CLI_DETALLE_CARRITO d
+          JOIN BOD_HISTORIAL_PRECIO_VENTA hv ON hv.hv_historial_precio_venta = d.hv_historial_precio_venta
+          JOIN (
+              SELECT h2.hip_historial_precio, h2.pro_referencia,
+                     ROW_NUMBER() OVER (PARTITION BY h2.pro_referencia ORDER BY s.sto_disponible DESC) rn
+                FROM BOD_HISTORIAL_PRECIO h2
+                JOIN BOD_STOCK s ON s.hip_historial_precio = h2.hip_historial_precio
+               WHERE h2.hip_fecha_final IS NULL
+                 AND h2.hip_precio IS NOT NULL
+                 AND s.sto_disponible > 0
+          ) h ON h.pro_referencia = hv.pro_referencia AND h.rn = 1
+         WHERE d.pre_carrito = p_carrito;
+    v_disponible NUMBER;
+BEGIN
+    assert_id(p_carrito, 'Carrito: ID obligatorio.');
+    FOR r IN c_detalles LOOP
+        SELECT sto_disponible INTO v_disponible
+          FROM BOD_STOCK
+         WHERE hip_historial_precio = r.hip_historial_precio;
+
+        IF v_disponible < r.detpre_cantidad THEN
+            RAISE_APPLICATION_ERROR(-20012,
+                'Stock insuficiente. Disponible: ' || v_disponible ||
+                ', Solicitado: ' || r.detpre_cantidad);
+        END IF;
+
+        PKG_BOD_STOCK.SALIDA(r.hip_historial_precio, r.detpre_cantidad);
+    END LOOP;
+END;
+
+PROCEDURE ALMACENES_CON_STOCK(p_hv_ids IN VARCHAR2, p_data OUT SYS_REFCURSOR) IS
+    v_total NUMBER;
+BEGIN
+    SELECT COUNT(DISTINCT hv.pro_referencia)
+      INTO v_total
+      FROM BOD_HISTORIAL_PRECIO_VENTA hv
+     WHERE INSTR(',' || p_hv_ids || ',', ',' || hv.hv_historial_precio_venta || ',') > 0;
+
+    OPEN p_data FOR
+        SELECT a.alm_almacen,
+               a.alm_nombre,
+               a.alm_ubicacion,
+               a.alm_pais
+          FROM BOD_ALMACEN a
+         WHERE (
+            SELECT COUNT(DISTINCT hv2.pro_referencia)
+              FROM BOD_STOCK              s
+              JOIN BOD_HISTORIAL_PRECIO   h   ON h.hip_historial_precio = s.hip_historial_precio
+                                             AND h.hip_fecha_final IS NULL
+              JOIN BOD_NIC_ALM            na  ON na.nic_nicho = h.nic_nicho
+              JOIN BOD_HISTORIAL_PRECIO_VENTA hv2 ON hv2.pro_referencia = h.pro_referencia
+                                                 AND hv2.hv_fecha_final IS NULL
+             WHERE na.alm_almacen = a.alm_almacen
+               AND s.sto_disponible > 0
+               AND INSTR(',' || p_hv_ids || ',', ',' || hv2.hv_historial_precio_venta || ',') > 0
+         ) >= v_total
+         ORDER BY a.alm_nombre;
+END;
 
 END PKG_CLI_CARRITO;
 /

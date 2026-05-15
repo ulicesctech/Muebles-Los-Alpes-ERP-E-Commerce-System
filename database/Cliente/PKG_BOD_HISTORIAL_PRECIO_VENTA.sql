@@ -24,6 +24,9 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_HISTORIAL_PRECIO_VENTA AS
         INSERT INTO BOD_HISTORIAL_PRECIO_VENTA(pro_referencia, hv_porcetaje, hv_precio_final, hv_fecha_inicio, hv_fecha_final)
         VALUES(p_pro_referencia, p_porcetaje, v_precio_final, SYSDATE, NULL)
         RETURNING hv_historial_precio_venta INTO p_id;
+                UPDATE BOD_PRODUCTO
+           SET pro_precio = v_precio_final
+         WHERE pro_referencia = p_pro_referencia;
     END;
 
     PROCEDURE LISTAR(p_data OUT SYS_REFCURSOR) IS

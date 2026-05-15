@@ -1,12 +1,15 @@
-import { useState, useEffect, useMemo } from 'react';
-import {
-  View, Text, StyleSheet, TouchableOpacity,
-  ActivityIndicator, Alert, FlatList, ScrollView,
-} from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  ActivityIndicator, Alert, FlatList, ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { fetchAPI } from '../../../services/apiClient';
-import { crearFactura } from '../../../services/facturaService';
 import { Carrito, listarCarritos } from '../../../services/carritoService';
+import { crearFactura } from '../../../services/facturaService';
 
 interface Factura {
   FACLI_CODIGO_FACTURA: string;
@@ -159,7 +162,7 @@ export default function FacturaScreen() {
       ) : (
         <FlatList
           data={facturas}
-          keyExtractor={(item) => item.FACLI_CODIGO_FACTURA}
+          keyExtractor={(item, index) => item.FACLI_CODIGO_FACTURA ?? String(index)}
           renderItem={({ item }) => (
             <View style={styles.card}>
               <View style={styles.cardHeader}>
