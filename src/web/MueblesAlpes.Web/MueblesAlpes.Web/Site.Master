@@ -329,11 +329,10 @@
                     <a href="#">Auth &amp; Usuarios &#9660;</a>
                     <div class="dropdown-nav">
                         <a runat="server" href="~/Modules/AuthUsuarios/Index.aspx">Dashboard</a>
-                        <a runat="server" href="~/Modules/AuthUsuarios/LoginEmpleado.aspx">Login Empleado</a>
-                        <a runat="server" href="~/Modules/AuthUsuarios/LoginCliente.aspx">Login Cliente</a>
-                        <a runat="server" href="~/Modules/AuthUsuarios/Puestos.aspx">Puestos</a>
-                        <a runat="server" href="~/Modules/AuthUsuarios/Admin/GrupoUsuario.aspx">Grupo Usuario</a>
-                        <a runat="server" href="~/Modules/AuthUsuarios/Admin/Permisos.aspx">Permisos</a>
+                        <%If Session("UsuarioId") Is Nothing Then%>
+                            <a runat="server" href="~/Modules/AuthUsuarios/LoginEmpleado.aspx">Login Empleado</a>
+                            <a runat="server" href="~/Modules/AuthUsuarios/LoginCliente.aspx">Login Cliente</a>
+                        <%End If%>
                     </div>
                 </li>
 

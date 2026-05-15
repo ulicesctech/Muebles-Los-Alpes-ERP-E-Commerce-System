@@ -1,14 +1,15 @@
+import DateTimePicker from '@react-native-community/datetimepicker';
 import React, { useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  ActivityIndicator,
+  Alert,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { cerrarAscenso, crearAscenso, eliminarAscenso, listarAscensos } from '../../../services/authUsuarios/ascensos';
 import { listarEmpleados } from '../../../services/authUsuarios/empleados';
@@ -28,6 +29,8 @@ export default function AscensosScreen() {
   const [empSeleccionado, setEmpSeleccionado] = useState('');
   const [puestoSeleccionado, setPuestoSeleccionado] = useState('');
   const [fechaInicio, setFechaInicio] = useState('');
+  const [fechaDate, setFechaDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [observaciones, setObservaciones] = useState('');
   const [paso, setPaso] = useState<'empleado' | 'puesto'>('empleado');
 
@@ -53,9 +56,22 @@ export default function AscensosScreen() {
     setEmpSeleccionado('');
     setPuestoSeleccionado('');
     setFechaInicio('');
+    setFechaDate(new Date());
     setObservaciones('');
     setPaso('empleado');
     setModalVisible(true);
+  };
+
+  const onFechaChange = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(false);
+    if (event.type === 'dismissed') return;
+    if (selectedDate) {
+      setFechaDate(selectedDate);
+      const yyyy = selectedDate.getFullYear();
+      const mm = String(selectedDate.getMonth() + 1).padStart(2, '0');
+      const dd = String(selectedDate.getDate()).padStart(2, '0');
+      setFechaInicio(`${yyyy}-${mm}-${dd}`);
+    }
   };
 
   const guardar = async () => {
@@ -81,24 +97,14 @@ export default function AscensosScreen() {
   const cerrar = (asc: any) => {
     Alert.alert('Cerrar Ascenso', '¿Cerrar este ascenso?', [
       { text: 'Cancelar', style: 'cancel' },
-      {
-        text: 'Cerrar', onPress: async () => {
-          await cerrarAscenso({ asc_ascenso: asc.asc_ascenso });
-          cargar();
-        }
-      },
+      { text: 'Cerrar', onPress: async () => { await cerrarAscenso({ asc_ascenso: asc.asc_ascenso }); cargar(); } },
     ]);
   };
 
   const eliminar = (asc: any) => {
     Alert.alert('Eliminar', '¿Eliminar este ascenso?', [
       { text: 'Cancelar', style: 'cancel' },
-      {
-        text: 'Eliminar', style: 'destructive', onPress: async () => {
-          await eliminarAscenso({ asc_ascenso: asc.asc_ascenso });
-          cargar();
-        }
-      },
+      { text: 'Eliminar', style: 'destructive', onPress: async () => { await eliminarAscenso({ asc_ascenso: asc.asc_ascenso }); cargar(); } },
     ]);
   };
 
@@ -111,13 +117,21 @@ export default function AscensosScreen() {
     return e ? `${e.em_primer_nombre} ${e.em_primer_apellido}` : 'Seleccionar...';
   };
 
-  const puestoNombre = (id: string) => {
-    const p = puestos.find(p => String(p.pue_puestos) === id);
-    return p ? p.pue_nombre : 'Seleccionar...';
-  };
-
   return (
     <View style={styles.container}>
+
+      {/* DatePicker FUERA del Modal — renderiza sobre todo */}
+      {showDatePicker && (
+        <DateTimePicker
+          value={fechaDate}
+          mode="date"
+          display="calendar"
+          onChange={onFechaChange}
+          maximumDate={new Date(2100, 11, 31)}
+          minimumDate={new Date(2000, 0, 1)}
+        />
+      )}
+
       <View style={styles.header}>
         <Text style={styles.title}>📈 Ascensos</Text>
         <TouchableOpacity onPress={abrirModal}>
@@ -168,13 +182,13 @@ export default function AscensosScreen() {
             <View style={styles.modalCard}>
               <Text style={styles.modalTitle}>Nuevo Ascenso</Text>
 
-              {/* Paso indicador */}
               <View style={styles.stepRow}>
                 <View style={[styles.step, paso === 'empleado' && styles.stepActive]}>
-                  <Text style={styles.stepText}>1. Empleado</Text>
+                  <Text style={[styles.stepText, paso === 'empleado' && styles.stepTextActive]}>1. Empleado</Text>
                 </View>
+                <View style={styles.stepLine} />
                 <View style={[styles.step, paso === 'puesto' && styles.stepActive]}>
-                  <Text style={styles.stepText}>2. Puesto</Text>
+                  <Text style={[styles.stepText, paso === 'puesto' && styles.stepTextActive]}>2. Puesto</Text>
                 </View>
               </View>
 
@@ -187,8 +201,12 @@ export default function AscensosScreen() {
                         key={i}
                         style={[styles.selectItem, empSeleccionado === String(e.em_empleado) && styles.selectItemActive]}
                         onPress={() => setEmpSeleccionado(String(e.em_empleado))}>
-                        <Text style={styles.selectText}>{e.em_primer_nombre} {e.em_primer_apellido}</Text>
-                        <Text style={styles.selectSub}>DPI: {e.em_DPI}</Text>
+                        <Text style={[styles.selectText, empSeleccionado === String(e.em_empleado) && styles.selectTextActive]}>
+                          {e.em_primer_nombre} {e.em_primer_apellido}
+                        </Text>
+                        <Text style={[styles.selectSub, empSeleccionado === String(e.em_empleado) && styles.selectSubActive]}>
+                          DPI: {e.em_DPI}
+                        </Text>
                       </TouchableOpacity>
                     ))}
                   </ScrollView>
@@ -219,24 +237,45 @@ export default function AscensosScreen() {
                         key={i}
                         style={[styles.selectItem, puestoSeleccionado === String(p.pue_puestos) && styles.selectItemActive]}
                         onPress={() => setPuestoSeleccionado(String(p.pue_puestos))}>
-                        <Text style={styles.selectText}>{p.pue_nombre}</Text>
-                        <Text style={styles.selectSub}>Q {parseFloat(p.pue_salario).toFixed(2)}</Text>
+                        <Text style={[styles.selectText, puestoSeleccionado === String(p.pue_puestos) && styles.selectTextActive]}>
+                          {p.pue_nombre}
+                        </Text>
+                        <Text style={[styles.selectSub, puestoSeleccionado === String(p.pue_puestos) && styles.selectSubActive]}>
+                          Q {parseFloat(p.pue_salario).toFixed(2)}
+                        </Text>
                       </TouchableOpacity>
                     ))}
                   </ScrollView>
 
-                  <Text style={styles.label}>Fecha Inicio * (YYYY-MM-DD)</Text>
-                  <TextInput style={styles.input} value={fechaInicio} onChangeText={setFechaInicio} placeholder="2026-01-01" />
+                  <Text style={styles.label}>Fecha de Inicio *</Text>
+                  <TouchableOpacity
+                    style={styles.dateBtn}
+                    onPress={() => {
+                      setModalVisible(false);
+                      setTimeout(() => setShowDatePicker(true), 300);
+                    }}>
+                    <Text style={styles.dateBtnIco}>📅</Text>
+                    <Text style={fechaInicio ? styles.dateBtnText : styles.dateBtnPlaceholder}>
+                      {fechaInicio || 'Seleccionar fecha...'}
+                    </Text>
+                  </TouchableOpacity>
 
                   <Text style={styles.label}>Observaciones</Text>
-                  <TextInput style={[styles.input, styles.inputMulti]} value={observaciones} onChangeText={setObservaciones} placeholder="Opcional..." multiline numberOfLines={3} />
+                  <TextInput
+                    style={[styles.input, styles.inputMulti]}
+                    value={observaciones}
+                    onChangeText={setObservaciones}
+                    placeholder="Opcional..."
+                    multiline
+                    numberOfLines={3}
+                  />
 
                   <View style={styles.modalActions}>
                     <TouchableOpacity style={styles.btnCancel} onPress={() => setPaso('empleado')}>
                       <Text style={styles.btnCancelText}>← Atrás</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.btnSave} onPress={guardar}>
-                      <Text style={styles.btnSaveText}>Guardar ✅</Text>
+                      <Text style={styles.btnSaveText}>💾 Guardar</Text>
                     </TouchableOpacity>
                   </View>
                 </>
@@ -275,20 +314,28 @@ const styles = StyleSheet.create({
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', paddingVertical: 40, paddingHorizontal: 20 },
   modalCard: { backgroundColor: 'white', borderRadius: 16, padding: 24 },
   modalTitle: { fontSize: 18, fontWeight: 'bold', color: CAFE, marginBottom: 16, textAlign: 'center' },
-  stepRow: { flexDirection: 'row', gap: 8, marginBottom: 16 },
+  stepRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
   step: { flex: 1, padding: 10, borderRadius: 8, backgroundColor: '#f3f4f6', alignItems: 'center' },
   stepActive: { backgroundColor: GOLD },
-  stepText: { fontSize: 13, fontWeight: 'bold', color: '#374151' },
+  stepText: { fontSize: 13, fontWeight: 'bold', color: '#9ca3af' },
+  stepTextActive: { color: '#1a1a1a' },
+  stepLine: { width: 16, height: 2, backgroundColor: '#e5e7eb', marginHorizontal: 4 },
   empInfo: { backgroundColor: '#fef3c7', padding: 10, borderRadius: 8, marginBottom: 12 },
   empInfoText: { color: '#92400e', fontWeight: 'bold', textAlign: 'center' },
   label: { fontSize: 12, fontWeight: 'bold', color: CAFE, marginBottom: 6 },
   input: { borderWidth: 1.5, borderColor: '#e8d8c0', borderRadius: 10, padding: 12, fontSize: 13, marginBottom: 16, backgroundColor: '#fafafa' },
   inputMulti: { height: 80, textAlignVertical: 'top' },
+  dateBtn: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1.5, borderColor: '#e8d8c0', borderRadius: 10, padding: 12, marginBottom: 16, backgroundColor: '#fafafa' },
+  dateBtnIco: { fontSize: 18 },
+  dateBtnText: { fontSize: 13, color: '#333', fontWeight: 'bold' },
+  dateBtnPlaceholder: { fontSize: 13, color: '#aaa' },
   selectList: { maxHeight: 180, marginBottom: 16 },
   selectItem: { padding: 12, borderRadius: 8, borderWidth: 1, borderColor: '#e8d8c0', marginBottom: 6 },
   selectItemActive: { backgroundColor: GOLD, borderColor: GOLD },
   selectText: { fontSize: 13, fontWeight: 'bold', color: '#374151' },
+  selectTextActive: { color: '#1a1a1a' },
   selectSub: { fontSize: 11, color: '#6b7280' },
+  selectSubActive: { color: '#1a1a1a' },
   modalActions: { flexDirection: 'row', gap: 12, marginTop: 8 },
   btnCancel: { flex: 1, backgroundColor: '#f3f4f6', padding: 12, borderRadius: 8, alignItems: 'center' },
   btnCancelText: { color: '#374151', fontWeight: 'bold' },

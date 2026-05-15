@@ -49,7 +49,7 @@
 <asp:Label ID="lblError"   runat="server" CssClass="alert-err" Visible="false" />
 
 <div class="hint-box">
-    💡 Cada puesto corresponde a un rol del sistema. El salario es el ingreso base mensual en Quetzales.
+    💡 Define los puestos de trabajo con su nombre, salario base y descripción. Los puestos se usan para gestionar los ascensos del personal.
 </div>
 
 <div class="form-card">
@@ -58,9 +58,9 @@
         <asp:HiddenField ID="hfId" runat="server" />
         <div class="form-row">
             <div class="form-group">
-                <label>Rol / Grupo *</label>
-                <asp:DropDownList ID="ddlGrupo" runat="server" CssClass="form-control"
-                    AutoPostBack="true" OnSelectedIndexChanged="ddlGrupo_SelectedIndexChanged" />
+                <label>Nombre del Puesto *</label>
+                <asp:TextBox ID="txtNombre" runat="server" CssClass="form-control"
+                    placeholder="Ej: Gerente, Vendedor, Bodeguero..." />
             </div>
             <div class="form-group">
                 <label>Salario Base (Q) *</label>
@@ -91,7 +91,7 @@
                     <span class="badge-id"><%#: Eval("pue_puestos") %></span>
                 </ItemTemplate>
             </asp:TemplateField>
-            <asp:BoundField DataField="pue_nombre"      HeaderText="Puesto / Rol" />
+            <asp:BoundField DataField="pue_nombre"      HeaderText="Nombre del Puesto" />
             <asp:BoundField DataField="pue_descripcion" HeaderText="Descripción" />
             <asp:TemplateField HeaderText="Salario Base">
                 <ItemTemplate>
@@ -103,7 +103,7 @@
                     <div class="actions-cell">
                         <asp:LinkButton runat="server" Text="✏️" CommandName="Editar"
                             CommandArgument='<%#: Eval("pue_puestos") %>' CssClass="btn-edit-t tiempoInhabilitado" />
-                        <asp:LinkButton runat="server" Text="🗑" CommandName="Eliminar"
+                        <asp:LinkButton runat="server" Text="" CommandName="Eliminar"
                             CommandArgument='<%#: Eval("pue_puestos") %>' CssClass="btn-del-t tiempoInhabilitado"
                             OnClientClick="return confirm('¿Eliminar este puesto?');" />
                     </div>

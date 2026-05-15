@@ -217,7 +217,6 @@ Public Class AuthHandler
             context.Session.Clear()
             context.Session.Abandon()
         End If
-
         context.Response.Write(JsonConvert.SerializeObject(New With {
             .ok = True,
             .mensaje = "Sesion cerrada."
@@ -227,48 +226,34 @@ Public Class AuthHandler
     Private Sub LoginEmpleado(context As HttpContext)
         If context.Request.HttpMethod <> "POST" Then
             context.Response.StatusCode = 405
-            context.Response.Write(JsonConvert.SerializeObject(New With {
-                .ok = False,
-                .mensaje = "Metodo no permitido. Use POST."
-            }))
+            context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Metodo no permitido. Use POST."}))
             Return
         End If
 
         Try
             Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
             Dim datos As Object = JsonConvert.DeserializeObject(body)
-
             Dim usuario As String = ObtenerCampo(datos, "usuario")
             Dim password As String = ObtenerCampo(datos, "password")
 
             If String.IsNullOrWhiteSpace(usuario) OrElse String.IsNullOrWhiteSpace(password) Then
                 context.Response.StatusCode = 400
-                context.Response.Write(JsonConvert.SerializeObject(New With {
-                    .ok = False,
-                    .mensaje = "Debe ingresar usuario y contrasena."
-                }))
+                context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Debe ingresar usuario y contrasena."}))
                 Return
             End If
 
             Dim result As LoginEmpleadoResult = Nothing
-
             Try
                 result = LoginEmpleadoService.Login(usuario, password)
             Catch
                 context.Response.StatusCode = 401
-                context.Response.Write(JsonConvert.SerializeObject(New With {
-                    .ok = False,
-                    .mensaje = "Credenciales invalidas. Verifica tu usuario y contrasena."
-                }))
+                context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Credenciales invalidas. Verifica tu usuario y contrasena."}))
                 Return
             End Try
 
             If result Is Nothing OrElse result.Resultado <> 1 Then
                 context.Response.StatusCode = 401
-                context.Response.Write(JsonConvert.SerializeObject(New With {
-                    .ok = False,
-                    .mensaje = "Credenciales invalidas. Verifica tu usuario y contrasena."
-                }))
+                context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Credenciales invalidas. Verifica tu usuario y contrasena."}))
                 Return
             End If
 
@@ -302,58 +287,41 @@ Public Class AuthHandler
 
         Catch ex As Exception
             context.Response.StatusCode = 500
-            context.Response.Write(JsonConvert.SerializeObject(New With {
-                .ok = False,
-                .mensaje = "No se pudo iniciar sesion. Intenta nuevamente."
-            }))
+            context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "No se pudo iniciar sesion. Intenta nuevamente."}))
         End Try
     End Sub
 
     Private Sub LoginCliente(context As HttpContext)
         If context.Request.HttpMethod <> "POST" Then
             context.Response.StatusCode = 405
-            context.Response.Write(JsonConvert.SerializeObject(New With {
-                .ok = False,
-                .mensaje = "Metodo no permitido. Use POST."
-            }))
+            context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Metodo no permitido. Use POST."}))
             Return
         End If
 
         Try
             Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
             Dim datos As Object = JsonConvert.DeserializeObject(body)
-
             Dim usuario As String = ObtenerCampo(datos, "usuario")
             Dim password As String = ObtenerCampo(datos, "password")
 
             If String.IsNullOrWhiteSpace(usuario) OrElse String.IsNullOrWhiteSpace(password) Then
                 context.Response.StatusCode = 400
-                context.Response.Write(JsonConvert.SerializeObject(New With {
-                    .ok = False,
-                    .mensaje = "Debe ingresar usuario y contrasena."
-                }))
+                context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Debe ingresar usuario y contrasena."}))
                 Return
             End If
 
             Dim result As LoginClienteResult = Nothing
-
             Try
                 result = LoginClienteService.Validar(usuario, password)
             Catch
                 context.Response.StatusCode = 401
-                context.Response.Write(JsonConvert.SerializeObject(New With {
-                    .ok = False,
-                    .mensaje = "Credenciales invalidas. Verifica tu usuario y contrasena."
-                }))
+                context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Credenciales invalidas. Verifica tu usuario y contrasena."}))
                 Return
             End Try
 
             If result Is Nothing OrElse result.Resultado <> 1 Then
                 context.Response.StatusCode = 401
-                context.Response.Write(JsonConvert.SerializeObject(New With {
-                    .ok = False,
-                    .mensaje = "Credenciales invalidas. Verifica tu usuario y contrasena."
-                }))
+                context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Credenciales invalidas. Verifica tu usuario y contrasena."}))
                 Return
             End If
 
@@ -382,10 +350,7 @@ Public Class AuthHandler
 
         Catch ex As Exception
             context.Response.StatusCode = 500
-            context.Response.Write(JsonConvert.SerializeObject(New With {
-                .ok = False,
-                .mensaje = "No se pudo iniciar sesion. Intenta nuevamente."
-            }))
+            context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "No se pudo iniciar sesion. Intenta nuevamente."}))
         End Try
     End Sub
 
@@ -426,7 +391,6 @@ Public Class AuthHandler
            String.IsNullOrWhiteSpace(municipio) OrElse String.IsNullOrWhiteSpace(zona) OrElse
            String.IsNullOrWhiteSpace(direccion) OrElse String.IsNullOrWhiteSpace(codigoPostal) OrElse
            String.IsNullOrWhiteSpace(password) Then
-
             context.Response.StatusCode = 400
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Faltan campos obligatorios."}))
             Return
@@ -454,7 +418,6 @@ Public Class AuthHandler
     Private Sub ListarEmpleados(context As HttpContext)
         Dim dt As System.Data.DataTable = EmpleadoService.Listar()
         Dim lst As New List(Of Object)
-
         For Each row As System.Data.DataRow In dt.Rows
             lst.Add(New With {
                 .em_empleado = row("em_empleado"),
@@ -472,7 +435,6 @@ Public Class AuthHandler
                 .rol_nombre = row("rol_nombre")
             })
         Next
-
         context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .data = lst}))
     End Sub
 
@@ -482,10 +444,8 @@ Public Class AuthHandler
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Use POST."}))
             Return
         End If
-
         Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
         Dim datos As Object = JsonConvert.DeserializeObject(body)
-
         Try
             Dim nuevoId As Integer = EmpleadoService.Crear(
                 ObtenerCampo(datos, "dpi"),
@@ -500,7 +460,6 @@ Public Class AuthHandler
                 ObtenerCampo(datos, "segundo_telefono", " "),
                 Convert.ToInt32(ObtenerCampo(datos, "rol", "0")),
                 ObtenerCampo(datos, "password"))
-
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .em_empleado = nuevoId}))
         Catch ex As Exception
             context.Response.StatusCode = 500
@@ -514,10 +473,8 @@ Public Class AuthHandler
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Use POST."}))
             Return
         End If
-
         Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
         Dim datos As Object = JsonConvert.DeserializeObject(body)
-
         Try
             EmpleadoService.Actualizar(
                 Convert.ToInt32(ObtenerCampo(datos, "em_empleado")),
@@ -532,7 +489,6 @@ Public Class AuthHandler
                 ObtenerCampo(datos, "primer_telefono"),
                 ObtenerCampo(datos, "segundo_telefono", " "),
                 Convert.ToInt32(ObtenerCampo(datos, "rol", "0")))
-
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .mensaje = "Empleado actualizado."}))
         Catch ex As Exception
             context.Response.StatusCode = 500
@@ -546,10 +502,8 @@ Public Class AuthHandler
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Use POST."}))
             Return
         End If
-
         Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
         Dim datos As Object = JsonConvert.DeserializeObject(body)
-
         Try
             EmpleadoService.Eliminar(Convert.ToInt32(ObtenerCampo(datos, "em_empleado")))
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .mensaje = "Empleado eliminado."}))
@@ -562,7 +516,6 @@ Public Class AuthHandler
     Private Sub ListarClientes(context As HttpContext)
         Dim dt As System.Data.DataTable = ClienteService.Listar()
         Dim lst As New List(Of Object)
-
         For Each row As System.Data.DataRow In dt.Rows
             lst.Add(New With {
                 .cli_cliente = row("cli_cliente"),
@@ -576,7 +529,6 @@ Public Class AuthHandler
                 .cli_tipocliente = row("cli_tipocliente")
             })
         Next
-
         context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .data = lst}))
     End Sub
 
@@ -586,10 +538,8 @@ Public Class AuthHandler
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Use POST."}))
             Return
         End If
-
         Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
         Dim datos As Object = JsonConvert.DeserializeObject(body)
-
         Try
             Dim nuevoId As Integer = ClienteService.Crear(
                 ObtenerCampo(datos, "tipodocumento"),
@@ -611,7 +561,6 @@ Public Class AuthHandler
                 ObtenerCampo(datos, "profesion", " "),
                 ObtenerCampo(datos, "tipocliente", "NATURAL"),
                 ObtenerCampo(datos, "password"))
-
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .cli_cliente = nuevoId}))
         Catch ex As Exception
             context.Response.StatusCode = 500
@@ -625,10 +574,8 @@ Public Class AuthHandler
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Use POST."}))
             Return
         End If
-
         Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
         Dim datos As Object = JsonConvert.DeserializeObject(body)
-
         Try
             ClienteService.Actualizar(
                 Convert.ToInt32(ObtenerCampo(datos, "cli_cliente")),
@@ -650,7 +597,6 @@ Public Class AuthHandler
                 ObtenerCampo(datos, "email"),
                 ObtenerCampo(datos, "profesion", " "),
                 ObtenerCampo(datos, "tipocliente", "NATURAL"))
-
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .mensaje = "Cliente actualizado."}))
         Catch ex As Exception
             context.Response.StatusCode = 500
@@ -664,10 +610,8 @@ Public Class AuthHandler
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Use POST."}))
             Return
         End If
-
         Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
         Dim datos As Object = JsonConvert.DeserializeObject(body)
-
         Try
             ClienteService.Eliminar(Convert.ToInt32(ObtenerCampo(datos, "cli_cliente")))
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .mensaje = "Cliente eliminado."}))
@@ -680,7 +624,6 @@ Public Class AuthHandler
     Private Sub ListarPuestos(context As HttpContext)
         Dim dt As System.Data.DataTable = PuestoService.Listar()
         Dim lst As New List(Of Object)
-
         For Each row As System.Data.DataRow In dt.Rows
             lst.Add(New With {
                 .pue_puestos = row("pue_puestos"),
@@ -689,7 +632,6 @@ Public Class AuthHandler
                 .pue_descripcion = row("pue_descripcion")
             })
         Next
-
         context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .data = lst}))
     End Sub
 
@@ -699,16 +641,13 @@ Public Class AuthHandler
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Use POST."}))
             Return
         End If
-
         Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
         Dim datos As Object = JsonConvert.DeserializeObject(body)
-
         Try
             Dim nuevoId As Integer = PuestoService.Crear(
                 ObtenerCampo(datos, "nombre"),
                 Convert.ToDecimal(ObtenerCampo(datos, "salario", "0")),
                 ObtenerCampo(datos, "descripcion"))
-
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .pue_puestos = nuevoId}))
         Catch ex As Exception
             context.Response.StatusCode = 500
@@ -722,17 +661,14 @@ Public Class AuthHandler
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Use POST."}))
             Return
         End If
-
         Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
         Dim datos As Object = JsonConvert.DeserializeObject(body)
-
         Try
             PuestoService.Actualizar(
                 Convert.ToInt32(ObtenerCampo(datos, "pue_puestos")),
                 ObtenerCampo(datos, "nombre"),
                 Convert.ToDecimal(ObtenerCampo(datos, "salario", "0")),
                 ObtenerCampo(datos, "descripcion"))
-
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .mensaje = "Puesto actualizado."}))
         Catch ex As Exception
             context.Response.StatusCode = 500
@@ -746,10 +682,8 @@ Public Class AuthHandler
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Use POST."}))
             Return
         End If
-
         Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
         Dim datos As Object = JsonConvert.DeserializeObject(body)
-
         Try
             PuestoService.Eliminar(Convert.ToInt32(ObtenerCampo(datos, "pue_puestos")))
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .mensaje = "Puesto eliminado."}))
@@ -762,19 +696,20 @@ Public Class AuthHandler
     Private Sub ListarAscensos(context As HttpContext)
         Dim dt As System.Data.DataTable = AscensoService.Listar()
         Dim lst As New List(Of Object)
-
         For Each row As System.Data.DataRow In dt.Rows
+            Dim fechaFin As Object = row("asc_fecha_final")
+            Dim estaActivo As Boolean = IsDBNull(fechaFin)
             lst.Add(New With {
                 .asc_ascenso = row("asc_ascenso"),
                 .pue_puestos = row("pue_puestos"),
                 .em_empleado = row("em_empleado"),
-                .asc_fecha_inicio = row("asc_fecha_inicio"),
-                .asc_fecha_fin = row("asc_fecha_fin"),
-                .pue_nombre = row("pue_nombre"),
-                .em_nombre = row("em_nombre")
+                .asc_fecha_inicio = If(IsDBNull(row("asc_fecha_inicio")), "", Convert.ToDateTime(row("asc_fecha_inicio")).ToString("yyyy-MM-dd")),
+                .asc_fecha_fin = If(estaActivo, Nothing, Convert.ToDateTime(fechaFin).ToString("yyyy-MM-dd")),
+                .puesto_nombre = row("pue_nombre"),
+                .empleado_nombre = row("em_nombre_completo"),
+                .asc_estado = If(estaActivo, "ACTIVO", "CERRADO")
             })
         Next
-
         context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .data = lst}))
     End Sub
 
@@ -784,10 +719,8 @@ Public Class AuthHandler
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Use POST."}))
             Return
         End If
-
         Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
         Dim datos As Object = JsonConvert.DeserializeObject(body)
-
         Try
             Dim fechaInicioTexto As String = ObtenerCampo(datos, "fecha_inicio")
             Dim fechaFinalTexto As String = ObtenerCampo(datos, "fecha_final")
@@ -818,11 +751,22 @@ Public Class AuthHandler
     End Sub
 
     Private Sub CerrarAscenso(context As HttpContext)
-        context.Response.StatusCode = 400
-        context.Response.Write(JsonConvert.SerializeObject(New With {
-            .ok = False,
-            .mensaje = "La accion cerrar-ascenso no esta disponible en AscensoService."
-        }))
+        If context.Request.HttpMethod <> "POST" Then
+            context.Response.StatusCode = 405
+            context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Use POST."}))
+            Return
+        End If
+        Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
+        Dim datos As Object = JsonConvert.DeserializeObject(body)
+        Try
+            AscensoService.ActualizarFechaFinal(
+                Convert.ToInt32(ObtenerCampo(datos, "asc_ascenso")),
+                Date.Today)
+            context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .mensaje = "Ascenso cerrado."}))
+        Catch ex As Exception
+            context.Response.StatusCode = 500
+            context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "No se pudo cerrar el ascenso."}))
+        End Try
     End Sub
 
     Private Sub EliminarAscenso(context As HttpContext)
@@ -831,10 +775,8 @@ Public Class AuthHandler
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Use POST."}))
             Return
         End If
-
         Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
         Dim datos As Object = JsonConvert.DeserializeObject(body)
-
         Try
             AscensoService.Eliminar(Convert.ToInt32(ObtenerCampo(datos, "asc_ascenso")))
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .mensaje = "Ascenso eliminado."}))
@@ -847,7 +789,6 @@ Public Class AuthHandler
     Private Sub ListarPermisos(context As HttpContext)
         Dim dt As System.Data.DataTable = PermisoService.Listar()
         Dim lst As New List(Of Object)
-
         For Each row As System.Data.DataRow In dt.Rows
             lst.Add(New With {
                 .per_permisos = row("per_permisos"),
@@ -859,7 +800,6 @@ Public Class AuthHandler
                 .per_promo = row("per_promo")
             })
         Next
-
         context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .data = lst}))
     End Sub
 
@@ -869,10 +809,8 @@ Public Class AuthHandler
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Use POST."}))
             Return
         End If
-
         Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
         Dim datos As Object = JsonConvert.DeserializeObject(body)
-
         Try
             Dim nuevoId As Integer = PermisoService.Crear(
                 Convert.ToInt32(ObtenerCampo(datos, "admin", "0")),
@@ -881,7 +819,6 @@ Public Class AuthHandler
                 Convert.ToInt32(ObtenerCampo(datos, "cli", "0")),
                 Convert.ToInt32(ObtenerCampo(datos, "bod", "0")),
                 Convert.ToInt32(ObtenerCampo(datos, "promo", "0")))
-
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .per_permisos = nuevoId}))
         Catch ex As Exception
             context.Response.StatusCode = 500
@@ -895,10 +832,8 @@ Public Class AuthHandler
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Use POST."}))
             Return
         End If
-
         Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
         Dim datos As Object = JsonConvert.DeserializeObject(body)
-
         Try
             PermisoService.Actualizar(
                 Convert.ToInt32(ObtenerCampo(datos, "per_permisos")),
@@ -908,7 +843,6 @@ Public Class AuthHandler
                 Convert.ToInt32(ObtenerCampo(datos, "cli", "0")),
                 Convert.ToInt32(ObtenerCampo(datos, "bod", "0")),
                 Convert.ToInt32(ObtenerCampo(datos, "promo", "0")))
-
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .mensaje = "Permiso actualizado."}))
         Catch ex As Exception
             context.Response.StatusCode = 500
@@ -922,10 +856,8 @@ Public Class AuthHandler
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Use POST."}))
             Return
         End If
-
         Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
         Dim datos As Object = JsonConvert.DeserializeObject(body)
-
         Try
             PermisoService.Eliminar(Convert.ToInt32(ObtenerCampo(datos, "per_permisos")))
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .mensaje = "Permiso eliminado."}))
@@ -938,7 +870,6 @@ Public Class AuthHandler
     Private Sub ListarGrupos(context As HttpContext)
         Dim dt As System.Data.DataTable = GrupoUsuarioService.Listar()
         Dim lst As New List(Of Object)
-
         For Each row As System.Data.DataRow In dt.Rows
             lst.Add(New With {
                 .grupus_grupo_usuario = row("grupus_grupo_usuario"),
@@ -946,7 +877,6 @@ Public Class AuthHandler
                 .per_permisos = row("per_permisos")
             })
         Next
-
         context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .data = lst}))
     End Sub
 
@@ -956,15 +886,12 @@ Public Class AuthHandler
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Use POST."}))
             Return
         End If
-
         Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
         Dim datos As Object = JsonConvert.DeserializeObject(body)
-
         Try
             Dim nuevoId As Integer = GrupoUsuarioService.Crear(
                 ObtenerCampo(datos, "descripcion"),
                 Convert.ToInt32(ObtenerCampo(datos, "per_permisos")))
-
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .grupus_grupo_usuario = nuevoId}))
         Catch ex As Exception
             context.Response.StatusCode = 500
@@ -978,16 +905,13 @@ Public Class AuthHandler
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Use POST."}))
             Return
         End If
-
         Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
         Dim datos As Object = JsonConvert.DeserializeObject(body)
-
         Try
             GrupoUsuarioService.Actualizar(
                 Convert.ToInt32(ObtenerCampo(datos, "grupus_grupo_usuario")),
                 ObtenerCampo(datos, "descripcion"),
                 Convert.ToInt32(ObtenerCampo(datos, "per_permisos")))
-
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .mensaje = "Grupo actualizado."}))
         Catch ex As Exception
             context.Response.StatusCode = 500
@@ -1001,10 +925,8 @@ Public Class AuthHandler
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Use POST."}))
             Return
         End If
-
         Dim body As String = New StreamReader(context.Request.InputStream).ReadToEnd()
         Dim datos As Object = JsonConvert.DeserializeObject(body)
-
         Try
             GrupoUsuarioService.Eliminar(Convert.ToInt32(ObtenerCampo(datos, "grupus_grupo_usuario")))
             context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True, .mensaje = "Grupo eliminado."}))

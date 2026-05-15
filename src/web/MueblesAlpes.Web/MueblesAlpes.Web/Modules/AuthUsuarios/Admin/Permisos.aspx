@@ -58,12 +58,12 @@
 <asp:Label ID="lblMensaje" runat="server" CssClass="alert-ok"  Visible="false" />
 <asp:Label ID="lblError"   runat="server" CssClass="alert-err" Visible="false" />
 
-<div class="hint-box">
+<div class="hint-box" style="display:none;">
     💡 Cada permiso define qué módulos puede acceder un grupo. <strong>1 = Acceso permitido</strong>, <strong>0 = Acceso negado</strong>.
     Luego asigna este permiso a un Grupo en <a href='<%: ResolveUrl("~/Modules/AuthUsuarios/Admin/GrupoUsuario.aspx") %>'>Gestión de Grupos</a>.
 </div>
 
-<div class="form-card">
+<div class="form-card" style="display:none;">
     <div class="form-card-head"><span>🔧 Nuevo / Editar Permiso</span></div>
     <div class="form-card-body">
         <asp:HiddenField ID="hfId" runat="server" />
@@ -159,17 +159,6 @@
             <asp:TemplateField HeaderText="🎁 Promociones">
                 <ItemTemplate>
                     <%# If(Eval("per_promo").ToString()="1","<span class='badge-ok'>✓ Sí</span>","<span class='badge-no'>✗ No</span>") %>
-                </ItemTemplate>
-            </asp:TemplateField>
-            <asp:TemplateField HeaderText="Acciones">
-                <ItemTemplate>
-                    <div class="actions-cell">
-                        <asp:LinkButton runat="server" Text="✏️" CommandName="Editar"
-                            CommandArgument='<%#: Eval("per_permisos") %>' CssClass="btn-edit-t tiempoInhabilitado" />
-                        <asp:LinkButton runat="server" Text="🗑" CommandName="Eliminar"
-                            CommandArgument='<%#: Eval("per_permisos") %>' CssClass="btn-del-t tiempoInhabilitado"
-                            OnClientClick="return confirm('¿Eliminar este permiso?');" />
-                    </div>
                 </ItemTemplate>
             </asp:TemplateField>
         </Columns>
