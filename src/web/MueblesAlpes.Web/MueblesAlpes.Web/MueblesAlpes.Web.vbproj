@@ -181,6 +181,7 @@
   <ItemGroup>
     <!-- PAGINAS RAIZ -->
     <Content Include="About.aspx" />
+    <Content Include="App_Data\seguridad.log" />
     <Content Include="Contact.aspx" />
     <Content Include="Content\bootstrap-grid.css" />
     <Content Include="Content\bootstrap-grid.min.css" />
@@ -256,7 +257,6 @@
     <Content Include="Handlers\ComprasProveedor\FacturaProveedorHandler.ashx" />
     <Content Include="Handlers\ComprasProveedor\OrdenDetallePedidoHandler.ashx" />
     <Content Include="Handlers\ComprasProveedor\ReclamoProveedorHandler.ashx" />
-    <Content Include="App_Data\seguridad.log" />
     <Content Include="Handlers\VentasFacturacion\HistorialPrecioVentaHandler.ashx" />
     <Content Include="Handlers\CatalogoInventario\PromocionesHandler.ashx" />
     <Content Include="Handlers\Cliente\CatalogoClienteHandler.ashx" />

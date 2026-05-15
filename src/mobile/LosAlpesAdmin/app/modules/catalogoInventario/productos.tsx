@@ -1,37 +1,37 @@
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    FlatList,
-    Modal,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Modal,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 // Servicios Propios
 import {
-    actualizarProducto,
-    buscarProductos,
-    crearProducto,
-    eliminarProducto,
-    getProductos,
-    Producto,
+  actualizarProducto,
+  buscarProductos,
+  crearProducto,
+  eliminarProducto,
+  getProductos,
+  Producto,
 } from "../../../services/catalogoInventario/productos";
 // Dependencias para los combos
 import {
-    Categoria,
-    getCategorias,
+  Categoria,
+  getCategorias,
 } from "../../../services/catalogoInventario/categorias";
 import {
-    getMateriales,
-    Material,
+  getMateriales,
+  Material,
 } from "../../../services/catalogoInventario/materiales";
 import {
-    getTiposPorCategoria,
-    Tipo,
+  getTiposPorCategoria,
+  Tipo,
 } from "../../../services/catalogoInventario/tipos";
 
 export default function ProductosScreen() {

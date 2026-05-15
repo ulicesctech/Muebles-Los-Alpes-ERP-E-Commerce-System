@@ -12,10 +12,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_CP_BOD_PROVEEDOR AS
     -- ----------------------------------------------------------
     -- VALIDAR_NIT
     -- Formatos validos (Guatemala):
-    --   NIT sin guion : 2-9 digitos + digito verificador (0-9 o K)
-    --                   Ej: 123456789 | 12345678K
-    --   CUI           : exactamente 13 digitos
-    --                   Ej: 1234567890101
+    --   NIT 9 digitos  : exactamente 9 digitos numericos
+    --                    Ej: 123456789
+    --   NIT 8dig + K   : exactamente 8 digitos + K mayuscula
+    --                    Ej: 12345678K
+    --   CUI            : exactamente 13 digitos
+    --                    Ej: 1234567890101
+    -- NOTA: \d NO funciona en Oracle REGEXP_LIKE (POSIX).
+    --       Se usa [0-9] en su lugar.
     -- ----------------------------------------------------------
     FUNCTION VALIDAR_NIT(p_nit IN VARCHAR2) RETURN BOOLEAN IS
         v_nit VARCHAR2(20);
@@ -23,12 +27,17 @@ CREATE OR REPLACE PACKAGE BODY PKG_CP_BOD_PROVEEDOR AS
         v_nit := UPPER(TRIM(p_nit));
 
         -- CUI: exactamente 13 digitos
-        IF REGEXP_LIKE(v_nit, '^\d{13}$') THEN
+        IF REGEXP_LIKE(v_nit, '^[0-9]{13}$') THEN
             RETURN TRUE;
         END IF;
 
-        -- NIT sin guion: 2-9 digitos + digito verificador (0-9 o K)
-        IF REGEXP_LIKE(v_nit, '^\d{2,9}[\dK]$') THEN
+        -- NIT: exactamente 9 digitos numericos
+        IF REGEXP_LIKE(v_nit, '^[0-9]{9}$') THEN
+            RETURN TRUE;
+        END IF;
+
+        -- NIT: exactamente 8 digitos + K como digito verificador
+        IF REGEXP_LIKE(v_nit, '^[0-9]{8}K$') THEN
             RETURN TRUE;
         END IF;
 
@@ -44,7 +53,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_CP_BOD_PROVEEDOR AS
     -- ----------------------------------------------------------
     FUNCTION VALIDAR_TELEFONO(p_telefono IN VARCHAR2) RETURN BOOLEAN IS
     BEGIN
-        RETURN REGEXP_LIKE(TRIM(p_telefono), '^\d{8}$');
+        RETURN REGEXP_LIKE(TRIM(p_telefono), '^[0-9]{8}$');
     END VALIDAR_TELEFONO;
 
     -- ==========================================================
@@ -67,7 +76,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_CP_BOD_PROVEEDOR AS
         IF NOT VALIDAR_NIT(p_nit) THEN
             RAISE_APPLICATION_ERROR(-20008,
                 'PKG_CP_BOD_PROVEEDOR: NIT o CUI con formato invalido. ' ||
-                'Formatos aceptados: NIT sin guion (ej: 123456789 o 12345678K) ' ||
+                'Formatos aceptados: 9 digitos (ej: 123456789), ' ||
+                '8 digitos + K (ej: 12345678K), ' ||
                 'o CUI de 13 digitos (ej: 1234567890101).');
         END IF;
 

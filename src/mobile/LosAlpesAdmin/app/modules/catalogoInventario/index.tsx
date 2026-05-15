@@ -16,6 +16,11 @@ const menuOptions = [
     icon: "📁",
   },
   {
+    title: "Tipos",
+    route: "/modules/catalogoInventario/tipos",
+    icon: "🗂️",
+  },
+  {
     title: "Materiales",
     route: "/modules/catalogoInventario/materiales",
     icon: "🪵",

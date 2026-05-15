@@ -535,7 +535,15 @@ export default function StockScreen() {
                   <Text style={styles.stepNumText}>3</Text>
                 </View>
                 <Text style={styles.stepTitle}>Selecciona el Nicho</Text>
-                <Text style={styles.stepSub}>{almSel?.ALM_NOMBRE}</Text>
+                {/* FIX: numberOfLines + ellipsizeMode evitan que nombres largos
+                    de almacén rompan el layout del stepHeader */}
+                <Text
+                  style={styles.stepSub}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {almSel?.ALM_NOMBRE}
+                </Text>
               </View>
               {loadingNichos ? (
                 <ActivityIndicator color="#C9973A" />
@@ -620,7 +628,14 @@ export default function StockScreen() {
                   <Text style={styles.stepNumText}>4</Text>
                 </View>
                 <Text style={styles.stepTitle}>Gestionar Stock</Text>
-                <Text style={styles.stepSub}>
+                {/* FIX: numberOfLines + ellipsizeMode evitan que características
+                    largas del nicho (ej: "Estante bajo, acceso frontal, productos sala cd")
+                    empujen el contenido del card fuera del área visible */}
+                <Text
+                  style={styles.stepSub}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
                   {nicSel
                     ? `${nicSel.NIC_NUMERO}${nicSel.NIC_CARACTERISTICA ? ` — ${nicSel.NIC_CARACTERISTICA}` : ""}`
                     : ""}
@@ -1307,7 +1322,11 @@ const styles = StyleSheet.create({
   },
   stepNumText: { color: "#1a0e05", fontWeight: "bold", fontSize: 13 },
   stepTitle: { fontSize: 15, fontWeight: "bold", color: "#5C3A1E", flex: 1 },
-  stepSub: { fontSize: 11, color: "#888" },
+  // FIX: flexShrink: 1 permite que el texto se comprima en el row en lugar de
+  // empujar el contenido del card fuera del área visible cuando la característica
+  // del nicho es larga (ej: "Estante bajo, acceso frontal, productos sala cd").
+  // Se combina con numberOfLines={1} + ellipsizeMode="tail" en el JSX.
+  stepSub: { fontSize: 11, color: "#888", flexShrink: 1 },
   infoBadge: {
     backgroundColor: "#fdf6ec",
     borderRadius: 8,
