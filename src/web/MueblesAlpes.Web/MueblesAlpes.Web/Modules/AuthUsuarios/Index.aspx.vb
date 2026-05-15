@@ -14,7 +14,6 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
                 pnlAdmin.Visible = False
                 pnlRH.Visible = False
                 pnlClientes.Visible = False
-                pnlFac.Visible = False
             Else
                 Dim tipo As String = Session("UsuarioTipo").ToString()
                 pnlAcceso.Visible = False
@@ -27,7 +26,6 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios
                     pnlAdmin.Visible = CType(Session("PerAdmin"), Boolean)
                     pnlRH.Visible = CType(Session("PerRH"), Boolean)
                     pnlClientes.Visible = CType(Session("PerCli"), Boolean)
-                    pnlFac.Visible = CType(Session("PerFac"), Boolean)
                 End If
             End If
         End Sub

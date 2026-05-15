@@ -7,6 +7,8 @@ Namespace Modules.CatalogoInventario
         Inherits BasePage
 
         Protected Sub Page_Load(sender As Object, e As EventArgs) Handles Me.Load
+            ' FIX: ocultar mensaje en cada carga/postback; cada handler lo vuelve a mostrar si hay error.
+            pnlMsg.Visible = False
             If Not IsPostBack Then
                 CargarProductos()
                 CargarFiltros()
@@ -52,7 +54,6 @@ Namespace Modules.CatalogoInventario
         ' =============================================
         ' HELPER — SCROLL
         ' =============================================
-        ' block: 'start' | 'center' | 'end' | 'nearest'
         Private Sub ScrollAPanel(control As System.Web.UI.Control,
                                   Optional block As String = "start")
             Dim clientId As String = control.ClientID
@@ -100,10 +101,12 @@ Namespace Modules.CatalogoInventario
             AplicarFiltros()
         End Sub
 
+        ' FIX: Limpiar también oculta cualquier mensaje de error/éxito previo
         Protected Sub btnLimpiar_Click(sender As Object, e As EventArgs)
             txtFiltroProducto.Text = ""
             ddlFiltroAlmacen.SelectedIndex = 0
             ddlFiltroNicho.SelectedIndex = 0
+            pnlMsg.Visible = False
             CargarTablaStock()
         End Sub
 
@@ -214,7 +217,7 @@ Namespace Modules.CatalogoInventario
                 End If
                 CargarAlmacenes()
                 pnlPaso2.Visible = True
-                ScrollAPanel(pnlPaso1, "end")   ' end: baja solo lo necesario, paso 1 sigue visible
+                ScrollAPanel(pnlPaso1, "end")
             Catch ex As Exception
                 MostrarError("Error: " & ex.Message)
             End Try
@@ -309,7 +312,7 @@ Namespace Modules.CatalogoInventario
                     pnlSinStock.Visible = False
 
                     pnlPaso4.Visible = True
-                    ScrollAPanel(pnlStockActual)   ' ← lleva directo al stock actual + botón confirmar
+                    ScrollAPanel(pnlStockActual)
                 Else
                     txtDisponibleNuevo.Text = cantIncremento.ToString()
                     txtDisponibleNuevo.ReadOnly = True
@@ -319,7 +322,7 @@ Namespace Modules.CatalogoInventario
                     pnlSinStock.Visible = True
 
                     pnlPaso4.Visible = True
-                    ScrollAPanel(pnlSinStock)      ' ← lleva directo al formulario de crear stock
+                    ScrollAPanel(pnlSinStock)
                 End If
 
             Catch ex As Exception
@@ -495,15 +498,22 @@ Namespace Modules.CatalogoInventario
         ' =============================================
         Protected Sub gvStock_RowEditing(sender As Object, e As GridViewEditEventArgs)
             gvStock.EditIndex = e.NewEditIndex
+            ' FIX: ocultar mensaje previo al entrar en modo edición
+            pnlMsg.Visible = False
             CargarTablaStock()
         End Sub
 
         Protected Sub gvStock_RowCancelingEdit(sender As Object, e As GridViewCancelEditEventArgs)
             gvStock.EditIndex = -1
+            ' FIX: ocultar mensaje previo al cancelar edición
+            pnlMsg.Visible = False
             CargarTablaStock()
         End Sub
 
         Protected Sub gvStock_RowUpdating(sender As Object, e As GridViewUpdateEventArgs)
+            ' FIX: limpiar mensaje anterior antes de validar/guardar,
+            ' así el error nuevo del paquete (ej: mínimo > disponible) aparece solo
+            pnlMsg.Visible = False
             Try
                 Dim row As GridViewRow = gvStock.Rows(e.RowIndex)
                 Dim hipId As Decimal = Convert.ToDecimal(gvStock.DataKeys(e.RowIndex).Value)

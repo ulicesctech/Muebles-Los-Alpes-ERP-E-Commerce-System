@@ -26,7 +26,7 @@
     .au-section { margin-bottom:32px; display:flex; flex-direction:column; align-items:center; }
     .au-grid { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; }
     .au-section-title { align-self:flex-start; }
-    </style>
+</style>
 
 <div class="au-hero">
     <h1>🔐 Auth &amp; Usuarios</h1>
@@ -121,29 +121,6 @@
                 <div class="au-card-body">
                     <div class="au-card-desc">Registra y gestiona los ascensos del personal.</div>
                     <a href='<%: ResolveUrl("~/Modules/AuthUsuarios/Ascensos.aspx") %>' class="au-btn">Gestionar Ascensos</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</asp:Panel>
-
-<%-- FACTURACIÓN — solo empleados con permiso FAC --%>
-<asp:Panel ID="pnlFac" runat="server" Visible="false">
-    <div class="au-section">
-        <div class="au-section-title">🧾 Facturación</div>
-        <div class="au-grid">
-            <div class="au-card">
-                <div class="au-card-head"><span>🧾</span><h3>Facturas a Clientes</h3></div>
-                <div class="au-card-body">
-                    <div class="au-card-desc">Genera y gestiona las facturas emitidas a clientes.</div>
-                    <a href='<%: ResolveUrl("~/Modules/VentasFacturacion/Factura.aspx") %>' class="au-btn">Ir a Facturación</a>
-                </div>
-            </div>
-            <div class="au-card">
-                <div class="au-card-head"><span>📋</span><h3>Facturas de Proveedor</h3></div>
-                <div class="au-card-body">
-                    <div class="au-card-desc">Administra las facturas recibidas de proveedores.</div>
-                    <a href='<%: ResolveUrl("~/Modules/ComprasProveedor/FacturasProveedor.aspx") %>' class="au-btn">Ir a Facturas Proveedor</a>
                 </div>
             </div>
         </div>

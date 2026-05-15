@@ -1,8 +1,8 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-    ActivityIndicator, Alert, Image, ScrollView,
-    StyleSheet, Text, TouchableOpacity, View
+  ActivityIndicator, Alert, Image, ScrollView,
+  StyleSheet, Text, TouchableOpacity, View
 } from 'react-native';
 import { useCarrito } from '../../../context/CarritoContext';
 import { detalleProducto } from '../../../services/cliente/catalogoService';
@@ -72,7 +72,7 @@ export default function DetalleProductoScreen() {
       {/* Imagen */}
       <View style={styles.imgCard}>
         <Image
-          source={{ uri: `${BASE}/Handlers/CatalogoInventario/FotoProductoHandler.ashx?ref=${producto.PRO_REFERENCIA}` }}
+          source={{ uri: `${BASE}/Handlers/CatalogoInventario/FotoProductoHandler.ashx?ref=${producto.PRO_REFERENCIA}&t=${Date.now()}` }}
           style={styles.img}
           resizeMode="cover"
         />

@@ -1,12 +1,16 @@
 <%@ WebHandler Language="VB" Class="PerfilClienteHandler" %>
 Imports System.Web
+Imports System.Web.SessionState
 Imports System.Data
 Imports System.Collections.Generic
 Imports Newtonsoft.Json
 Imports Oracle.ManagedDataAccess.Client
+Imports MueblesAlpes.Web.Security
+
+
 
 Public Class PerfilClienteHandler
-    Implements IHttpHandler
+    Implements IHttpHandler, IRequiresSessionState
 
     Public ReadOnly Property IsReusable() As Boolean Implements IHttpHandler.IsReusable
         Get
@@ -18,7 +22,8 @@ Public Class PerfilClienteHandler
         context.Response.ContentType = "application/json"
         context.Response.AddHeader("Access-Control-Allow-Origin", "*")
         context.Response.AddHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        context.Response.AddHeader("Access-Control-Allow-Headers", "Content-Type")
+        context.Response.AddHeader("Access-Control-Allow-Headers", "Content-Type, Cookie")
+        context.Response.AddHeader("Access-Control-Allow-Credentials", "true")
 
         If context.Request.HttpMethod = "OPTIONS" Then
             context.Response.StatusCode = 200
@@ -29,20 +34,33 @@ Public Class PerfilClienteHandler
 
         Try
             Select Case action
-                Case "obtener" : ObtenerPerfil(context)
-                Case "actualizar" : ActualizarPerfil(context)
+                Case "obtener"
+                    If Not SecurityGuard.RequiereCliente(context) Then Return
+                    ObtenerPerfil(context)
+
+                Case "actualizar"
+                    If Not SecurityGuard.RequiereCliente(context) Then Return
+                    ActualizarPerfil(context)
+
                 Case Else
                     context.Response.StatusCode = 400
                     context.Response.Write("{""ok"": false, ""mensaje"": ""Accion no reconocida.""}")
             End Select
         Catch ex As Exception
             context.Response.StatusCode = 500
-            context.Response.Write("{""ok"": false, ""mensaje"": """ & ex.Message.Replace("""", "\""") & """}")
+            context.Response.Write("{""ok"": false, ""mensaje"": ""No se pudo procesar la solicitud.""}")
         End Try
     End Sub
 
     Private Sub ObtenerPerfil(context As HttpContext)
-        Dim clienteId As Integer = Convert.ToInt32(context.Request("clienteId"))
+        Dim clienteId As Integer = SecurityGuard.ClienteIdActual(context)
+
+        If clienteId <= 0 Then
+            context.Response.StatusCode = 401
+            context.Response.Write("{""ok"": false, ""mensaje"": ""Cliente no autenticado.""}")
+            Return
+        End If
+
         Dim dt As DataTable = OracleDb.ExecRefCursor(
             "PKG_CLI_CLIENTE.CLI_BUSCAR",
             New List(Of OracleParameter) From {
@@ -76,12 +94,20 @@ Public Class PerfilClienteHandler
                 Return
             End If
         Next
+
         context.Response.StatusCode = 404
         context.Response.Write("{""ok"": false, ""mensaje"": ""Cliente no encontrado.""}")
     End Sub
 
     Private Sub ActualizarPerfil(context As HttpContext)
-        Dim clienteId As Integer = Convert.ToInt32(context.Request("clienteId"))
+        Dim clienteId As Integer = SecurityGuard.ClienteIdActual(context)
+
+        If clienteId <= 0 Then
+            context.Response.StatusCode = 401
+            context.Response.Write("{""ok"": false, ""mensaje"": ""Cliente no autenticado.""}")
+            Return
+        End If
+
         Dim ps As New List(Of OracleParameter) From {
             New OracleParameter("p_id", OracleDbType.Decimal, clienteId, ParameterDirection.Input),
             New OracleParameter("p_tipodoc", OracleDbType.Varchar2, context.Request("tipoDoc"), ParameterDirection.Input),
@@ -100,8 +126,9 @@ Public Class PerfilClienteHandler
             New OracleParameter("p_tel2", OracleDbType.Varchar2, If(context.Request("tel2"), ""), ParameterDirection.Input),
             New OracleParameter("p_email", OracleDbType.Varchar2, context.Request("email"), ParameterDirection.Input),
             New OracleParameter("p_prof", OracleDbType.Varchar2, If(context.Request("profesion"), ""), ParameterDirection.Input),
-            New OracleParameter("p_tipocli", OracleDbType.Varchar2, "NATURAL", ParameterDirection.Input)
+            New OracleParameter("p_tipocli", OracleDbType.Varchar2, If(context.Request("tipoCliente"), "NATURAL"), ParameterDirection.Input)
         }
+
         OracleDb.ExecNonQuery("PKG_CLI_CLIENTE.CLI_ACTUALIZAR", ps)
         context.Response.Write(JsonConvert.SerializeObject(New With {.ok = True}))
     End Sub

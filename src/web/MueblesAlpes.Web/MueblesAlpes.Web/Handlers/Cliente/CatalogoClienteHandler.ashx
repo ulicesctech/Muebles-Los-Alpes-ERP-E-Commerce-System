@@ -38,9 +38,16 @@ Public Class CatalogoClienteHandler
             End Select
         Catch ex As Exception
             context.Response.StatusCode = 500
-            context.Response.Write("{""ok"": false, ""mensaje"": """ & ex.Message.Replace("""", "\""") & """}")
+            context.Response.Write("{""ok"": false, ""mensaje"": ""No se pudo procesar la solicitud.""}")
         End Try
     End Sub
+
+    Private Function Valor(row As DataRow, columna As String, Optional defecto As Object = Nothing) As Object
+        If row.Table.Columns.Contains(columna) AndAlso Not IsDBNull(row(columna)) Then
+            Return row(columna)
+        End If
+        Return defecto
+    End Function
 
     Private Sub ListarProductos(context As HttpContext)
         Dim dt As DataTable = CatalogoClienteService.Listar()
@@ -48,18 +55,18 @@ Public Class CatalogoClienteHandler
 
         For Each row As DataRow In dt.Rows
             lst.Add(New With {
-                .PRO_REFERENCIA = row("PRO_REFERENCIA"),
-                .PRO_NOMBRE = row("PRO_NOMBRE"),
-                .PRO_DESCRIPCION = row("PRO_DESCRIPCION"),
-                .PRO_PRECIO = row("PRO_PRECIO"),
-                .PRECIO_FINAL = row("PRECIO_FINAL"),
-                .HV_HISTORIAL_PRECIO_VENTA = If(IsDBNull(row("HV_HISTORIAL_PRECIO_VENTA")), Nothing, row("HV_HISTORIAL_PRECIO_VENTA")),
-                .CAT_DESCRIPCION = row("CAT_DESCRIPCION"),
-                .TIP_DESCRIPCION = row("TIP_DESCRIPCION"),
-                .MAT_DESCRIPCION = row("MAT_DESCRIPCION"),
-                .PROM_PORCENTAJE = If(IsDBNull(row("PROM_PORCENTAJE")), Nothing, row("PROM_PORCENTAJE")),
-                .CAMP_NOMBRE = If(IsDBNull(row("CAMP_NOMBRE")), "", row("CAMP_NOMBRE")),
-                .STO_DISPONIBLE = row("STO_DISPONIBLE")
+                .PRO_REFERENCIA = Valor(row, "PRO_REFERENCIA", ""),
+                .PRO_NOMBRE = Valor(row, "PRO_NOMBRE", ""),
+                .PRO_DESCRIPCION = Valor(row, "PRO_DESCRIPCION", ""),
+                .PRO_PRECIO = Valor(row, "PRO_PRECIO", 0),
+                .PRECIO_FINAL = Valor(row, "PRECIO_FINAL", 0),
+                .HV_HISTORIAL_PRECIO_VENTA = Valor(row, "HV_HISTORIAL_PRECIO_VENTA", Nothing),
+                .CAT_DESCRIPCION = Valor(row, "CAT_DESCRIPCION", ""),
+                .TIP_DESCRIPCION = Valor(row, "TIP_DESCRIPCION", ""),
+                .MAT_DESCRIPCION = Valor(row, "MAT_DESCRIPCION", ""),
+                .PROM_PORCENTAJE = Valor(row, "PROM_PORCENTAJE", Nothing),
+                .CAMP_NOMBRE = Valor(row, "CAMP_NOMBRE", ""),
+                .STO_DISPONIBLE = Valor(row, "STO_DISPONIBLE", 0)
             })
         Next
 
@@ -72,8 +79,8 @@ Public Class CatalogoClienteHandler
 
         For Each row As DataRow In dt.Rows
             lst.Add(New With {
-                .CAT_CATEGORIA = row("CAT_CATEGORIA"),
-                .CAT_DESCRIPCION = row("CAT_DESCRIPCION")
+                .CAT_CATEGORIA = Valor(row, "CAT_CATEGORIA", 0),
+                .CAT_DESCRIPCION = Valor(row, "CAT_DESCRIPCION", "")
             })
         Next
 
@@ -93,18 +100,18 @@ Public Class CatalogoClienteHandler
 
         For Each row As DataRow In dt.Rows
             lst.Add(New With {
-                .PRO_REFERENCIA = row("PRO_REFERENCIA"),
-                .PRO_NOMBRE = row("PRO_NOMBRE"),
-                .PRO_DESCRIPCION = row("PRO_DESCRIPCION"),
-                .PRO_PRECIO = row("PRO_PRECIO"),
-                .PRECIO_FINAL = row("PRECIO_FINAL"),
-                .HV_HISTORIAL_PRECIO_VENTA = If(IsDBNull(row("HV_HISTORIAL_PRECIO_VENTA")), Nothing, row("HV_HISTORIAL_PRECIO_VENTA")),
-                .CAT_DESCRIPCION = row("CAT_DESCRIPCION"),
-                .TIP_DESCRIPCION = row("TIP_DESCRIPCION"),
-                .MAT_DESCRIPCION = row("MAT_DESCRIPCION"),
-                .PROM_PORCENTAJE = If(IsDBNull(row("PROM_PORCENTAJE")), Nothing, row("PROM_PORCENTAJE")),
-                .CAMP_NOMBRE = If(IsDBNull(row("CAMP_NOMBRE")), "", row("CAMP_NOMBRE")),
-                .STO_DISPONIBLE = row("STO_DISPONIBLE")
+                .PRO_REFERENCIA = Valor(row, "PRO_REFERENCIA", ""),
+                .PRO_NOMBRE = Valor(row, "PRO_NOMBRE", ""),
+                .PRO_DESCRIPCION = Valor(row, "PRO_DESCRIPCION", ""),
+                .PRO_PRECIO = Valor(row, "PRO_PRECIO", 0),
+                .PRECIO_FINAL = Valor(row, "PRECIO_FINAL", 0),
+                .HV_HISTORIAL_PRECIO_VENTA = Valor(row, "HV_HISTORIAL_PRECIO_VENTA", Nothing),
+                .CAT_DESCRIPCION = Valor(row, "CAT_DESCRIPCION", ""),
+                .TIP_DESCRIPCION = Valor(row, "TIP_DESCRIPCION", ""),
+                .MAT_DESCRIPCION = Valor(row, "MAT_DESCRIPCION", ""),
+                .PROM_PORCENTAJE = Valor(row, "PROM_PORCENTAJE", Nothing),
+                .CAMP_NOMBRE = Valor(row, "CAMP_NOMBRE", ""),
+                .STO_DISPONIBLE = Valor(row, "STO_DISPONIBLE", 0)
             })
         Next
 
@@ -113,39 +120,44 @@ Public Class CatalogoClienteHandler
 
     Private Sub DetalleProducto(context As HttpContext)
         Dim ref As String = context.Request("ref")
+
         If String.IsNullOrEmpty(ref) Then
             context.Response.StatusCode = 400
             context.Response.Write("{""ok"": false, ""mensaje"": ""Referencia obligatoria.""}")
             Return
         End If
+
         Dim dt As DataTable = CatalogoClienteService.Listar()
         Dim filas As DataRow() = dt.Select("PRO_REFERENCIA = '" & ref.Replace("'", "''") & "'")
+
         If filas.Length = 0 Then
             context.Response.StatusCode = 404
             context.Response.Write("{""ok"": false, ""mensaje"": ""Producto no encontrado.""}")
             Return
         End If
+
         Dim row As DataRow = filas(0)
+
         context.Response.Write(JsonConvert.SerializeObject(New With {
             .ok = True,
             .data = New With {
-                .PRO_REFERENCIA = row("PRO_REFERENCIA"),
-                .PRO_NOMBRE = row("PRO_NOMBRE"),
-                .PRO_DESCRIPCION = row("PRO_DESCRIPCION"),
-                .PRO_PRECIO = row("PRO_PRECIO"),
-                .PRO_COLOR = If(IsDBNull(row("PRO_COLOR")), "N/A", row("PRO_COLOR")),
-                .PRO_ALTO_CM = row("PRO_ALTO_CM"),
-                .PRO_ANCHO_CM = row("PRO_ANCHO_CM"),
-                .PRO_PROFUNDIDAD_CM = row("PRO_PROFUNDIDAD_CM"),
-                .PRO_PESO = row("PRO_PESO"),
-                .PRECIO_FINAL = row("PRECIO_FINAL"),
-                .HV_HISTORIAL_PRECIO_VENTA = If(IsDBNull(row("HV_HISTORIAL_PRECIO_VENTA")), Nothing, row("HV_HISTORIAL_PRECIO_VENTA")),
-                .CAT_DESCRIPCION = row("CAT_DESCRIPCION"),
-                .TIP_DESCRIPCION = row("TIP_DESCRIPCION"),
-                .MAT_DESCRIPCION = row("MAT_DESCRIPCION"),
-                .PROM_PORCENTAJE = If(IsDBNull(row("PROM_PORCENTAJE")), Nothing, row("PROM_PORCENTAJE")),
-                .CAMP_NOMBRE = If(IsDBNull(row("CAMP_NOMBRE")), "", row("CAMP_NOMBRE")),
-                .STO_DISPONIBLE = row("STO_DISPONIBLE")
+                .PRO_REFERENCIA = Valor(row, "PRO_REFERENCIA", ""),
+                .PRO_NOMBRE = Valor(row, "PRO_NOMBRE", ""),
+                .PRO_DESCRIPCION = Valor(row, "PRO_DESCRIPCION", ""),
+                .PRO_PRECIO = Valor(row, "PRO_PRECIO", 0),
+                .PRO_COLOR = Valor(row, "PRO_COLOR", "N/A"),
+                .PRO_ALTO_CM = Valor(row, "PRO_ALTO_CM", 0),
+                .PRO_ANCHO_CM = Valor(row, "PRO_ANCHO_CM", 0),
+                .PRO_PROFUNDIDAD_CM = Valor(row, "PRO_PROFUNDIDAD_CM", 0),
+                .PRO_PESO = Valor(row, "PRO_PESO", 0),
+                .PRECIO_FINAL = Valor(row, "PRECIO_FINAL", 0),
+                .HV_HISTORIAL_PRECIO_VENTA = Valor(row, "HV_HISTORIAL_PRECIO_VENTA", Nothing),
+                .CAT_DESCRIPCION = Valor(row, "CAT_DESCRIPCION", ""),
+                .TIP_DESCRIPCION = Valor(row, "TIP_DESCRIPCION", ""),
+                .MAT_DESCRIPCION = Valor(row, "MAT_DESCRIPCION", ""),
+                .PROM_PORCENTAJE = Valor(row, "PROM_PORCENTAJE", Nothing),
+                .CAMP_NOMBRE = Valor(row, "CAMP_NOMBRE", ""),
+                .STO_DISPONIBLE = Valor(row, "STO_DISPONIBLE", 0)
             }
         }))
     End Sub
@@ -156,18 +168,18 @@ Public Class CatalogoClienteHandler
 
         For Each row As DataRow In dt.Rows
             lst.Add(New With {
-                .PRO_REFERENCIA = row("PRO_REFERENCIA"),
-                .PRO_NOMBRE = row("PRO_NOMBRE"),
-                .PRO_DESCRIPCION = row("PRO_DESCRIPCION"),
-                .PRO_PRECIO = row("PRO_PRECIO"),
-                .PRECIO_FINAL = row("PRECIO_FINAL"),
-                .HV_HISTORIAL_PRECIO_VENTA = If(IsDBNull(row("HV_HISTORIAL_PRECIO_VENTA")), Nothing, row("HV_HISTORIAL_PRECIO_VENTA")),
-                .CAT_DESCRIPCION = row("CAT_DESCRIPCION"),
-                .TIP_DESCRIPCION = row("TIP_DESCRIPCION"),
-                .MAT_DESCRIPCION = row("MAT_DESCRIPCION"),
-                .PROM_PORCENTAJE = If(IsDBNull(row("PROM_PORCENTAJE")), Nothing, row("PROM_PORCENTAJE")),
-                .CAMP_NOMBRE = If(IsDBNull(row("CAMP_NOMBRE")), "", row("CAMP_NOMBRE")),
-                .STO_DISPONIBLE = row("STO_DISPONIBLE")
+                .PRO_REFERENCIA = Valor(row, "PRO_REFERENCIA", ""),
+                .PRO_NOMBRE = Valor(row, "PRO_NOMBRE", ""),
+                .PRO_DESCRIPCION = Valor(row, "PRO_DESCRIPCION", ""),
+                .PRO_PRECIO = Valor(row, "PRO_PRECIO", 0),
+                .PRECIO_FINAL = Valor(row, "PRECIO_FINAL", 0),
+                .HV_HISTORIAL_PRECIO_VENTA = Valor(row, "HV_HISTORIAL_PRECIO_VENTA", Nothing),
+                .CAT_DESCRIPCION = Valor(row, "CAT_DESCRIPCION", ""),
+                .TIP_DESCRIPCION = Valor(row, "TIP_DESCRIPCION", ""),
+                .MAT_DESCRIPCION = Valor(row, "MAT_DESCRIPCION", ""),
+                .PROM_PORCENTAJE = Valor(row, "PROM_PORCENTAJE", Nothing),
+                .CAMP_NOMBRE = Valor(row, "CAMP_NOMBRE", ""),
+                .STO_DISPONIBLE = Valor(row, "STO_DISPONIBLE", 0)
             })
         Next
 

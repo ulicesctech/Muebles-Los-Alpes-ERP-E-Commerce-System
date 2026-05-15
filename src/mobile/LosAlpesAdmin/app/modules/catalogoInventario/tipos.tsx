@@ -1,27 +1,30 @@
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    FlatList,
-    Modal,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import {
-    Categoria,
-    getCategorias,
+  Categoria,
+  getCategorias,
 } from "../../../services/catalogoInventario/categorias";
 import {
-    actualizarTipo,
-    crearTipo,
-    eliminarTipo,
-    getTipos,
-    getTiposPorCategoria,
-    Tipo,
+  actualizarTipo,
+  crearTipo,
+  eliminarTipo,
+  getTipos,
+  getTiposPorCategoria,
+  Tipo,
 } from "../../../services/catalogoInventario/tipos";
 
 export default function TiposScreen() {
@@ -149,35 +152,6 @@ export default function TiposScreen() {
   };
 
   // --- ENCABEZADO DE LA LISTA ---
-  const renderHeader = () => (
-    <View>
-      <View style={styles.searchContainer}>
-        <TouchableOpacity
-          style={styles.filterDropdown}
-          onPress={() => setModalFiltroVisible(true)}
-        >
-          <Text style={styles.filterText}>
-            🏷️ Filtro:{" "}
-            {filtroCategoria
-              ? getNombreCategoriaSeleccionada(filtroCategoria)
-              : "Todas las Categorías"}
-          </Text>
-        </TouchableOpacity>
-        {filtroCategoria !== null && (
-          <TouchableOpacity
-            style={styles.btnClearFilter}
-            onPress={() => setFiltroCategoria(null)}
-          >
-            <Text style={styles.btnTextRed}>✕</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      <TouchableOpacity style={styles.btnAdd} onPress={() => abrirModal()}>
-        <Text style={styles.btnTextWhite}>📋 + Nuevo Tipo</Text>
-      </TouchableOpacity>
-    </View>
-  );
 
   const renderItem = ({ item }: { item: Tipo }) => (
     <View style={styles.card}>
@@ -207,11 +181,37 @@ export default function TiposScreen() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.headerContainer}>
+        <View style={styles.searchContainer}>
+          <TouchableOpacity
+            style={styles.filterDropdown}
+            onPress={() => setModalFiltroVisible(true)}
+          >
+            <Text style={styles.filterText}>
+              🏷️ Filtro:{" "}
+              {filtroCategoria
+                ? getNombreCategoriaSeleccionada(filtroCategoria)
+                : "Todas las Categorías"}
+            </Text>
+          </TouchableOpacity>
+          {filtroCategoria !== null && (
+            <TouchableOpacity
+              style={styles.btnClearFilter}
+              onPress={() => setFiltroCategoria(null)}
+            >
+              <Text style={styles.btnTextRed}>✕</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <TouchableOpacity style={styles.btnAdd} onPress={() => abrirModal()}>
+          <Text style={styles.btnTextWhite}>📋 + Nuevo Tipo</Text>
+        </TouchableOpacity>
+      </View>
       <FlatList
         data={tipos}
         keyExtractor={(item) => item.TIP_TIPO.toString()}
         renderItem={renderItem}
-        ListHeaderComponent={renderHeader}
         contentContainerStyle={{ paddingBottom: 20 }}
         ListEmptyComponent={
           loading ? (
@@ -232,45 +232,62 @@ export default function TiposScreen() {
       {/* Modal Formulario */}
       <Modal visible={modalVisible} animationType="slide" transparent={true}>
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
-              {currentId ? "Editar Tipo" : "Nuevo Tipo"}
-            </Text>
-
-            <Text style={styles.label}>Descripción *</Text>
-            <TextInput
-              style={styles.input}
-              value={descripcion}
-              onChangeText={setDescripcion}
-              placeholder="Ej: Sofá, Mesa, Silla..."
-              maxLength={200}
-            />
-
-            <Text style={styles.label}>Categoría *</Text>
-            <TouchableOpacity
-              style={styles.selectorInput}
-              onPress={() => setModalSelectorVisible(true)}
+          <KeyboardAvoidingView
+            style={styles.keyboardContainer}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+          >
+            <ScrollView
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="none"
+              showsVerticalScrollIndicator={false}
             >
-              <Text
-                style={
-                  selectedCategoria
-                    ? styles.selectorText
-                    : styles.selectorPlaceholder
-                }
-              >
-                {getNombreCategoriaSeleccionada(selectedCategoria)}
-              </Text>
-            </TouchableOpacity>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>
+                  {currentId ? "Editar Tipo" : "Nuevo Tipo"}
+                </Text>
 
-            <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.btnCancel} onPress={cerrarModal}>
-                <Text style={styles.btnTextDark}>Cancelar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.btnSave} onPress={handleGuardar}>
-                <Text style={styles.btnTextWhite}>💾 Guardar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+                <Text style={styles.label}>Descripción *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={descripcion}
+                  onChangeText={setDescripcion}
+                  placeholder="Ej: Sofá, Mesa, Silla..."
+                  maxLength={200}
+                />
+
+                <Text style={styles.label}>Categoría *</Text>
+                <TouchableOpacity
+                  style={styles.selectorInput}
+                  onPress={() => setModalSelectorVisible(true)}
+                >
+                  <Text
+                    style={
+                      selectedCategoria
+                        ? styles.selectorText
+                        : styles.selectorPlaceholder
+                    }
+                  >
+                    {getNombreCategoriaSeleccionada(selectedCategoria)}
+                  </Text>
+                </TouchableOpacity>
+
+                <View style={styles.modalActions}>
+                  <TouchableOpacity
+                    style={styles.btnCancel}
+                    onPress={cerrarModal}
+                  >
+                    <Text style={styles.btnTextDark}>Cancelar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.btnSave}
+                    onPress={handleGuardar}
+                  >
+                    <Text style={styles.btnTextWhite}>💾 Guardar</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
         </View>
       </Modal>
 
@@ -323,6 +340,7 @@ export default function TiposScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fdf8f3", padding: 16 },
+  headerContainer: { marginBottom: 10 },
   searchContainer: { flexDirection: "row", marginBottom: 12, gap: 8 },
   filterDropdown: {
     flex: 1,
@@ -410,6 +428,9 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "center",
     padding: 20,
+  },
+  keyboardContainer: {
+    width: "100%",
   },
   modalContent: { backgroundColor: "white", padding: 20, borderRadius: 12 },
   modalTitle: {

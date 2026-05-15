@@ -168,7 +168,7 @@ export default function CatalogoScreen() {
                 {/* Imagen */}
                 <View style={styles.cardImgWrap}>
                   <Image
-                    source={{ uri: `${BASE}/Handlers/CatalogoInventario/FotoProductoHandler.ashx?ref=${item.PRO_REFERENCIA}` }}
+                    source={{ uri: `${BASE}/Handlers/CatalogoInventario/FotoProductoHandler.ashx?ref=${item.PRO_REFERENCIA}&t=${Date.now()}` }}
                     style={styles.cardImg}
                     resizeMode="cover"
                   />

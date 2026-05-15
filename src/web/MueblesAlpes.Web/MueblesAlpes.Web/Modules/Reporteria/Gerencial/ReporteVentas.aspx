@@ -7,8 +7,13 @@
 
     <div class="panel-reporte" style="min-height: 600px; width: 100%; background: #fff; border: 1px solid #dcc29a; border-radius: 14px;">
         <iframe id="iframeVentas"
+<<<<<<< HEAD
                 src="http://192.168.56.1/Reports/powerbi/VENTAS?rs:Embed=true"
                 style="width: 100%; height: 600px; border: none;" 
+=======
+                src="http://192.168.0.101/Reports/powerbi/VENTAS?rs:Embed=true"
+                style="width: 100%; height: 800px; border: none;" 
+>>>>>>> 5bc675990cf417f92d859f72b9beb18bce1ca2b3
                 allowFullScreen="true">
         </iframe>
     </div>

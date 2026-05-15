@@ -20,11 +20,36 @@ function AuthGuard() {
 
   useEffect(() => {
     if (loading) return;
+
     const enAuth = segments[0] === '(auth)';
+    const enModulos = segments[0] === 'modules';
+    const enCliente = segments[1] === 'cliente';
+    const enRoot = !segments[0];
+
     if (!usuario && !enAuth) {
       router.replace('/(auth)/login');
-    } else if (usuario && enAuth) {
+      return;
+    }
+
+    if (usuario && enAuth) {
+      if (usuario.tipo === 'CLIENTE') {
+        router.replace('/modules/cliente/catalogo' as any);
+      } else {
+        router.replace('/');
+      }
+      return;
+    }
+
+    if (usuario?.tipo === 'CLIENTE') {
+      if (enRoot || !enCliente) {
+        router.replace('/modules/cliente/catalogo' as any);
+      }
+      return;
+    }
+
+    if (usuario?.tipo === 'EMPLEADO' && enModulos && enCliente) {
       router.replace('/');
+      return;
     }
   }, [usuario, loading, segments]);
 
@@ -37,10 +62,13 @@ function NavAdmin() {
   const handleLogout = async () => {
     Alert.alert('Cerrar Sesión', '¿Estás seguro?', [
       { text: 'Cancelar', style: 'cancel' },
-      { text: 'Sí, salir', onPress: async () => {
-        await logout();
-        router.replace('/(auth)/login');
-      }}
+      {
+        text: 'Sí, salir',
+        onPress: async () => {
+          await logout();
+          router.replace('/(auth)/login');
+        }
+      }
     ]);
   };
 
@@ -49,6 +77,7 @@ function NavAdmin() {
       <View style={styles.topBar}>
         <Text style={styles.topBarText}>Envíos a todo Guatemala | Tel: +502 5568 8472</Text>
       </View>
+
       <View style={styles.header}>
         <View style={styles.headerTop}>
           <Text style={styles.logoText}>Muebles Los Alpes</Text>
@@ -57,6 +86,7 @@ function NavAdmin() {
           </TouchableOpacity>
         </View>
       </View>
+
       <View style={styles.navContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.navScroll}>
           <Link href="/" asChild>
@@ -64,36 +94,43 @@ function NavAdmin() {
               <Text style={styles.navText}>Inicio</Text>
             </TouchableOpacity>
           </Link>
+
           <Link href="/modules/catalogoInventario" asChild>
             <TouchableOpacity style={styles.navItem}>
               <Text style={styles.navText}>Catálogo & Inv.</Text>
             </TouchableOpacity>
           </Link>
+
           <Link href="/modules/authUsuarios" asChild>
             <TouchableOpacity style={styles.navItem}>
               <Text style={styles.navText}>Usuarios</Text>
             </TouchableOpacity>
           </Link>
+
           <Link href="/modules/comprasProveedor" asChild>
             <TouchableOpacity style={styles.navItem}>
               <Text style={styles.navText}>Compras</Text>
             </TouchableOpacity>
           </Link>
+
           <Link href="/modules/ventasFacturacion" asChild>
             <TouchableOpacity style={styles.navItem}>
               <Text style={styles.navText}>Ventas</Text>
             </TouchableOpacity>
           </Link>
-          <Link href="/modules/reporteria" asChild>
+
+          <Link href={"/modules/reporteria" as any} asChild>
             <TouchableOpacity style={styles.navItem}>
-              <Text style={styles.navText}>Reporteria</Text>
+              <Text style={styles.navText}> Reportes</Text>
             </TouchableOpacity>
           </Link>
         </ScrollView>
       </View>
+
       <View style={styles.contentWrapper}>
         <Slot />
       </View>
+
       <View style={styles.footerMain}>
         <Text style={styles.footerTitle}>Santos & Familia — Desde 1978</Text>
         <Text style={styles.footerText}>Diseño & Confort Hogareño — Guatemala</Text>
@@ -115,10 +152,13 @@ function NavCliente() {
     setMenuAbierto(false);
     Alert.alert('Cerrar Sesión', '¿Estás seguro?', [
       { text: 'Cancelar', style: 'cancel' },
-      { text: 'Sí, salir', onPress: async () => {
-        await logout();
-        router.replace('/(auth)/login');
-      }}
+      {
+        text: 'Sí, salir',
+        onPress: async () => {
+          await logout();
+          router.replace('/(auth)/login');
+        }
+      }
     ]);
   };
 
@@ -127,10 +167,12 @@ function NavCliente() {
       <View style={styles.header}>
         <View style={styles.headerTop}>
           <Text style={styles.logoText}>Muebles Los Alpes</Text>
+
           <View style={styles.headerBtns}>
             <TouchableOpacity
               style={styles.carritoBtn}
-              onPress={() => router.push('/modules/cliente/carrito' as any)}>
+              onPress={() => router.push('/modules/cliente/carrito' as any)}
+            >
               <Text style={styles.carritoIcon}>🛒</Text>
               {totalItems > 0 && (
                 <View style={styles.carritoBadge}>
@@ -138,9 +180,11 @@ function NavCliente() {
                 </View>
               )}
             </TouchableOpacity>
+
             <TouchableOpacity
               style={styles.userBtn}
-              onPress={() => setMenuAbierto(true)}>
+              onPress={() => setMenuAbierto(true)}
+            >
               <Text style={styles.userBtnText}>
                 Hola, {usuario?.nombre.split(' ')[0]} ▾
               </Text>
@@ -149,7 +193,6 @@ function NavCliente() {
         </View>
       </View>
 
-      {/* Nav horizontal */}
       <View style={styles.navContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.navScroll}>
           <Link href={'/modules/cliente/catalogo' as any} asChild>
@@ -157,11 +200,13 @@ function NavCliente() {
               <Text style={styles.navText}>🛋 Productos</Text>
             </TouchableOpacity>
           </Link>
+
           <Link href={'/modules/cliente/misCompras' as any} asChild>
             <TouchableOpacity style={styles.navItem}>
               <Text style={styles.navText}>Mis Compras</Text>
             </TouchableOpacity>
           </Link>
+
           <Link href={'/modules/cliente/promociones' as any} asChild>
             <TouchableOpacity style={styles.navItem}>
               <Text style={styles.navText}>Promociones</Text>
@@ -170,7 +215,6 @@ function NavCliente() {
         </ScrollView>
       </View>
 
-      {/* Dropdown menu usuario */}
       <Modal visible={menuAbierto} transparent animationType="fade">
         <TouchableWithoutFeedback onPress={() => setMenuAbierto(false)}>
           <View style={styles.modalOverlay}>
@@ -186,8 +230,9 @@ function NavCliente() {
                   onPress={() => {
                     setMenuAbierto(false);
                     router.push('/modules/cliente/misCompras' as any);
-                  }}>
-                  <Text style={styles.menuItemIcon}></Text>
+                  }}
+                >
+                  <Text style={styles.menuItemIcon}>📦</Text>
                   <Text style={styles.menuItemText}>Mis Pedidos</Text>
                 </TouchableOpacity>
 
@@ -196,7 +241,8 @@ function NavCliente() {
                   onPress={() => {
                     setMenuAbierto(false);
                     router.push('/modules/cliente/miPerfil' as any);
-                  }}>
+                  }}
+                >
                   <Text style={styles.menuItemIcon}>👤</Text>
                   <Text style={styles.menuItemText}>Mi Información</Text>
                 </TouchableOpacity>
@@ -205,8 +251,9 @@ function NavCliente() {
 
                 <TouchableOpacity
                   style={[styles.menuItem, styles.menuItemLogout]}
-                  onPress={handleLogout}>
-                  <Text style={styles.menuItemIcon}></Text>
+                  onPress={handleLogout}
+                >
+                  <Text style={styles.menuItemIcon}>🚪</Text>
                   <Text style={styles.menuItemTextLogout}>Cerrar sesión</Text>
                 </TouchableOpacity>
               </View>
@@ -224,8 +271,10 @@ function NavCliente() {
 
 function Layout() {
   const { usuario } = useAuth();
+
   if (!usuario) return <Slot />;
   if (usuario.tipo === 'CLIENTE') return <NavCliente />;
+
   return <NavAdmin />;
 }
 
@@ -244,28 +293,120 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f0ebe0" },
   topBar: { backgroundColor: "#3a1f0a", padding: 6, alignItems: "center" },
   topBarText: { color: "rgba(240,217,160,0.7)", fontSize: 10 },
-  header: { backgroundColor: "#111", padding: 15, borderBottomWidth: 3, borderBottomColor: "#C9973A" },
-  headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  headerBtns: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  logoText: { color: "#f0d9a0", fontSize: 20, fontWeight: "bold" },
-  btnSalir: { backgroundColor: '#c53030', width: 32, height: 32, borderRadius: 6, justifyContent: 'center', alignItems: 'center' },
-  btnSalirText: { color: 'white', fontSize: 14, fontWeight: 'bold' },
-  carritoBtn: { position: 'relative', padding: 4 },
-  carritoIcon: { fontSize: 24 },
-  carritoBadge: { position: 'absolute', top: 0, right: 0, backgroundColor: '#e53e3e', borderRadius: 10, width: 16, height: 16, alignItems: 'center', justifyContent: 'center' },
-  carritoBadgeText: { color: 'white', fontSize: 9, fontWeight: 'bold' },
-  navContainer: { backgroundColor: "#1a0e05", borderBottomWidth: 2, borderBottomColor: "#C9973A", flexDirection: 'row', alignItems: 'center' },
-  navScroll: { paddingHorizontal: 10 },
-  navItem: { paddingVertical: 12, paddingHorizontal: 15 },
-  navText: { color: "rgba(240,217,160,0.85)", fontWeight: "bold", fontSize: 13 },
-  navHola: { paddingRight: 16 },
-  navHolaText: { color: '#C9973A', fontSize: 12, fontWeight: 'bold' },
-  contentWrapper: { flex: 1 },
-  footerMain: { backgroundColor: "#0d0703", paddingTop: 16, alignItems: "center", borderTopWidth: 3, borderTopColor: "#C9973A" },
-  footerTitle: { color: "#C9973A", fontSize: 11, fontWeight: "bold", textTransform: "uppercase", letterSpacing: 1 },
-  footerText: { color: "rgba(240,217,160,0.45)", fontSize: 11, marginTop: 4 },
-  footerBottom: { backgroundColor: "#050300", width: "100%", padding: 8, marginTop: 12, alignItems: "center" },
-  footerBottomText: { color: "rgba(240,217,160,0.25)", fontSize: 10 },
+
+  header: {
+    backgroundColor: "#111",
+    padding: 15,
+    borderBottomWidth: 3,
+    borderBottomColor: "#C9973A",
+  },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  headerBtns: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  logoText: {
+    color: "#f0d9a0",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+
+  btnSalir: {
+    backgroundColor: '#c53030',
+    width: 32,
+    height: 32,
+    borderRadius: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  btnSalirText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+
+  carritoBtn: {
+    position: 'relative',
+    padding: 4,
+  },
+  carritoIcon: {
+    fontSize: 24,
+  },
+  carritoBadge: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    backgroundColor: '#e53e3e',
+    borderRadius: 10,
+    width: 16,
+    height: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  carritoBadgeText: {
+    color: 'white',
+    fontSize: 9,
+    fontWeight: 'bold',
+  },
+
+  navContainer: {
+    backgroundColor: "#1a0e05",
+    borderBottomWidth: 2,
+    borderBottomColor: "#C9973A",
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  navScroll: {
+    paddingHorizontal: 10,
+  },
+  navItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+  },
+  navText: {
+    color: "rgba(240,217,160,0.85)",
+    fontWeight: "bold",
+    fontSize: 13,
+  },
+  contentWrapper: {
+    flex: 1,
+  },
+
+  footerMain: {
+    backgroundColor: "#0d0703",
+    paddingTop: 16,
+    alignItems: "center",
+    borderTopWidth: 3,
+    borderTopColor: "#C9973A",
+  },
+  footerTitle: {
+    color: "#C9973A",
+    fontSize: 11,
+    fontWeight: "bold",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
+  footerText: {
+    color: "rgba(240,217,160,0.45)",
+    fontSize: 11,
+    marginTop: 4,
+  },
+  footerBottom: {
+    backgroundColor: "#050300",
+    width: "100%",
+    padding: 8,
+    marginTop: 12,
+    alignItems: "center",
+  },
+  footerBottomText: {
+    color: "rgba(240,217,160,0.25)",
+    fontSize: 10,
+  },
 
   userBtn: {
     backgroundColor: 'rgba(201,151,58,0.15)',
@@ -273,19 +414,19 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(201,151,58,0.3)'
+    borderColor: 'rgba(201,151,58,0.3)',
   },
   userBtnText: {
     color: '#C9973A',
     fontSize: 12,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.4)',
     alignItems: 'flex-end',
     paddingTop: 90,
-    paddingRight: 16
+    paddingRight: 16,
   },
   menuDropdown: {
     backgroundColor: 'white',
@@ -294,21 +435,21 @@ const styles = StyleSheet.create({
     elevation: 10,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#e8d8c0'
+    borderColor: '#e8d8c0',
   },
   menuHeader: {
     backgroundColor: '#5C3A1E',
-    padding: 16
+    padding: 16,
   },
   menuHeaderText: {
     color: '#f0d9a0',
     fontSize: 15,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   menuHeaderSub: {
     color: '#d4b896',
     fontSize: 12,
-    marginTop: 2
+    marginTop: 2,
   },
   menuItem: {
     flexDirection: 'row',
@@ -316,26 +457,26 @@ const styles = StyleSheet.create({
     padding: 14,
     gap: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#f5ece0'
+    borderBottomColor: '#f5ece0',
   },
   menuItemIcon: {
-    fontSize: 18
+    fontSize: 18,
   },
   menuItemText: {
     fontSize: 14,
     color: '#3a2a1a',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   menuDivider: {
     height: 1,
-    backgroundColor: '#e8d8c0'
+    backgroundColor: '#e8d8c0',
   },
   menuItemLogout: {
-    borderBottomWidth: 0
+    borderBottomWidth: 0,
   },
   menuItemTextLogout: {
     fontSize: 14,
     color: '#c53030',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
 });

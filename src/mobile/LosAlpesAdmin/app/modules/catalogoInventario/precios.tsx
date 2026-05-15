@@ -3,14 +3,15 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   SafeAreaView,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import {
   getHistorialAnios,
@@ -202,263 +203,208 @@ export default function PreciosScreen() {
   // ─────────────────────────────────────────────────────────────────────────
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        {/* ══ HEADER ══ */}
-        <View style={styles.modHeader}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.modTitle}>Historial de Precios</Text>
-            <Text style={styles.modSubtitle}>
-              Precios de venta por producto, almacén y nicho.
-            </Text>
-          </View>
-          <Text style={styles.modIcon}>💰</Text>
-        </View>
-
-        {/* ══ BARRA COMPACTA: buscador + toggle filtros + botón filtrar ══ */}
-        <View style={styles.topBar}>
-          <View style={styles.searchRow}>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Buscar por producto..."
-              value={searchInput}
-              onChangeText={setSearchInput}
-              returnKeyType="search"
-              onSubmitEditing={handleFiltrar}
-              autoCorrect={false}
-            />
-            {searchInput.trim() !== "" && (
-              <TouchableOpacity
-                style={styles.btnClear}
-                onPress={() => setSearchInput("")}
-              >
-                <Text style={styles.btnTextGold}>✕</Text>
-              </TouchableOpacity>
-            )}
-            <TouchableOpacity
-              style={[
-                styles.btnToggle,
-                filtrosExpandido && styles.btnToggleActive,
-              ]}
-              onPress={() => setFiltrosExpandido((v) => !v)}
-            >
-              <Text style={{ fontSize: 15 }}>⚙️</Text>
-              {hayFiltrosActivos && <View style={styles.toggleDot} />}
-            </TouchableOpacity>
+      <KeyboardAvoidingView
+        style={styles.keyboardContainer}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <View style={styles.container}>
+          {/* ══ HEADER ══ */}
+          <View style={styles.modHeader}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.modTitle}>Historial de Precios</Text>
+              <Text style={styles.modSubtitle}>
+                Precios de venta por producto, almacén y nicho.
+              </Text>
+            </View>
+            <Text style={styles.modIcon}>💰</Text>
           </View>
 
-          <View style={styles.topActions}>
-            <TouchableOpacity
-              style={styles.btnFiltrar}
-              onPress={handleFiltrar}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator size="small" color="#1a0e05" />
-              ) : (
-                <Text style={styles.btnTextDark}>🔍 Filtrar</Text>
+          {/* ══ BARRA COMPACTA: buscador + toggle filtros + botón filtrar ══ */}
+          <View style={styles.topBar}>
+            <View style={styles.searchRow}>
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Buscar por producto..."
+                value={searchInput}
+                onChangeText={setSearchInput}
+                returnKeyType="search"
+                onSubmitEditing={handleFiltrar}
+                autoCorrect={false}
+              />
+              {searchInput.trim() !== "" && (
+                <TouchableOpacity
+                  style={styles.btnClear}
+                  onPress={() => setSearchInput("")}
+                >
+                  <Text style={styles.btnTextGold}>✕</Text>
+                </TouchableOpacity>
               )}
-            </TouchableOpacity>
-            {hayFiltrosActivos && (
               <TouchableOpacity
-                style={styles.btnLimpiar}
-                onPress={handleLimpiar}
+                style={[
+                  styles.btnToggle,
+                  filtrosExpandido && styles.btnToggleActive,
+                ]}
+                onPress={() => setFiltrosExpandido((v) => !v)}
               >
-                <Text style={styles.btnTextGold}>✕ Limpiar</Text>
+                <Text style={{ fontSize: 15 }}>⚙️</Text>
+                {hayFiltrosActivos && <View style={styles.toggleDot} />}
               </TouchableOpacity>
-            )}
-          </View>
-        </View>
-
-        {/* ══ PANEL DE FILTROS COLAPSABLE ══ */}
-        {filtrosExpandido && (
-          <View style={styles.filterBar}>
-            <View style={styles.rowInputs}>
-              <View style={{ flex: 1, marginRight: 6 }}>
-                <Text style={styles.label}>MES</Text>
-                <TouchableOpacity
-                  style={styles.selectorInput}
-                  onPress={() => setModalMesVisible(true)}
-                >
-                  <Text
-                    style={
-                      mesInput
-                        ? styles.selectorText
-                        : styles.selectorPlaceholder
-                    }
-                  >
-                    {mesInput
-                      ? MESES.find((m) => m.id === mesInput)?.nombre
-                      : "Todos"}
-                  </Text>
-                  <Text style={styles.selectorArrow}>▾</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={{ flex: 1, marginLeft: 6 }}>
-                <Text style={styles.label}>AÑO</Text>
-                <TouchableOpacity
-                  style={styles.selectorInput}
-                  onPress={() => setModalAnioVisible(true)}
-                >
-                  <Text
-                    style={
-                      anioInput
-                        ? styles.selectorText
-                        : styles.selectorPlaceholder
-                    }
-                  >
-                    {anioInput?.toString() ?? "Todos"}
-                  </Text>
-                  <Text style={styles.selectorArrow}>▾</Text>
-                </TouchableOpacity>
-              </View>
             </View>
 
-            <TouchableOpacity
-              style={[styles.chkWrap, soloVigentesIn && styles.chkWrapActive]}
-              onPress={() => setSoloVigentesIn((v) => !v)}
-            >
-              <Text
-                style={[styles.chkText, soloVigentesIn && styles.chkTextActive]}
+            <View style={styles.topActions}>
+              <TouchableOpacity
+                style={styles.btnFiltrar}
+                onPress={handleFiltrar}
+                disabled={loading}
               >
-                {soloVigentesIn ? "🟢 Solo vigentes" : "⚪ Mostrar todos"}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {/* Contador */}
-        <Text style={styles.contadorText}>
-          Mostrando{" "}
-          <Text style={styles.contadorBold}>{historialFiltrado.length}</Text>{" "}
-          registro(s)
-          {hayFiltrosActivos && (
-            <Text style={styles.filtroNote}> · filtros activos</Text>
-          )}
-        </Text>
-
-        {/* ══ LISTA — flex:1 para ocupar todo el espacio restante ══ */}
-        <FlatList
-          data={historialFiltrado}
-          keyExtractor={(item) => item.HIP_HISTORIAL_PRECIO.toString()}
-          renderItem={renderItem}
-          keyboardShouldPersistTaps="handled"
-          style={styles.lista}
-          contentContainerStyle={{ paddingBottom: 24 }}
-          ListEmptyComponent={
-            loading ? (
-              <ActivityIndicator
-                size="large"
-                color="#C9973A"
-                style={{ marginTop: 30 }}
-              />
-            ) : (
-              <View style={styles.emptyState}>
-                <Text style={styles.emptyEmoji}>📉</Text>
-                <Text style={styles.emptyTitle}>Sin registros</Text>
-                <Text style={styles.emptyText}>
-                  {hayFiltrosActivos
-                    ? "No hay registros que coincidan con los filtros aplicados."
-                    : "No hay historial de precios registrado."}
-                </Text>
-                {hayFiltrosActivos && (
-                  <TouchableOpacity
-                    style={styles.btnLimpiarEmpty}
-                    onPress={handleLimpiar}
-                  >
-                    <Text style={styles.btnTextGold}>Limpiar filtros</Text>
-                  </TouchableOpacity>
+                {loading ? (
+                  <ActivityIndicator size="small" color="#1a0e05" />
+                ) : (
+                  <Text style={styles.btnTextDark}>🔍 Filtrar</Text>
                 )}
-              </View>
-            )
-          }
-        />
+              </TouchableOpacity>
+              {hayFiltrosActivos && (
+                <TouchableOpacity
+                  style={styles.btnLimpiar}
+                  onPress={handleLimpiar}
+                >
+                  <Text style={styles.btnTextGold}>✕ Limpiar</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
 
-        {/* ══ MODAL SELECTOR MES ══ */}
-        <Modal visible={modalMesVisible} animationType="fade" transparent>
-          <View style={styles.modalOverlay}>
-            <View style={styles.selectorContent}>
-              <Text style={styles.modalTitle}>Seleccionar mes</Text>
-              <FlatList
-                data={MESES}
-                keyExtractor={(item) => item.id.toString()}
-                showsVerticalScrollIndicator={false}
-                ListHeaderComponent={
+          {/* ══ PANEL DE FILTROS COLAPSABLE ══ */}
+          {filtrosExpandido && (
+            <View style={styles.filterBar}>
+              <View style={styles.rowInputs}>
+                <View style={{ flex: 1, marginRight: 6 }}>
+                  <Text style={styles.label}>MES</Text>
                   <TouchableOpacity
-                    style={[
-                      styles.selectorItem,
-                      mesInput === null && styles.selectorItemSel,
-                    ]}
-                    onPress={() => {
-                      setMesInput(null);
-                      setModalMesVisible(false);
-                    }}
-                  >
-                    <Text style={styles.selectorItemText}>
-                      — Todos los meses —
-                    </Text>
-                  </TouchableOpacity>
-                }
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={[
-                      styles.selectorItem,
-                      mesInput === item.id && styles.selectorItemSel,
-                    ]}
-                    onPress={() => {
-                      setMesInput(item.id);
-                      setModalMesVisible(false);
-                    }}
+                    style={styles.selectorInput}
+                    onPress={() => setModalMesVisible(true)}
                   >
                     <Text
-                      style={[
-                        styles.selectorItemText,
-                        mesInput === item.id && styles.selectorItemTextSel,
-                      ]}
+                      style={
+                        mesInput
+                          ? styles.selectorText
+                          : styles.selectorPlaceholder
+                      }
                     >
-                      {item.nombre}
+                      {mesInput
+                        ? MESES.find((m) => m.id === mesInput)?.nombre
+                        : "Todos"}
                     </Text>
+                    <Text style={styles.selectorArrow}>▾</Text>
                   </TouchableOpacity>
-                )}
-              />
+                </View>
+                <View style={{ flex: 1, marginLeft: 6 }}>
+                  <Text style={styles.label}>AÑO</Text>
+                  <TouchableOpacity
+                    style={styles.selectorInput}
+                    onPress={() => setModalAnioVisible(true)}
+                  >
+                    <Text
+                      style={
+                        anioInput
+                          ? styles.selectorText
+                          : styles.selectorPlaceholder
+                      }
+                    >
+                      {anioInput?.toString() ?? "Todos"}
+                    </Text>
+                    <Text style={styles.selectorArrow}>▾</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
               <TouchableOpacity
-                style={styles.btnCancelSelector}
-                onPress={() => setModalMesVisible(false)}
+                style={[styles.chkWrap, soloVigentesIn && styles.chkWrapActive]}
+                onPress={() => setSoloVigentesIn((v) => !v)}
               >
-                <Text style={styles.btnTextRed}>Cancelar</Text>
+                <Text
+                  style={[
+                    styles.chkText,
+                    soloVigentesIn && styles.chkTextActive,
+                  ]}
+                >
+                  {soloVigentesIn ? "🟢 Solo vigentes" : "⚪ Mostrar todos"}
+                </Text>
               </TouchableOpacity>
             </View>
-          </View>
-        </Modal>
+          )}
 
-        {/* ══ MODAL SELECTOR AÑO — años vienen del backend (OBTENER_ANIOS) ══ */}
-        <Modal visible={modalAnioVisible} animationType="fade" transparent>
-          <View style={styles.modalOverlay}>
-            <View style={styles.selectorContent}>
-              <Text style={styles.modalTitle}>Seleccionar año</Text>
-              {aniosDisponibles.length === 0 ? (
+          {/* Contador */}
+          <Text style={styles.contadorText}>
+            Mostrando{" "}
+            <Text style={styles.contadorBold}>{historialFiltrado.length}</Text>{" "}
+            registro(s)
+            {hayFiltrosActivos && (
+              <Text style={styles.filtroNote}> · filtros activos</Text>
+            )}
+          </Text>
+
+          {/* ══ LISTA — flex:1 para ocupar todo el espacio restante ══ */}
+          <FlatList
+            data={historialFiltrado}
+            keyExtractor={(item) => item.HIP_HISTORIAL_PRECIO.toString()}
+            renderItem={renderItem}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="none"
+            style={styles.lista}
+            contentContainerStyle={{ paddingBottom: 24 }}
+            ListEmptyComponent={
+              loading ? (
                 <ActivityIndicator
-                  size="small"
+                  size="large"
                   color="#C9973A"
-                  style={{ marginVertical: 20 }}
+                  style={{ marginTop: 30 }}
                 />
               ) : (
+                <View style={styles.emptyState}>
+                  <Text style={styles.emptyEmoji}>📉</Text>
+                  <Text style={styles.emptyTitle}>Sin registros</Text>
+                  <Text style={styles.emptyText}>
+                    {hayFiltrosActivos
+                      ? "No hay registros que coincidan con los filtros aplicados."
+                      : "No hay historial de precios registrado."}
+                  </Text>
+                  {hayFiltrosActivos && (
+                    <TouchableOpacity
+                      style={styles.btnLimpiarEmpty}
+                      onPress={handleLimpiar}
+                    >
+                      <Text style={styles.btnTextGold}>Limpiar filtros</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )
+            }
+          />
+
+          {/* ══ MODAL SELECTOR MES ══ */}
+          <Modal visible={modalMesVisible} animationType="fade" transparent>
+            <View style={styles.modalOverlay}>
+              <View style={styles.selectorContent}>
+                <Text style={styles.modalTitle}>Seleccionar mes</Text>
                 <FlatList
-                  data={aniosDisponibles}
-                  keyExtractor={(item) => item.toString()}
+                  data={MESES}
+                  keyExtractor={(item) => item.id.toString()}
                   showsVerticalScrollIndicator={false}
+                  keyboardShouldPersistTaps="handled"
                   ListHeaderComponent={
                     <TouchableOpacity
                       style={[
                         styles.selectorItem,
-                        anioInput === null && styles.selectorItemSel,
+                        mesInput === null && styles.selectorItemSel,
                       ]}
                       onPress={() => {
-                        setAnioInput(null);
-                        setModalAnioVisible(false);
+                        setMesInput(null);
+                        setModalMesVisible(false);
                       }}
                     >
                       <Text style={styles.selectorItemText}>
-                        — Todos los años —
+                        — Todos los meses —
                       </Text>
                     </TouchableOpacity>
                   }
@@ -466,35 +412,101 @@ export default function PreciosScreen() {
                     <TouchableOpacity
                       style={[
                         styles.selectorItem,
-                        anioInput === item && styles.selectorItemSel,
+                        mesInput === item.id && styles.selectorItemSel,
                       ]}
                       onPress={() => {
-                        setAnioInput(item);
-                        setModalAnioVisible(false);
+                        setMesInput(item.id);
+                        setModalMesVisible(false);
                       }}
                     >
                       <Text
                         style={[
                           styles.selectorItemText,
-                          anioInput === item && styles.selectorItemTextSel,
+                          mesInput === item.id && styles.selectorItemTextSel,
                         ]}
                       >
-                        {item}
+                        {item.nombre}
                       </Text>
                     </TouchableOpacity>
                   )}
                 />
-              )}
-              <TouchableOpacity
-                style={styles.btnCancelSelector}
-                onPress={() => setModalAnioVisible(false)}
-              >
-                <Text style={styles.btnTextRed}>Cancelar</Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.btnCancelSelector}
+                  onPress={() => setModalMesVisible(false)}
+                >
+                  <Text style={styles.btnTextRed}>Cancelar</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        </Modal>
-      </View>
+          </Modal>
+
+          {/* ══ MODAL SELECTOR AÑO — años vienen del backend (OBTENER_ANIOS) ══ */}
+          <Modal visible={modalAnioVisible} animationType="fade" transparent>
+            <View style={styles.modalOverlay}>
+              <View style={styles.selectorContent}>
+                <Text style={styles.modalTitle}>Seleccionar año</Text>
+                {aniosDisponibles.length === 0 ? (
+                  <ActivityIndicator
+                    size="small"
+                    color="#C9973A"
+                    style={{ marginVertical: 20 }}
+                  />
+                ) : (
+                  <FlatList
+                    data={aniosDisponibles}
+                    keyExtractor={(item) => item.toString()}
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
+                    ListHeaderComponent={
+                      <TouchableOpacity
+                        style={[
+                          styles.selectorItem,
+                          anioInput === null && styles.selectorItemSel,
+                        ]}
+                        onPress={() => {
+                          setAnioInput(null);
+                          setModalAnioVisible(false);
+                        }}
+                      >
+                        <Text style={styles.selectorItemText}>
+                          — Todos los años —
+                        </Text>
+                      </TouchableOpacity>
+                    }
+                    renderItem={({ item }) => (
+                      <TouchableOpacity
+                        style={[
+                          styles.selectorItem,
+                          anioInput === item && styles.selectorItemSel,
+                        ]}
+                        onPress={() => {
+                          setAnioInput(item);
+                          setModalAnioVisible(false);
+                        }}
+                      >
+                        <Text
+                          style={[
+                            styles.selectorItemText,
+                            anioInput === item && styles.selectorItemTextSel,
+                          ]}
+                        >
+                          {item}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+                  />
+                )}
+                <TouchableOpacity
+                  style={styles.btnCancelSelector}
+                  onPress={() => setModalAnioVisible(false)}
+                >
+                  <Text style={styles.btnTextRed}>Cancelar</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+        </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -502,6 +514,7 @@ export default function PreciosScreen() {
 // ─────────────────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#fdf8f3" },
+  keyboardContainer: { flex: 1 },
   container: { flex: 1, padding: 16 },
 
   // header oscuro

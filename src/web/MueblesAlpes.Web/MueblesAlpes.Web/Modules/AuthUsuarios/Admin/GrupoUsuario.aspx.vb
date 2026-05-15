@@ -73,7 +73,6 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios.Admin
                     Dim nuevoId As Integer = PermisoService.Crear(admin, rh, fac, cli, bod, promo)
                     lblMensaje.Text = "✅ Permiso creado con ID: " & nuevoId &
                                       " — Ahora asígnalo a un Grupo abajo ↓"
-                    ' Auto-seleccionar el permiso recién creado en el DDL de grupos
                     hfPermisoSeleccionado.Value = nuevoId.ToString()
                     hfPermisoFormOpen.Value = "false"
                     hfPermisoEditing.Value = "false"
@@ -84,7 +83,6 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios.Admin
                 LimpiarFormularioPermiso()
                 CargarTablaPermisos()
                 CargarPermisos()
-                ' Re-seleccionar si se acaba de crear
                 If hfPermisoSeleccionado.Value <> "" Then
                     Dim selVal As String = hfPermisoSeleccionado.Value
                     Dim item = ddlPermisos.Items.FindByValue(selVal)
@@ -129,7 +127,8 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios.Admin
                     Next
                     hfPermisoFormOpen.Value = "true"
                     hfPermisoEditing.Value = "true"
-                    lblMensaje.Visible = False
+                    lblMensaje.Text = "✏️ Editando Permiso ID: " & id & " — modifica los toggles y guarda."
+                    lblMensaje.Visible = True
                     lblError.Visible = False
                 Catch ex As Exception
                     lblError.Text = "Error al cargar: " & ex.Message
@@ -137,7 +136,6 @@ Namespace MueblesAlpes.Web.Modules.AuthUsuarios.Admin
                 End Try
 
             ElseIf e.CommandName = "UsarPermiso" Then
-                ' Seleccionar permiso y abrir formulario de grupo
                 hfPermisoSeleccionado.Value = id.ToString()
                 hfGrupoFormOpen.Value = "true"
                 CargarPermisos()

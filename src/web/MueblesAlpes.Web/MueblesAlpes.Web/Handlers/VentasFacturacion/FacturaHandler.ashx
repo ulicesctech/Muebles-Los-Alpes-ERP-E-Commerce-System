@@ -32,7 +32,11 @@ Public Class FacturaHandler
                     Case "crear"
                         Dim carrito As Decimal = Convert.ToDecimal(context.Request("carrito"))
                         Dim empleado As Decimal = Convert.ToDecimal(context.Request("empleado"))
-                        Dim codigo As String = FacturaService.Crear(carrito, empleado)
+                        Dim formaPago As String = If(String.IsNullOrEmpty(context.Request("formaPago")), "EFECTIVO", context.Request("formaPago"))
+                        Dim tipoEntrega As String = If(String.IsNullOrEmpty(context.Request("tipoEntrega")), "DOMICILIO", context.Request("tipoEntrega"))
+                        Dim almacenRaw As String = context.Request("almacen")
+                        Dim almacen As Object = If(String.IsNullOrEmpty(almacenRaw), Nothing, CType(Convert.ToDecimal(almacenRaw), Object))
+                        Dim codigo As String = FacturaService.Crear(carrito, empleado, formaPago, tipoEntrega, almacen)
                         context.Response.Write("{""codigo"":""" & codigo.Replace("""", "\""") & """}")
 
                     Case Else

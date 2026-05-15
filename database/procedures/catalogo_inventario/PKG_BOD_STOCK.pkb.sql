@@ -18,8 +18,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_STOCK AS
     IF p_minimo < 0 OR p_maximo < 0 OR p_disponible < 0 THEN
       RAISE_APPLICATION_ERROR(-20003, 'BOD_STOCK: valores no pueden ser negativos.');
     END IF;
-    IF p_minimo > p_maximo THEN
-      RAISE_APPLICATION_ERROR(-20004, 'BOD_STOCK: minimo no puede ser mayor a maximo.');
+    IF p_minimo < 1 THEN
+      RAISE_APPLICATION_ERROR(-20017, 'BOD_STOCK: el minimo debe ser al menos 1.');
+    END IF;
+    IF p_maximo < p_minimo THEN
+      RAISE_APPLICATION_ERROR(-20004, 'BOD_STOCK: el maximo debe ser igual o mayor al minimo.');
+    END IF;
+    IF p_minimo > p_disponible THEN
+      RAISE_APPLICATION_ERROR(-20018, 'BOD_STOCK: el minimo (' || p_minimo || ') no puede ser mayor al disponible actual (' || p_disponible || ').');
     END IF;
 
     SELECT COUNT(1) INTO v_exists

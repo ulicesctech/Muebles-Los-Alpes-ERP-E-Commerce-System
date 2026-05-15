@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  ActivityIndicator,
+  Alert,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import { useAuth } from '../../../context/AuthContext';
+import { listarGrupos } from '../../../services/authUsuarios/admin/grupoUsuario';
 import { actualizarEmpleado, crearEmpleado, eliminarEmpleado, listarEmpleados } from '../../../services/authUsuarios/empleados';
 
 const CAFE = '#5C3A1E';
@@ -19,10 +20,12 @@ const GOLD = '#C9973A';
 export default function EmpleadosScreen() {
   const { usuario } = useAuth();
   const [empleados, setEmpleados] = useState<any[]>([]);
+  const [grupos, setGrupos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [editando, setEditando] = useState<any>(null);
   const [busqueda, setBusqueda] = useState('');
+  const [dropdownVisible, setDropdownVisible] = useState(false);
 
   const [dpi, setDpi] = useState('');
   const [primerNombre, setPrimerNombre] = useState('');
@@ -34,7 +37,8 @@ export default function EmpleadosScreen() {
   const [cp, setCp] = useState('');
   const [tel1, setTel1] = useState('');
   const [tel2, setTel2] = useState('');
-  const [rol, setRol] = useState('');
+  const [rolId, setRolId] = useState('');
+  const [rolNombre, setRolNombre] = useState('');
   const [password, setPassword] = useState('');
 
   useEffect(() => { cargar(); }, []);
@@ -42,10 +46,11 @@ export default function EmpleadosScreen() {
   const cargar = async () => {
     setLoading(true);
     try {
-      const res = await listarEmpleados();
-      if (res.ok) setEmpleados(res.data);
+      const [resE, resG] = await Promise.all([listarEmpleados(), listarGrupos()]);
+      if (resE.ok) setEmpleados(resE.data);
+      if (resG.ok) setGrupos(resG.data);
     } catch {
-      Alert.alert('Error', 'No se pudo cargar empleados.');
+      Alert.alert('Error', 'No se pudo cargar.');
     } finally {
       setLoading(false);
     }
@@ -64,20 +69,31 @@ export default function EmpleadosScreen() {
       setCp(emp.em_codigo_postal);
       setTel1(emp.em_primer_telefono);
       setTel2(emp.em_segundo_telefono || '');
-      setRol(String(emp.rolus_rol_usuario));
+      setRolId(String(emp.rolus_rol_usuario));
+      // Buscar nombre del grupo actual
+      const grupoActual = grupos.find(g => g.grupus_grupo_usuario === emp.rolus_rol_usuario);
+      setRolNombre(grupoActual ? grupoActual.grupus_descripcion : `Grupo #${emp.rolus_rol_usuario}`);
       setPassword('');
     } else {
       setEditando(null);
       setDpi(''); setPrimerNombre(''); setSegundoNombre('');
       setPrimerApellido(''); setSegundoApellido('');
       setDireccion(''); setAvenida(''); setCp('');
-      setTel1(''); setTel2(''); setRol(''); setPassword('');
+      setTel1(''); setTel2(''); setRolId(''); setRolNombre('');
+      setPassword('');
     }
+    setDropdownVisible(false);
     setModalVisible(true);
   };
 
+  const seleccionarGrupo = (g: any) => {
+    setRolId(String(g.grupus_grupo_usuario));
+    setRolNombre(g.grupus_descripcion);
+    setDropdownVisible(false);
+  };
+
   const guardar = async () => {
-    if (!dpi || !primerNombre || !primerApellido || !tel1 || !rol) {
+    if (!dpi || !primerNombre || !primerApellido || !tel1 || !rolId) {
       Alert.alert('Error', 'Completa los campos obligatorios.');
       return;
     }
@@ -88,7 +104,7 @@ export default function EmpleadosScreen() {
           dpi, primer_nombre: primerNombre, segundo_nombre: segundoNombre || ' ',
           primer_apellido: primerApellido, segundo_apellido: segundoApellido || ' ',
           direccion, avenida, codigo_postal: cp,
-          primer_telefono: tel1, segundo_telefono: tel2 || ' ', rol: parseInt(rol)
+          primer_telefono: tel1, segundo_telefono: tel2 || ' ', rol: parseInt(rolId)
         });
         Alert.alert('✅', 'Empleado actualizado.');
       } else {
@@ -98,7 +114,7 @@ export default function EmpleadosScreen() {
           primer_apellido: primerApellido, segundo_apellido: segundoApellido || ' ',
           direccion, avenida, codigo_postal: cp,
           primer_telefono: tel1, segundo_telefono: tel2 || ' ',
-          rol: parseInt(rol), password
+          rol: parseInt(rolId), password
         });
         Alert.alert('✅', 'Empleado creado.');
       }
@@ -153,13 +169,13 @@ export default function EmpleadosScreen() {
             <View key={i} style={styles.card}>
               <Text style={styles.cardNombre}>{e.em_primer_nombre} {e.em_primer_apellido}</Text>
               <Text style={styles.cardDpi}>DPI: {e.em_DPI}</Text>
-              <Text style={styles.cardRol}>Rol: {e.rol_nombre}</Text>
+              <Text style={styles.cardRol}>Grupo: {e.rol_nombre}</Text>
               <View style={styles.actions}>
                 <TouchableOpacity style={styles.btnEdit} onPress={() => abrirModal(e)}>
-                  <Text style={styles.btnEditText}>✏️ Editar</Text>
+                  <Text style={styles.btnEditText}>Editar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.btnDel} onPress={() => eliminar(e)}>
-                  <Text style={styles.btnDelText}>🗑️ Eliminar</Text>
+                  <Text style={styles.btnDelText}>Eliminar</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -174,7 +190,12 @@ export default function EmpleadosScreen() {
               <Text style={styles.modalTitle}>{editando ? 'Editar Empleado' : 'Nuevo Empleado'}</Text>
 
               <Text style={styles.label}>DPI *</Text>
-              <TextInput style={styles.input} value={dpi} onChangeText={setDpi} placeholder="13 dígitos..." keyboardType="numeric" editable={!editando} />
+              <TextInput
+                style={[styles.input, editando && styles.inputDisabled]}
+                value={dpi} onChangeText={setDpi}
+                placeholder="13 dígitos..." keyboardType="numeric"
+                editable={!editando} maxLength={13}
+              />
 
               <Text style={styles.label}>Primer Nombre *</Text>
               <TextInput style={styles.input} value={primerNombre} onChangeText={setPrimerNombre} placeholder="Nombre..." />
@@ -192,24 +213,57 @@ export default function EmpleadosScreen() {
               <TextInput style={styles.input} value={direccion} onChangeText={setDireccion} placeholder="Dirección..." />
 
               <Text style={styles.label}>Avenida</Text>
-              <TextInput style={styles.input} value={avenida} onChangeText={setAvenida} placeholder="Avenida..." />
+              <TextInput style={styles.input} value={avenida} onChangeText={setAvenida} placeholder="Avenida.." />
 
               <Text style={styles.label}>Código Postal</Text>
-              <TextInput style={styles.input} value={cp} onChangeText={setCp} placeholder="01001..." keyboardType="numeric" />
+              <TextInput style={styles.input} value={cp} onChangeText={setCp} placeholder="00000" keyboardType="numeric" />
 
               <Text style={styles.label}>Teléfono Principal *</Text>
-              <TextInput style={styles.input} value={tel1} onChangeText={setTel1} placeholder="55551234..." keyboardType="numeric" />
+              <TextInput style={styles.input} value={tel1} onChangeText={setTel1} placeholder="00000000" keyboardType="numeric" maxLength={8} />
 
               <Text style={styles.label}>Teléfono Secundario</Text>
-              <TextInput style={styles.input} value={tel2} onChangeText={setTel2} placeholder="Opcional..." keyboardType="numeric" />
+              <TextInput style={styles.input} value={tel2} onChangeText={setTel2} placeholder="Opcional..." keyboardType="numeric" maxLength={8} />
 
-              <Text style={styles.label}>Rol (ID Grupo) *</Text>
-              <TextInput style={styles.input} value={rol} onChangeText={setRol} placeholder="1=SuperUsuario, 2=Admin..." keyboardType="numeric" />
+              {/* SELECTOR DE GRUPO */}
+              <Text style={styles.label}>Grupo / Rol *</Text>
+              <TouchableOpacity
+                style={[styles.input, styles.selector]}
+                onPress={() => setDropdownVisible(!dropdownVisible)}>
+                <Text style={rolId ? styles.selectorText : styles.selectorPlaceholder}>
+                  {rolNombre || 'Seleccionar grupo...'}
+                </Text>
+                <Text style={styles.selectorArrow}>{dropdownVisible ? '▲' : '▼'}</Text>
+              </TouchableOpacity>
+
+              {dropdownVisible && (
+                <View style={styles.dropdown}>
+                  {grupos.map((g, i) => (
+                    <TouchableOpacity
+                      key={i}
+                      style={[
+                        styles.dropdownItem,
+                        rolId === String(g.grupus_grupo_usuario) && styles.dropdownItemSelected
+                      ]}
+                      onPress={() => seleccionarGrupo(g)}>
+                      <Text style={[
+                        styles.dropdownText,
+                        rolId === String(g.grupus_grupo_usuario) && styles.dropdownTextSelected
+                      ]}>
+                        {g.grupus_descripcion}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
 
               {!editando && (
                 <>
                   <Text style={styles.label}>Contraseña *</Text>
-                  <TextInput style={styles.input} value={password} onChangeText={setPassword} placeholder="Mín. 8 caracteres..." secureTextEntry />
+                  <TextInput
+                    style={styles.input} value={password}
+                    onChangeText={setPassword} placeholder="********"
+                    secureTextEntry
+                  />
                 </>
               )}
 
@@ -218,7 +272,7 @@ export default function EmpleadosScreen() {
                   <Text style={styles.btnCancelText}>Cancelar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.btnSave} onPress={guardar}>
-                  <Text style={styles.btnSaveText}>Guardar</Text>
+                  <Text style={styles.btnSaveText}>💾 Guardar</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -251,6 +305,16 @@ const styles = StyleSheet.create({
   modalTitle: { fontSize: 18, fontWeight: 'bold', color: CAFE, marginBottom: 16, textAlign: 'center' },
   label: { fontSize: 12, fontWeight: 'bold', color: CAFE, marginBottom: 6 },
   input: { borderWidth: 1.5, borderColor: '#e8d8c0', borderRadius: 10, padding: 12, fontSize: 13, marginBottom: 16, backgroundColor: '#fafafa' },
+  inputDisabled: { backgroundColor: '#f0f0f0', color: '#aaa' },
+  selector: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  selectorText: { fontSize: 13, color: '#333' },
+  selectorPlaceholder: { fontSize: 13, color: '#aaa' },
+  selectorArrow: { fontSize: 12, color: '#888' },
+  dropdown: { backgroundColor: 'white', borderWidth: 1.5, borderColor: '#e8d8c0', borderRadius: 10, marginBottom: 16, overflow: 'hidden' },
+  dropdownItem: { padding: 12, borderBottomWidth: 1, borderBottomColor: '#f5ece0' },
+  dropdownItemSelected: { backgroundColor: GOLD },
+  dropdownText: { fontSize: 13, color: '#374151' },
+  dropdownTextSelected: { color: '#1a1a1a', fontWeight: 'bold' },
   modalActions: { flexDirection: 'row', gap: 12, marginTop: 8 },
   btnCancel: { flex: 1, backgroundColor: '#f3f4f6', padding: 12, borderRadius: 8, alignItems: 'center' },
   btnCancelText: { color: '#374151', fontWeight: 'bold' },
