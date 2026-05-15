@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchAPI } from "../apiClient";
 
-const BASE_URL = "http://10.0.2.2:61850";
+const BASE_URL = "http://10.91.87.87:61850";
 const SESSION_KEY = "ASP_NET_SESSION_COOKIE";
 const HANDLER_PATH = "Handlers/CatalogoInventario/ProductosHandler.ashx";
 

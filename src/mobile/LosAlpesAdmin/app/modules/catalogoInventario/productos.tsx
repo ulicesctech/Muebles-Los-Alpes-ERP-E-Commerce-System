@@ -95,26 +95,16 @@ export default function ProductosScreen() {
   const cargarDatosIniciales = async () => {
     setLoading(true);
     try {
-      // Usamos .catch(() => []) en cada uno.
-      // Si uno falla, devuelve un arreglo vacío solo para ese, pero no rompe a los demás.
-      const dataProd = await getProductos().catch((e) => {
-        console.log("Error Productos", e);
-        return [];
-      });
-      const dataCat = await getCategorias().catch((e) => {
-        console.log("Error Categorías", e);
-        return [];
-      });
-      const dataMat = await getMateriales().catch((e) => {
-        console.log("Error Materiales", e);
-        return [];
-      });
-
+      const [dataProd, dataCat, dataMat] = await Promise.all([
+        getProductos(),
+        getCategorias(),
+        getMateriales(),
+      ]);
       setProductos(dataProd);
       setCategorias(dataCat);
       setMateriales(dataMat);
     } catch (error) {
-      Alert.alert("Error", "Error general al cargar la pantalla");
+      Alert.alert("Error", "No se pudieron cargar los datos iniciales");
     } finally {
       setLoading(false);
     }
@@ -566,26 +556,11 @@ export default function ProductosScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <View style={styles.searchContainer}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Buscar producto..."
-            value={search}
-            onChangeText={setSearch}
-          />
-          <TouchableOpacity style={styles.btnSearch} onPress={handleBuscar}>
-            <Text style={styles.btnTextWhite}>Buscar</Text>
-          </TouchableOpacity>
-        </View>
-        <TouchableOpacity style={styles.btnAdd} onPress={() => abrirModal()}>
-          <Text style={styles.btnTextWhite}>🛋️ + Nuevo Producto</Text>
-        </TouchableOpacity>
-      </View>
       <FlatList
         data={productos}
         keyExtractor={(item) => item.PRO_REFERENCIA}
         renderItem={renderItem}
+        ListHeaderComponent={renderHeader}
         contentContainerStyle={{ paddingBottom: 20 }}
         ListEmptyComponent={
           loading ? (
@@ -668,7 +643,6 @@ export default function ProductosScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fdf8f3", padding: 16 },
-  headerContainer: { marginBottom: 10 },
   searchContainer: { flexDirection: "row", marginBottom: 10, gap: 8 },
   searchInput: {
     flex: 1,
