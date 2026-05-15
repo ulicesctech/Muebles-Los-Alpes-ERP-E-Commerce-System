@@ -3,10 +3,7 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
-  KeyboardAvoidingView,
   Modal,
-  Platform,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -127,27 +124,6 @@ export default function MaterialesScreen() {
     setDescripcion("");
   };
 
-  // --- ENCABEZADO DE LA LISTA ---
-  const renderHeader = () => (
-    <View>
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Buscar material..."
-          value={search}
-          onChangeText={setSearch}
-        />
-        <TouchableOpacity style={styles.btnSearch} onPress={handleBuscar}>
-          <Text style={styles.btnTextWhite}>Buscar</Text>
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity style={styles.btnAdd} onPress={() => abrirModal()}>
-        <Text style={styles.btnTextWhite}>🧱 + Nuevo Material</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
   const renderItem = ({ item }: { item: Material }) => (
     <View style={styles.card}>
       <View style={styles.cardInfo}>
@@ -173,11 +149,28 @@ export default function MaterialesScreen() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.headerContainer}>
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Buscar material..."
+            value={search}
+            onChangeText={setSearch}
+          />
+          <TouchableOpacity style={styles.btnSearch} onPress={handleBuscar}>
+            <Text style={styles.btnTextWhite}>Buscar</Text>
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity style={styles.btnAdd} onPress={() => abrirModal()}>
+          <Text style={styles.btnTextWhite}>🧱 + Nuevo Material</Text>
+        </TouchableOpacity>
+      </View>
+
       <FlatList
         data={materiales}
         keyExtractor={(item) => item.MAT_MATERIAL.toString()}
         renderItem={renderItem}
-        ListHeaderComponent={renderHeader}
         contentContainerStyle={{ paddingBottom: 20 }}
         ListEmptyComponent={
           loading ? (
@@ -246,6 +239,7 @@ export default function MaterialesScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fdf8f3", padding: 16 },
+  headerContainer: { marginBottom: 10 },
   searchContainer: { flexDirection: "row", marginBottom: 10, gap: 8 },
   searchInput: {
     flex: 1,

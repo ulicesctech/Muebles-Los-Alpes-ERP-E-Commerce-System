@@ -1,6 +1,6 @@
 // app/services/apiClient.ts
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const BASE_URL = "http:///10.91.87.87:61850";
 const SESSION_KEY = "ASP_NET_SESSION_COOKIE";
@@ -26,17 +26,17 @@ export const limpiarSesionAPI = async () => {
 
 const obtenerMensajeError = (status: number, jsonResult: any) => {
   const mensajeBackend =
-    jsonResult?.mensaje ||
-    jsonResult?.message ||
-    jsonResult?.error ||
-    "";
+    jsonResult?.mensaje || jsonResult?.message || jsonResult?.error || "";
 
   if (status === 400) {
     return mensajeBackend || "La solicitud enviada no es valida.";
   }
 
   if (status === 401) {
-    return mensajeBackend || "Credenciales invalidas. Verifica tu usuario y contrasena.";
+    return (
+      mensajeBackend ||
+      "Credenciales invalidas. Verifica tu usuario y contrasena."
+    );
   }
 
   if (status === 403) {
@@ -56,7 +56,9 @@ const obtenerMensajeError = (status: number, jsonResult: any) => {
   }
 
   if (status >= 500) {
-    return mensajeBackend || "Ocurrio un error en el servidor. Intenta nuevamente.";
+    return (
+      mensajeBackend || "Ocurrio un error en el servidor. Intenta nuevamente."
+    );
   }
 
   return mensajeBackend || "No se pudo procesar la solicitud.";
@@ -116,11 +118,15 @@ export const fetchAPI = async (
     }
 
     if (jsonResult?.status === "error") {
-      throw new Error(jsonResult.message || "No se pudo procesar la solicitud.");
+      throw new Error(
+        jsonResult.message || "No se pudo procesar la solicitud.",
+      );
     }
 
     if (jsonResult?.ok === false) {
-      throw new Error(jsonResult.mensaje || "No se pudo procesar la solicitud.");
+      throw new Error(
+        jsonResult.mensaje || "No se pudo procesar la solicitud.",
+      );
     }
 
     return jsonResult;
@@ -134,7 +140,9 @@ export const fetchAPI = async (
       mensaje.includes("Failed to fetch") ||
       mensaje.includes("NetworkError")
     ) {
-      throw new Error("No se pudo conectar con el servidor. Verifica que IIS este encendido.");
+      throw new Error(
+        "No se pudo conectar con el servidor. Verifica que IIS este encendido.",
+      );
     }
 
     throw new Error(mensaje || "No se pudo procesar la solicitud.");
