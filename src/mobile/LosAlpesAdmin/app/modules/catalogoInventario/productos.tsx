@@ -22,6 +22,7 @@ import {
   buscarProductos,
   crearProducto,
   eliminarProducto,
+  getFotoUrl,
   getProductos,
   Producto,
 } from "../../../services/catalogoInventario/productos";
@@ -237,7 +238,8 @@ export default function ProductosScreen() {
       setAlto(prod.PRO_ALTO_CM?.toString() || "");
       setAncho(prod.PRO_ANCHO_CM?.toString() || "");
       setProfundidad(prod.PRO_PROFUNDIDAD_CM?.toString() || "");
-      setTipoId(prod.TIP_TIPO || null);
+      setCategoriaId(prod.CAT_CATEGORIA || null); // primero la categoría
+      setTipoId(prod.TIP_TIPO || null); // luego el tipo
       setFotoUri(null);
     } else {
       setIsEditing(false);
@@ -529,12 +531,21 @@ export default function ProductosScreen() {
       <Text style={styles.label}>Foto del producto</Text>
       <TouchableOpacity style={styles.fotoBtn} onPress={seleccionarFoto}>
         {fotoUri ? (
+          // Nueva foto seleccionada desde galería
           <Image
             source={{ uri: fotoUri }}
             style={styles.fotoPreview}
             resizeMode="cover"
           />
+        ) : isEditing ? (
+          // Edición sin nueva foto: muestra la foto guardada en el servidor
+          <Image
+            source={{ uri: getFotoUrl(referencia) }}
+            style={styles.fotoPreview}
+            resizeMode="cover"
+          />
         ) : (
+          // Nuevo producto sin foto
           <View style={styles.fotoPlaceholder}>
             <Text style={styles.fotoPlaceholderIcon}>📷</Text>
             <Text style={styles.fotoPlaceholderText}>Seleccionar foto</Text>

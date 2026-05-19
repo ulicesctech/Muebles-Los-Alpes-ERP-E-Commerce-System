@@ -287,8 +287,9 @@
                     <span>Q <asp:Label ID="lblTotal" runat="server" Text="0.00" /></span>
                 </div>
             </div>
-            <asp:Button ID="btnConfirmar" runat="server" Text="✓ Confirmar Pedido"
-                CssClass="btn-confirmar tiempoInhabilitado" OnClick="btnConfirmar_Click" />
+            <asp:Button 
+    ID="btnConfirmar"  runat="server" Text="✓ Confirmar Pedido" BackColor="#4FC3F7" ForeColor="White" BorderStyle="None"/>
+                CssClass="btn-confirmar tiempoInhabilitado" OnClick="btnConfirmar_Click"  />
             <a href="/Modules/Cliente/Carrito.aspx" class="btn-volver">← Volver al carrito</a>
         </div>
     </div>

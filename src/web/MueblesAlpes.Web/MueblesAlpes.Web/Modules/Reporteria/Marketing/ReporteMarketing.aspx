@@ -7,7 +7,7 @@
 
     <div class="panel-reporte" style="min-height: 800px; width: 100%; background: #fff; border: 1px solid #dcc29a; border-radius: 14px;">
         <iframe id="iframeMarketing"
-                src="https://laptopt-guuqb70o/Reports/powerbi/Marketing?rs:Embed=true&rs:navContentPaneEnabled=false"
+                src="https://192.168.0.99/reports/powerbi/marketing?rs:Embed=true"
                 style="width: 100%; height: 800px; border: none;" 
                 allowFullScreen="true">
         </iframe>

@@ -32,6 +32,15 @@ Partial Public Class SiteMaster
     Protected WithEvents lnkLogo As Global.System.Web.UI.WebControls.HyperLink
 
     '''<summary>
+    '''Control upCarrito.
+    '''</summary>
+    '''<remarks>
+    '''Campo generado automáticamente.
+    '''Para modificarlo, mueva la declaración del campo del archivo del diseñador al archivo de código subyacente.
+    '''</remarks>
+    Protected WithEvents upCarrito As Global.System.Web.UI.UpdatePanel
+
+    '''<summary>
     '''Control pnlCarritoHeader.
     '''</summary>
     '''<remarks>

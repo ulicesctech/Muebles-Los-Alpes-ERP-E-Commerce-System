@@ -57,7 +57,6 @@ CREATE OR REPLACE PACKAGE BODY PKG_CLI_CATALOGO AS
                    WHERE hv_fecha_final IS NULL
                    GROUP BY pro_referencia
               ) h ON h.pro_referencia = p.pro_referencia
-             WHERE p.pro_precio > 0
              ORDER BY p.pro_nombre;
     END LISTAR;
 
@@ -109,8 +108,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_CLI_CATALOGO AS
                    WHERE hv_fecha_final IS NULL
                    GROUP BY pro_referencia
               ) h ON h.pro_referencia = p.pro_referencia
-             WHERE p.pro_precio > 0
-               AND c.cat_categoria = p_categoria
+             WHERE c.cat_categoria = p_categoria
              ORDER BY p.pro_nombre;
     END LISTAR_POR_CATEGORIA;
 
@@ -164,8 +162,7 @@ CREATE OR REPLACE PACKAGE BODY PKG_CLI_CATALOGO AS
                    WHERE hv_fecha_final IS NULL
                    GROUP BY pro_referencia
               ) h ON h.pro_referencia = p.pro_referencia
-             WHERE p.pro_precio > 0
-               AND (p_categoria = 0 OR c.cat_categoria = p_categoria)
+             WHERE (p_categoria = 0 OR c.cat_categoria = p_categoria)
                AND (UPPER(p.pro_nombre)      LIKE v_txt
                 OR  UPPER(p.pro_descripcion) LIKE v_txt
                 OR  UPPER(t.tip_descripcion) LIKE v_txt

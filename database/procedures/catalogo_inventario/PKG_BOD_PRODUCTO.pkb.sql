@@ -111,11 +111,20 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_PRODUCTO AS
     v_ref := TRIM(p_referencia);
     IF v_ref IS NULL THEN RAISE_APPLICATION_ERROR(-20020, 'BOD_PRODUCTO: referencia obligatoria.'); END IF;
     OPEN p_data FOR
-      SELECT p.pro_referencia, p.pro_nombre, p.pro_descripcion,
-             p.tip_tipo, t.tip_descripcion,
-             p.mat_material, m.mat_descripcion,
-             p.pro_alto_cm, p.pro_ancho_cm, p.pro_profundidad_cm,
-             p.pro_color, p.pro_peso, p.pro_precio
+      SELECT p.pro_referencia,
+             p.pro_nombre,
+             p.pro_descripcion,
+             p.tip_tipo,
+             t.tip_descripcion,
+             t.cat_categoria,           -- para preseleccionar categoria en el formulario
+             p.mat_material,
+             m.mat_descripcion,
+             p.pro_alto_cm,
+             p.pro_ancho_cm,
+             p.pro_profundidad_cm,
+             p.pro_color,
+             p.pro_peso,
+             p.pro_precio
         FROM BOD_PRODUCTO p
         JOIN BOD_TIPO     t ON t.tip_tipo     = p.tip_tipo
         JOIN BOD_MATERIAL m ON m.mat_material = p.mat_material
@@ -127,12 +136,17 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_PRODUCTO AS
     OPEN p_data FOR
       SELECT p.pro_referencia,
              p.pro_nombre,
+             p.pro_descripcion,
              p.tip_tipo,
              t.tip_descripcion,
+             t.cat_categoria,           -- para preseleccionar categoria en el formulario
              p.mat_material,
              m.mat_descripcion,
              p.pro_color,
              p.pro_peso,
+             p.pro_alto_cm,
+             p.pro_ancho_cm,
+             p.pro_profundidad_cm,
              p.pro_precio
         FROM BOD_PRODUCTO p
         JOIN BOD_TIPO     t ON t.tip_tipo     = p.tip_tipo
@@ -150,10 +164,14 @@ CREATE OR REPLACE PACKAGE BODY PKG_BOD_PRODUCTO AS
              p.pro_descripcion,
              p.tip_tipo,
              t.tip_descripcion,
+             t.cat_categoria,           -- para preseleccionar categoria en el formulario
              p.mat_material,
              m.mat_descripcion,
              p.pro_color,
              p.pro_peso,
+             p.pro_alto_cm,
+             p.pro_ancho_cm,
+             p.pro_profundidad_cm,
              p.pro_precio
         FROM BOD_PRODUCTO p
         JOIN BOD_TIPO     t ON t.tip_tipo     = p.tip_tipo

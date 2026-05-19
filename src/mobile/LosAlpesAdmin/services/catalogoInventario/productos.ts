@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchAPI } from "../apiClient";
 
-const BASE_URL = "http://10.91.87.87:61850";
+const BASE_URL = "http://192.168.0.99:61850";
 const SESSION_KEY = "ASP_NET_SESSION_COOKIE";
 const HANDLER_PATH = "Handlers/CatalogoInventario/ProductosHandler.ashx";
 
@@ -9,6 +9,7 @@ export interface Producto {
   PRO_REFERENCIA: string;
   PRO_NOMBRE: string;
   PRO_DESCRIPCION?: string;
+  CAT_CATEGORIA?: number;
   TIP_TIPO?: number;
   TIP_DESCRIPCION?: string;
   MAT_MATERIAL?: number;
@@ -20,6 +21,10 @@ export interface Producto {
   PRO_PESO?: number;
   PRO_PRECIO?: number;
 }
+
+export const getFotoUrl = (referencia: string): string => {
+  return `${BASE_URL}/Handlers/CatalogoInventario/FotoProductoHandler.ashx?ref=${encodeURIComponent(referencia)}`;
+};
 
 export const getProductos = async (): Promise<Producto[]> => {
   return await fetchAPI(HANDLER_PATH, "listar", "GET");
