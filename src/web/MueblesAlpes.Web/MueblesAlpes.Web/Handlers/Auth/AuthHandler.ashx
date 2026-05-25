@@ -312,7 +312,7 @@ Public Class AuthHandler
 
             Dim result As LoginClienteResult = Nothing
             Try
-                result = LoginClienteService.Validar(usuario, password)
+                result = LoginClienteService.Validar(usuario, password, 2)
             Catch
                 context.Response.StatusCode = 401
                 context.Response.Write(JsonConvert.SerializeObject(New With {.ok = False, .mensaje = "Credenciales invalidas. Verifica tu usuario y contrasena."}))

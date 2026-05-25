@@ -56,7 +56,7 @@ Public Class ClienteService
         Dim nuevoId As Integer = Convert.ToInt32(pId.Value.ToString())
 
         ' Crear login: usuario=email, password=elegido por cliente o asignado por admin
-        LoginClienteService.Crear(nuevoId, email.ToLower().Trim(), password.Trim())
+        LoginClienteService.Crear(nuevoId, email.ToLower().Trim(), password.Trim(), 5, 2)
         Return nuevoId
     End Function
 
