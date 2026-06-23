@@ -1,19 +1,15 @@
 ﻿<%@ Page Language="VB" AutoEventWireup="true" CodeBehind="Catalogo.aspx.vb"
     Inherits="MueblesAlpes.Web.Modules.Cliente.Catalogo"
     MasterPageFile="~/Site.Master" %>
-
 <asp:Content ID="cBody" ContentPlaceHolderID="MainContent" runat="server">
 <style>
     * { box-sizing: border-box; }
-
     .cat-breadcrumb { font-size: 13px; font-family: Arial,sans-serif; color: #888;
         margin-bottom: 16px; }
     .cat-breadcrumb a { color: #C9973A; text-decoration: none; }
     .cat-breadcrumb a:hover { text-decoration: underline; }
-
     .cat-layout { display: grid; grid-template-columns: 240px 1fr; gap: 24px; }
     @media(max-width:768px) { .cat-layout { grid-template-columns: 1fr; } }
-
     /* SIDEBAR */
     .sidebar { display: flex; flex-direction: column; gap: 16px; }
     .sidebar-card { background: white; border-radius: 10px; border: 1px solid #e8d8c0;
@@ -27,13 +23,11 @@
         font-size: 13px; color: #3a2a1a; transition: all 0.15s; text-decoration: none;
         border-left: 3px solid transparent; }
     .cat-item:hover { background: #fdf6ec; color: #C9973A; border-left-color: #C9973A; }
-    .cat-item.active { background: #fdf6ec; color: #C9973A; border-left-color: #C9973A; font-wei  ght: bold; }
+    .cat-item.active { background: #fdf6ec; color: #C9973A; border-left-color: #C9973A; font-weight: bold; }
     .cat-count { font-size: 11px; color: #aaa; }
-
     .sidebar-select { width: 100%; padding: 10px 14px; border: none; outline: none;
         font-family: Arial,sans-serif; font-size: 13px; color: #3a2a1a;
         background: white; cursor: pointer; }
-
     /* BUSCADOR */
     .search-bar { background: white; border-radius: 10px; border: 1px solid #e8d8c0;
         padding: 14px 16px; margin-bottom: 16px;
@@ -54,13 +48,11 @@
         padding: 10px 18px; border-radius: 8px; font-size: 13px; cursor: pointer;
         white-space: nowrap; font-family: Arial,sans-serif; }
     .btn-outline:hover { border-color: #C9973A; color: #C9973A; }
-
     /* TOOLBAR */
     .toolbar { display: flex; justify-content: space-between; align-items: center;
         margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
     .resultado-info { font-size: 13px; color: #888; font-family: Arial,sans-serif; }
     .resultado-info strong { color: #5C3A1E; }
-
     /* GRID */
     .cards-grid { display: grid;
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -69,6 +61,16 @@
         overflow: hidden; box-shadow: 0 2px 8px rgba(92,58,30,0.06);
         transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; }
     .prod-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(92,58,30,0.12); }
+    /* ── TARJETA AGOTADA ── */
+    .prod-card.agotado { background: #f5f5f5; border-color: #ddd; }
+    .prod-card.agotado:hover { transform: none; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .prod-card.agotado .card-img-wrap img,
+    .prod-card.agotado .card-img-placeholder { filter: grayscale(100%) opacity(0.55); }
+    .prod-card.agotado .card-nombre { color: #999; }
+    .prod-card.agotado .card-categoria { color: #bbb; }
+    .prod-card.agotado .card-tipo { color: #bbb; }
+    .prod-card.agotado .card-precio-final { color: #aaa; }
+    .prod-card.agotado .card-footer { background: #f0f0f0; border-top-color: #e0e0e0; }
     .card-img-wrap { position: relative; height: 180px; overflow: hidden; background: #fdf8f3; }
     .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .card-img-placeholder { width: 100%; height: 100%; display: flex; align-items: center;
@@ -105,7 +107,9 @@
         border: none; padding: 8px; border-radius: 6px; font-size: 11px; font-weight: bold;
         cursor: pointer; font-family: Arial,sans-serif; }
     .btn-carrito:hover { background: linear-gradient(135deg,#3a2010,#5C3A1E); }
-    .btn-carrito:disabled { background: #ccc; cursor: not-allowed; }
+    .btn-carrito:disabled,
+    .btn-carrito[disabled] { background: #c8c8c8; color: #888; cursor: not-allowed;
+        box-shadow: none; }
     .empty-cat { text-align: center; padding: 60px 20px; color: #aaa; font-family: Arial,sans-serif; }
     .empty-cat .ei { font-size: 64px; margin-bottom: 12px; }
     .alert-ok {
@@ -133,6 +137,13 @@
 </div>
 
 <asp:UpdatePanel ID="upMain" runat="server" UpdateMode="Conditional" ChildrenAsTriggers="true">
+<Triggers>
+    <asp:AsyncPostBackTrigger ControlID="rptCategorias" EventName="ItemCommand" />
+    <asp:AsyncPostBackTrigger ControlID="btnTodasCategorias" EventName="Click" />
+    <asp:AsyncPostBackTrigger ControlID="rptProductos" EventName="ItemCommand" />
+    <asp:AsyncPostBackTrigger ControlID="btnBuscar" EventName="Click" />
+    <asp:AsyncPostBackTrigger ControlID="btnLimpiar" EventName="Click" />
+</Triggers>
 <ContentTemplate>
 
     <asp:Panel ID="pnlMsg" runat="server" Visible="false">
@@ -140,11 +151,8 @@
     </asp:Panel>
 
     <div class="cat-layout">
-
         <%-- SIDEBAR --%>
         <div class="sidebar">
-
-            <%-- Categorías --%>
             <div class="sidebar-card">
                 <div class="sidebar-head"> Categorías</div>
                 <div class="sidebar-body">
@@ -153,19 +161,19 @@
                             <asp:LinkButton CommandName="FiltrarCategoria"
                                 CommandArgument='<%#: Eval("CAT_CATEGORIA") %>'
                                 runat="server"
-                                CssClass= '<%# If(Eval("CAT_CATEGORIA").ToString() = hfCatActiva.Value, "cat-item active tiempoInhabilitado", "cat-item tiempoInhabilitado") %>'> 
+                                CssClass='<%# If(Eval("CAT_CATEGORIA").ToString() = hfCatActiva.Value, "cat-item active", "cat-item") %>'>
                                 <%#: Eval("CAT_DESCRIPCION") %>
                             </asp:LinkButton>
                         </ItemTemplate>
                     </asp:Repeater>
-                    <asp:LinkButton CommandName="FiltrarCategoria" CommandArgument="0"
-                        runat="server" CssClass="cat-item tiempoInhabilitado"
-                        OnCommand="rptCategorias_ItemCommand">
+                    <%-- ID propio + OnClick directo, sin OnCommand ni --%>
+                    <asp:LinkButton ID="btnTodasCategorias" runat="server"
+                        CssClass="cat-item"
+                        OnClick="btnTodasCategorias_Click">
                         Todas las categorías
                     </asp:LinkButton>
                 </div>
             </div>
-
         </div>
 
         <%-- CONTENIDO DERECHO --%>
@@ -193,14 +201,14 @@
             <div class="cards-grid">
                 <asp:Repeater ID="rptProductos" runat="server" OnItemCommand="rptProductos_ItemCommand">
                     <ItemTemplate>
-                        <div class="prod-card">
+                        <div class='prod-card <%# If(Convert.ToInt32(Eval("STO_DISPONIBLE")) > 0, "", "agotado") %>'>
                             <div class="card-img-wrap">
                                 <img src='<%# ResolveUrl("~/Handlers/CatalogoInventario/FotoProductoHandler.ashx?ref=" & Eval("PRO_REFERENCIA").ToString() & "&t=" & DateTime.Now.Ticks.ToString()) %>'
                                      alt='<%#: Eval("PRO_NOMBRE") %>'
                                      onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
                                 <div class="card-img-placeholder" style="display:none;">🛋️</div>
                                 <%# If(Eval("PROM_PORCENTAJE") IsNot DBNull.Value,
-                                                             "<span class='badge-promo'> " & Eval("CAMP_NOMBRE").ToString() & " -" & Eval("PROM_PORCENTAJE") & "%</span>", "") %>
+                                    "<span class='badge-promo'> " & Eval("CAMP_NOMBRE").ToString() & " -" & Eval("PROM_PORCENTAJE") & "%</span>", "") %>
                                 <%# If(Convert.ToInt32(Eval("STO_DISPONIBLE")) > 0,
                                     "<span class='badge-disponible'> Disponible</span>",
                                     "<span class='badge-agotado'> Agotado</span>") %>
@@ -220,10 +228,10 @@
                             <div class="card-footer">
                                 <asp:LinkButton CommandName="VerDetalle"
                                     CommandArgument='<%#: Eval("PRO_REFERENCIA") %>'
-                                    runat="server" CssClass="btn-detalle tiempoInhabilitado"> Ver</asp:LinkButton>
+                                    runat="server" CssClass="btn-detalle"> Ver</asp:LinkButton>
                                 <asp:LinkButton CommandName="AgregarCarrito"
-                                    CommandArgument='<%#: Eval("HV_HISTORIAL_PRECIO_VENTA") %>'
-                                    runat="server" CssClass="btn-carrito tiempoInhabilitado"
+                                    CommandArgument='<%# If(Eval("HV_HISTORIAL_PRECIO_VENTA") Is DBNull.Value, "0", Eval("HV_HISTORIAL_PRECIO_VENTA").ToString()) %>'
+                                    runat="server" CssClass="btn-carrito"
                                     Enabled='<%# Convert.ToInt32(Eval("STO_DISPONIBLE")) > 0 %>'>
                                     Agregar
                                 </asp:LinkButton>
@@ -262,7 +270,24 @@
         }
     });
     if (typeof Sys !== 'undefined') {
-        Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
+        var prm = Sys.WebForms.PageRequestManager.getInstance();
+
+        prm.add_beginRequest(function () {
+            // Bloquear botones del grid al iniciar postback
+            document.querySelectorAll('.btn-carrito:not([disabled]), .btn-detalle').forEach(function (btn) {
+                btn.setAttribute('data-bloqueado-temp', 'true');
+                btn.style.opacity = '0.6';
+                btn.style.pointerEvents = 'none';
+            });
+        });
+
+        prm.add_endRequest(function () {
+            // Rehabilitar solo los que bloqueamos temporalmente
+            document.querySelectorAll('[data-bloqueado-temp]').forEach(function (btn) {
+                btn.removeAttribute('data-bloqueado-temp');
+                btn.style.opacity = '';
+                btn.style.pointerEvents = '';
+            });
             var pnl = document.getElementById('<%= pnlMsg.ClientID %>');
             if (pnl && pnl.style.display !== 'none') {
                 setTimeout(ocultarMensaje, 4000);

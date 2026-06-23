@@ -65,17 +65,20 @@ Namespace Modules.Cliente
             CargarProductos()
         End Sub
 
+        ' Botón independiente "Todas las categorías"
+        Protected Sub btnTodasCategorias_Click(sender As Object, e As EventArgs)
+            OcultarMensaje()
+            hfCatActiva.Value = "0"
+            Dim dt As DataTable = CatalogoClienteService.Listar()
+            BindProductos(dt)
+        End Sub
+
         Protected Sub rptCategorias_ItemCommand(source As Object, e As RepeaterCommandEventArgs)
             If e.CommandName = "FiltrarCategoria" Then
                 OcultarMensaje()
                 hfCatActiva.Value = e.CommandArgument.ToString()
                 Dim categoria As Integer = Convert.ToInt32(e.CommandArgument)
-                Dim dt As DataTable
-                If categoria = 0 Then
-                    dt = CatalogoClienteService.Listar()
-                Else
-                    dt = CatalogoClienteService.Buscar("", categoria)
-                End If
+                Dim dt As DataTable = CatalogoClienteService.Buscar("", categoria)
                 BindProductos(dt)
             End If
         End Sub
@@ -123,6 +126,11 @@ Namespace Modules.Cliente
                     End If
 
                     Session("CARRITO_TEMP") = carrito
+
+                    ' Actualizar contador del carrito en el header del Master
+                    Dim master As SiteMaster = CType(Me.Master, SiteMaster)
+                    master.RefrescarCarrito()
+
                     MostrarMensaje("✓ Has agregado <strong>" & nombreProducto &
                         "</strong> al <a href='/Modules/Cliente/Carrito.aspx' style='color:#276749;font-weight:bold;'>carrito de compras</a>.", False)
 

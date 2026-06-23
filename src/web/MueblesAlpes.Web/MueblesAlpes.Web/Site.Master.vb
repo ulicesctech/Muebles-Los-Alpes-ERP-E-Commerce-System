@@ -8,7 +8,6 @@ Partial Public Class SiteMaster
     Protected Sub Page_Load(sender As Object, e As EventArgs)
 
         ' Evita que el navegador guarde páginas viejas en caché.
-        ' Esto ayuda a que catálogo, precios, promociones y carrito carguen datos frescos.
         Response.Cache.SetCacheability(HttpCacheability.NoCache)
         Response.Cache.SetNoStore()
         Response.Cache.SetExpires(DateTime.UtcNow.AddDays(-1))
@@ -17,10 +16,10 @@ Partial Public Class SiteMaster
         Dim url As String = Request.AppRelativeCurrentExecutionFilePath.ToLower()
 
         Dim esVistaCliente As Boolean = url.Contains("modules/cliente/") OrElse
-                                    url.Contains("modules/authusuarios/logincliente")
+                                        url.Contains("modules/authusuarios/logincliente")
 
         Dim esPaginaLogin As Boolean = url.Contains("authusuarios/loginempleado") OrElse
-                                   url.Contains("authusuarios/logincliente")
+                                       url.Contains("authusuarios/logincliente")
 
         If Not esVistaCliente AndAlso Not esPaginaLogin Then
             If Session("UsuarioId") Is Nothing Then
@@ -45,7 +44,7 @@ Partial Public Class SiteMaster
                 liMisCompras.Visible = True
 
                 Dim nombre As String = If(Session("CLI_NOMBRE") IsNot Nothing,
-                    Session("CLI_NOMBRE").ToString().Split(" ")(0), "Cliente")
+                        Session("CLI_NOMBRE").ToString().Split(" ")(0), "Cliente")
 
                 lblNombreCliente.Text = nombre
                 lblNavNombre.Text = nombre
@@ -67,7 +66,7 @@ Partial Public Class SiteMaster
                 liMisCompras.Visible = False
 
                 lblNombreCliente.Text = If(Session("UsuarioNombre") IsNot Nothing,
-                    Session("UsuarioNombre").ToString().Split(" ")(0), "Admin")
+                        Session("UsuarioNombre").ToString().Split(" ")(0), "Admin")
             Else
                 pnlNoLogueado.Visible = False
                 pnlLogueado.Visible = False
@@ -84,11 +83,12 @@ Partial Public Class SiteMaster
             liMisCompras.Visible = False
         End If
 
-        ActualizarContadorCarrito()
+        RefrescarCarrito()
 
     End Sub
 
-    Private Sub ActualizarContadorCarrito()
+    ' Public para que páginas como Catalogo.aspx.vb puedan llamarlo después de agregar al carrito
+    Public Sub RefrescarCarrito()
         Dim count As Integer = 0
         Dim total As Decimal = 0
 
@@ -97,7 +97,6 @@ Partial Public Class SiteMaster
                 Dim carrito = CType(Session("CARRITO_TEMP"), List(Of Dictionary(Of String, String)))
 
                 Dim dtCatalogo As DataTable = Nothing
-
                 Try
                     dtCatalogo = CatalogoClienteService.Listar()
                 Catch

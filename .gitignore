@@ -51,3 +51,6 @@ Desktop.ini
 **/*.cer
 **/*.key
 .env
+/src/web/MueblesAlpes.Web/MueblesAlpes.Web/Web.config
+/src/web/MueblesAlpes.Web/MueblesAlpes.Web/Web.Debug.config
+/src/web/MueblesAlpes.Web/MueblesAlpes.Web/Web.Release.config

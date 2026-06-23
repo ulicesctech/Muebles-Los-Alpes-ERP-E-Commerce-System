@@ -204,79 +204,84 @@
 
             <div style="display:flex; gap:4px; align-items:center; margin-left:auto; flex-shrink:0;">
 
-                <asp:Panel ID="pnlCarritoHeader" runat="server" Visible="false">
-                    <div class="carrito-drop-wrap" style="position:relative;">
-                        <a href="/Modules/Cliente/Carrito.aspx"
-                           style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 16px; border-radius:8px; text-decoration:none; color:rgba(240,217,160,0.75); font-size:11px; font-family:Arial,sans-serif;"
-                           onmouseover="this.style.color='#C9973A';"
-                           onmouseout="this.style.color='rgba(240,217,160,0.75)';">
-                            <div style="position:relative;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-14.5-16H1v2h1.5l3.5 8.5-1.5 2.5c0 1.1.9 2 2 2h13v-2H8.5l1-2H19c.75 0 1.4-.4 1.75-1l3.5-6.5H5.21L4 2H2.5z"/>
-                                </svg>
-                                <asp:Label ID="lblCartCount" runat="server" Text="0"
-                                    style="position:absolute; top:-8px; right:-8px; background:#e53e3e; color:white;
-                                           border-radius:50%; width:18px; height:18px; font-size:10px; font-weight:bold;
-                                           display:none; align-items:center; justify-content:center; font-family:Arial,sans-serif;" />
-                            </div>
-                            <span>Carrito</span>
-                        </a>
+                <%-- UpdatePanel propio para el carrito — se refresca en cada postback asíncrono --%>
+                <asp:UpdatePanel ID="upCarrito" runat="server" UpdateMode="Always">
+                <ContentTemplate>
+                    <asp:Panel ID="pnlCarritoHeader" runat="server" Visible="false">
+                        <div class="carrito-drop-wrap" style="position:relative;">
+                            <a href="/Modules/Cliente/Carrito.aspx"
+                               style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 16px; border-radius:8px; text-decoration:none; color:rgba(240,217,160,0.75); font-size:11px; font-family:Arial,sans-serif;"
+                               onmouseover="this.style.color='#C9973A';"
+                               onmouseout="this.style.color='rgba(240,217,160,0.75)';">
+                                <div style="position:relative;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-14.5-16H1v2h1.5l3.5 8.5-1.5 2.5c0 1.1.9 2 2 2h13v-2H8.5l1-2H19c.75 0 1.4-.4 1.75-1l3.5-6.5H5.21L4 2H2.5z"/>
+                                    </svg>
+                                    <asp:Label ID="lblCartCount" runat="server" Text="0"
+                                        style="position:absolute; top:-8px; right:-8px; background:#e53e3e; color:white;
+                                               border-radius:50%; width:18px; height:18px; font-size:10px; font-weight:bold;
+                                               display:none; align-items:center; justify-content:center; font-family:Arial,sans-serif;" />
+                                </div>
+                                <span>Carrito</span>
+                            </a>
 
-                        <div class="carrito-drop">
-                            <div style="background:#f5f5f5; padding:12px 16px; border-bottom:1px solid #e0e0e0;">
-                                <span style="font-size:13px; font-weight:bold; color:#333; font-family:Arial,sans-serif;">
-                                    <asp:Label ID="lblDropCartCount" runat="server" Text="0" /> producto(s)
-                                </span>
-                            </div>
-
-                            <div style="max-height:240px; overflow-y:auto; padding:8px 0;">
-                                <asp:Repeater ID="rptDropCarrito" runat="server">
-                                    <ItemTemplate>
-                                        <div style="display:flex; gap:10px; padding:10px 16px; border-bottom:1px solid #f5f5f5; align-items:center;">
-                                            <img src='<%# ResolveUrl("~/Handlers/CatalogoInventario/FotoProductoHandler.ashx?ref=" & Eval("PRO_REFERENCIA").ToString()) %>'
-                                                 style="width:50px; height:50px; object-fit:cover; border-radius:6px; flex-shrink:0;"
-                                                 onerror="this.style.display='none'" alt="" />
-                                            <div style="flex:1; min-width:0;">
-                                                <div style="font-size:12px; font-weight:bold; color:#333; font-family:Arial,sans-serif; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                                                    <%#: Eval("PRO_NOMBRE") %>
-                                                </div>
-                                                <div style="font-size:12px; color:#888; font-family:Arial,sans-serif;">
-                                                    Q <%# String.Format("{0:N2}", Eval("PRECIO_FINAL")) %> | Cant: <%#: Eval("CANTIDAD") %>
-                                                </div>
-                                            </div>
-                                            <div style="font-size:13px; font-weight:bold; color:#333; font-family:Arial,sans-serif; white-space:nowrap;">
-                                                Q <%# String.Format("{0:N2}", Convert.ToDecimal(Eval("PRECIO_FINAL")) * Convert.ToInt32(Eval("CANTIDAD"))) %>
-                                            </div>
-                                        </div>
-                                    </ItemTemplate>
-                                </asp:Repeater>
-
-                                <asp:Panel ID="pnlDropVacio" runat="server" Visible="false">
-                                    <div style="text-align:center; padding:20px; color:#aaa; font-family:Arial,sans-serif; font-size:13px;">Tu carrito está vacío</div>
-                                </asp:Panel>
-                            </div>
-
-                            <div style="padding:12px 16px; border-top:1px solid #e0e0e0; background:#f9f9f9;">
-                                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                                    <span style="font-size:13px; color:#333; font-family:Arial,sans-serif;">Subtotal:</span>
-                                    <span style="font-size:15px; font-weight:bold; color:#333; font-family:Arial,sans-serif;">
-                                        Q <asp:Label ID="lblDropTotal" runat="server" Text="0.00" />
+                            <div class="carrito-drop">
+                                <div style="background:#f5f5f5; padding:12px 16px; border-bottom:1px solid #e0e0e0;">
+                                    <span style="font-size:13px; font-weight:bold; color:#333; font-family:Arial,sans-serif;">
+                                        <asp:Label ID="lblDropCartCount" runat="server" Text="0" /> producto(s)
                                     </span>
                                 </div>
-                                <a href="/Modules/Cliente/Factura.aspx"
-                                   style="display:block; width:100%; background:#C9973A; color:white; text-align:center;
-                                          padding:12px; border-radius:6px; text-decoration:none; font-size:14px;
-                                          font-weight:bold; font-family:Arial,sans-serif; box-sizing:border-box;">
-                                    Ir a pagar
-                                </a>
-                                <a href="/Modules/Cliente/Carrito.aspx"
-                                   style="display:block; text-align:center; margin-top:8px; color:#C9973A; font-size:13px; font-family:Arial,sans-serif; text-decoration:none;">
-                                    Ver y editar carrito
-                                </a>
+
+                                <div style="max-height:240px; overflow-y:auto; padding:8px 0;">
+                                    <asp:Repeater ID="rptDropCarrito" runat="server">
+                                        <ItemTemplate>
+                                            <div style="display:flex; gap:10px; padding:10px 16px; border-bottom:1px solid #f5f5f5; align-items:center;">
+                                                <img src='<%# ResolveUrl("~/Handlers/CatalogoInventario/FotoProductoHandler.ashx?ref=" & Eval("PRO_REFERENCIA").ToString()) %>'
+                                                     style="width:50px; height:50px; object-fit:cover; border-radius:6px; flex-shrink:0;"
+                                                     onerror="this.style.display='none'" alt="" />
+                                                <div style="flex:1; min-width:0;">
+                                                    <div style="font-size:12px; font-weight:bold; color:#333; font-family:Arial,sans-serif; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                                        <%#: Eval("PRO_NOMBRE") %>
+                                                    </div>
+                                                    <div style="font-size:12px; color:#888; font-family:Arial,sans-serif;">
+                                                        Q <%# String.Format("{0:N2}", Eval("PRECIO_FINAL")) %> | Cant: <%#: Eval("CANTIDAD") %>
+                                                    </div>
+                                                </div>
+                                                <div style="font-size:13px; font-weight:bold; color:#333; font-family:Arial,sans-serif; white-space:nowrap;">
+                                                    Q <%# String.Format("{0:N2}", Convert.ToDecimal(Eval("PRECIO_FINAL")) * Convert.ToInt32(Eval("CANTIDAD"))) %>
+                                                </div>
+                                            </div>
+                                        </ItemTemplate>
+                                    </asp:Repeater>
+
+                                    <asp:Panel ID="pnlDropVacio" runat="server" Visible="false">
+                                        <div style="text-align:center; padding:20px; color:#aaa; font-family:Arial,sans-serif; font-size:13px;">Tu carrito está vacío</div>
+                                    </asp:Panel>
+                                </div>
+
+                                <div style="padding:12px 16px; border-top:1px solid #e0e0e0; background:#f9f9f9;">
+                                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                                        <span style="font-size:13px; color:#333; font-family:Arial,sans-serif;">Subtotal:</span>
+                                        <span style="font-size:15px; font-weight:bold; color:#333; font-family:Arial,sans-serif;">
+                                            Q <asp:Label ID="lblDropTotal" runat="server" Text="0.00" />
+                                        </span>
+                                    </div>
+                                    <a href="/Modules/Cliente/Factura.aspx"
+                                       style="display:block; width:100%; background:#C9973A; color:white; text-align:center;
+                                              padding:12px; border-radius:6px; text-decoration:none; font-size:14px;
+                                              font-weight:bold; font-family:Arial,sans-serif; box-sizing:border-box;">
+                                        Ir a pagar
+                                    </a>
+                                    <a href="/Modules/Cliente/Carrito.aspx"
+                                       style="display:block; text-align:center; margin-top:8px; color:#C9973A; font-size:13px; font-family:Arial,sans-serif; text-decoration:none;">
+                                        Ver y editar carrito
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </asp:Panel>
+                    </asp:Panel>
+                </ContentTemplate>
+                </asp:UpdatePanel>
 
                 <asp:Panel ID="pnlNoLogueado" runat="server">
                     <asp:HyperLink ID="lnkLogin" runat="server"
@@ -329,11 +334,10 @@
                     <a href="#">Auth &amp; Usuarios &#9660;</a>
                     <div class="dropdown-nav">
                         <a runat="server" href="~/Modules/AuthUsuarios/Index.aspx">Dashboard</a>
-                        <a runat="server" href="~/Modules/AuthUsuarios/LoginEmpleado.aspx">Login Empleado</a>
-                        <a runat="server" href="~/Modules/AuthUsuarios/LoginCliente.aspx">Login Cliente</a>
-                        <a runat="server" href="~/Modules/AuthUsuarios/Puestos.aspx">Puestos</a>
-                        <a runat="server" href="~/Modules/AuthUsuarios/Admin/GrupoUsuario.aspx">Grupo Usuario</a>
-                        <a runat="server" href="~/Modules/AuthUsuarios/Admin/Permisos.aspx">Permisos</a>
+                        <%If Session("UsuarioId") Is Nothing Then%>
+                            <a runat="server" href="~/Modules/AuthUsuarios/LoginEmpleado.aspx">Login Empleado</a>
+                            <a runat="server" href="~/Modules/AuthUsuarios/LoginCliente.aspx">Login Cliente</a>
+                        <%End If%>
                     </div>
                 </li>
 

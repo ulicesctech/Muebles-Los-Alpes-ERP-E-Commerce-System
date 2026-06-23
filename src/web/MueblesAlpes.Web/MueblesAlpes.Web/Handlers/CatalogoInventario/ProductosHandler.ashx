@@ -1,4 +1,4 @@
-
+ï»¿
 <%@ WebHandler Language="VB" Class="ProductosHandler" %>
 Imports System.Web
 Imports System.Data
@@ -12,7 +12,7 @@ Public Class ProductosHandler
     Implements IHttpHandler
 
     Public Sub ProcessRequest(ByVal context As HttpContext) Implements IHttpHandler.ProcessRequest
-        ' Configuración de CORS
+        ' ConfiguraciÃ³n de CORS
         context.Response.ContentType = "application/json"
         context.Response.AddHeader("Access-Control-Allow-Origin", "*")
         context.Response.AddHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
@@ -41,7 +41,7 @@ Public Class ProductosHandler
                     Eliminar(context)
                 Case Else
                     context.Response.StatusCode = 400
-                    context.Response.Write("{""error"": ""Acción no válida. Usa ?action=listar""}")
+                    context.Response.Write("{""error"": ""AcciÃ³n no vÃ¡lida. Usa ?action=listar""}")
             End Select
 
         Catch ex As Exception
@@ -69,7 +69,7 @@ Public Class ProductosHandler
     End Sub
 
     Private Sub Crear(context As HttpContext)
-        ' 1. Capturar datos de texto y números
+        ' 1. Capturar datos de texto y nÃºmeros
         Dim referencia As String = context.Request("referencia")
         Dim nombre As String = context.Request("nombre")
         Dim descripcion As String = context.Request("descripcion")
@@ -77,7 +77,7 @@ Public Class ProductosHandler
         Dim matMaterial As Decimal = Convert.ToDecimal(context.Request("matMaterial"))
         Dim color As String = context.Request("color")
         
-        ' Validaciones para números opcionales (por si vienen vacíos)
+        ' Validaciones para nÃºmeros opcionales (por si vienen vacÃ­os)
         Dim altoCm As Decimal = If(String.IsNullOrEmpty(context.Request("altoCm")), 0, Convert.ToDecimal(context.Request("altoCm")))
         Dim anchoCm As Decimal = If(String.IsNullOrEmpty(context.Request("anchoCm")), 0, Convert.ToDecimal(context.Request("anchoCm")))
         Dim profundidadCm As Decimal = If(String.IsNullOrEmpty(context.Request("profundidadCm")), 0, Convert.ToDecimal(context.Request("profundidadCm")))
@@ -89,7 +89,7 @@ Public Class ProductosHandler
         ' 3. Llamar al servicio
         ProductoService.Crear(referencia, nombre, descripcion, tipTipo, matMaterial, altoCm, anchoCm, profundidadCm, color, peso, fotoBytes)
         
-        context.Response.Write("{""mensaje"": ""Producto creado con éxito""}")
+        context.Response.Write("{""mensaje"": ""Producto creado con Ã©xito""}")
     End Sub
 
     Private Sub Actualizar(context As HttpContext)
@@ -106,23 +106,23 @@ Public Class ProductosHandler
         Dim profundidadCm As Decimal = If(String.IsNullOrEmpty(context.Request("profundidadCm")), 0, Convert.ToDecimal(context.Request("profundidadCm")))
         Dim peso As Decimal = If(String.IsNullOrEmpty(context.Request("peso")), 0, Convert.ToDecimal(context.Request("peso")))
 
-        ' 2. Capturar la nueva foto (si se envió)
+        ' 2. Capturar la nueva foto (si se enviÃ³)
         Dim fotoBytes As Byte() = ObtenerBytesDeArchivo(context)
 
         ' 3. Llamar al servicio
         ProductoService.Actualizar(referencia, nombre, descripcion, tipTipo, matMaterial, altoCm, anchoCm, profundidadCm, color, peso, fotoBytes)
         
-        context.Response.Write("{""mensaje"": ""Producto actualizado con éxito""}")
+        context.Response.Write("{""mensaje"": ""Producto actualizado con Ã©xito""}")
     End Sub
 
     Private Sub Eliminar(context As HttpContext)
         Dim referencia As String = context.Request("referencia")
         
         ProductoService.Eliminar(referencia)
-        context.Response.Write("{""mensaje"": ""Producto eliminado con éxito""}")
+        context.Response.Write("{""mensaje"": ""Producto eliminado con Ã©xito""}")
     End Sub
 
-    ' --- MÉTODO AUXILIAR PARA LEER LA IMAGEN ---
+    ' --- MÃ‰TODO AUXILIAR PARA LEER LA IMAGEN ---
     Private Function ObtenerBytesDeArchivo(context As HttpContext) As Byte()
         If context.Request.Files.Count > 0 Then
             Dim archivo As HttpPostedFile = context.Request.Files(0)
@@ -132,7 +132,7 @@ Public Class ProductosHandler
                 End Using
             End If
         End If
-        Return Nothing ' Retorna Nothing si no se subió foto
+        Return Nothing ' Retorna Nothing si no se subiÃ³ foto
     End Function
 
     Public ReadOnly Property IsReusable() As Boolean Implements IHttpHandler.IsReusable

@@ -7,6 +7,7 @@ Public Class LoginClienteService
     Public Shared Function Validar(usuario As String, password As String) As LoginClienteResult
         Dim result As New LoginClienteResult()
         Dim pIdCliente As New OracleParameter("p_id_cliente", OracleDbType.Decimal, ParameterDirection.Output)
+
         Dim ps As New List(Of OracleParameter) From {
             New OracleParameter("p_usuario", OracleDbType.Varchar2, usuario, ParameterDirection.Input),
             New OracleParameter("p_password", OracleDbType.Varchar2, password, ParameterDirection.Input),

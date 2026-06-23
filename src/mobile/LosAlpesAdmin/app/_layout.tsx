@@ -9,7 +9,7 @@ import {
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  View
+  View,
 } from "react-native";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import { CarritoProvider, useCarrito } from "../context/CarritoContext";
@@ -21,34 +21,34 @@ function AuthGuard() {
   useEffect(() => {
     if (loading) return;
 
-    const enAuth = segments[0] === '(auth)';
-    const enModulos = segments[0] === 'modules';
-    const enCliente = segments[1] === 'cliente';
+    const enAuth = segments[0] === "(auth)";
+    const enModulos = segments[0] === "modules";
+    const enCliente = segments[1] === "cliente";
     const enRoot = !segments[0];
 
     if (!usuario && !enAuth) {
-      router.replace('/(auth)/login');
+      router.replace("/(auth)/login");
       return;
     }
 
     if (usuario && enAuth) {
-      if (usuario.tipo === 'CLIENTE') {
-        router.replace('/modules/cliente/catalogo' as any);
+      if (usuario.tipo === "CLIENTE") {
+        router.replace("/modules/cliente/catalogo" as any);
       } else {
-        router.replace('/');
+        router.replace("/");
       }
       return;
     }
 
-    if (usuario?.tipo === 'CLIENTE') {
+    if (usuario?.tipo === "CLIENTE") {
       if (enRoot || !enCliente) {
-        router.replace('/modules/cliente/catalogo' as any);
+        router.replace("/modules/cliente/catalogo" as any);
       }
       return;
     }
 
-    if (usuario?.tipo === 'EMPLEADO' && enModulos && enCliente) {
-      router.replace('/');
+    if (usuario?.tipo === "EMPLEADO" && enModulos && enCliente) {
+      router.replace("/");
       return;
     }
   }, [usuario, loading, segments]);
@@ -60,22 +60,24 @@ function NavAdmin() {
   const { logout } = useAuth();
 
   const handleLogout = async () => {
-    Alert.alert('Cerrar Sesión', '¿Estás seguro?', [
-      { text: 'Cancelar', style: 'cancel' },
+    Alert.alert("Cerrar Sesión", "¿Estás seguro?", [
+      { text: "Cancelar", style: "cancel" },
       {
-        text: 'Sí, salir',
+        text: "Sí, salir",
         onPress: async () => {
           await logout();
-          router.replace('/(auth)/login');
-        }
-      }
+          router.replace("/(auth)/login");
+        },
+      },
     ]);
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.topBar}>
-        <Text style={styles.topBarText}>Envíos a todo Guatemala | Tel: +502 5568 8472</Text>
+        <Text style={styles.topBarText}>
+          Envíos a todo Guatemala | Tel: +502 5568 8472
+        </Text>
       </View>
 
       <View style={styles.header}>
@@ -88,7 +90,11 @@ function NavAdmin() {
       </View>
 
       <View style={styles.navContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.navScroll}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.navScroll}
+        >
           <Link href="/" asChild>
             <TouchableOpacity style={styles.navItem}>
               <Text style={styles.navText}>Inicio</Text>
@@ -133,9 +139,13 @@ function NavAdmin() {
 
       <View style={styles.footerMain}>
         <Text style={styles.footerTitle}>Santos & Familia — Desde 1978</Text>
-        <Text style={styles.footerText}>Diseño & Confort Hogareño — Guatemala</Text>
+        <Text style={styles.footerText}>
+          Diseño & Confort Hogareño — Guatemala
+        </Text>
         <View style={styles.footerBottom}>
-          <Text style={styles.footerBottomText}>© 2026 — Muebles Los Alpes ERP</Text>
+          <Text style={styles.footerBottomText}>
+            © 2026 — Muebles Los Alpes ERP
+          </Text>
         </View>
       </View>
     </SafeAreaView>
@@ -150,15 +160,15 @@ function NavCliente() {
 
   const handleLogout = async () => {
     setMenuAbierto(false);
-    Alert.alert('Cerrar Sesión', '¿Estás seguro?', [
-      { text: 'Cancelar', style: 'cancel' },
+    Alert.alert("Cerrar Sesión", "¿Estás seguro?", [
+      { text: "Cancelar", style: "cancel" },
       {
-        text: 'Sí, salir',
+        text: "Sí, salir",
         onPress: async () => {
           await logout();
-          router.replace('/(auth)/login');
-        }
-      }
+          router.replace("/(auth)/login");
+        },
+      },
     ]);
   };
 
@@ -171,7 +181,7 @@ function NavCliente() {
           <View style={styles.headerBtns}>
             <TouchableOpacity
               style={styles.carritoBtn}
-              onPress={() => router.push('/modules/cliente/carrito' as any)}
+              onPress={() => router.push("/modules/cliente/carrito" as any)}
             >
               <Text style={styles.carritoIcon}>🛒</Text>
               {totalItems > 0 && (
@@ -186,7 +196,7 @@ function NavCliente() {
               onPress={() => setMenuAbierto(true)}
             >
               <Text style={styles.userBtnText}>
-                Hola, {usuario?.nombre.split(' ')[0]} ▾
+                Hola, {usuario?.nombre.split(" ")[0]} ▾
               </Text>
             </TouchableOpacity>
           </View>
@@ -194,20 +204,24 @@ function NavCliente() {
       </View>
 
       <View style={styles.navContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.navScroll}>
-          <Link href={'/modules/cliente/catalogo' as any} asChild>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.navScroll}
+        >
+          <Link href={"/modules/cliente/catalogo" as any} asChild>
             <TouchableOpacity style={styles.navItem}>
               <Text style={styles.navText}>🛋 Productos</Text>
             </TouchableOpacity>
           </Link>
 
-          <Link href={'/modules/cliente/misCompras' as any} asChild>
+          <Link href={"/modules/cliente/misCompras" as any} asChild>
             <TouchableOpacity style={styles.navItem}>
               <Text style={styles.navText}>Mis Compras</Text>
             </TouchableOpacity>
           </Link>
 
-          <Link href={'/modules/cliente/promociones' as any} asChild>
+          <Link href={"/modules/cliente/promociones" as any} asChild>
             <TouchableOpacity style={styles.navItem}>
               <Text style={styles.navText}>Promociones</Text>
             </TouchableOpacity>
@@ -221,7 +235,9 @@ function NavCliente() {
             <TouchableWithoutFeedback>
               <View style={styles.menuDropdown}>
                 <View style={styles.menuHeader}>
-                  <Text style={styles.menuHeaderText}>Hola, {usuario?.nombre.split(' ')[0]}</Text>
+                  <Text style={styles.menuHeaderText}>
+                    Hola, {usuario?.nombre.split(" ")[0]}
+                  </Text>
                   <Text style={styles.menuHeaderSub}>{usuario?.nombre}</Text>
                 </View>
 
@@ -229,7 +245,7 @@ function NavCliente() {
                   style={styles.menuItem}
                   onPress={() => {
                     setMenuAbierto(false);
-                    router.push('/modules/cliente/misCompras' as any);
+                    router.push("/modules/cliente/misCompras" as any);
                   }}
                 >
                   <Text style={styles.menuItemIcon}>📦</Text>
@@ -240,7 +256,7 @@ function NavCliente() {
                   style={styles.menuItem}
                   onPress={() => {
                     setMenuAbierto(false);
-                    router.push('/modules/cliente/miPerfil' as any);
+                    router.push("/modules/cliente/miPerfil" as any);
                   }}
                 >
                   <Text style={styles.menuItemIcon}>👤</Text>
@@ -273,7 +289,7 @@ function Layout() {
   const { usuario } = useAuth();
 
   if (!usuario) return <Slot />;
-  if (usuario.tipo === 'CLIENTE') return <NavCliente />;
+  if (usuario.tipo === "CLIENTE") return <NavCliente />;
 
   return <NavAdmin />;
 }
@@ -301,13 +317,13 @@ const styles = StyleSheet.create({
     borderBottomColor: "#C9973A",
   },
   headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   headerBtns: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   logoText: {
@@ -317,49 +333,49 @@ const styles = StyleSheet.create({
   },
 
   btnSalir: {
-    backgroundColor: '#c53030',
+    backgroundColor: "#c53030",
     width: 32,
     height: 32,
     borderRadius: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   btnSalirText: {
-    color: 'white',
+    color: "white",
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 
   carritoBtn: {
-    position: 'relative',
+    position: "relative",
     padding: 4,
   },
   carritoIcon: {
     fontSize: 24,
   },
   carritoBadge: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     right: 0,
-    backgroundColor: '#e53e3e',
+    backgroundColor: "#e53e3e",
     borderRadius: 10,
     width: 16,
     height: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   carritoBadgeText: {
-    color: 'white',
+    color: "white",
     fontSize: 9,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 
   navContainer: {
     backgroundColor: "#1a0e05",
     borderBottomWidth: 2,
     borderBottomColor: "#C9973A",
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   navScroll: {
     paddingHorizontal: 10,
@@ -409,74 +425,74 @@ const styles = StyleSheet.create({
   },
 
   userBtn: {
-    backgroundColor: 'rgba(201,151,58,0.15)',
+    backgroundColor: "rgba(201,151,58,0.15)",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(201,151,58,0.3)',
+    borderColor: "rgba(201,151,58,0.3)",
   },
   userBtnText: {
-    color: '#C9973A',
+    color: "#C9973A",
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    alignItems: 'flex-end',
+    backgroundColor: "rgba(0,0,0,0.4)",
+    alignItems: "flex-end",
     paddingTop: 90,
     paddingRight: 16,
   },
   menuDropdown: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 12,
     width: 220,
     elevation: 10,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
-    borderColor: '#e8d8c0',
+    borderColor: "#e8d8c0",
   },
   menuHeader: {
-    backgroundColor: '#5C3A1E',
+    backgroundColor: "#5C3A1E",
     padding: 16,
   },
   menuHeaderText: {
-    color: '#f0d9a0',
+    color: "#f0d9a0",
     fontSize: 15,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   menuHeaderSub: {
-    color: '#d4b896',
+    color: "#d4b896",
     fontSize: 12,
     marginTop: 2,
   },
   menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 14,
     gap: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#f5ece0',
+    borderBottomColor: "#f5ece0",
   },
   menuItemIcon: {
     fontSize: 18,
   },
   menuItemText: {
     fontSize: 14,
-    color: '#3a2a1a',
-    fontWeight: 'bold',
+    color: "#3a2a1a",
+    fontWeight: "bold",
   },
   menuDivider: {
     height: 1,
-    backgroundColor: '#e8d8c0',
+    backgroundColor: "#e8d8c0",
   },
   menuItemLogout: {
     borderBottomWidth: 0,
   },
   menuItemTextLogout: {
     fontSize: 14,
-    color: '#c53030',
-    fontWeight: 'bold',
+    color: "#c53030",
+    fontWeight: "bold",
   },
 });

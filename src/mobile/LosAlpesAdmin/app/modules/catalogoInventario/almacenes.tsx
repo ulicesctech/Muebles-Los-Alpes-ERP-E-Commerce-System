@@ -2,9 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  FlatList,
-  KeyboardAvoidingView,
-  Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -12,11 +10,17 @@ import {
   View,
 } from "react-native";
 
-// Importamos el servicio centralizado (Asegúrate de que la ruta sea correcta según tu árbol de carpetas)
+// Importamos el servicio centralizado
 import { AlmacenService } from "../../../services/catalogoInventario/almacenService";
 
+import {
+  crearYAsignarNicho,
+  getNichosPorAlmacen,
+  Nicho,
+} from "../../../services/catalogoInventario/nichos";
+
 export default function AlmacenesScreen() {
-  const [almacenes, setAlmacenes] = useState([]);
+  const [almacenes, setAlmacenes] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
   // Estados del Formulario
@@ -29,6 +33,7 @@ export default function AlmacenesScreen() {
   const [nicNumero, setNicNumero] = useState("");
   const [nicZona, setNicZona] = useState("");
   const [nicCaracteristica, setNicCaracteristica] = useState("");
+  const [nichos, setNichos] = useState<Nicho[]>([]);
 
   // Cargar datos al iniciar la pantalla
   useEffect(() => {
@@ -54,11 +59,22 @@ export default function AlmacenesScreen() {
     }
   };
 
+  const cargarNichosDelAlmacen = async (idAlmacen: number) => {
+    try {
+      const data = await getNichosPorAlmacen(idAlmacen);
+      setNichos(data || []);
+    } catch (error) {
+      console.log("Error al cargar nichos", error);
+      setNichos([]);
+    }
+  };
+
   const limpiarFormulario = () => {
     setId(0);
     setNombre("");
     setPais("");
     setUbicacion("");
+    setNichos([]); // Limpiamos los nichos al cancelar la edición
   };
 
   const handleGuardar = async () => {
@@ -100,6 +116,9 @@ export default function AlmacenesScreen() {
     setNombre(almacen.ALM_NOMBRE);
     setPais(almacen.ALM_PAIS);
     setUbicacion(almacen.ALM_UBICACION);
+
+    // Cargamos los nichos asociados a este almacén
+    cargarNichosDelAlmacen(almacen.ALM_ALMACEN);
   };
 
   const handleEliminar = (idAlmacen: number) => {
@@ -129,170 +148,209 @@ export default function AlmacenesScreen() {
     ]);
   };
 
-  // --------------------------------------------------------
-  // UI DEL ENCABEZADO (Formulario y Títulos)
-  // --------------------------------------------------------
-  const renderHeader = () => (
-    <View>
-      <Text style={styles.pageTitle}>Gestión de Almacenes</Text>
+  const handleCrearNicho = async () => {
+    if (!nicNumero || !nicZona || !nicCaracteristica) {
+      Alert.alert(
+        "Atención",
+        "Por favor llena todos los campos del nicho (Número, Zona y Característica).",
+      );
+      return;
+    }
 
-      {/* FORMULARIO */}
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <Text style={styles.cardHeaderText}>
-            {id === 0 ? "Nuevo Almacén" : `Editando Almacén #${id}`}
-          </Text>
-        </View>
-        <View style={styles.cardBody}>
-          <Text style={styles.label}>Nombre *</Text>
-          <TextInput
-            style={styles.input}
-            value={nombre}
-            onChangeText={setNombre}
-            placeholder="Nombre del almacén"
-          />
+    setLoading(true);
+    try {
+      // 'id' es el estado que guarda el ID del almacén que estamos editando
+      await crearYAsignarNicho(nicNumero, nicZona, nicCaracteristica, id);
 
-          <Text style={styles.label}>País *</Text>
-          <TextInput
-            style={styles.input}
-            value={pais}
-            onChangeText={setPais}
-            placeholder="Ej. Guatemala"
-          />
+      Alert.alert("Éxito", "Nicho creado y asignado al almacén.");
 
-          <Text style={styles.label}>Ubicación *</Text>
-          <TextInput
-            style={styles.input}
-            value={ubicacion}
-            onChangeText={setUbicacion}
-            placeholder="Dirección exacta"
-            multiline
-          />
+      // Limpiamos los campos
+      setNicNumero("");
+      setNicZona("");
+      setNicCaracteristica("");
 
-          <View style={styles.rowButtons}>
-            <TouchableOpacity
-              style={styles.btnOutline}
-              onPress={limpiarFormulario}
-            >
-              <Text style={styles.btnOutlineText}>Cancelar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.btnGold}
-              onPress={handleGuardar}
-              disabled={loading}
-            >
-              <Text style={styles.btnGoldText}>
-                {loading ? "Guardando..." : "Guardar"}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-
-      {/* PANEL DE NICHOS (Solo si se está editando un almacén) */}
-      {id > 0 && (
-        <View style={styles.nichosPanel}>
-          <Text style={styles.nichosTitle}>Nichos del Almacén</Text>
-
-          <View style={styles.nichoRow}>
-            <TextInput
-              style={[styles.input, { flex: 1, marginRight: 5 }]}
-              placeholder="Número (A-01)"
-              value={nicNumero}
-              onChangeText={setNicNumero}
-            />
-            <TextInput
-              style={[styles.input, { flex: 1, marginLeft: 5 }]}
-              placeholder="Zona"
-              value={nicZona}
-              onChangeText={setNicZona}
-            />
-          </View>
-          <TextInput
-            style={styles.input}
-            placeholder="Característica (Ej. Estantería alta)"
-            value={nicCaracteristica}
-            onChangeText={setNicCaracteristica}
-          />
-
-          <TouchableOpacity style={styles.btnGold}>
-            <Text style={styles.btnGoldText}>Crear y Asignar Nicho</Text>
-          </TouchableOpacity>
-
-          <Text style={styles.emptyState}>
-            No hay nichos asignados a este almacén aún.
-          </Text>
-        </View>
-      )}
-
-      {/* TÍTULO DEL LISTADO */}
-      <Text style={styles.sectionLabel}>Almacenes Registrados</Text>
-    </View>
-  );
+      // Recargamos la lista de nichos para ver el nuevo
+      cargarNichosDelAlmacen(id);
+    } catch (error) {
+      Alert.alert("Error", "No se pudo guardar el nicho.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // --------------------------------------------------------
-  // UI DE CADA ELEMENTO DE LA LISTA
-  // --------------------------------------------------------
-  const renderItem = ({ item }: { item: any }) => (
-    <View style={styles.listItem}>
-      <View style={styles.listContent}>
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>ID: {item.ALM_ALMACEN}</Text>
-        </View>
-        <Text style={styles.itemTitle}>{item.ALM_NOMBRE}</Text>
-        <Text style={styles.itemText}>📍 {item.ALM_UBICACION}</Text>
-        <Text style={styles.itemText}>🌎 {item.ALM_PAIS}</Text>
-      </View>
-      <View style={styles.listActions}>
-        <TouchableOpacity
-          style={styles.btnEdit}
-          onPress={() => handleEditar(item)}
-        >
-          <Text style={styles.btnEditText}>Editar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.btnDelete}
-          onPress={() => handleEliminar(item.ALM_ALMACEN)}
-        >
-          <Text style={styles.btnDeleteText}>Eliminar</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-
-  // --------------------------------------------------------
-  // RENDER PRINCIPAL DE LA PANTALLA
+  // RENDER PRINCIPAL DE LA PANTALLA (Usando ScrollView)
   // --------------------------------------------------------
   return (
     <View style={styles.mainWrapper}>
-      <KeyboardAvoidingView
-        style={styles.keyboardContainer}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
-        <FlatList
-          data={almacenes}
-          keyExtractor={(item) => item.ALM_ALMACEN.toString()}
-          renderItem={renderItem}
-          ListHeaderComponent={renderHeader()}
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="none"
-          contentContainerStyle={styles.container}
-          ListEmptyComponent={
-            loading ? (
-              <ActivityIndicator
-                size="large"
-                color="#C9973A"
-                style={{ marginTop: 20 }}
+        <Text style={styles.pageTitle}>Gestión de Almacenes</Text>
+
+        {/* --- FORMULARIO FIJO --- */}
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <Text style={styles.cardHeaderText}>
+              {id === 0 ? "Nuevo Almacén" : `Editando Almacén #${id}`}
+            </Text>
+          </View>
+          <View style={styles.cardBody}>
+            <Text style={styles.label}>Nombre *</Text>
+            <TextInput
+              style={styles.input}
+              value={nombre}
+              onChangeText={setNombre}
+              placeholder="Nombre del almacén"
+            />
+
+            <Text style={styles.label}>País *</Text>
+            <TextInput
+              style={styles.input}
+              value={pais}
+              onChangeText={setPais}
+              placeholder="Ej. Guatemala"
+            />
+
+            <Text style={styles.label}>Ubicación *</Text>
+            <TextInput
+              style={styles.input}
+              value={ubicacion}
+              onChangeText={setUbicacion}
+              placeholder="Dirección exacta"
+              multiline
+            />
+
+            <View style={styles.rowButtons}>
+              <TouchableOpacity
+                style={styles.btnOutline}
+                onPress={limpiarFormulario}
+              >
+                <Text style={styles.btnOutlineText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.btnGold}
+                onPress={handleGuardar}
+                disabled={loading}
+              >
+                <Text style={styles.btnGoldText}>
+                  {loading ? "Guardando..." : "Guardar"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
+        {/* --- PANEL DE NICHOS (Solo si se edita un almacén) --- */}
+        {id > 0 && (
+          <View style={styles.nichosPanel}>
+            <Text style={styles.nichosTitle}>Nichos del Almacén</Text>
+
+            <View style={styles.nichoRow}>
+              <TextInput
+                style={[styles.input, { flex: 1, marginRight: 5 }]}
+                placeholder="Número (A-01)"
+                value={nicNumero}
+                onChangeText={setNicNumero}
               />
-            ) : (
-              <Text style={styles.emptyState}>
-                No hay almacenes registrados en la base de datos.
-              </Text>
-            )
-          }
-          ListFooterComponent={<View style={{ height: 40 }} />}
-        />
-      </KeyboardAvoidingView>
+              <TextInput
+                style={[styles.input, { flex: 1, marginLeft: 5 }]}
+                placeholder="Zona"
+                value={nicZona}
+                onChangeText={setNicZona}
+              />
+            </View>
+            <TextInput
+              style={styles.input}
+              placeholder="Característica (Ej. Estantería alta)"
+              value={nicCaracteristica}
+              onChangeText={setNicCaracteristica}
+            />
+
+            <TouchableOpacity style={styles.btnGold} onPress={handleCrearNicho}>
+              <Text style={styles.btnGoldText}>Crear y Asignar Nicho</Text>
+            </TouchableOpacity>
+
+            {/* LISTA DE NICHOS DEL ALMACÉN */}
+            <View style={{ marginTop: 20 }}>
+              {nichos.length === 0 ? (
+                <Text style={styles.emptyState}>
+                  No hay nichos asignados a este almacén aún.
+                </Text>
+              ) : (
+                nichos.map((nicho, index) => (
+                  <View
+                    key={index}
+                    style={{
+                      backgroundColor: "white",
+                      padding: 10,
+                      borderRadius: 8,
+                      marginBottom: 8,
+                      borderLeftWidth: 4,
+                      borderLeftColor: "#C9973A",
+                    }}
+                  >
+                    <Text style={{ fontWeight: "bold", color: "#5C3A1E" }}>
+                      {nicho.NIC_NUMERO} - Zona {nicho.NIC_ZONA}
+                    </Text>
+                    <Text style={{ fontSize: 12, color: "#666" }}>
+                      {nicho.NIC_CARACTERISTICA}
+                    </Text>
+                  </View>
+                ))
+              )}
+            </View>
+          </View>
+        )}
+
+        {/* --- TÍTULO DEL LISTADO --- */}
+        <Text style={styles.sectionLabel}>Almacenes Registrados</Text>
+
+        {/* --- LISTADO (Mapeado directo en vez de FlatList) --- */}
+        {loading ? (
+          <ActivityIndicator
+            size="large"
+            color="#C9973A"
+            style={{ marginTop: 20 }}
+          />
+        ) : almacenes.length === 0 ? (
+          <Text style={styles.emptyState}>
+            No hay almacenes registrados en la base de datos.
+          </Text>
+        ) : (
+          almacenes.map((item) => (
+            <View key={item.ALM_ALMACEN.toString()} style={styles.listItem}>
+              <View style={styles.listContent}>
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>ID: {item.ALM_ALMACEN}</Text>
+                </View>
+                <Text style={styles.itemTitle}>{item.ALM_NOMBRE}</Text>
+                <Text style={styles.itemText}>📍 {item.ALM_UBICACION}</Text>
+                <Text style={styles.itemText}>🌎 {item.ALM_PAIS}</Text>
+              </View>
+              <View style={styles.listActions}>
+                <TouchableOpacity
+                  style={styles.btnEdit}
+                  onPress={() => handleEditar(item)}
+                >
+                  <Text style={styles.btnEditText}>Editar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.btnDelete}
+                  onPress={() => handleEliminar(item.ALM_ALMACEN)}
+                >
+                  <Text style={styles.btnDeleteText}>Eliminar</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))
+        )}
+
+        {/* Espacio extra al final para asegurar el scroll completo */}
+        <View style={{ height: 40 }} />
+      </ScrollView>
     </View>
   );
 }

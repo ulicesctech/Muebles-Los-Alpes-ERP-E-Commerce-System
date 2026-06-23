@@ -4,9 +4,7 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
-  KeyboardAvoidingView,
   Modal,
-  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -410,121 +408,207 @@ export default function StockScreen() {
 
     return (
       <View style={styles.wrapper}>
-        <KeyboardAvoidingView
-          style={styles.keyboardContainer}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        <ScrollView
+          contentContainerStyle={styles.container}
+          keyboardShouldPersistTaps="handled"
         >
-          <ScrollView
-            contentContainerStyle={styles.container}
-            keyboardShouldPersistTaps="handled"
-            keyboardDismissMode="none"
-          >
-            <View style={styles.avisoPedido}>
-              <Text style={styles.avisoTitle}>
-                ⚠ Recepción de Pedido #{pedidoId}
+          <View style={styles.avisoPedido}>
+            <Text style={styles.avisoTitle}>
+              ⚠ Recepción de Pedido #{pedidoId}
+            </Text>
+            <Text style={styles.avisoText}>
+              {"Selecciona el almacén y nicho donde ingresa la mercancía.\n"}
+              {
+                "Al confirmar se registrará la cantidad recibida y el historial de precios se actualizará si el precio cambió.\n"
+              }
+              <Text style={{ fontStyle: "italic" }}>
+                Si salís sin confirmar, la cantidad recibida NO quedará
+                registrada.
               </Text>
-              <Text style={styles.avisoText}>
-                {"Selecciona el almacén y nicho donde ingresa la mercancía.\n"}
-                {
-                  "Al confirmar se registrará la cantidad recibida y el historial de precios se actualizará si el precio cambió.\n"
-                }
-                <Text style={{ fontStyle: "italic" }}>
-                  Si salís sin confirmar, la cantidad recibida NO quedará
-                  registrada.
-                </Text>
-              </Text>
-            </View>
+            </Text>
+          </View>
 
-            {/* PASO 1 */}
-            <View style={styles.stepCard}>
-              <View style={styles.stepHeader}>
-                <View style={styles.stepNum}>
-                  <Text style={styles.stepNumText}>1</Text>
-                </View>
-                <Text style={styles.stepTitle}>Producto seleccionado</Text>
+          {/* PASO 1 */}
+          <View style={styles.stepCard}>
+            <View style={styles.stepHeader}>
+              <View style={styles.stepNum}>
+                <Text style={styles.stepNumText}>1</Text>
               </View>
-              <View style={styles.infoBadge}>
-                <Text style={styles.infoBadgeText}>{proNombre}</Text>
-                {!!proMaterial && (
-                  <Text style={styles.infoBadgeCant}>{proMaterial}</Text>
-                )}
+              <Text style={styles.stepTitle}>Producto seleccionado</Text>
+            </View>
+            <View style={styles.infoBadge}>
+              <Text style={styles.infoBadgeText}>{proNombre}</Text>
+              {!!proMaterial && (
+                <Text style={styles.infoBadgeCant}>{proMaterial}</Text>
+              )}
+              <Text style={styles.infoBadgeCant}>
+                Cantidad a ingresar:{" "}
+                <Text style={{ fontWeight: "bold" }}>{cantRecibida}</Text>
+              </Text>
+              {precioODP > 0 && (
                 <Text style={styles.infoBadgeCant}>
-                  Cantidad a ingresar:{" "}
-                  <Text style={{ fontWeight: "bold" }}>{cantRecibida}</Text>
-                </Text>
-                {precioODP > 0 && (
-                  <Text style={styles.infoBadgeCant}>
-                    Precio OC:{" "}
-                    <Text style={{ fontWeight: "bold" }}>
-                      Q {precioODP.toFixed(2)}
-                    </Text>
+                  Precio OC:{" "}
+                  <Text style={{ fontWeight: "bold" }}>
+                    Q {precioODP.toFixed(2)}
                   </Text>
-                )}
-              </View>
+                </Text>
+              )}
             </View>
+          </View>
 
-            {/* PASO 2 */}
+          {/* PASO 2 */}
+          <View style={styles.stepCard}>
+            <View style={styles.stepHeader}>
+              <View style={styles.stepNum}>
+                <Text style={styles.stepNumText}>2</Text>
+              </View>
+              <Text style={styles.stepTitle}>Selecciona el Almacén</Text>
+            </View>
+            {loadingAlm ? (
+              <ActivityIndicator color="#C9973A" />
+            ) : (
+              <>
+                <TouchableOpacity
+                  style={styles.dropdownBtn}
+                  onPress={() => setShowAlmDropdown((v) => !v)}
+                >
+                  <Text
+                    style={
+                      almSelId
+                        ? styles.dropdownBtnTextSel
+                        : styles.dropdownBtnPlaceholder
+                    }
+                  >
+                    {almSelId
+                      ? (almacenes.find((a) => a.ALM_ALMACEN === almSelId)
+                          ?.ALM_NOMBRE ?? "Seleccionar...")
+                      : "Seleccionar almacén..."}
+                  </Text>
+                  <Text style={styles.dropdownArrow}>
+                    {showAlmDropdown ? "▲" : "▼"}
+                  </Text>
+                </TouchableOpacity>
+                {showAlmDropdown && (
+                  <ScrollView
+                    style={styles.dropdownList}
+                    nestedScrollEnabled
+                    keyboardShouldPersistTaps="handled"
+                  >
+                    {almacenes.map((alm) => (
+                      <TouchableOpacity
+                        key={alm.ALM_ALMACEN}
+                        style={[
+                          styles.dropdownItem,
+                          almSelId === alm.ALM_ALMACEN &&
+                            styles.dropdownItemSel,
+                        ]}
+                        onPress={() => {
+                          seleccionarAlmacen(alm.ALM_ALMACEN);
+                          setShowAlmDropdown(false);
+                        }}
+                      >
+                        <Text
+                          style={[
+                            styles.dropdownItemText,
+                            almSelId === alm.ALM_ALMACEN &&
+                              styles.dropdownItemTextSel,
+                          ]}
+                        >
+                          {alm.ALM_NOMBRE}
+                        </Text>
+                        {almSelId === alm.ALM_ALMACEN && (
+                          <Text style={{ color: "#C9973A" }}>✔</Text>
+                        )}
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                )}
+              </>
+            )}
+          </View>
+
+          {/* PASO 3 */}
+          {almSelId !== null && (
             <View style={styles.stepCard}>
               <View style={styles.stepHeader}>
                 <View style={styles.stepNum}>
-                  <Text style={styles.stepNumText}>2</Text>
+                  <Text style={styles.stepNumText}>3</Text>
                 </View>
-                <Text style={styles.stepTitle}>Selecciona el Almacén</Text>
+                <Text style={styles.stepTitle}>Selecciona el Nicho</Text>
+                {/* FIX: numberOfLines + ellipsizeMode evitan que nombres largos
+                    de almacén rompan el layout del stepHeader */}
+                <Text
+                  style={styles.stepSub}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {almSel?.ALM_NOMBRE}
+                </Text>
               </View>
-              {loadingAlm ? (
+              {loadingNichos ? (
                 <ActivityIndicator color="#C9973A" />
+              ) : nichos.length === 0 ? (
+                <Text style={styles.emptyState}>
+                  No hay nichos en este almacén.
+                </Text>
               ) : (
                 <>
                   <TouchableOpacity
                     style={styles.dropdownBtn}
-                    onPress={() => setShowAlmDropdown((v) => !v)}
+                    onPress={() => setShowNicDropdown((v) => !v)}
                   >
                     <Text
                       style={
-                        almSelId
+                        nicSelId
                           ? styles.dropdownBtnTextSel
                           : styles.dropdownBtnPlaceholder
                       }
                     >
-                      {almSelId
-                        ? (almacenes.find((a) => a.ALM_ALMACEN === almSelId)
-                            ?.ALM_NOMBRE ?? "Seleccionar...")
-                        : "Seleccionar almacén..."}
+                      {nicSelId
+                        ? (nichos.find((n) => n.NIC_NICHO === nicSelId)
+                            ?.NIC_NUMERO ?? "Seleccionar...") +
+                          (nichos.find((n) => n.NIC_NICHO === nicSelId)
+                            ?.NIC_CARACTERISTICA
+                            ? ` — ${nichos.find((n) => n.NIC_NICHO === nicSelId)?.NIC_CARACTERISTICA}`
+                            : "")
+                        : "Seleccionar nicho..."}
                     </Text>
                     <Text style={styles.dropdownArrow}>
-                      {showAlmDropdown ? "▲" : "▼"}
+                      {showNicDropdown ? "▲" : "▼"}
                     </Text>
                   </TouchableOpacity>
-                  {showAlmDropdown && (
+                  {showNicDropdown && (
                     <ScrollView
                       style={styles.dropdownList}
                       nestedScrollEnabled
                       keyboardShouldPersistTaps="handled"
-                      keyboardDismissMode="none"
                     >
-                      {almacenes.map((alm) => (
+                      {nichos.map((nic) => (
                         <TouchableOpacity
-                          key={alm.ALM_ALMACEN}
+                          key={nic.NIC_NICHO}
                           style={[
                             styles.dropdownItem,
-                            almSelId === alm.ALM_ALMACEN &&
+                            nicSelId === nic.NIC_NICHO &&
                               styles.dropdownItemSel,
                           ]}
                           onPress={() => {
-                            seleccionarAlmacen(alm.ALM_ALMACEN);
-                            setShowAlmDropdown(false);
+                            seleccionarNicho(nic.NIC_NICHO);
+                            setShowNicDropdown(false);
                           }}
                         >
                           <Text
                             style={[
                               styles.dropdownItemText,
-                              almSelId === alm.ALM_ALMACEN &&
+                              nicSelId === nic.NIC_NICHO &&
                                 styles.dropdownItemTextSel,
                             ]}
                           >
-                            {alm.ALM_NOMBRE}
+                            {nic.NIC_NUMERO}
+                            {nic.NIC_CARACTERISTICA
+                              ? ` — ${nic.NIC_CARACTERISTICA}`
+                              : ""}
                           </Text>
-                          {almSelId === alm.ALM_ALMACEN && (
+                          {nicSelId === nic.NIC_NICHO && (
                             <Text style={{ color: "#C9973A" }}>✔</Text>
                           )}
                         </TouchableOpacity>
@@ -534,366 +618,287 @@ export default function StockScreen() {
                 </>
               )}
             </View>
+          )}
 
-            {/* PASO 3 */}
-            {almSelId !== null && (
-              <View style={styles.stepCard}>
-                <View style={styles.stepHeader}>
-                  <View style={styles.stepNum}>
-                    <Text style={styles.stepNumText}>3</Text>
-                  </View>
-                  <Text style={styles.stepTitle}>Selecciona el Nicho</Text>
-                  <Text style={styles.stepSub}>{almSel?.ALM_NOMBRE}</Text>
+          {/* PASO 4 */}
+          {nicSelId !== null && (
+            <View style={styles.stepCard}>
+              <View style={styles.stepHeader}>
+                <View style={styles.stepNum}>
+                  <Text style={styles.stepNumText}>4</Text>
                 </View>
-                {loadingNichos ? (
-                  <ActivityIndicator color="#C9973A" />
-                ) : nichos.length === 0 ? (
-                  <Text style={styles.emptyState}>
-                    No hay nichos en este almacén.
-                  </Text>
-                ) : (
-                  <>
-                    <TouchableOpacity
-                      style={styles.dropdownBtn}
-                      onPress={() => setShowNicDropdown((v) => !v)}
-                    >
-                      <Text
-                        style={
-                          nicSelId
-                            ? styles.dropdownBtnTextSel
-                            : styles.dropdownBtnPlaceholder
-                        }
-                      >
-                        {nicSelId
-                          ? (nichos.find((n) => n.NIC_NICHO === nicSelId)
-                              ?.NIC_NUMERO ?? "Seleccionar...") +
-                            (nichos.find((n) => n.NIC_NICHO === nicSelId)
-                              ?.NIC_CARACTERISTICA
-                              ? ` — ${nichos.find((n) => n.NIC_NICHO === nicSelId)?.NIC_CARACTERISTICA}`
-                              : "")
-                          : "Seleccionar nicho..."}
-                      </Text>
-                      <Text style={styles.dropdownArrow}>
-                        {showNicDropdown ? "▲" : "▼"}
-                      </Text>
-                    </TouchableOpacity>
-                    {showNicDropdown && (
-                      <ScrollView
-                        style={styles.dropdownList}
-                        nestedScrollEnabled
-                        keyboardShouldPersistTaps="handled"
-                        keyboardDismissMode="none"
-                      >
-                        {nichos.map((nic) => (
-                          <TouchableOpacity
-                            key={nic.NIC_NICHO}
-                            style={[
-                              styles.dropdownItem,
-                              nicSelId === nic.NIC_NICHO &&
-                                styles.dropdownItemSel,
-                            ]}
-                            onPress={() => {
-                              seleccionarNicho(nic.NIC_NICHO);
-                              setShowNicDropdown(false);
-                            }}
-                          >
-                            <Text
-                              style={[
-                                styles.dropdownItemText,
-                                nicSelId === nic.NIC_NICHO &&
-                                  styles.dropdownItemTextSel,
-                              ]}
-                            >
-                              {nic.NIC_NUMERO}
-                              {nic.NIC_CARACTERISTICA
-                                ? ` — ${nic.NIC_CARACTERISTICA}`
-                                : ""}
-                            </Text>
-                            {nicSelId === nic.NIC_NICHO && (
-                              <Text style={{ color: "#C9973A" }}>✔</Text>
-                            )}
-                          </TouchableOpacity>
-                        ))}
-                      </ScrollView>
-                    )}
-                  </>
-                )}
+                <Text style={styles.stepTitle}>Gestionar Stock</Text>
+                {/* FIX: numberOfLines + ellipsizeMode evitan que características
+                    largas del nicho (ej: "Estante bajo, acceso frontal, productos sala cd")
+                    empujen el contenido del card fuera del área visible */}
+                <Text
+                  style={styles.stepSub}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {nicSel
+                    ? `${nicSel.NIC_NUMERO}${nicSel.NIC_CARACTERISTICA ? ` — ${nicSel.NIC_CARACTERISTICA}` : ""}`
+                    : ""}
+                </Text>
               </View>
-            )}
 
-            {/* PASO 4 */}
-            {nicSelId !== null && (
-              <View style={styles.stepCard}>
-                <View style={styles.stepHeader}>
-                  <View style={styles.stepNum}>
-                    <Text style={styles.stepNumText}>4</Text>
-                  </View>
-                  <Text style={styles.stepTitle}>Gestionar Stock</Text>
-                  <Text style={styles.stepSub}>
-                    {nicSel
-                      ? `${nicSel.NIC_NUMERO}${nicSel.NIC_CARACTERISTICA ? ` — ${nicSel.NIC_CARACTERISTICA}` : ""}`
-                      : ""}
-                  </Text>
-                </View>
+              {loadingPaso4 && (
+                <ActivityIndicator
+                  color="#C9973A"
+                  style={{ marginVertical: 12 }}
+                />
+              )}
 
-                {loadingPaso4 && (
-                  <ActivityIndicator
-                    color="#C9973A"
-                    style={{ marginVertical: 12 }}
-                  />
-                )}
-
-                {/* Con stock existente */}
-                {!loadingPaso4 && tieneStock === true && stockNicho && (
-                  <View>
-                    <View style={styles.stockActual}>
-                      <Text style={styles.stockActualTitle}>Stock Actual</Text>
-                      <View style={styles.stockGrid}>
-                        <View
-                          style={[
-                            styles.stockItem,
-                            stockNicho.STO_DISPONIBLE <=
-                              stockNicho.STO_MINIMO && styles.stockItemBajo,
-                            stockNicho.STO_DISPONIBLE >=
-                              stockNicho.STO_MAXIMO && styles.stockItemAlto,
-                          ]}
-                        >
-                          <Text style={styles.stockVal}>
-                            {stockNicho.STO_DISPONIBLE}
-                          </Text>
-                          <Text style={styles.stockLbl}>Disponible</Text>
-                        </View>
-                        <View style={styles.stockItem}>
-                          <Text style={styles.stockVal}>
-                            {stockNicho.STO_MINIMO}
-                          </Text>
-                          <Text style={styles.stockLbl}>Mínimo</Text>
-                        </View>
-                        <View style={styles.stockItem}>
-                          <Text style={styles.stockVal}>
-                            {stockNicho.STO_MAXIMO}
-                          </Text>
-                          <Text style={styles.stockLbl}>Máximo</Text>
-                        </View>
+              {/* Con stock existente */}
+              {!loadingPaso4 && tieneStock === true && stockNicho && (
+                <View>
+                  <View style={styles.stockActual}>
+                    <Text style={styles.stockActualTitle}>Stock Actual</Text>
+                    <View style={styles.stockGrid}>
+                      <View
+                        style={[
+                          styles.stockItem,
+                          stockNicho.STO_DISPONIBLE <= stockNicho.STO_MINIMO &&
+                            styles.stockItemBajo,
+                          stockNicho.STO_DISPONIBLE >= stockNicho.STO_MAXIMO &&
+                            styles.stockItemAlto,
+                        ]}
+                      >
+                        <Text style={styles.stockVal}>
+                          {stockNicho.STO_DISPONIBLE}
+                        </Text>
+                        <Text style={styles.stockLbl}>Disponible</Text>
+                      </View>
+                      <View style={styles.stockItem}>
+                        <Text style={styles.stockVal}>
+                          {stockNicho.STO_MINIMO}
+                        </Text>
+                        <Text style={styles.stockLbl}>Mínimo</Text>
+                      </View>
+                      <View style={styles.stockItem}>
+                        <Text style={styles.stockVal}>
+                          {stockNicho.STO_MAXIMO}
+                        </Text>
+                        <Text style={styles.stockLbl}>Máximo</Text>
                       </View>
                     </View>
+                  </View>
 
-                    <View style={styles.sumaInfo}>
-                      <Text style={styles.sumaInfoText}>
-                        {"➕ Al confirmar el disponible quedará en: "}
-                        <Text style={styles.sumaInfoVal}>
-                          {stockNicho.STO_DISPONIBLE} + {cantRecibida} ={" "}
-                          <Text style={{ fontWeight: "900" }}>
-                            {nuevoDisponible}
-                          </Text>
+                  <View style={styles.sumaInfo}>
+                    <Text style={styles.sumaInfoText}>
+                      {"➕ Al confirmar el disponible quedará en: "}
+                      <Text style={styles.sumaInfoVal}>
+                        {stockNicho.STO_DISPONIBLE} + {cantRecibida} ={" "}
+                        <Text style={{ fontWeight: "900" }}>
+                          {nuevoDisponible}
                         </Text>
                       </Text>
-                    </View>
+                    </Text>
+                  </View>
 
-                    <View style={styles.entradaCard}>
-                      <Text style={styles.entradaTitle}>
-                        Registrar Entrada de Mercancía
-                      </Text>
-                      <View style={styles.entradaRow}>
-                        <View style={styles.entradaReadonly}>
-                          <Text style={styles.entradaReadonlyVal}>
-                            {cantRecibida}
-                          </Text>
-                          <Text style={styles.entradaReadonlyLbl}>
-                            Cantidad a ingresar
-                          </Text>
-                        </View>
-                        <TouchableOpacity
-                          style={[styles.btnGreen, saving && { opacity: 0.6 }]}
-                          onPress={confirmarEntradaExistente}
-                          disabled={saving}
-                        >
-                          <Text style={styles.btnGreenText}>
-                            {saving
-                              ? "Confirmando..."
-                              : "✔ Confirmar Recepción y Volver a Pedidos"}
-                          </Text>
-                        </TouchableOpacity>
+                  <View style={styles.entradaCard}>
+                    <Text style={styles.entradaTitle}>
+                      Registrar Entrada de Mercancía
+                    </Text>
+                    <View style={styles.entradaRow}>
+                      <View style={styles.entradaReadonly}>
+                        <Text style={styles.entradaReadonlyVal}>
+                          {cantRecibida}
+                        </Text>
+                        <Text style={styles.entradaReadonlyLbl}>
+                          Cantidad a ingresar
+                        </Text>
                       </View>
-                    </View>
-
-                    {/* ── Ajustar límites: todos en la misma fila alineada ── */}
-                    <View style={{ marginTop: 16 }}>
-                      <Text style={styles.subLabel}>Ajustar Límites</Text>
-                      {/* Fila con 3 celdas iguales: Disponible | Mínimo | Máximo */}
-                      <View style={styles.limitesRow}>
-                        <View style={styles.limiteCampo}>
-                          <Text style={styles.label}>Disponible</Text>
-                          <View style={styles.inputReadonly}>
-                            <Text style={styles.inputReadonlyText}>
-                              {stockNicho.STO_DISPONIBLE}
-                            </Text>
-                          </View>
-                        </View>
-                        <View style={styles.limiteCampo}>
-                          <Text style={styles.label}>Mínimo *</Text>
-                          <TextInput
-                            style={[
-                              styles.input,
-                              styles.inputLimite,
-                              !editLimites && styles.inputReadonlyField,
-                            ]}
-                            value={txtMin}
-                            onChangeText={setTxtMin}
-                            keyboardType="numeric"
-                            editable={editLimites}
-                          />
-                        </View>
-                        <View style={styles.limiteCampo}>
-                          <Text style={styles.label}>Máximo *</Text>
-                          <TextInput
-                            style={[
-                              styles.input,
-                              styles.inputLimite,
-                              !editLimites && styles.inputReadonlyField,
-                            ]}
-                            value={txtMax}
-                            onChangeText={setTxtMax}
-                            keyboardType="numeric"
-                            editable={editLimites}
-                          />
-                        </View>
-                      </View>
-
-                      {!editLimites ? (
-                        <TouchableOpacity
-                          style={styles.btnOutline}
-                          onPress={() => setEditLimites(true)}
-                        >
-                          <Text style={styles.btnOutlineText}>
-                            ✎ Editar Límites
-                          </Text>
-                        </TouchableOpacity>
-                      ) : (
-                        <View style={{ flexDirection: "row", gap: 10 }}>
-                          <TouchableOpacity
-                            style={styles.btnOutline}
-                            onPress={() => {
-                              setEditLimites(false);
-                              setTxtMin(stockNicho.STO_MINIMO.toString());
-                              setTxtMax(stockNicho.STO_MAXIMO.toString());
-                            }}
-                          >
-                            <Text style={styles.btnOutlineText}>Cancelar</Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            style={[styles.btnGold, saving && { opacity: 0.6 }]}
-                            disabled={saving}
-                            onPress={async () => {
-                              const min = parseInt(txtMin, 10);
-                              const max = parseInt(txtMax, 10);
-                              if (isNaN(min) || isNaN(max) || min > max) {
-                                Alert.alert(
-                                  "Atención",
-                                  "Mínimo no puede ser mayor al máximo.",
-                                );
-                                return;
-                              }
-                              setSaving(true);
-                              try {
-                                await StockService.guardar(
-                                  stockNicho.HIP_HISTORIAL_PRECIO,
-                                  min,
-                                  max,
-                                  stockNicho.STO_DISPONIBLE,
-                                );
-                                Alert.alert(
-                                  "✅ Listo",
-                                  "Los límites fueron actualizados.",
-                                );
-                                setEditLimites(false);
-                                await seleccionarNicho(nicSelId!);
-                              } catch (err: any) {
-                                Alert.alert(
-                                  "😕 Algo salió mal",
-                                  err.message?.includes("500")
-                                    ? "Error en el servidor."
-                                    : (err.message ?? "Error inesperado."),
-                                );
-                              } finally {
-                                setSaving(false);
-                              }
-                            }}
-                          >
-                            <Text style={styles.btnGoldText}>
-                              Guardar Límites
-                            </Text>
-                          </TouchableOpacity>
-                        </View>
-                      )}
+                      <TouchableOpacity
+                        style={[styles.btnGreen, saving && { opacity: 0.6 }]}
+                        onPress={confirmarEntradaExistente}
+                        disabled={saving}
+                      >
+                        <Text style={styles.btnGreenText}>
+                          {saving
+                            ? "Confirmando..."
+                            : "✔ Confirmar Recepción y Volver a Pedidos"}
+                        </Text>
+                      </TouchableOpacity>
                     </View>
                   </View>
-                )}
 
-                {/* Sin stock */}
-                {!loadingPaso4 && tieneStock === false && (
-                  <View>
-                    <View style={styles.avisoPrecio}>
-                      <Text style={styles.avisoPrecioText}>
-                        Este producto no tiene stock registrado en este nicho aún.
-                      </Text>
-                    </View>
-                    {/* Misma fila alineada: Disponible inicial | Mínimo | Máximo */}
+                  {/* ── Ajustar límites: todos en la misma fila alineada ── */}
+                  <View style={{ marginTop: 16 }}>
+                    <Text style={styles.subLabel}>Ajustar Límites</Text>
+                    {/* Fila con 3 celdas iguales: Disponible | Mínimo | Máximo */}
                     <View style={styles.limitesRow}>
                       <View style={styles.limiteCampo}>
-                        <Text style={styles.label}>Disponible inicial</Text>
+                        <Text style={styles.label}>Disponible</Text>
                         <View style={styles.inputReadonly}>
                           <Text style={styles.inputReadonlyText}>
-                            {cantRecibida}
+                            {stockNicho.STO_DISPONIBLE}
                           </Text>
                         </View>
                       </View>
                       <View style={styles.limiteCampo}>
                         <Text style={styles.label}>Mínimo *</Text>
                         <TextInput
-                          style={[styles.input, styles.inputLimite]}
-                          value={txtMinNuevo}
-                          onChangeText={setTxtMinNuevo}
+                          style={[
+                            styles.input,
+                            styles.inputLimite,
+                            !editLimites && styles.inputReadonlyField,
+                          ]}
+                          value={txtMin}
+                          onChangeText={setTxtMin}
                           keyboardType="numeric"
-                          placeholder="0"
+                          editable={editLimites}
                         />
                       </View>
                       <View style={styles.limiteCampo}>
                         <Text style={styles.label}>Máximo *</Text>
                         <TextInput
-                          style={[styles.input, styles.inputLimite]}
-                          value={txtMaxNuevo}
-                          onChangeText={setTxtMaxNuevo}
+                          style={[
+                            styles.input,
+                            styles.inputLimite,
+                            !editLimites && styles.inputReadonlyField,
+                          ]}
+                          value={txtMax}
+                          onChangeText={setTxtMax}
                           keyboardType="numeric"
-                          placeholder="0"
+                          editable={editLimites}
                         />
                       </View>
                     </View>
-                    <TouchableOpacity
-                      style={[styles.btnGold, saving && { opacity: 0.6 }]}
-                      onPress={confirmarCrearStock}
-                      disabled={saving}
-                    >
-                      <Text style={styles.btnGoldText}>
-                        {saving
-                          ? "Creando..."
-                          : "✔ Confirmar Recepción y Volver a Pedidos"}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
-              </View>
-            )}
 
-            <TouchableOpacity
-              style={[styles.btnOutline, { marginTop: 16 }]}
-              onPress={() => router.back()}
-            >
-              <Text style={styles.btnOutlineText}>← Cancelar y volver</Text>
-            </TouchableOpacity>
-            <View style={{ height: 40 }} />
-          </ScrollView>
-        </KeyboardAvoidingView>
+                    {!editLimites ? (
+                      <TouchableOpacity
+                        style={styles.btnOutline}
+                        onPress={() => setEditLimites(true)}
+                      >
+                        <Text style={styles.btnOutlineText}>
+                          ✎ Editar Límites
+                        </Text>
+                      </TouchableOpacity>
+                    ) : (
+                      <View style={{ flexDirection: "row", gap: 10 }}>
+                        <TouchableOpacity
+                          style={styles.btnOutline}
+                          onPress={() => {
+                            setEditLimites(false);
+                            setTxtMin(stockNicho.STO_MINIMO.toString());
+                            setTxtMax(stockNicho.STO_MAXIMO.toString());
+                          }}
+                        >
+                          <Text style={styles.btnOutlineText}>Cancelar</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={[styles.btnGold, saving && { opacity: 0.6 }]}
+                          disabled={saving}
+                          onPress={async () => {
+                            const min = parseInt(txtMin, 10);
+                            const max = parseInt(txtMax, 10);
+                            if (isNaN(min) || isNaN(max) || min > max) {
+                              Alert.alert(
+                                "Atención",
+                                "Mínimo no puede ser mayor al máximo.",
+                              );
+                              return;
+                            }
+                            setSaving(true);
+                            try {
+                              await StockService.guardar(
+                                stockNicho.HIP_HISTORIAL_PRECIO,
+                                min,
+                                max,
+                                stockNicho.STO_DISPONIBLE,
+                              );
+                              Alert.alert(
+                                "✅ Listo",
+                                "Los límites fueron actualizados.",
+                              );
+                              setEditLimites(false);
+                              await seleccionarNicho(nicSelId!);
+                            } catch (err: any) {
+                              Alert.alert(
+                                "😕 Algo salió mal",
+                                err.message?.includes("500")
+                                  ? "Error en el servidor."
+                                  : (err.message ?? "Error inesperado."),
+                              );
+                            } finally {
+                              setSaving(false);
+                            }
+                          }}
+                        >
+                          <Text style={styles.btnGoldText}>
+                            Guardar Límites
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  </View>
+                </View>
+              )}
+
+              {/* Sin stock */}
+              {!loadingPaso4 && tieneStock === false && (
+                <View>
+                  <View style={styles.avisoPrecio}>
+                    <Text style={styles.avisoPrecioText}>
+                      Este producto no tiene stock registrado en este nicho aún.
+                    </Text>
+                  </View>
+                  {/* Misma fila alineada: Disponible inicial | Mínimo | Máximo */}
+                  <View style={styles.limitesRow}>
+                    <View style={styles.limiteCampo}>
+                      <Text style={styles.label}>Disponible inicial</Text>
+                      <View style={styles.inputReadonly}>
+                        <Text style={styles.inputReadonlyText}>
+                          {cantRecibida}
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={styles.limiteCampo}>
+                      <Text style={styles.label}>Mínimo *</Text>
+                      <TextInput
+                        style={[styles.input, styles.inputLimite]}
+                        value={txtMinNuevo}
+                        onChangeText={setTxtMinNuevo}
+                        keyboardType="numeric"
+                        placeholder="0"
+                      />
+                    </View>
+                    <View style={styles.limiteCampo}>
+                      <Text style={styles.label}>Máximo *</Text>
+                      <TextInput
+                        style={[styles.input, styles.inputLimite]}
+                        value={txtMaxNuevo}
+                        onChangeText={setTxtMaxNuevo}
+                        keyboardType="numeric"
+                        placeholder="0"
+                      />
+                    </View>
+                  </View>
+                  <TouchableOpacity
+                    style={[styles.btnGold, saving && { opacity: 0.6 }]}
+                    onPress={confirmarCrearStock}
+                    disabled={saving}
+                  >
+                    <Text style={styles.btnGoldText}>
+                      {saving
+                        ? "Creando..."
+                        : "✔ Confirmar Recepción y Volver a Pedidos"}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+          )}
+
+          <TouchableOpacity
+            style={[styles.btnOutline, { marginTop: 16 }]}
+            onPress={() => router.back()}
+          >
+            <Text style={styles.btnOutlineText}>← Cancelar y volver</Text>
+          </TouchableOpacity>
+          <View style={{ height: 40 }} />
+        </ScrollView>
       </View>
     );
   }
@@ -955,333 +960,314 @@ export default function StockScreen() {
 
   return (
     <SafeAreaView style={styles.wrapper}>
-      <KeyboardAvoidingView
-        style={styles.keyboardContainer}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-      >
-        <View style={{ flex: 1 }}>
-          {/* ══ FILTROS FUERA DEL FLATLIST ══ */}
-          <View style={styles.filtrosCard}>
-            {/* Título + toggle */}
-            <TouchableOpacity
-              style={styles.filtrosTitleRow}
-              onPress={() => setFiltrosExpandido((v) => !v)}
+      <View style={{ flex: 1 }}>
+        {/* ══ FILTROS FUERA DEL FLATLIST ══ */}
+        <View style={styles.filtrosCard}>
+          {/* Título + toggle */}
+          <TouchableOpacity
+            style={styles.filtrosTitleRow}
+            onPress={() => setFiltrosExpandido((v) => !v)}
+          >
+            <Text style={styles.filtrosTitle}>📦 Control de Stock</Text>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
             >
-              <Text style={styles.filtrosTitle}>📦 Control de Stock</Text>
-              <View
-                style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
+              {(filtroProdInput.trim() !== "" || filtroAlmInput !== null) && (
+                <View style={styles.filtrosDot} />
+              )}
+              <Text style={styles.filtrosToggleText}>
+                {filtrosExpandido ? "▲ Ocultar" : "▼ Filtros"}
+              </Text>
+            </View>
+          </TouchableOpacity>
+
+          {filtrosExpandido && (
+            <>
+              <TextInput
+                style={[styles.input, { marginTop: 12 }]}
+                placeholder="Buscar por producto..."
+                value={filtroProdInput}
+                onChangeText={setFiltroProdInput}
+                returnKeyType="search"
+                onSubmitEditing={aplicarFiltros}
+                autoCorrect={false}
+              />
+
+              <Text style={styles.label}>ALMACÉN</Text>
+              <TouchableOpacity
+                style={styles.dropdownBtn}
+                onPress={() => {
+                  setShowAlmFilter((v) => !v);
+                  setShowNicFilter(false);
+                }}
               >
-                {(filtroProdInput.trim() !== "" || filtroAlmInput !== null) && (
-                  <View style={styles.filtrosDot} />
-                )}
-                <Text style={styles.filtrosToggleText}>
-                  {filtrosExpandido ? "▲ Ocultar" : "▼ Filtros"}
-                </Text>
-              </View>
-            </TouchableOpacity>
-
-            {filtrosExpandido && (
-              <>
-                <TextInput
-                  style={[styles.input, { marginTop: 12 }]}
-                  placeholder="Buscar por producto..."
-                  value={filtroProdInput}
-                  onChangeText={setFiltroProdInput}
-                  returnKeyType="search"
-                  onSubmitEditing={aplicarFiltros}
-                  autoCorrect={false}
-                />
-
-                <Text style={styles.label}>ALMACÉN</Text>
-                <TouchableOpacity
-                  style={styles.dropdownBtn}
-                  onPress={() => {
-                    setShowAlmFilter((v) => !v);
-                    setShowNicFilter(false);
-                  }}
+                <Text
+                  style={
+                    filtroAlmInput
+                      ? styles.dropdownBtnTextSel
+                      : styles.dropdownBtnPlaceholder
+                  }
                 >
-                  <Text
-                    style={
-                      filtroAlmInput
-                        ? styles.dropdownBtnTextSel
-                        : styles.dropdownBtnPlaceholder
-                    }
+                  {filtroAlmInput
+                    ? (almacenesFilter.find(
+                        (a) => a.ALM_ALMACEN === filtroAlmInput,
+                      )?.ALM_NOMBRE ?? "Todos")
+                    : "Todos los almacenes"}
+                </Text>
+                <Text style={styles.dropdownArrow}>
+                  {showAlmFilter ? "▲" : "▼"}
+                </Text>
+              </TouchableOpacity>
+              {showAlmFilter && (
+                <ScrollView
+                  style={styles.dropdownList}
+                  nestedScrollEnabled
+                  keyboardShouldPersistTaps="handled"
+                >
+                  <TouchableOpacity
+                    style={styles.dropdownItem}
+                    onPress={() => {
+                      setFiltroAlmInput(null);
+                      setFiltroNicInput(null);
+                      setNichosFilter([]);
+                      setShowAlmFilter(false);
+                    }}
                   >
-                    {filtroAlmInput
-                      ? (almacenesFilter.find(
-                          (a) => a.ALM_ALMACEN === filtroAlmInput,
-                        )?.ALM_NOMBRE ?? "Todos")
-                      : "Todos los almacenes"}
-                  </Text>
-                  <Text style={styles.dropdownArrow}>
-                    {showAlmFilter ? "▲" : "▼"}
-                  </Text>
-                </TouchableOpacity>
-                {showAlmFilter && (
-                  <ScrollView
-                    style={styles.dropdownList}
-                    nestedScrollEnabled
-                    keyboardShouldPersistTaps="handled"
-                    keyboardDismissMode="none"
-                  >
-                    <TouchableOpacity
-                      style={styles.dropdownItem}
-                      onPress={() => {
-                        setFiltroAlmInput(null);
-                        setFiltroNicInput(null);
-                        setNichosFilter([]);
-                        setShowAlmFilter(false);
-                      }}
-                    >
-                      <Text style={styles.dropdownItemText}>
-                        — Todos los almacenes —
-                      </Text>
-                    </TouchableOpacity>
-                    {loadingAlmFilter ? (
-                      <ActivityIndicator
-                        color="#C9973A"
-                        style={{ padding: 12 }}
-                      />
-                    ) : (
-                      almacenesFilter.map((alm) => (
-                        <TouchableOpacity
-                          key={alm.ALM_ALMACEN}
+                    <Text style={styles.dropdownItemText}>
+                      — Todos los almacenes —
+                    </Text>
+                  </TouchableOpacity>
+                  {loadingAlmFilter ? (
+                    <ActivityIndicator
+                      color="#C9973A"
+                      style={{ padding: 12 }}
+                    />
+                  ) : (
+                    almacenesFilter.map((alm) => (
+                      <TouchableOpacity
+                        key={alm.ALM_ALMACEN}
+                        style={[
+                          styles.dropdownItem,
+                          filtroAlmInput === alm.ALM_ALMACEN &&
+                            styles.dropdownItemSel,
+                        ]}
+                        onPress={() => {
+                          setFiltroAlmInput(alm.ALM_ALMACEN);
+                          setShowAlmFilter(false);
+                          cargarNichosFilter(alm.ALM_ALMACEN);
+                        }}
+                      >
+                        <Text
                           style={[
-                            styles.dropdownItem,
+                            styles.dropdownItemText,
                             filtroAlmInput === alm.ALM_ALMACEN &&
-                              styles.dropdownItemSel,
+                              styles.dropdownItemTextSel,
                           ]}
-                          onPress={() => {
-                            setFiltroAlmInput(alm.ALM_ALMACEN);
-                            setShowAlmFilter(false);
-                            cargarNichosFilter(alm.ALM_ALMACEN);
-                          }}
                         >
-                          <Text
-                            style={[
-                              styles.dropdownItemText,
-                              filtroAlmInput === alm.ALM_ALMACEN &&
-                                styles.dropdownItemTextSel,
-                            ]}
-                          >
-                            {alm.ALM_NOMBRE}
-                          </Text>
-                          {filtroAlmInput === alm.ALM_ALMACEN && (
-                            <Text style={{ color: "#C9973A" }}>✔</Text>
-                          )}
-                        </TouchableOpacity>
-                      ))
-                    )}
-                  </ScrollView>
-                )}
-
-                {filtroAlmInput !== null && (
-                  <>
-                    <Text style={[styles.label, { marginTop: 8 }]}>NICHO</Text>
-                    <TouchableOpacity
-                      style={styles.dropdownBtn}
-                      onPress={() => {
-                        setShowNicFilter((v) => !v);
-                        setShowAlmFilter(false);
-                      }}
-                    >
-                      <Text
-                        style={
-                          filtroNicInput
-                            ? styles.dropdownBtnTextSel
-                            : styles.dropdownBtnPlaceholder
-                        }
-                      >
-                        {filtroNicInput
-                          ? (nichosFilter.find(
-                              (n) => n.NIC_NICHO === filtroNicInput,
-                            )?.NIC_NUMERO ?? "Todos") +
-                            (nichosFilter.find(
-                              (n) => n.NIC_NICHO === filtroNicInput,
-                            )?.NIC_CARACTERISTICA
-                              ? ` — ${nichosFilter.find((n) => n.NIC_NICHO === filtroNicInput)?.NIC_CARACTERISTICA}`
-                              : "")
-                          : "Todos los nichos"}
-                      </Text>
-                      <Text style={styles.dropdownArrow}>
-                        {showNicFilter ? "▲" : "▼"}
-                      </Text>
-                    </TouchableOpacity>
-                    {showNicFilter && (
-                      <ScrollView
-                        style={styles.dropdownList}
-                        nestedScrollEnabled
-                        keyboardShouldPersistTaps="handled"
-                        keyboardDismissMode="none"
-                      >
-                        <TouchableOpacity
-                          style={styles.dropdownItem}
-                          onPress={() => {
-                            setFiltroNicInput(null);
-                            setShowNicFilter(false);
-                          }}
-                        >
-                          <Text style={styles.dropdownItemText}>
-                            — Todos los nichos —
-                          </Text>
-                        </TouchableOpacity>
-                        {loadingNicFilter ? (
-                          <ActivityIndicator
-                            color="#C9973A"
-                            style={{ padding: 12 }}
-                          />
-                        ) : (
-                          nichosFilter.map((nic) => (
-                            <TouchableOpacity
-                              key={nic.NIC_NICHO}
-                              style={[
-                                styles.dropdownItem,
-                                filtroNicInput === nic.NIC_NICHO &&
-                                  styles.dropdownItemSel,
-                              ]}
-                              onPress={() => {
-                                setFiltroNicInput(nic.NIC_NICHO);
-                                setShowNicFilter(false);
-                              }}
-                            >
-                              <Text
-                                style={[
-                                  styles.dropdownItemText,
-                                  filtroNicInput === nic.NIC_NICHO &&
-                                    styles.dropdownItemTextSel,
-                                ]}
-                              >
-                                {nic.NIC_NUMERO}
-                                {nic.NIC_CARACTERISTICA
-                                  ? ` — ${nic.NIC_CARACTERISTICA}`
-                                  : ""}
-                              </Text>
-                              {filtroNicInput === nic.NIC_NICHO && (
-                                <Text style={{ color: "#C9973A" }}>✔</Text>
-                              )}
-                            </TouchableOpacity>
-                          ))
+                          {alm.ALM_NOMBRE}
+                        </Text>
+                        {filtroAlmInput === alm.ALM_ALMACEN && (
+                          <Text style={{ color: "#C9973A" }}>✔</Text>
                         )}
-                      </ScrollView>
-                    )}
-                  </>
-                )}
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              )}
 
-                <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
+              {filtroAlmInput !== null && (
+                <>
+                  <Text style={[styles.label, { marginTop: 8 }]}>NICHO</Text>
                   <TouchableOpacity
-                    style={styles.btnOutline}
-                    onPress={limpiarFiltros}
+                    style={styles.dropdownBtn}
+                    onPress={() => {
+                      setShowNicFilter((v) => !v);
+                      setShowAlmFilter(false);
+                    }}
                   >
-                    <Text style={styles.btnOutlineText}>Limpiar</Text>
+                    <Text
+                      style={
+                        filtroNicInput
+                          ? styles.dropdownBtnTextSel
+                          : styles.dropdownBtnPlaceholder
+                      }
+                    >
+                      {filtroNicInput
+                        ? (nichosFilter.find(
+                            (n) => n.NIC_NICHO === filtroNicInput,
+                          )?.NIC_NUMERO ?? "Todos") +
+                          (nichosFilter.find(
+                            (n) => n.NIC_NICHO === filtroNicInput,
+                          )?.NIC_CARACTERISTICA
+                            ? ` — ${nichosFilter.find((n) => n.NIC_NICHO === filtroNicInput)?.NIC_CARACTERISTICA}`
+                            : "")
+                        : "Todos los nichos"}
+                    </Text>
+                    <Text style={styles.dropdownArrow}>
+                      {showNicFilter ? "▲" : "▼"}
+                    </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.btnGold}
-                    onPress={aplicarFiltros}
-                  >
-                    <Text style={styles.btnGoldText}>🔍 Filtrar</Text>
-                  </TouchableOpacity>
-                </View>
-              </>
-            )}
-          </View>
+                  {showNicFilter && (
+                    <ScrollView
+                      style={styles.dropdownList}
+                      nestedScrollEnabled
+                      keyboardShouldPersistTaps="handled"
+                    >
+                      <TouchableOpacity
+                        style={styles.dropdownItem}
+                        onPress={() => {
+                          setFiltroNicInput(null);
+                          setShowNicFilter(false);
+                        }}
+                      >
+                        <Text style={styles.dropdownItemText}>
+                          — Todos los nichos —
+                        </Text>
+                      </TouchableOpacity>
+                      {loadingNicFilter ? (
+                        <ActivityIndicator
+                          color="#C9973A"
+                          style={{ padding: 12 }}
+                        />
+                      ) : (
+                        nichosFilter.map((nic) => (
+                          <TouchableOpacity
+                            key={nic.NIC_NICHO}
+                            style={[
+                              styles.dropdownItem,
+                              filtroNicInput === nic.NIC_NICHO &&
+                                styles.dropdownItemSel,
+                            ]}
+                            onPress={() => {
+                              setFiltroNicInput(nic.NIC_NICHO);
+                              setShowNicFilter(false);
+                            }}
+                          >
+                            <Text
+                              style={[
+                                styles.dropdownItemText,
+                                filtroNicInput === nic.NIC_NICHO &&
+                                  styles.dropdownItemTextSel,
+                              ]}
+                            >
+                              {nic.NIC_NUMERO}
+                              {nic.NIC_CARACTERISTICA
+                                ? ` — ${nic.NIC_CARACTERISTICA}`
+                                : ""}
+                            </Text>
+                            {filtroNicInput === nic.NIC_NICHO && (
+                              <Text style={{ color: "#C9973A" }}>✔</Text>
+                            )}
+                          </TouchableOpacity>
+                        ))
+                      )}
+                    </ScrollView>
+                  )}
+                </>
+              )}
 
-          <Text style={styles.contador}>
-            Mostrando{" "}
-            <Text style={{ fontWeight: "bold", color: "#5C3A1E" }}>
-              {filtered.length}
-            </Text>{" "}
-            registro(s)
-          </Text>
-
-          {/* ══ LISTA ══ */}
-          <FlatList
-            data={filtered}
-            keyExtractor={(item) => item.HIP_HISTORIAL_PRECIO.toString()}
-            renderItem={renderItem}
-            style={{ flex: 1 }}
-            contentContainerStyle={{ padding: 15, paddingTop: 0 }}
-            keyboardShouldPersistTaps="handled"
-            keyboardDismissMode="none"
-            ListEmptyComponent={
-              loadingTabla ? (
-                <ActivityIndicator
-                  size="large"
-                  color="#C9973A"
-                  style={{ marginTop: 30 }}
-                />
-              ) : (
-                <Text style={styles.emptyState}>No hay registros de stock.</Text>
-              )
-            }
-            ListFooterComponent={<View style={{ height: 40 }} />}
-          />
+              <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
+                <TouchableOpacity
+                  style={styles.btnOutline}
+                  onPress={limpiarFiltros}
+                >
+                  <Text style={styles.btnOutlineText}>Limpiar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.btnGold}
+                  onPress={aplicarFiltros}
+                >
+                  <Text style={styles.btnGoldText}>🔍 Filtrar</Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
         </View>
-      </KeyboardAvoidingView>
+
+        <Text style={styles.contador}>
+          Mostrando{" "}
+          <Text style={{ fontWeight: "bold", color: "#5C3A1E" }}>
+            {filtered.length}
+          </Text>{" "}
+          registro(s)
+        </Text>
+
+        {/* ══ LISTA ══ */}
+        <FlatList
+          data={filtered}
+          keyExtractor={(item) => item.HIP_HISTORIAL_PRECIO.toString()}
+          renderItem={renderItem}
+          style={{ flex: 1 }}
+          contentContainerStyle={{ padding: 15, paddingTop: 0 }}
+          keyboardShouldPersistTaps="handled"
+          ListEmptyComponent={
+            loadingTabla ? (
+              <ActivityIndicator
+                size="large"
+                color="#C9973A"
+                style={{ marginTop: 30 }}
+              />
+            ) : (
+              <Text style={styles.emptyState}>No hay registros de stock.</Text>
+            )
+          }
+          ListFooterComponent={<View style={{ height: 40 }} />}
+        />
+      </View>
 
       {/* Modal límites */}
       <Modal visible={modalLimites} transparent animationType="slide">
         <View style={styles.modalOverlay}>
-          <KeyboardAvoidingView
-            style={styles.modalKeyboardContainer}
-            behavior={Platform.OS === "ios" ? "padding" : undefined}
-          >
-            <View style={styles.modalBox}>
-              <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Ajustar Límites</Text>
-              </View>
-              {itemActivo && (
-                <ScrollView
-                  keyboardShouldPersistTaps="handled"
-                  keyboardDismissMode="none"
-                  showsVerticalScrollIndicator={false}
-                >
-                  <View style={styles.modalBody}>
-                    <Text style={styles.modalProd}>{itemActivo.PRO_NOMBRE}</Text>
-                    <Text style={styles.modalSub}>
-                      {itemActivo.ALM_NOMBRE} · Nicho {itemActivo.NIC_NUMERO}
-                    </Text>
-                    <View style={styles.modalInfoBox}>
-                      <Text style={styles.modalInfoVal}>
-                        {itemActivo.STO_DISPONIBLE}
-                      </Text>
-                      <Text style={styles.modalInfoLbl}>Disponible actual</Text>
-                    </View>
-                    <Text style={styles.label}>Mínimo *</Text>
-                    <TextInput
-                      style={styles.input}
-                      value={modalMin}
-                      onChangeText={setModalMin}
-                      keyboardType="numeric"
-                    />
-                    <Text style={styles.label}>Máximo *</Text>
-                    <TextInput
-                      style={styles.input}
-                      value={modalMax}
-                      onChangeText={setModalMax}
-                      keyboardType="numeric"
-                    />
-                    <View style={{ flexDirection: "row", gap: 10 }}>
-                      <TouchableOpacity
-                        style={styles.btnOutline}
-                        onPress={() => setModalLimites(false)}
-                      >
-                        <Text style={styles.btnOutlineText}>Cancelar</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.btnGold}
-                        onPress={guardarLimitesModal}
-                        disabled={savingModal}
-                      >
-                        <Text style={styles.btnGoldText}>
-                          {savingModal ? "Guardando..." : "Guardar"}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </ScrollView>
-              )}
+          <View style={styles.modalBox}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Ajustar Límites</Text>
             </View>
-          </KeyboardAvoidingView>
+            {itemActivo && (
+              <View style={styles.modalBody}>
+                <Text style={styles.modalProd}>{itemActivo.PRO_NOMBRE}</Text>
+                <Text style={styles.modalSub}>
+                  {itemActivo.ALM_NOMBRE} · Nicho {itemActivo.NIC_NUMERO}
+                </Text>
+                <View style={styles.modalInfoBox}>
+                  <Text style={styles.modalInfoVal}>
+                    {itemActivo.STO_DISPONIBLE}
+                  </Text>
+                  <Text style={styles.modalInfoLbl}>Disponible actual</Text>
+                </View>
+                <Text style={styles.label}>Mínimo *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={modalMin}
+                  onChangeText={setModalMin}
+                  keyboardType="numeric"
+                />
+                <Text style={styles.label}>Máximo *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={modalMax}
+                  onChangeText={setModalMax}
+                  keyboardType="numeric"
+                />
+                <View style={{ flexDirection: "row", gap: 10 }}>
+                  <TouchableOpacity
+                    style={styles.btnOutline}
+                    onPress={() => setModalLimites(false)}
+                  >
+                    <Text style={styles.btnOutlineText}>Cancelar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.btnGold}
+                    onPress={guardarLimitesModal}
+                    disabled={savingModal}
+                  >
+                    <Text style={styles.btnGoldText}>
+                      {savingModal ? "Guardando..." : "Guardar"}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+          </View>
         </View>
       </Modal>
     </SafeAreaView>
@@ -1290,8 +1276,6 @@ export default function StockScreen() {
 
 const styles = StyleSheet.create({
   wrapper: { flex: 1, backgroundColor: "#f0ebe0" },
-  keyboardContainer: { flex: 1 },
-  modalKeyboardContainer: { width: "100%" },
   container: { padding: 15 },
 
   // aviso pedido
@@ -1338,7 +1322,11 @@ const styles = StyleSheet.create({
   },
   stepNumText: { color: "#1a0e05", fontWeight: "bold", fontSize: 13 },
   stepTitle: { fontSize: 15, fontWeight: "bold", color: "#5C3A1E", flex: 1 },
-  stepSub: { fontSize: 11, color: "#888" },
+  // FIX: flexShrink: 1 permite que el texto se comprima en el row en lugar de
+  // empujar el contenido del card fuera del área visible cuando la característica
+  // del nicho es larga (ej: "Estante bajo, acceso frontal, productos sala cd").
+  // Se combina con numberOfLines={1} + ellipsizeMode="tail" en el JSX.
+  stepSub: { fontSize: 11, color: "#888", flexShrink: 1 },
   infoBadge: {
     backgroundColor: "#fdf6ec",
     borderRadius: 8,

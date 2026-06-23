@@ -32,7 +32,7 @@
     .lc-footer a:hover { color:#5C3A1E; }
     .section-sep { border:none; border-top:1px solid #f0e8d8; margin:22px 0; }
     .pass-rules { font-size:11px; color:#8B5E3C; font-family:Arial,sans-serif; margin-top:5px; padding:6px 10px; background:#fdf6ec; border-radius:6px; border-left:3px solid #C9973A; }
-</style>
+</style>    
 
 <div class="lc-wrap">
     <a href='<%: ResolveUrl("~/Modules/Cliente/Catalogo.aspx") %>' class="back-link">Volver al catálogo</a>
@@ -62,12 +62,12 @@
             <div class="form-group">
                 <label>Email *</label>
                 <asp:TextBox ID="txtEmail" runat="server" CssClass="form-control"
-                    placeholder="tucorreo@email.com" autocomplete="off" />
+                    placeholder="correo@gmail.com" autocomplete="off" />
             </div>
             <div class="form-group">
                 <label>Contraseña *</label>
                 <asp:TextBox ID="txtPassword" runat="server" CssClass="form-control"
-                    TextMode="Password" placeholder="Tu contraseña..." autocomplete="new-password" />
+                    TextMode="Password" placeholder="********" autocomplete="new-password" />
             </div>
             <asp:Button ID="btnLogin" runat="server" Text="🔑 Ingresar a mi cuenta"
                 CssClass="btn-gold tiempoInhabilitado" OnClick="btnLogin_Click" />
@@ -85,14 +85,13 @@
                     <asp:DropDownList ID="ddlTipoDoc" runat="server" CssClass="form-control">
                         <asp:ListItem Value="">-- Tipo --</asp:ListItem>
                         <asp:ListItem Value="DPI">DPI</asp:ListItem>
-                        <asp:ListItem Value="Pasaporte">Pasaporte</asp:ListItem>
                         <asp:ListItem Value="NIT">NIT</asp:ListItem>
                     </asp:DropDownList>
                 </div>
                 <div class="form-group">
                     <label>Número Documento *</label>
                     <asp:TextBox ID="txtNumDoc" runat="server" CssClass="form-control"
-                        placeholder="1234567890101" MaxLength="13" autocomplete="off" />
+                        placeholder="0000000000000" MaxLength="13" autocomplete="off" />
                 </div>
             </div>
 
@@ -100,16 +99,16 @@
                 <div class="form-group">
                     <label>NIT <small style="color:#aaa;font-weight:normal;">(opcional)</small></label>
                     <asp:TextBox ID="txtNITReg" runat="server" CssClass="form-control"
-                        placeholder="NIT..." MaxLength="20" autocomplete="off"
+                        placeholder="00000000" MaxLength="20" autocomplete="off"
                         onkeyup="onNitChangeReg(this.value)" onchange="onNitChangeReg(this.value)" />
-                    <div class="hint-warn">💡 Si llenas este campo se asignará Jurídica automáticamente</div>
+                    <div class="hint-warn"> Si llenas este campo se asignará Jurídica automáticamente</div>
                 </div>
                 <div class="form-group">
                     <label>Tipo Cliente *</label>
                     <asp:DropDownList ID="ddlTipoClienteReg" runat="server" CssClass="form-control">
                         <asp:ListItem Value="">-- Seleccione --</asp:ListItem>
-                        <asp:ListItem Value="NATURAL">Natural (persona física)</asp:ListItem>
-                        <asp:ListItem Value="JURIDICA">Jurídica (empresa)</asp:ListItem>
+                        <asp:ListItem Value="NATURAL">Natural</asp:ListItem>
+                        <asp:ListItem Value="JURIDICA">Jurídica</asp:ListItem>
                     </asp:DropDownList>
                 </div>
             </div>
@@ -118,12 +117,12 @@
                 <div class="form-group">
                     <label>Primer Nombre *</label>
                     <asp:TextBox ID="txtPrimerNombre" runat="server" CssClass="form-control"
-                        placeholder="Tu nombre..." autocomplete="off" />
+                        placeholder="Primer" autocomplete="off" />
                 </div>
                 <div class="form-group">
                     <label>Segundo Nombre</label>
                     <asp:TextBox ID="txtSegundoNombre" runat="server" CssClass="form-control"
-                        placeholder="Opcional..." autocomplete="off" />
+                        placeholder="Segundo" autocomplete="off" />
                 </div>
             </div>
 
@@ -131,39 +130,39 @@
                 <div class="form-group">
                     <label>Primer Apellido *</label>
                     <asp:TextBox ID="txtPrimerApellido" runat="server" CssClass="form-control"
-                        placeholder="Tu apellido..." autocomplete="off" />
+                        placeholder="Primer" autocomplete="off" />
                 </div>
                 <div class="form-group">
                     <label>Segundo Apellido</label>
                     <asp:TextBox ID="txtSegundoApellido" runat="server" CssClass="form-control"
-                        placeholder="Opcional..." autocomplete="off" />
+                        placeholder="Segundo" autocomplete="off" />
                 </div>
             </div>
 
             <div class="form-group">
                 <label>Email * <small style="color:#aaa;font-weight:normal;">(será tu usuario)</small></label>
                 <asp:TextBox ID="txtRegEmail" runat="server" CssClass="form-control"
-                    placeholder="tucorreo@email.com" autocomplete="off" />
+                    placeholder="correo@gmail.com" autocomplete="off" />
                 <div class="hint-warn">Con este email ingresarás al sistema</div>
             </div>
 
             <div class="form-group">
                 <label>Contraseña * <small style="color:#aaa;font-weight:normal;">(mínimo 8 caracteres)</small></label>
                 <asp:TextBox ID="txtRegPassword" runat="server" CssClass="form-control"
-                    TextMode="Password" placeholder="Crea tu contraseña..." autocomplete="new-password" />
-                <div class="pass-rules">Mínimo 8 caracteres — mayúscula, minúscula y número. Ej: <strong>Muebles1</strong></div>
+                    TextMode="Password" placeholder="********" autocomplete="new-password" />
+                <div class="pass-rules">Mínimo 8 caracteres — mayúscula, minúscula</div>
             </div>
 
             <div class="form-group">
                 <label>Confirmar Contraseña *</label>
                 <asp:TextBox ID="txtConfirmPassword" runat="server" CssClass="form-control"
-                    TextMode="Password" placeholder="Repite tu contraseña..." autocomplete="new-password" />
+                    TextMode="Password" placeholder="********" autocomplete="new-password" />
             </div>
 
             <div class="form-group">
                 <label>Teléfono * <small style="color:#aaa;font-weight:normal;">(8 dígitos)</small></label>
                 <asp:TextBox ID="txtTelefono" runat="server" CssClass="form-control"
-                    placeholder="55551234" MaxLength="8" autocomplete="off" />
+                    placeholder="00000000" MaxLength="8" autocomplete="off" />
                 <div class="hint-warn">Solo dígitos, sin guiones ni espacios</div>
             </div>
 
@@ -173,12 +172,12 @@
                 <div class="form-group">
                     <label>País *</label>
                     <asp:TextBox ID="txtPais" runat="server" CssClass="form-control"
-                        placeholder="Guatemala" autocomplete="off" />
+                        placeholder="País" autocomplete="off" />
                 </div>
                 <div class="form-group">
                     <label>Departamento *</label>
                     <asp:TextBox ID="txtDepartamento" runat="server" CssClass="form-control"
-                        placeholder="Guatemala" autocomplete="off" />
+                        placeholder="Depto" autocomplete="off" />
                 </div>
             </div>
 
@@ -186,12 +185,12 @@
                 <div class="form-group">
                     <label>Municipio *</label>
                     <asp:TextBox ID="txtMunicipio" runat="server" CssClass="form-control"
-                        placeholder="Guatemala" autocomplete="off" />
+                        placeholder="Municipio" autocomplete="off" />
                 </div>
                 <div class="form-group">
                     <label>Zona *</label>
                     <asp:TextBox ID="txtZona" runat="server" CssClass="form-control"
-                        placeholder="Zona 1" autocomplete="off" />
+                        placeholder="Zona 00" autocomplete="off" />
                 </div>
             </div>
 
@@ -199,12 +198,12 @@
                 <div class="form-group">
                     <label>Dirección *</label>
                     <asp:TextBox ID="txtDireccion" runat="server" CssClass="form-control"
-                        placeholder="1 Calle 1-23" autocomplete="off" />
+                        placeholder="Calle 00-00" autocomplete="off" />
                 </div>
                 <div class="form-group">
                     <label>Código Postal *</label>
                     <asp:TextBox ID="txtCodigoPostal" runat="server" CssClass="form-control"
-                        placeholder="01001" autocomplete="off" />
+                        placeholder="00000" autocomplete="off" />
                 </div>
             </div>
 

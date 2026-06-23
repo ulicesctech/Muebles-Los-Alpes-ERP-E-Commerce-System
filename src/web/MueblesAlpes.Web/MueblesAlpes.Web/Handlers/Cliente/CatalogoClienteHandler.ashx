@@ -49,13 +49,20 @@ Public Class CatalogoClienteHandler
         Return defecto
     End Function
 
+    ' Construye la URL absoluta de la foto del producto
+    Private Function GetFotoUrl(context As HttpContext, referencia As String) As String
+        Dim baseUrl As String = context.Request.Url.GetLeftPart(UriPartial.Authority)
+        Return baseUrl & "/Handlers/CatalogoInventario/FotoProductoHandler.ashx?ref=" & Uri.EscapeDataString(referencia)
+    End Function
+
     Private Sub ListarProductos(context As HttpContext)
         Dim dt As DataTable = CatalogoClienteService.Listar()
         Dim lst As New List(Of Object)
 
         For Each row As DataRow In dt.Rows
+            Dim ref As String = Valor(row, "PRO_REFERENCIA", "").ToString()
             lst.Add(New With {
-                .PRO_REFERENCIA = Valor(row, "PRO_REFERENCIA", ""),
+                .PRO_REFERENCIA = ref,
                 .PRO_NOMBRE = Valor(row, "PRO_NOMBRE", ""),
                 .PRO_DESCRIPCION = Valor(row, "PRO_DESCRIPCION", ""),
                 .PRO_PRECIO = Valor(row, "PRO_PRECIO", 0),
@@ -66,7 +73,8 @@ Public Class CatalogoClienteHandler
                 .MAT_DESCRIPCION = Valor(row, "MAT_DESCRIPCION", ""),
                 .PROM_PORCENTAJE = Valor(row, "PROM_PORCENTAJE", Nothing),
                 .CAMP_NOMBRE = Valor(row, "CAMP_NOMBRE", ""),
-                .STO_DISPONIBLE = Valor(row, "STO_DISPONIBLE", 0)
+                .STO_DISPONIBLE = Valor(row, "STO_DISPONIBLE", 0),
+                .FOTO_URL = GetFotoUrl(context, ref)
             })
         Next
 
@@ -99,8 +107,9 @@ Public Class CatalogoClienteHandler
         Dim lst As New List(Of Object)
 
         For Each row As DataRow In dt.Rows
+            Dim ref As String = Valor(row, "PRO_REFERENCIA", "").ToString()
             lst.Add(New With {
-                .PRO_REFERENCIA = Valor(row, "PRO_REFERENCIA", ""),
+                .PRO_REFERENCIA = ref,
                 .PRO_NOMBRE = Valor(row, "PRO_NOMBRE", ""),
                 .PRO_DESCRIPCION = Valor(row, "PRO_DESCRIPCION", ""),
                 .PRO_PRECIO = Valor(row, "PRO_PRECIO", 0),
@@ -111,7 +120,8 @@ Public Class CatalogoClienteHandler
                 .MAT_DESCRIPCION = Valor(row, "MAT_DESCRIPCION", ""),
                 .PROM_PORCENTAJE = Valor(row, "PROM_PORCENTAJE", Nothing),
                 .CAMP_NOMBRE = Valor(row, "CAMP_NOMBRE", ""),
-                .STO_DISPONIBLE = Valor(row, "STO_DISPONIBLE", 0)
+                .STO_DISPONIBLE = Valor(row, "STO_DISPONIBLE", 0),
+                .FOTO_URL = GetFotoUrl(context, ref)
             })
         Next
 
@@ -157,7 +167,8 @@ Public Class CatalogoClienteHandler
                 .MAT_DESCRIPCION = Valor(row, "MAT_DESCRIPCION", ""),
                 .PROM_PORCENTAJE = Valor(row, "PROM_PORCENTAJE", Nothing),
                 .CAMP_NOMBRE = Valor(row, "CAMP_NOMBRE", ""),
-                .STO_DISPONIBLE = Valor(row, "STO_DISPONIBLE", 0)
+                .STO_DISPONIBLE = Valor(row, "STO_DISPONIBLE", 0),
+                .FOTO_URL = GetFotoUrl(context, ref)
             }
         }))
     End Sub
@@ -167,8 +178,9 @@ Public Class CatalogoClienteHandler
         Dim lst As New List(Of Object)
 
         For Each row As DataRow In dt.Rows
+            Dim ref As String = Valor(row, "PRO_REFERENCIA", "").ToString()
             lst.Add(New With {
-                .PRO_REFERENCIA = Valor(row, "PRO_REFERENCIA", ""),
+                .PRO_REFERENCIA = ref,
                 .PRO_NOMBRE = Valor(row, "PRO_NOMBRE", ""),
                 .PRO_DESCRIPCION = Valor(row, "PRO_DESCRIPCION", ""),
                 .PRO_PRECIO = Valor(row, "PRO_PRECIO", 0),
@@ -179,7 +191,8 @@ Public Class CatalogoClienteHandler
                 .MAT_DESCRIPCION = Valor(row, "MAT_DESCRIPCION", ""),
                 .PROM_PORCENTAJE = Valor(row, "PROM_PORCENTAJE", Nothing),
                 .CAMP_NOMBRE = Valor(row, "CAMP_NOMBRE", ""),
-                .STO_DISPONIBLE = Valor(row, "STO_DISPONIBLE", 0)
+                .STO_DISPONIBLE = Valor(row, "STO_DISPONIBLE", 0),
+                .FOTO_URL = GetFotoUrl(context, ref)
             })
         Next
 
