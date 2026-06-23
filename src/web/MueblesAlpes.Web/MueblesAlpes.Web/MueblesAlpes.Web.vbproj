@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -46,13 +45,101 @@
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Antlr3.Runtime, Version=3.5.0.2, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.FriendlyUrls, Version=1.0.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.FriendlyUrls.Core.1.0.2\lib\net45\Microsoft.AspNet.FriendlyUrls.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Web.Optimization.WebForms, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.WebForms.1.1.3\lib\net45\Microsoft.AspNet.Web.Optimization.WebForms.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=10.0.0.7, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.10.0.7\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=4.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.4.1.0\lib\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.ScriptManager.MSAjax, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.ScriptManager.MSAjax.5.0.0\lib\net45\Microsoft.ScriptManager.MSAjax.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.ScriptManager.WebForms, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.ScriptManager.WebForms.5.0.0\lib\net45\Microsoft.ScriptManager.WebForms.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.2.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Oracle.ManagedDataAccess, Version=4.122.23.1, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
+      <HintPath>..\packages\Oracle.ManagedDataAccess.23.26.200\lib\net472\Oracle.ManagedDataAccess.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.6.1\lib\net462\System.Buffers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Collections.Immutable, Version=10.0.0.3, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Collections.Immutable.10.0.3\lib\net462\System.Collections.Immutable.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=6.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.6.0.2\lib\net461\System.Diagnostics.DiagnosticSource.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Core" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Formats.Asn1, Version=8.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Formats.Asn1.8.0.1\lib\net462\System.Formats.Asn1.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.IO.Pipelines, Version=10.0.0.7, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.Pipelines.10.0.7\lib\net462\System.IO.Pipelines.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.6.3\lib\net462\System.Memory.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.6.1\lib\net462\System.Numerics.Vectors.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.1.2\lib\net462\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Text.Encodings.Web, Version=10.0.0.7, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encodings.Web.10.0.7\lib\net462\System.Text.Encodings.Web.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Text.Json, Version=10.0.0.7, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Json.10.0.7\lib\net462\System.Text.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.6.3\lib\net462\System.Threading.Tasks.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ValueTuple" />
     <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Optimization, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.1.3\lib\net40\System.Web.Optimization.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
@@ -62,41 +149,9 @@
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
-    <Reference Include="Microsoft.Web.Infrastructure, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.Web.Infrastructure.2.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.ScriptManager.MSAjax">
-      <HintPath>..\packages\Microsoft.AspNet.ScriptManager.MSAjax.5.0.0\lib\net45\Microsoft.ScriptManager.MSAjax.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.ScriptManager.WebForms">
-      <HintPath>..\packages\Microsoft.AspNet.ScriptManager.WebForms.5.0.0\lib\net45\Microsoft.ScriptManager.WebForms.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.Optimization, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.1.3\lib\net40\System.Web.Optimization.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="WebGrease">
-      <Private>True</Private>
+    <Reference Include="WebGrease, Version=1.6.5135.21930, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
-    </Reference>
-    <Reference Include="Antlr3.Runtime">
       <Private>True</Private>
-      <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.Web.Optimization.WebForms">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.WebForms.1.1.3\lib\net45\Microsoft.AspNet.Web.Optimization.WebForms.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.FriendlyUrls">
-      <HintPath>..\packages\Microsoft.AspNet.FriendlyUrls.Core.1.0.2\lib\net45\Microsoft.AspNet.FriendlyUrls.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform">
-      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -124,7 +179,9 @@
     <Import Include="System.Web.UI.HtmlControls" />
   </ItemGroup>
   <ItemGroup>
+    <!-- PAGINAS RAIZ -->
     <Content Include="About.aspx" />
+    <Content Include="App_Data\seguridad.log" />
     <Content Include="Contact.aspx" />
     <Content Include="Content\bootstrap-grid.css" />
     <Content Include="Content\bootstrap-grid.min.css" />
@@ -142,22 +199,71 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
-    <Content Include="Content\Site.css" />
     <Content Include="Default.aspx" />
-    <Content Include="favicon.ico" />
+    <Content Include="ErrorLimite.aspx" />
     <Content Include="Global.asax" />
+    <Content Include="favicon.ico" />
+    <Content Include="Handlers\CatalogoInventario\AlmacenesHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\CategoriasHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\FotoProductoHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\HistorialPreciosHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\MaterialesHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\NicAlmHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\NichoHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\ProductosHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\StockHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\TiposHandler.ashx" />
+    <Content Include="Handlers\VentasFacturacion\CarritoHandler.ashx" />
+    <Content Include="Handlers\VentasFacturacion\FacturaHandler.ashx" />
+    <Content Include="Images\no-foto.png" />
+    <Content Include="Modules\AuthUsuarios\Admin\GrupoUsuario.aspx" />
+    <Content Include="Modules\AuthUsuarios\Admin\Permisos.aspx" />
+    <Content Include="Modules\AuthUsuarios\Ascensos.aspx" />
+    <Content Include="Modules\AuthUsuarios\Clientes.aspx" />
+    <Content Include="Modules\AuthUsuarios\Empleados.aspx" />
+    <Content Include="Modules\AuthUsuarios\LoginCliente.aspx" />
+    <Content Include="Modules\AuthUsuarios\LoginEmpleado.aspx" />
+    <Content Include="Modules\AuthUsuarios\Puestos.aspx" />
+    <Content Include="Modules\CatalogoInventario\Precios.aspx" />
+    <Content Include="Modules\CatalogoInventario\Promociones.aspx" />
+    <Content Include="Modules\CatalogoInventario\Stock.aspx" />
+    <Content Include="Modules\Cliente\Carrito.aspx" />
+    <Content Include="Modules\Cliente\Catalogo.aspx" />
+    <Content Include="Modules\Cliente\DetalleProducto.aspx" />
+    <Content Include="Modules\Cliente\Factura.aspx" />
+    <Content Include="Modules\Cliente\Login.aspx" />
+    <Content Include="Modules\Cliente\MiPerfil.aspx" />
+    <Content Include="Modules\Cliente\MisCompras.aspx" />
+    <Content Include="Modules\Cliente\Promociones.aspx" />
+    <Content Include="Modules\Cliente\Registro.aspx" />
+    <Content Include="Modules\Cliente\Tiendas.aspx" />
+    <Content Include="Modules\Marketing\Campana.aspx" />
+    <Content Include="Modules\Marketing\CostosADS.aspx" />
+    <Content Include="Modules\Reporteria\Gerencial\ReporteInventario.aspx" />
+    <Content Include="Modules\Reporteria\Gerencial\ReporteVentas.aspx" />
+    <Content Include="Modules\Reporteria\Marketing\ReporteMarketing.aspx" />
+    <Content Include="Content\css\.gitkeep" />
+    <Content Include="Content\img\.gitkeep" />
+    <Content Include="Content\js\.gitkeep" />
+    <Content Include="Handlers\ComprasProveedor\PedidoHandler.ashx" />
+    <Content Include="Handlers\ComprasProveedor\DetallePedidoHandler.ashx" />
+    <Content Include="Handlers\ComprasProveedor\FacturaProveedorHandler.ashx" />
+    <Content Include="Handlers\ComprasProveedor\OrdenDetallePedidoHandler.ashx" />
+    <Content Include="Handlers\ComprasProveedor\ReclamoProveedorHandler.ashx" />
+    <Content Include="Handlers\VentasFacturacion\HistorialPrecioVentaHandler.ashx" />
+    <Content Include="Handlers\CatalogoInventario\PromocionesHandler.ashx" />
+    <Content Include="Handlers\Cliente\CatalogoClienteHandler.ashx" />
+    <Content Include="Handlers\Cliente\CarritoClienteHandler.ashx" />
+    <Content Include="Handlers\Cliente\FacturaClienteHandler.ashx" />
+    <Content Include="Handlers\Cliente\PerfilClienteHandler.ashx" />
+    <Content Include="Handlers\Auth\AuthHandler.ashx" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
     <Content Include="Scripts\bootstrap.esm.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <Content Include="Scripts\bootstrap.min.js.map" />
-    <Content Include="Scripts\bootstrap.js.map" />
-    <Content Include="Scripts\bootstrap.esm.min.js.map" />
-    <Content Include="Scripts\bootstrap.esm.js.map" />
-    <Content Include="Scripts\bootstrap.bundle.min.js.map" />
-    <Content Include="Scripts\bootstrap.bundle.js.map" />
+    <Content Include="Scripts\global-buttons.js" />
     <Content Include="Content\bootstrap.rtl.min.css.map" />
     <Content Include="Content\bootstrap.rtl.css.map" />
     <Content Include="Content\bootstrap.min.css.map" />
@@ -174,11 +280,32 @@
     <Content Include="Content\bootstrap-grid.rtl.css.map" />
     <Content Include="Content\bootstrap-grid.min.css.map" />
     <Content Include="Content\bootstrap-grid.css.map" />
+    <None Include="Oracle.DataAccess.Common.Configuration.Section.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Oracle.ManagedDataAccess.Client.Configuration.Section.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
+    <Content Include="Scripts\bootstrap.min.js.map" />
+    <Content Include="Scripts\bootstrap.js.map" />
+    <Content Include="Scripts\bootstrap.esm.min.js.map" />
+    <Content Include="Scripts\bootstrap.esm.js.map" />
+    <Content Include="Scripts\bootstrap.bundle.min.js.map" />
+    <Content Include="Scripts\bootstrap.bundle.js.map" />
     <None Include="Scripts\jquery-3.7.0.intellisense.js" />
     <Content Include="Scripts\jquery-3.7.0.js" />
     <Content Include="Scripts\jquery-3.7.0.min.js" />
     <Content Include="Scripts\jquery-3.7.0.slim.js" />
     <Content Include="Scripts\jquery-3.7.0.slim.min.js" />
+    <Content Include="Scripts\jquery-3.7.0.slim.min.map" />
+    <Content Include="Scripts\jquery-3.7.0.min.map" />
+    <None Include="Scripts\jquery-3.7.1.intellisense.js" />
+    <Content Include="Scripts\jquery-3.7.1.js" />
+    <Content Include="Scripts\jquery-3.7.1.min.js" />
+    <Content Include="Scripts\jquery-3.7.1.slim.js" />
+    <Content Include="Scripts\jquery-3.7.1.slim.min.js" />
+    <Content Include="Bundle.config" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Scripts\WebForms\DetailsView.js" />
     <Content Include="Scripts\WebForms\Focus.js" />
@@ -201,18 +328,189 @@
     <Content Include="Scripts\WebForms\WebForms.js" />
     <Content Include="Scripts\WebForms\WebParts.js" />
     <Content Include="Scripts\WebForms\WebUIValidation.js" />
-    <Content Include="Web.config" />
-    <Content Include="Bundle.config" />
+    <Content Include="Site.Master" />
+    <Content Include="Site.Mobile.Master" />
+    <Content Include="ViewSwitcher.ascx" />
+    <Content Include="Modules\AuthUsuarios\Index.aspx" />
+    <Content Include="Modules\CatalogoInventario\Almacenes.aspx" />
+    <Content Include="Modules\CatalogoInventario\Categorias.aspx" />
+    <Content Include="Modules\CatalogoInventario\Index.aspx" />
+    <Content Include="Modules\CatalogoInventario\Materiales.aspx" />
+    <Content Include="Modules\CatalogoInventario\Nichos.aspx" />
+    <Content Include="Modules\CatalogoInventario\Productos.aspx" />
+    <Content Include="Modules\CatalogoInventario\Tipos.aspx" />
+    <Content Include="Modules\ComprasProveedor\FacturasProveedor.aspx" />
+    <Content Include="Modules\ComprasProveedor\Index.aspx" />
+    <Content Include="Modules\ComprasProveedor\OrdenesCompra.aspx" />
+    <Content Include="Modules\ComprasProveedor\Pedidos.aspx" />
+    <Content Include="Modules\ComprasProveedor\Proveedores.aspx" />
+    <Content Include="Modules\ComprasProveedor\ReclamosProveedor.aspx" />
+    <Content Include="Modules\VentasFacturacion\Carrito.aspx" />
+    <Content Include="Modules\VentasFacturacion\DetalleCarrito.aspx" />
+    <Content Include="Modules\VentasFacturacion\Factura.aspx" />
+    <Content Include="Modules\VentasFacturacion\HistorialPrecioVenta.aspx" />
+    <Content Include="Modules\VentasFacturacion\Index.aspx" />
+    <Content Include="Modules\AuthUsuarios\.gitkeep" />
+    <Content Include="Modules\CatalogoInventario\.gitkeep" />
+    <Content Include="Modules\ComprasProveedor\.gitkeep" />
+    <Content Include="Modules\VentasFacturacion\.gitkeep" />
+    <Content Include="Modules\Cliente\.gitkeep" />
+    <Content Include="App_Code\Models\.gitkeep" />
+    <Content Include="App_Code\Services\.gitkeep" />
+    <Content Include="App_Code\Utils\.gitkeep" />
+    <Content Include="App_Code\Common\.gitkeep" />
+    <Content Include="App_Code\Data\.gitkeep" />
+    <Content Include="App_Code\Services\Cliente\.gitkeep" />
+    <Content Include="bin\Antlr3.Runtime.dll" />
+    <Content Include="bin\Antlr3.Runtime.pdb" />
+    <Content Include="bin\Microsoft.AspNet.FriendlyUrls.dll" />
+    <Content Include="bin\Microsoft.AspNet.FriendlyUrls.xml" />
+    <Content Include="bin\Microsoft.AspNet.Web.Optimization.WebForms.dll" />
+    <Content Include="bin\Microsoft.Bcl.AsyncInterfaces.dll" />
+    <Content Include="bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll" />
+    <Content Include="bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml" />
+    <Content Include="bin\Microsoft.ScriptManager.MSAjax.dll" />
+    <Content Include="bin\Microsoft.ScriptManager.WebForms.dll" />
+    <Content Include="bin\Microsoft.Web.Infrastructure.dll" />
+    <Content Include="bin\MueblesAlpes.Web.dll" />
+    <Content Include="bin\MueblesAlpes.Web.pdb" />
+    <Content Include="bin\Newtonsoft.Json.dll" />
+    <Content Include="bin\Newtonsoft.Json.xml" />
+    <Content Include="bin\Oracle.ManagedDataAccess.dll" />
+    <Content Include="bin\System.Buffers.dll" />
+    <Content Include="bin\System.Diagnostics.DiagnosticSource.dll" />
+    <Content Include="bin\System.Formats.Asn1.dll" />
+    <Content Include="bin\System.Memory.dll" />
+    <Content Include="bin\System.Numerics.Vectors.dll" />
+    <Content Include="bin\System.Runtime.CompilerServices.Unsafe.dll" />
+    <Content Include="bin\System.Text.Encodings.Web.dll" />
+    <Content Include="bin\System.Text.Json.dll" />
+    <Content Include="bin\System.Threading.Tasks.Extensions.dll" />
+    <Content Include="bin\System.ValueTuple.dll" />
+    <Content Include="bin\System.Web.Optimization.dll" />
+    <Content Include="bin\System.Web.Optimization.xml" />
+    <Content Include="bin\WebForms_Basic.xml" />
+    <Content Include="bin\WebGrease.dll" />
+    <Content Include="bin\roslyn\csc.exe" />
+    <Content Include="bin\roslyn\csi.exe" />
+    <Content Include="bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll" />
+    <Content Include="bin\roslyn\Microsoft.CodeAnalysis.CSharp.dll" />
+    <Content Include="bin\roslyn\Microsoft.CodeAnalysis.CSharp.Scripting.dll" />
+    <Content Include="bin\roslyn\Microsoft.CodeAnalysis.dll" />
+    <Content Include="bin\roslyn\Microsoft.CodeAnalysis.Scripting.dll" />
+    <Content Include="bin\roslyn\Microsoft.CodeAnalysis.VisualBasic.dll" />
+    <Content Include="bin\roslyn\Microsoft.DiaSymReader.Native.amd64.dll" />
+    <Content Include="bin\roslyn\Microsoft.DiaSymReader.Native.x86.dll" />
+    <Content Include="bin\roslyn\Microsoft.Win32.Primitives.dll" />
+    <Content Include="bin\roslyn\System.AppContext.dll" />
+    <Content Include="bin\roslyn\System.Collections.Immutable.dll" />
+    <Content Include="bin\roslyn\System.Console.dll" />
+    <Content Include="bin\roslyn\System.Diagnostics.DiagnosticSource.dll" />
+    <Content Include="bin\roslyn\System.Diagnostics.FileVersionInfo.dll" />
+    <Content Include="bin\roslyn\System.Diagnostics.StackTrace.dll" />
+    <Content Include="bin\roslyn\System.Globalization.Calendars.dll" />
+    <Content Include="bin\roslyn\System.IO.Compression.dll" />
+    <Content Include="bin\roslyn\System.IO.Compression.ZipFile.dll" />
+    <Content Include="bin\roslyn\System.IO.FileSystem.dll" />
+    <Content Include="bin\roslyn\System.IO.FileSystem.Primitives.dll" />
+    <Content Include="bin\roslyn\System.Net.Http.dll" />
+    <Content Include="bin\roslyn\System.Net.Sockets.dll" />
+    <Content Include="bin\roslyn\System.Reflection.Metadata.dll" />
+    <Content Include="bin\roslyn\System.Runtime.InteropServices.RuntimeInformation.dll" />
+    <Content Include="bin\roslyn\System.Security.Cryptography.Algorithms.dll" />
+    <Content Include="bin\roslyn\System.Security.Cryptography.Encoding.dll" />
+    <Content Include="bin\roslyn\System.Security.Cryptography.Primitives.dll" />
+    <Content Include="bin\roslyn\System.Security.Cryptography.X509Certificates.dll" />
+    <Content Include="bin\roslyn\System.Text.Encoding.CodePages.dll" />
+    <Content Include="bin\roslyn\System.Threading.Tasks.Extensions.dll" />
+    <Content Include="bin\roslyn\System.ValueTuple.dll" />
+    <Content Include="bin\roslyn\System.Xml.ReaderWriter.dll" />
+    <Content Include="bin\roslyn\System.Xml.XmlDocument.dll" />
+    <Content Include="bin\roslyn\System.Xml.XPath.dll" />
+    <Content Include="bin\roslyn\System.Xml.XPath.XDocument.dll" />
+    <Content Include="bin\roslyn\vbc.exe" />
+    <Content Include="bin\roslyn\VBCSCompiler.exe" />
+    <Content Include="bin\roslyn\csc.exe.config" />
+    <Content Include="bin\roslyn\csc.rsp" />
+    <Content Include="bin\roslyn\csi.exe.config" />
+    <Content Include="bin\roslyn\csi.rsp" />
+    <Content Include="bin\roslyn\Microsoft.CSharp.Core.targets" />
+    <Content Include="bin\roslyn\Microsoft.Managed.Core.targets" />
+    <Content Include="bin\roslyn\Microsoft.VisualBasic.Core.targets" />
+    <Content Include="bin\roslyn\vbc.exe.config" />
+    <Content Include="bin\roslyn\vbc.rsp" />
+    <Content Include="bin\roslyn\VBCSCompiler.exe.config" />
+    <Content Include="Content\Site.css" />
+    <Content Include="obj\Debug\MueblesAlpes.Web.dll" />
+    <Content Include="obj\Debug\MueblesAlpes.Web.pdb" />
+    <Content Include="obj\Debug\MueblesAlpes.Web.vbproj.FileListAbsolute.txt" />
+    <Content Include="obj\Debug\TempPE\My Project.Resources.Designer.vb.dll" />
+    <Content Include="obj\Debug\WebForms_Basic.xml" />
+    <Content Include="obj\Debug\DesignTimeResolveAssemblyReferences.cache" />
+    <Content Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
+    <Content Include="obj\Debug\MueblesA.73C4537B.Up2Date" />
+    <Content Include="obj\Debug\MueblesAlpes.Web.vbproj.AssemblyReference.cache" />
+    <Content Include="obj\Debug\MueblesAlpes.Web.vbproj.CoreCompileInputs.cache" />
+    <Content Include="obj\Debug\MueblesAlpes.Web.vbproj.GenerateResource.cache" />
+    <Content Include="obj\Release\MueblesAlpes.Web.vbproj.AssemblyReference.cache" />
+    <Content Include="Scripts\jquery-3.7.1.slim.min.map" />
+    <Content Include="Scripts\jquery-3.7.1.min.map" />
+    <None Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </None>
   </ItemGroup>
   <ItemGroup>
+    <!-- SERVICES -->
+    <Compile Include="App_Code\Data\OracleDb.vb" />
+    <Content Include="App_Code\Segurity\SecurityGuard.vb" />
+    <Compile Include="App_Code\Services\AuthUsuarios\AscensoService.vb" />
+    <Compile Include="App_Code\Services\AuthUsuarios\ClienteService.vb" />
+    <Compile Include="App_Code\Services\AuthUsuarios\EmpleadoService.vb" />
+    <Compile Include="App_Code\Services\AuthUsuarios\GrupoUsuarioService.vb" />
+    <Compile Include="App_Code\Services\AuthUsuarios\LoginClienteService.vb" />
+    <Compile Include="App_Code\Services\AuthUsuarios\LoginEmpleadoService.vb" />
+    <Compile Include="App_Code\Services\AuthUsuarios\PermisoService.vb" />
+    <Compile Include="App_Code\Services\AuthUsuarios\PuestoService.vb" />
+    <Compile Include="App_Code\Services\CatalogoInventario\AlmacenService.vb" />
+    <Compile Include="App_Code\Services\CatalogoInventario\CategoriaService.vb" />
+    <Compile Include="App_Code\Services\CatalogoInventario\HistorialPrecioService.vb" />
+    <Compile Include="App_Code\Services\CatalogoInventario\MaterialService.vb" />
+    <Compile Include="App_Code\Services\CatalogoInventario\NicAlmService.vb" />
+    <Compile Include="App_Code\Services\CatalogoInventario\NichoService.vb" />
+    <Compile Include="App_Code\Services\CatalogoInventario\ProductoService.vb" />
+    <Compile Include="App_Code\Services\CatalogoInventario\PromocionService.vb" />
+    <Compile Include="App_Code\Services\CatalogoInventario\StockService.vb" />
+    <Compile Include="App_Code\Services\CatalogoInventario\TipoService.vb" />
+    <Compile Include="App_Code\Services\Cliente\AuthClienteService.vb" />
+    <Compile Include="App_Code\Services\Cliente\CarritoService.vb" />
+    <Compile Include="App_Code\Services\Cliente\CatalogoClienteService.vb" />
+    <Compile Include="App_Code\Services\Cliente\FacturaClienteService.vb" />
+    <Compile Include="App_Code\Services\ComprasProveedor\DetallePedidoService.vb" />
+    <Compile Include="App_Code\Services\ComprasProveedor\FacturaProveedorService.vb" />
+    <Compile Include="App_Code\Services\ComprasProveedor\OrdenCompraService.vb" />
+    <Compile Include="App_Code\Services\ComprasProveedor\OrdenDetallePedidoService.vb" />
+    <Compile Include="App_Code\Services\ComprasProveedor\PedidoService.vb" />
+    <Compile Include="App_Code\Services\ComprasProveedor\ProveedorService.vb" />
+    <Compile Include="App_Code\Services\ComprasProveedor\ReclamoProveedorService.vb" />
+    <Compile Include="App_Code\Services\VentasFacturacion\CarritoService.vb" />
+    <Compile Include="App_Code\Services\VentasFacturacion\FacturaService.vb" />
+    <Compile Include="App_Code\Services\VentasFacturacion\HistorialPrecioVentaService.vb" />
+    <!-- APP START -->
     <Compile Include="App_Start\BundleConfig.vb" />
     <Compile Include="App_Start\RouteConfig.vb" />
+    <!-- RAIZ -->
     <Compile Include="About.aspx.designer.vb">
       <DependentUpon>About.aspx</DependentUpon>
     </Compile>
     <Compile Include="About.aspx.vb">
       <DependentUpon>About.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="BasePage.vb">
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Contact.aspx.designer.vb">
       <DependentUpon>Contact.aspx</DependentUpon>
@@ -228,28 +526,199 @@
     <Compile Include="Default.aspx.designer.vb">
       <DependentUpon>Default.aspx</DependentUpon>
     </Compile>
+    <Compile Include="ErrorLimite.aspx.designer.vb">
+      <DependentUpon>ErrorLimite.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ErrorLimite.aspx.vb">
+      <DependentUpon>ErrorLimite.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="Global.asax.vb">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="My Project\AssemblyInfo.vb" />
-    <Compile Include="My Project\Application.Designer.vb">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Application.myapp</DependentUpon>
+    <Compile Include="Modules\AuthUsuarios\Admin\GrupoUsuario.aspx.designer.vb">
+      <DependentUpon>GrupoUsuario.aspx</DependentUpon>
     </Compile>
-    <Compile Include="My Project\MyExtensions\MyWebExtension.vb">
-      <VBMyExtensionTemplateID>Microsoft.VisualBasic.Web.MyExtension</VBMyExtensionTemplateID>
-      <VBMyExtensionTemplateVersion>1.0.0.0</VBMyExtensionTemplateVersion>
+    <Compile Include="Modules\AuthUsuarios\Admin\GrupoUsuario.aspx.vb">
+      <DependentUpon>GrupoUsuario.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="My Project\Resources.Designer.vb">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
+    <Compile Include="Modules\AuthUsuarios\Admin\Permisos.aspx.designer.vb">
+      <DependentUpon>Permisos.aspx</DependentUpon>
     </Compile>
-    <Compile Include="My Project\Settings.Designer.vb">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    <Compile Include="Modules\AuthUsuarios\Admin\Permisos.aspx.vb">
+      <DependentUpon>Permisos.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="Modules\AuthUsuarios\Ascensos.aspx.designer.vb">
+      <DependentUpon>Ascensos.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\Ascensos.aspx.vb">
+      <DependentUpon>Ascensos.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\Clientes.aspx.designer.vb">
+      <DependentUpon>Clientes.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\Clientes.aspx.vb">
+      <DependentUpon>Clientes.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\Empleados.aspx.designer.vb">
+      <DependentUpon>Empleados.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\Empleados.aspx.vb">
+      <DependentUpon>Empleados.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\LoginCliente.aspx.designer.vb">
+      <DependentUpon>LoginCliente.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\LoginCliente.aspx.vb">
+      <DependentUpon>LoginCliente.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\LoginEmpleado.aspx.designer.vb">
+      <DependentUpon>LoginEmpleado.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\LoginEmpleado.aspx.vb">
+      <DependentUpon>LoginEmpleado.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\Puestos.aspx.designer.vb">
+      <DependentUpon>Puestos.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\Puestos.aspx.vb">
+      <DependentUpon>Puestos.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Precios.aspx.designer.vb">
+      <DependentUpon>Precios.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Precios.aspx.vb">
+      <DependentUpon>Precios.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Promociones.aspx.designer.vb">
+      <DependentUpon>Promociones.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Promociones.aspx.vb">
+      <DependentUpon>Promociones.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Stock.aspx.designer.vb">
+      <DependentUpon>Stock.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Stock.aspx.vb">
+      <DependentUpon>Stock.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Cliente\Carrito.aspx.designer.vb">
+      <DependentUpon>Carrito.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Cliente\Carrito.aspx.vb">
+      <DependentUpon>Carrito.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Cliente\Catalogo.aspx.designer.vb">
+      <DependentUpon>Catalogo.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Cliente\Catalogo.aspx.vb">
+      <DependentUpon>Catalogo.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Cliente\DetalleProducto.aspx.designer.vb">
+      <DependentUpon>DetalleProducto.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Cliente\DetalleProducto.aspx.vb">
+      <DependentUpon>DetalleProducto.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Cliente\Factura.aspx.designer.vb">
+      <DependentUpon>Factura.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Cliente\Factura.aspx.vb">
+      <DependentUpon>Factura.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Cliente\Login.aspx.designer.vb">
+      <DependentUpon>Login.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Cliente\Login.aspx.vb">
+      <DependentUpon>Login.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Cliente\MiPerfil.aspx.designer.vb">
+      <DependentUpon>MiPerfil.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Cliente\MiPerfil.aspx.vb">
+      <DependentUpon>MiPerfil.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Cliente\MisCompras.aspx.designer.vb">
+      <DependentUpon>MisCompras.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Cliente\MisCompras.aspx.vb">
+      <DependentUpon>MisCompras.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Cliente\Promociones.aspx.designer.vb">
+      <DependentUpon>Promociones.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Cliente\Promociones.aspx.vb">
+      <DependentUpon>Promociones.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Cliente\Registro.aspx.designer.vb">
+      <DependentUpon>Registro.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Cliente\Registro.aspx.vb">
+      <DependentUpon>Registro.aspx</DependentUpon>
+      <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Cliente\Tiendas.aspx.designer.vb">
+      <DependentUpon>Tiendas.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Cliente\Tiendas.aspx.vb">
+      <DependentUpon>Tiendas.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Marketing\Campana.aspx.designer.vb">
+      <DependentUpon>Campana.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Marketing\Campana.aspx.vb">
+      <DependentUpon>Campana.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Marketing\CostosADS.aspx.designer.vb">
+      <DependentUpon>CostosADS.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Marketing\CostosADS.aspx.vb">
+      <DependentUpon>CostosADS.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reporteria\Gerencial\ReporteInventario.aspx.designer.vb">
+      <DependentUpon>ReporteInventario.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reporteria\Gerencial\ReporteInventario.aspx.vb">
+      <DependentUpon>ReporteInventario.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reporteria\Gerencial\ReporteVentas.aspx.designer.vb">
+      <DependentUpon>ReporteVentas.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reporteria\Gerencial\ReporteVentas.aspx.vb">
+      <DependentUpon>ReporteVentas.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\Reporteria\Marketing\ReporteMarketing.aspx.designer.vb">
+      <DependentUpon>ReporteMarketing.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Reporteria\Marketing\ReporteMarketing.aspx.vb">
+      <DependentUpon>ReporteMarketing.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="SecurityLogger.vb" />
     <Compile Include="Site.Master.designer.vb">
       <DependentUpon>Site.Master</DependentUpon>
     </Compile>
@@ -271,6 +740,158 @@
     <Compile Include="Site.Mobile.Master.designer.vb">
       <DependentUpon>Site.Mobile.Master</DependentUpon>
     </Compile>
+    <Compile Include="Modules\AuthUsuarios\Index.aspx.designer.vb">
+      <DependentUpon>Index.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\AuthUsuarios\Index.aspx.vb">
+      <DependentUpon>Index.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Almacenes.aspx.designer.vb">
+      <DependentUpon>Almacenes.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Almacenes.aspx.vb">
+      <DependentUpon>Almacenes.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Categorias.aspx.designer.vb">
+      <DependentUpon>Categorias.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Categorias.aspx.vb">
+      <DependentUpon>Categorias.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Index.aspx.designer.vb">
+      <DependentUpon>Index.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Index.aspx.vb">
+      <DependentUpon>Index.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Materiales.aspx.designer.vb">
+      <DependentUpon>Materiales.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Materiales.aspx.vb">
+      <DependentUpon>Materiales.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Nichos.aspx.designer.vb">
+      <DependentUpon>Nichos.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Nichos.aspx.vb">
+      <DependentUpon>Nichos.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Productos.aspx.designer.vb">
+      <DependentUpon>Productos.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Productos.aspx.vb">
+      <DependentUpon>Productos.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Tipos.aspx.designer.vb">
+      <DependentUpon>Tipos.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\CatalogoInventario\Tipos.aspx.vb">
+      <DependentUpon>Tipos.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\ComprasProveedor\FacturasProveedor.aspx.designer.vb">
+      <DependentUpon>FacturasProveedor.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\ComprasProveedor\FacturasProveedor.aspx.vb">
+      <DependentUpon>FacturasProveedor.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\ComprasProveedor\Index.aspx.designer.vb">
+      <DependentUpon>Index.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\ComprasProveedor\Index.aspx.vb">
+      <DependentUpon>Index.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\ComprasProveedor\OrdenesCompra.aspx.designer.vb">
+      <DependentUpon>OrdenesCompra.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\ComprasProveedor\OrdenesCompra.aspx.vb">
+      <DependentUpon>OrdenesCompra.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\ComprasProveedor\Pedidos.aspx.designer.vb">
+      <DependentUpon>Pedidos.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\ComprasProveedor\Pedidos.aspx.vb">
+      <DependentUpon>Pedidos.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\ComprasProveedor\Proveedores.aspx.designer.vb">
+      <DependentUpon>Proveedores.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\ComprasProveedor\Proveedores.aspx.vb">
+      <DependentUpon>Proveedores.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\ComprasProveedor\ReclamosProveedor.aspx.designer.vb">
+      <DependentUpon>ReclamosProveedor.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\ComprasProveedor\ReclamosProveedor.aspx.vb">
+      <DependentUpon>ReclamosProveedor.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\VentasFacturacion\Carrito.aspx.designer.vb">
+      <DependentUpon>Carrito.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\VentasFacturacion\Carrito.aspx.vb">
+      <DependentUpon>Carrito.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\VentasFacturacion\DetalleCarrito.aspx.designer.vb">
+      <DependentUpon>DetalleCarrito.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\VentasFacturacion\DetalleCarrito.aspx.vb">
+      <DependentUpon>DetalleCarrito.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\VentasFacturacion\Factura.aspx.designer.vb">
+      <DependentUpon>Factura.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\VentasFacturacion\Factura.aspx.vb">
+      <DependentUpon>Factura.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\VentasFacturacion\HistorialPrecioVenta.aspx.designer.vb">
+      <DependentUpon>HistorialPrecioVenta.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\VentasFacturacion\HistorialPrecioVenta.aspx.vb">
+      <DependentUpon>HistorialPrecioVenta.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Modules\VentasFacturacion\Index.aspx.designer.vb">
+      <DependentUpon>Index.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\VentasFacturacion\Index.aspx.vb">
+      <DependentUpon>Index.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\MyExtensions\MyWebExtension.vb">
+      <VBMyExtensionTemplateID>Microsoft.VisualBasic.Web.MyExtension</VBMyExtensionTemplateID>
+      <VBMyExtensionTemplateVersion>1.0.0.0</VBMyExtensionTemplateVersion>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -279,8 +900,15 @@
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="obj\Debug\MueblesAlpes.Web.Resources.resources" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Handlers\Cliente\MisComprasHandler.ashx" />
+    <Content Include="Handlers\Reportes\ReporteComprasHandler.ashx" />
+    <Content Include="Handlers\Reportes\ReporteStockHandler.ashx" />
+    <Content Include="Handlers\Reportes\ReporteVentasHandler.ashx" />
+    <Content Include="Handlers\ComprasProveedor\ProveedorHandler.ashx" />
+    <Content Include="Handlers\ComprasProveedor\OrdenCompraHandler.ashx" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
@@ -290,22 +918,11 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
-    <Content Include="Site.Master" />
-    <Content Include="Site.Mobile.Master" />
-    <Content Include="ViewSwitcher.ascx" />
-    <None Include="packages.config" />
-    <Content Include="Scripts\jquery-3.7.0.slim.min.map" />
-    <Content Include="Scripts\jquery-3.7.0.min.map" />
-    <None Include="Web.Debug.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
-    <None Include="Web.Release.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
+    <None Include="bin\MueblesAlpes.Web.dll.config" />
+    <Content Include="Web.config" />
+    <Content Include="Web.config.example" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
@@ -333,7 +950,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>61850</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>https://localhost:44375/</IISUrl>
+          <IISUrl>http://localhost:61850/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
@@ -345,15 +962,11 @@
   </ProjectExtensions>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+      <ErrorText>Este proyecto hace referencia a los paquetes NuGet que faltan en este equipo. Use la restauración de paquetes NuGet para descargarlos. Para obtener más información, consulte http://go.microsoft.com/fwlink/?LinkID=322105. El archivo que falta es {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
+    <Error Condition="!Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.4.1.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.4.1.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets'))" />
   </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
+  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.4.1.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.4.1.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets')" />
 </Project>
